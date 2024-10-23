@@ -229,3 +229,53 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 		}
 	})
 }
+
+// TestUserSessionStorePaginationDefaults tests the default pagination values.
+func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
+	a, ctx := test.New(t)
+
+	usr1 := st.population.NewUser()
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.UserSessionStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement UserSessionStore")
+	}
+	defer s.Close()
+
+	for i := 0; i < 15; i++ {
+		_, err := s.CreateSession(ctx, &ttnpb.UserSession{
+			UserIds:   usr1.GetIds(),
+			SessionId: fmt.Sprintf("SESS%d", i+1),
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		time.Sleep(test.Delay)
+	}
+
+	t.Run("FindSessions_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 0, &total)
+		got, err := s.FindSessions(paginateCtx, usr1.GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 2, &total)
+		got, err = s.FindSessions(paginateCtx, usr1.GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+	})
+}

@@ -23,6 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 - Fix reversed Join Server dev nonce metrics.
 - Identity Server's store runs each migration within a transaction, so a migration's changes are only applied if all of its queries are successful.
   - Identity Server's store now marks a migration as successful after all its operations are finished. Previously it was possible to have a successful migration which not all of its queries were processed.
+- Enforce default page limit on IS List RPCs if a value is not provided in the request.
 
 ### Security
 

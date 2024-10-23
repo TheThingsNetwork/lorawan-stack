@@ -18,11 +18,15 @@ import (
 	"github.com/uptrace/bun"
 	"github.com/uptrace/bun/dialect/pgdialect"
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
+	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
 )
 
 func (is *IdentityServer) setupStore() error {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: is.config.Pagination.DefaultLimit,
+	})
 	return is.setupBunStore()
 }
 

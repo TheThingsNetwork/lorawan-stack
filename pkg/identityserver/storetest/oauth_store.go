@@ -451,3 +451,88 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 		}
 	})
 }
+
+// TestOAuthStorePaginationDefaults tests the default pagination values.
+func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
+	a, ctx := test.New(t)
+
+	usr1 := st.population.NewUser()
+
+	var clients []*ttnpb.Client
+	for i := 0; i < 15; i++ {
+		clients = append(clients, st.population.NewClient(usr1.GetOrganizationOrUserIdentifiers()))
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.OAuthStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement OAuthStore")
+	}
+	defer s.Close()
+
+	for i := 0; i < 15; i++ {
+		_, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
+			UserIds:   usr1.GetIds(),
+			ClientIds: clients[i].GetIds(),
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		time.Sleep(test.Delay)
+	}
+
+	for i := 0; i < 15; i++ {
+		_, err := s.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+			UserIds:   usr1.GetIds(),
+			ClientIds: clients[0].GetIds(),
+			Id:        fmt.Sprintf("TOKEN%d", i+1),
+		}, "")
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+
+		time.Sleep(test.Delay)
+	}
+
+	t.Run("ListAuthorizations_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 0, &total)
+		got, err := s.ListAuthorizations(paginateCtx, usr1.GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 2, &total)
+		got, err = s.ListAuthorizations(paginateCtx, usr1.GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+	})
+
+	t.Run("ListAccessTokens_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 0, &total)
+		got, err := s.ListAccessTokens(paginateCtx, usr1.GetIds(), clients[0].GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(store.WithOrder(ctx, "created_at"), 0, 2, &total)
+		got, err = s.ListAccessTokens(paginateCtx, usr1.GetIds(), clients[0].GetIds())
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+	})
+}

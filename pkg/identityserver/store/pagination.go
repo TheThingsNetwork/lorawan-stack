@@ -20,6 +20,17 @@ import (
 	"strings"
 )
 
+// PaginationDefaults sets default values for paginations options within the IS store.
+type PaginationDefaults struct {
+	DefaultLimit uint32
+}
+
+var paginationDefaults = PaginationDefaults{}
+
+// SetPaginationDefaults should only be called at the initialization of the server, never on regitries or
+// auxiliary functions.
+func SetPaginationDefaults(d PaginationDefaults) { paginationDefaults = d }
+
 type paginationOptionsKeyType struct{}
 
 var paginationOptionsKey paginationOptionsKeyType
@@ -36,6 +47,9 @@ type PaginationOptions struct {
 func WithPagination(ctx context.Context, limit, page uint32, total *uint64) context.Context {
 	if page == 0 {
 		page = 1
+	}
+	if limit == 0 {
+		limit = paginationDefaults.DefaultLimit
 	}
 	return context.WithValue(ctx, paginationOptionsKey, PaginationOptions{
 		limit:  limit,
