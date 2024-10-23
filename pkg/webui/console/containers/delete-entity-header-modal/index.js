@@ -95,8 +95,16 @@ const deletedErrorMessageMap = {
 }
 
 const DeleteEntityHeaderModal = props => {
-  const { entity, entityId, entityName, visible, setVisible, setError, additionalConditions } =
-    props
+  const {
+    entity,
+    entityId,
+    entityName,
+    visible,
+    setVisible,
+    setError,
+    additionalConditions,
+    additionalAction,
+  } = props
 
   const lowerCaseEntity = entity.toLowerCase()
   const [confirmId, setConfirmId] = React.useState('')
@@ -138,6 +146,9 @@ const DeleteEntityHeaderModal = props => {
             if (setError) {
               setError(undefined)
             }
+            if (additionalAction) {
+              await additionalAction()
+            }
             await dispatch(
               attachPromise(
                 deleteEntityActionMap[entity](entityId, { purge: purgeEntity || false }),
@@ -163,7 +174,7 @@ const DeleteEntityHeaderModal = props => {
       }
       setVisible(false)
     },
-    [dispatch, entityId, navigate, purgeEntity, setError, setVisible, entity],
+    [setVisible, setError, additionalAction, dispatch, entity, entityId, purgeEntity, navigate],
   )
 
   const loadData = useCallback(
@@ -266,6 +277,7 @@ const DeleteEntityHeaderModal = props => {
 }
 
 DeleteEntityHeaderModal.propTypes = {
+  additionalAction: PropTypes.func,
   additionalConditions: PropTypes.bool,
   entity: PropTypes.string.isRequired,
   entityId: PropTypes.string.isRequired,
@@ -279,6 +291,7 @@ DeleteEntityHeaderModal.defaultProps = {
   additionalConditions: false,
   entityName: undefined,
   setError: undefined,
+  additionalAction: undefined,
 }
 
 export default DeleteEntityHeaderModal
