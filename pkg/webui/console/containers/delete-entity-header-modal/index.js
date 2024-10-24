@@ -50,7 +50,7 @@ import {
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
 import { deleteApplication } from '@console/store/actions/applications'
-import { deleteGateway } from '@console/store/actions/gateways'
+import { deleteGateway, unclaimGateway } from '@console/store/actions/gateways'
 
 import { selectApiKeysTotalCount } from '@console/store/selectors/api-keys'
 
@@ -102,11 +102,12 @@ const DeleteEntityHeaderModal = props => {
     visible,
     setVisible,
     setError,
-    additionalConditions,
-    additionalAction,
+    isPristine: isPristineProp,
+    supportsClaiming,
   } = props
 
   const lowerCaseEntity = entity.toLowerCase()
+  const isGateway = entity === GATEWAY
   const [confirmId, setConfirmId] = React.useState('')
   const [purgeEntity, setPurgeEntity] = React.useState(false)
   const dispatch = useDispatch()
@@ -122,7 +123,7 @@ const DeleteEntityHeaderModal = props => {
   )
   const hasApiKeys = apiKeysCount > 0
   const hasAddedCollaborators = collaboratorsCount > 1
-  const isPristine = !hasAddedCollaborators && !hasApiKeys && !additionalConditions
+  const isPristine = !hasAddedCollaborators && !hasApiKeys && !isPristineProp
   const mayViewCollaborators = useSelector(state =>
     checkFromState(mayViewOrEditEntityCollaboratorsMap[entity], state),
   )
@@ -146,8 +147,8 @@ const DeleteEntityHeaderModal = props => {
             if (setError) {
               setError(undefined)
             }
-            if (additionalAction) {
-              await additionalAction()
+            if (supportsClaiming && isGateway) {
+              await dispatch(attachPromise(unclaimGateway(entityId)))
             }
             await dispatch(
               attachPromise(
@@ -174,7 +175,17 @@ const DeleteEntityHeaderModal = props => {
       }
       setVisible(false)
     },
-    [setVisible, setError, additionalAction, dispatch, entity, entityId, purgeEntity, navigate],
+    [
+      setVisible,
+      setError,
+      supportsClaiming,
+      isGateway,
+      dispatch,
+      entity,
+      entityId,
+      purgeEntity,
+      navigate,
+    ],
   )
 
   const loadData = useCallback(
@@ -277,21 +288,21 @@ const DeleteEntityHeaderModal = props => {
 }
 
 DeleteEntityHeaderModal.propTypes = {
-  additionalAction: PropTypes.func,
-  additionalConditions: PropTypes.bool,
   entity: PropTypes.string.isRequired,
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
+  isPristine: PropTypes.bool,
   setError: PropTypes.func,
   setVisible: PropTypes.func.isRequired,
+  supportsClaiming: PropTypes.bool,
   visible: PropTypes.bool.isRequired,
 }
 
 DeleteEntityHeaderModal.defaultProps = {
-  additionalConditions: false,
+  isPristine: false,
   entityName: undefined,
   setError: undefined,
-  additionalAction: undefined,
+  supportsClaiming: false,
 }
 
 export default DeleteEntityHeaderModal

@@ -44,7 +44,6 @@ import {
   DELETE_BOOKMARK_BASE,
   deleteBookmark,
 } from '@console/store/actions/user-preferences'
-import { unclaimGateway } from '@console/store/actions/gateways'
 
 import { selectUser } from '@console/store/selectors/user'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
@@ -129,12 +128,6 @@ const GatewayOverviewHeader = ({ gateway }) => {
     </>
   )
 
-  const handleUnclaimGateway = useCallback(async () => {
-    if (supportsClaiming) {
-      await dispatch(attachPromise(unclaimGateway(gateway_id)))
-    }
-  }, [dispatch, gateway_id, supportsClaiming])
-
   return (
     <div className={style.root}>
       <div className="overflow-hidden d-flex flex-column gap-cs-xs">
@@ -173,7 +166,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
           entityName={name}
           setVisible={setDeleteGatewayVisible}
           visible={deleteGatewayVisible}
-          additionalAction={handleUnclaimGateway}
+          supportsClaiming={supportsClaiming}
         />
       </div>
     </div>

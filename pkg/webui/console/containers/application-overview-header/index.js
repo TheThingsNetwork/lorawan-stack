@@ -99,7 +99,6 @@ const ApplicationOverviewHeader = () => {
   const webhooksCount = useSelector(selectWebhooksTotalCount)
   const pubsubsCount = useSelector(selectPubsubsTotalCount)
   const hasIntegrations = webhooksCount > 0 || pubsubsCount > 0
-  const additionalCondition = hasIntegrations
   const mayViewDevices = useSelector(state => checkFromState(mayViewApplicationDevices, state))
   const devicesTotalCount = useSelector(state =>
     selectApplicationDeviceCount(state, application_id),
@@ -249,7 +248,7 @@ const ApplicationOverviewHeader = () => {
             entityName={name}
             setVisible={setDeleteApplicationModalVisible}
             visible={deleteApplicationModalVisible}
-            additionalConditions={additionalCondition}
+            isPristine={hasIntegrations}
           />
         </RequireRequest>
       </div>

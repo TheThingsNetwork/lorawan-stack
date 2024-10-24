@@ -13,7 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import { GATEWAY } from '@console/constants/entities'
 
@@ -38,12 +38,9 @@ import Require from '@console/lib/components/require'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
-import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
 import { encodeAttributes, decodeAttributes } from '@console/lib/attributes'
 import { checkFromState, mayDeleteGateway } from '@console/lib/feature-checks'
-
-import { unclaimGateway } from '@console/store/actions/gateways'
 
 import { selectIsConfiguration } from '@console/store/selectors/identity-server'
 import { selectUserId } from '@console/store/selectors/user'
@@ -79,8 +76,6 @@ const BasicSettingsForm = React.memo(props => {
   const [error, setError] = React.useState(undefined)
   const [deleteGtwVisible, setDeleteGtwVisible] = React.useState(false)
 
-  const dispatch = useDispatch()
-
   const handleOpenDeleteGatewayModal = useCallback(() => {
     setDeleteGtwVisible(true)
   }, [])
@@ -106,12 +101,6 @@ const BasicSettingsForm = React.memo(props => {
     },
     [onSubmit],
   )
-
-  const handleUnclaimGateway = useCallback(async () => {
-    if (supportsClaiming) {
-      await dispatch(attachPromise(unclaimGateway(gtwId)))
-    }
-  }, [dispatch, gtwId, supportsClaiming])
 
   return (
     <Form
@@ -283,7 +272,7 @@ const BasicSettingsForm = React.memo(props => {
             entityName={gateway.name}
             setVisible={setDeleteGtwVisible}
             visible={deleteGtwVisible}
-            additionalAction={handleUnclaimGateway}
+            supportsClaiming={supportsClaiming}
           />
         </Require>
       </SubmitBar>
