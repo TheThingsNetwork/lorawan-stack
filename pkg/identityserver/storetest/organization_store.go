@@ -350,3 +350,45 @@ func (st *StoreTest) TestOrganizationStorePagination(t *T) {
 		}
 	})
 }
+
+// TestOrganizationStorePaginationDefaults tests the default pagination values.
+func (st *StoreTest) TestOrganizationStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
+	usr1 := st.population.NewUser()
+
+	for i := 0; i < 15; i++ {
+		st.population.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.OrganizationStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement OrganizationStore")
+	}
+	defer s.Close()
+
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.OrganizationFieldPathsTopLevel...), "contact_info")
+
+	t.Run("FindOrganizations_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.FindOrganizations(paginateCtx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.FindOrganizations(paginateCtx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+	})
+}

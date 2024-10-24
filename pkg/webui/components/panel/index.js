@@ -15,11 +15,13 @@
 import React from 'react'
 import classnames from 'classnames'
 
+import Icon, { IconArrowUpRight } from '@ttn-lw/components/icon'
+import Button from '@ttn-lw/components/button'
+
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import Icon from '../icon'
 import Link from '../link'
 
 import Toggle from './toggle'
@@ -58,6 +60,7 @@ const Panel = ({
   divider,
   shortCutLinkTarget,
   shortCutLinkDisabled,
+  shortCutLinkButton,
   compact,
 }) => (
   <div
@@ -81,17 +84,30 @@ const Panel = ({
         {toggleOptions ? (
           <Toggle options={toggleOptions} active={activeToggle} onToggleChange={onToggleClick} />
         ) : (
-          shortCutLinkTitle && (
-            <Link
-              primary
-              to={shortCutLinkPath}
-              className={styles.panelButton}
-              target={shortCutLinkTarget}
-              disabled={shortCutLinkDisabled}
-            >
-              <Message content={shortCutLinkTitle} /> →
-            </Link>
-          )
+          <>
+            {shortCutLinkButton && !shortCutLinkTitle && (
+              <Button.Link
+                to={shortCutLinkPath}
+                target={shortCutLinkTarget}
+                disabled={shortCutLinkDisabled}
+                icon={IconArrowUpRight}
+                primary
+                naked
+                large
+              />
+            )}
+            {shortCutLinkTitle && !shortCutLinkButton && (
+              <Link
+                primary
+                to={shortCutLinkPath}
+                className={styles.panelButton}
+                target={shortCutLinkTarget}
+                disabled={shortCutLinkDisabled}
+              >
+                <Message content={shortCutLinkTitle} /> →
+              </Link>
+            )}
+          </>
         )}
       </div>
     )}
@@ -111,6 +127,7 @@ Panel.propTypes = {
   onMouseEnter: PropTypes.func,
   onMouseLeave: PropTypes.func,
   onToggleClick: PropTypes.func,
+  shortCutLinkButton: PropTypes.bool,
   shortCutLinkDisabled: PropTypes.bool,
   shortCutLinkPath: PropTypes.string,
   shortCutLinkTarget: PropTypes.string,
@@ -130,7 +147,8 @@ Panel.defaultProps = {
   compact: false,
   messageDecorators: undefined,
   divider: false,
-  shortCutLinkDisabled: undefined,
+  shortCutLinkDisabled: false,
+  shortCutLinkButton: false,
   shortCutLinkPath: undefined,
   shortCutLinkTitle: undefined,
   shortCutLinkTarget: undefined,

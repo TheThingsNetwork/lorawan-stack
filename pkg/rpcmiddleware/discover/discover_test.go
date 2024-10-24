@@ -16,20 +16,15 @@ package discover_test
 
 import (
 	"context"
-	"crypto/tls"
-	"crypto/x509"
-	"fmt"
 	"net"
-	"os"
+	"net/url"
 	"testing"
+	"time"
 
 	"github.com/smarty/assertions"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/discover"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/resolver"
 )
 
@@ -37,39 +32,44 @@ type mockResolver struct {
 	LookupSRVFunc func(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error)
 }
 
-func (r *mockResolver) LookupSRV(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error) {
+func (r *mockResolver) LookupSRV(
+	ctx context.Context, service, proto, name string,
+) (cname string, addrs []*net.SRV, err error) {
 	if r.LookupSRVFunc == nil {
 		panic("LookupSRVFunc called, but not set")
 	}
 	return r.LookupSRVFunc(ctx, service, proto, name)
 }
 
-func TestDialContext(t *testing.T) {
-	ctx := log.NewContext(test.Context(), test.GetLogger(t))
+type mockClientConn struct {
+	resolver.ClientConn
+	UpdateStateFunc func(resolver.State) error
+	ReportErrorFunc func(error)
+}
 
-	serverCert := test.Must(tls.LoadX509KeyPair("testdata/servercert.pem", "testdata/serverkey.pem"))
-	serverTLSConfig := &tls.Config{
-		Certificates: []tls.Certificate{serverCert},
+func (c *mockClientConn) UpdateState(state resolver.State) error {
+	if c.UpdateStateFunc == nil {
+		panic("UpdateStateFunc called, but not set")
 	}
+	return c.UpdateStateFunc(state)
+}
 
-	listen := func(addr string) (port int, address string, lis net.Listener) {
-		lis = test.Must(tls.Listen("tcp", addr, serverTLSConfig))
-		go grpc.NewServer().Serve(lis)
-		port = lis.Addr().(*net.TCPAddr).Port
-		address = fmt.Sprintf("localhost:%d", port)
-		return
+func (c *mockClientConn) ReportError(err error) {
+	if c.ReportErrorFunc == nil {
+		panic("ReportErrorFunc called, but not set")
 	}
-	lis1Port, lis1Address, lis1 := listen(":0")
-	defer lis1.Close()
-	lis2Port, lis2Address, lis2 := listen(fmt.Sprintf(":%d", discover.DefaultPorts[true]))
-	defer lis2.Close()
+	c.ReportErrorFunc(err)
+}
+
+func TestResolver(t *testing.T) {
+	t.Parallel()
 
 	for _, tc := range []struct {
-		Name                   string
-		LookupResult           []*net.SRV
-		LookupError            error
-		DialAddressesAssertion func(*testing.T, []string) bool
-		ErrorAssertion         func(*testing.T, error) bool
+		Name               string
+		LookupResult       []*net.SRV
+		LookupError        error
+		AddressesAssertion func(*testing.T, []string) bool
+		ErrorAssertion     func(*testing.T, error) bool
 	}{
 		{
 			Name: "SRVNotFound",
@@ -77,8 +77,10 @@ func TestDialContext(t *testing.T) {
 				Err:        "not found",
 				IsNotFound: true,
 			},
-			DialAddressesAssertion: func(t *testing.T, addresses []string) bool {
-				return assertions.New(t).So(addresses, should.Resemble, []string{lis2Address}) // SRV not set; use default port.
+			AddressesAssertion: func(t *testing.T, addresses []string) bool {
+				t.Helper()
+				// SRV not set; use default port.
+				return assertions.New(t).So(addresses, should.Resemble, []string{"localhost:8884"})
 			},
 		},
 		{
@@ -86,10 +88,12 @@ func TestDialContext(t *testing.T) {
 			LookupError: &net.DNSError{
 				Err: "dns failure",
 			},
-			DialAddressesAssertion: func(t *testing.T, addresses []string) bool {
+			AddressesAssertion: func(t *testing.T, addresses []string) bool {
+				t.Helper()
 				return assertions.New(t).So(addresses, should.BeEmpty) // DNS failure; nothing gets dialed.
 			},
 			ErrorAssertion: func(t *testing.T, err error) bool {
+				t.Helper()
 				return assertions.New(t).So(err, should.NotBeNil)
 			},
 		},
@@ -108,15 +112,16 @@ func TestDialContext(t *testing.T) {
 				},
 				{
 					Target:   "localhost.",
-					Port:     uint16(lis1Port),
+					Port:     8884,
 					Priority: 10,
 				},
 			},
-			DialAddressesAssertion: func(t *testing.T, addresses []string) bool {
+			AddressesAssertion: func(t *testing.T, addresses []string) bool {
+				t.Helper()
 				return assertions.New(t).So(addresses, should.Resemble, []string{
 					"invalid:1234",
 					"invalid:4321",
-					lis1Address,
+					"localhost:8884",
 				})
 			},
 		},
@@ -134,40 +139,43 @@ func TestDialContext(t *testing.T) {
 					Priority: 90,
 				},
 			},
-			DialAddressesAssertion: func(t *testing.T, addresses []string) bool {
+			AddressesAssertion: func(t *testing.T, addresses []string) bool {
+				t.Helper()
 				return assertions.New(t).So(addresses, should.Resemble, []string{
 					"invalid:1234",
 					"invalid:4321",
 				})
 			},
-			ErrorAssertion: func(t *testing.T, err error) bool {
-				return assertions.New(t).So(err, should.NotBeNil)
-			},
 		},
 		{
-			Name: "PickFirst",
+			Name: "Multiple",
 			LookupResult: []*net.SRV{
 				{
 					Target:   "localhost.",
-					Port:     uint16(lis1Port),
+					Port:     8884,
 					Priority: 100,
 					Weight:   1,
 				},
 				{
 					Target:   "localhost.",
-					Port:     uint16(lis2Port),
+					Port:     8885,
 					Priority: 100,
 					Weight:   2,
 				},
 			},
-			DialAddressesAssertion: func(t *testing.T, addresses []string) bool {
-				return assertions.New(t).So(addresses, should.Resemble, []string{lis1Address})
+			AddressesAssertion: func(t *testing.T, addresses []string) bool {
+				t.Helper()
+				return assertions.New(t).So(addresses, should.Resemble, []string{"localhost:8884", "localhost:8885"})
 			},
 		},
 	} {
+		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
 			dns := &mockResolver{
-				LookupSRVFunc: func(ctx context.Context, service, proto, name string) (cname string, addrs []*net.SRV, err error) {
+				LookupSRVFunc: func(
+					_ context.Context, service, proto, name string,
+				) (cname string, addrs []*net.SRV, err error) {
 					if tc.LookupError != nil {
 						return "", nil, tc.LookupError
 					}
@@ -180,51 +188,64 @@ func TestDialContext(t *testing.T) {
 					return "test", tc.LookupResult, nil
 				},
 			}
-			resolver.Register(discover.NewBuilder("ttn-v3-gs", discover.WithDNS(dns)))
+			builder := discover.NewBuilder("ttn-v3-gs", discover.WithDNS(dns))
 
-			clientTLSConfig := &tls.Config{
-				RootCAs: x509.NewCertPool(),
-			}
-			serverCA := test.Must(os.ReadFile("testdata/serverca.pem"))
-			clientTLSConfig.RootCAs.AppendCertsFromPEM(serverCA)
-
-			var dialAddresses []string
-			conn, err := grpc.DialContext(
-				ctx,
-				"ttn-v3-gs:///localhost",
-				grpc.WithTransportCredentials(credentials.NewTLS(clientTLSConfig)),
-				grpc.WithBlock(),
-				grpc.FailOnNonTempDialError(true),
-				grpc.WithTimeout(test.Delay<<10),
-				grpc.WithContextDialer(func(ctx context.Context, address string) (net.Conn, error) {
-					t.Logf("Dialing %s", address)
-					dialAddresses = append(dialAddresses, address)
-					if host, _, err := net.SplitHostPort(address); err == nil && host == "localhost" {
-						return new(net.Dialer).DialContext(ctx, "tcp", address)
-					}
-					return nil, &net.DNSError{
-						Err:         "not found",
-						IsTemporary: false,
-						IsNotFound:  true,
-					}
-				}),
+			var (
+				resolveState resolver.State
+				resolveErr   error
+				resolveDone  = make(chan struct{})
 			)
-
+			clientConn := &mockClientConn{
+				UpdateStateFunc: func(state resolver.State) error {
+					resolveState = state
+					close(resolveDone)
+					return nil
+				},
+				ReportErrorFunc: func(err error) {
+					resolveErr = err
+					close(resolveDone)
+				},
+			}
+			res, err := builder.Build(
+				resolver.Target{
+					URL: url.URL{
+						Scheme: "ttn-v3-gs",
+						Opaque: "localhost",
+					},
+				},
+				clientConn,
+				resolver.BuildOptions{},
+			)
 			if err != nil {
+				t.Fatalf("Failed to build resolver: %v", err)
+			}
+			defer res.Close()
+
+			select {
+			case <-resolveDone:
+			case <-time.After(test.Delay << 10):
+				t.Fatal("Timeout waiting for resolver to resolve")
+			}
+
+			addresses := make([]string, len(resolveState.Addresses))
+			for i, a := range resolveState.Addresses {
+				addresses[i] = a.Addr
+			}
+
+			if resolveErr != nil {
 				if tc.ErrorAssertion == nil {
-					t.Fatalf("Unexpected error: %v", err)
+					t.Fatalf("Unexpected error: %v", resolveErr)
 				}
-				if !tc.ErrorAssertion(t, err) {
+				if !tc.ErrorAssertion(t, resolveErr) {
 					t.FailNow()
 				}
 			} else {
-				defer conn.Close()
 				if tc.ErrorAssertion != nil {
 					t.Fatal("Expected error but got none")
 				}
 			}
 
-			if !tc.DialAddressesAssertion(t, dialAddresses) {
+			if !tc.AddressesAssertion(t, addresses) {
 				t.FailNow()
 			}
 		})
@@ -232,6 +253,7 @@ func TestDialContext(t *testing.T) {
 }
 
 func TestDefaultPort(t *testing.T) {
+	t.Parallel()
 	for input, expected := range map[string]string{
 		"localhost:http": "localhost:http",
 		"localhost:80":   "localhost:80",
@@ -247,7 +269,9 @@ func TestDefaultPort(t *testing.T) {
 		"[::]":           "", // Invalid address
 		"[::":            "", // Invalid address
 	} {
+		input, expected := input, expected
 		t.Run(input, func(t *testing.T) {
+			t.Parallel()
 			target, err := discover.DefaultPort(input, 8884)
 			if err != nil {
 				target = ""
@@ -258,6 +282,7 @@ func TestDefaultPort(t *testing.T) {
 }
 
 func TestDefaultURL(t *testing.T) {
+	t.Parallel()
 	for _, tc := range []struct {
 		target   string
 		port     int
@@ -301,7 +326,9 @@ func TestDefaultURL(t *testing.T) {
 			expected: "https://hostname:8443",
 		},
 	} {
+		tc := tc
 		t.Run(tc.expected, func(t *testing.T) {
+			t.Parallel()
 			target, err := discover.DefaultURL(tc.target, tc.port, tc.tls)
 			if err != nil {
 				target = ""

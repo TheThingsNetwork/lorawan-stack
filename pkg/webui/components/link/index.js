@@ -80,9 +80,9 @@ const Link = React.forwardRef((props, ref) => {
 
   if (disabled) {
     return (
-      <span className={classnames(classNames, style.disabled)} role={role}>
+      <button className={classnames(classNames, style.disabled)} disabled={disabled} role={role}>
         {children}
-      </span>
+      </button>
     )
   }
 

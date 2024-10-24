@@ -360,10 +360,10 @@ The development server runs on `http://localhost:8080` and will proxy all API ca
 
 #### Interactive development stack launcher tool
 
-In order to easily launch development environments in different deployment contexts, this script configures and starts a development environment for The Things Stack, allowing users to choose between local and staging environments, enable branding, and configure cloud-hosted mock setups. You can launch it via:
+In order to easily launch development environments in different deployment contexts, this mage target configures and starts a development environment for The Things Stack, allowing users to choose between local and staging environments, enable branding, and configure cloud-hosted mock setups. You can launch it via:
 
 ```bash
-$ node tools/js/serve-dev-stack.js
+$ tools/bin/mage dev:serveDevWebui
 ```
 
 It will interactively guide you through the desired setup and launches the The Things Stack Enterprise as well as a frontend development server wia webpack.

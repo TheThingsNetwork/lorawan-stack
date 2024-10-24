@@ -92,7 +92,9 @@ describe('End device repository claiming', () => {
     cy.wait('@claim-request')
       .its('request.body')
       .should('deep.equal', composeExpectedRequest(device1))
-    cy.findByTestId('toast-notification').findByText('End device registered').should('be.visible')
+    cy.findByTestId('toast-notification-success')
+      .findByText('End device registered')
+      .should('be.visible')
     cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
 
     cy.intercept('POST', '/api/v3/edcs/claim', composeClaimResponse(device2)).as('claim-request')
@@ -184,7 +186,9 @@ describe('End device repository claiming', () => {
       .its('request.body')
       .should('deep.equal', composeExpectedRequest(device1))
     // Properly wait for the form to finish submitting.
-    cy.findByTestId('toast-notification').findByText('End device registered').should('be.visible')
+    cy.findByTestId('toast-notification-success')
+      .findByText('End device registered')
+      .should('be.visible')
     cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
 
     cy.intercept('POST', '/api/v3/edcs/claim', composeClaimResponse(device2)).as('claim-request')
@@ -200,7 +204,9 @@ describe('End device repository claiming', () => {
       .its('request.body')
       .should('deep.equal', composeExpectedRequest(device2))
     // Properly wait for the form to finish submitting.
-    cy.findByTestId('toast-notification').findByText('End device registered').should('be.visible')
+    cy.findByTestId('toast-notification-success')
+      .findByText('End device registered')
+      .should('be.visible')
     cy.findByRole('button', { name: 'Register end device' }).should('not.be.disabled')
 
     cy.intercept('POST', '/api/v3/edcs/claim', composeClaimResponse(device3)).as('claim-request')

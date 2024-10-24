@@ -166,7 +166,7 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 				txBandwidths    []uint32
 			)
 			for _, b := range gwConfig.Boards {
-				rfChainFreqs := []int64{int64(b.RfChain0.GetFrequency()), int64(b.RfChain1.GetFrequency())}
+				rfChainFreqs := []int64{int64(b.RfChain0.GetFrequency()), int64(b.RfChain1.GetFrequency())} //nolint:gosec
 				for i, multiSF := range []*lorav1.Board_IntermediateFrequencies_MultipleSF{
 					b.Ifs.GetMultipleSf0(),
 					b.Ifs.GetMultipleSf1(),
@@ -180,8 +180,8 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 					if multiSF == nil {
 						continue
 					}
-					freq := uint64(rfChainFreqs[multiSF.RfChain] + int64(multiSF.Frequency))
-					multiSFIFChains[freq] = uint32(i)
+					freq := uint64(rfChainFreqs[multiSF.RfChain] + int64(multiSF.Frequency)) //nolint:gosec
+					multiSFIFChains[freq] = uint32(i)                                        //nolint:gosec
 				}
 			}
 			for _, ch := range gwConfig.Tx {
@@ -206,16 +206,20 @@ func TestFrontend(t *testing.T) { //nolint:gocyclo
 							messages := make([]*lorav1.UplinkMessage, 0, len(msg.UplinkMessages))
 							for _, up := range msg.UplinkMessages {
 								uplink := &lorav1.UplinkMessage{
-									Board:              0,
-									Timestamp:          up.RxMetadata[0].Timestamp,
-									RssiChannelNegated: -up.RxMetadata[0].ChannelRssi,
-									Payload:            up.RawPayload,
+									Board:     0,
+									Timestamp: up.RxMetadata[0].Timestamp,
+									RssiChannel: &lorav1.UplinkMessage_RssiChannelNegatedDeprecated{
+										RssiChannelNegatedDeprecated: -up.RxMetadata[0].ChannelRssi,
+									},
+									Payload: up.RawPayload,
 								}
 								switch mod := up.Settings.DataRate.Modulation.(type) {
 								case *ttnpb.DataRate_Lora:
 									dr := &lorav1.UplinkMessage_Lora{
-										RssiSignalNegated: -up.RxMetadata[0].SignalRssi.GetValue(),
-										SpreadingFactor:   mod.Lora.SpreadingFactor,
+										RssiSignal: &lorav1.UplinkMessage_Lora_RssiSignalNegatedDeprecated{
+											RssiSignalNegatedDeprecated: -up.RxMetadata[0].SignalRssi.GetValue(),
+										},
+										SpreadingFactor: mod.Lora.SpreadingFactor,
 										CodeRate: map[string]lorav1.CodeRate{
 											"4/5": lorav1.CodeRate_CODE_RATE_4_5,
 											"4/6": lorav1.CodeRate_CODE_RATE_4_6,

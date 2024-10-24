@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   MapContainer,
   Marker,
@@ -108,6 +108,7 @@ const MarkerRenderer = ({ marker }) => {
 
 const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
   const map = useMap()
+  const [useManualZoom, setUseManualZoom] = useState(false)
 
   useEffect(() => {
     const handleWheel = e => {
@@ -118,23 +119,36 @@ const Controller = ({ onClick, centerOnMarkers, markers, bounds }) => {
         const zoomLevel = map.getZoom() - delta // Calculate the new zoom level
 
         map.setZoom(zoomLevel)
+        setUseManualZoom(true) // Mark user interaction
       }
     }
 
+    const handleUserInteracted = () => {
+      setUseManualZoom(true) // Mark user interaction on zoom
+    }
+
+    // Ensure the map resizes correctly when the container changes size
+    map.invalidateSize()
+
     map.getContainer().addEventListener('wheel', handleWheel)
+    map.on('zoomend', handleUserInteracted)
+    map.on('moveend', handleUserInteracted)
 
     return () => {
       map.getContainer().removeEventListener('wheel', handleWheel)
+      map.off('zoomend', handleUserInteracted)
+      map.off('moveend', handleUserInteracted)
     }
   }, [map])
 
+  useEffect(() => {
+    if (centerOnMarkers && markers.length > 1 && !useManualZoom) {
+      map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
+    }
+  }, [map, centerOnMarkers, markers, bounds, useManualZoom])
+
   useMapEvent('click', onClick)
-  // Fix incomplete tile loading in some rare cases.
-  map.invalidateSize()
-  // Attach click handler.
-  if (centerOnMarkers && markers.length > 1) {
-    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 14 })
-  }
+
   return markers.map(marker => (
     <MarkerRenderer
       key={`${marker.position.latitude}-${marker.position.longitude}`}

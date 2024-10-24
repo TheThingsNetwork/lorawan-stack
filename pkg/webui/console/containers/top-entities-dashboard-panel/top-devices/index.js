@@ -31,7 +31,10 @@ import { selectEndDeviceTopEntities } from '@console/store/selectors/top-entitie
 import EntitiesList from '../list'
 
 const TopDevicesList = ({ appId }) => {
-  const topEntityFilter = useMemo(() => (appId ? e => e.id.startsWith(appId) : undefined), [appId])
+  const topEntityFilter = useMemo(
+    () => (appId ? e => e.id.split('/')[0] === appId : undefined),
+    [appId],
+  )
   const items = useSelector(state => selectEndDeviceTopEntities(state, topEntityFilter))
 
   const headers = [

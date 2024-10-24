@@ -39,7 +39,6 @@ const assembleClassnames = ({
   primary,
   secondary,
   naked,
-  grey,
   icon,
   small,
   busy,
@@ -57,7 +56,6 @@ const assembleClassnames = ({
     [style.secondary]: secondary,
     [style.naked]: naked,
     [style.busy]: busy,
-    [style.grey]: grey,
     [style.small]: small,
     [style.withIcon]: icon !== undefined && message,
     [style.noDropdownIcon]: noDropdownIcon,
@@ -68,12 +66,21 @@ const assembleClassnames = ({
   })
 
 const buttonChildren = props => {
-  const { dropdownItems, icon, busy, message, messageValues, noDropdownIcon, children, small } =
-    props
+  const {
+    dropdownItems,
+    icon,
+    busy,
+    message,
+    messageValues,
+    noDropdownIcon,
+    children,
+    small,
+    large,
+  } = props
 
   const content = (
     <>
-      {icon && <Icon className={style.icon} icon={icon} size={small ? 16 : 18} />}
+      {icon && <Icon className={style.icon} icon={icon} size={small ? 16 : large ? 24 : 18} />}
       {message && (
         <Message content={message} values={messageValues} className={style.linkButtonMessage} />
       )}
@@ -81,7 +88,11 @@ const buttonChildren = props => {
       {dropdownItems && (
         <>
           {!noDropdownIcon && (
-            <Icon className={style.expandIcon} icon={IconChevronDown} size={small ? 12 : 18} />
+            <Icon
+              className={style.expandIcon}
+              icon={IconChevronDown}
+              size={small ? 12 : large ? 22 : 18}
+            />
           )}
         </>
       )}
@@ -321,6 +332,8 @@ const commonPropTypes = {
   dropdownItems: PropTypes.node,
   /** A flag specifying whether the small styling should applied to the button. */
   small: PropTypes.bool,
+  /** A flag specifying whether the large styling should applied to the button. */
+  large: PropTypes.bool,
 }
 
 buttonChildren.propTypes = {
@@ -342,6 +355,7 @@ buttonChildren.defaultProps = {
   messageValues: undefined,
   children: null,
   small: false,
+  large: false,
 }
 
 Button.propTypes = {

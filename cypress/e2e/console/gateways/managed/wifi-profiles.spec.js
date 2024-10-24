@@ -196,7 +196,7 @@ describe('Managed Gateway WiFi profiles', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
       cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .and('contain', 'WiFi profile created')
       cy.location('pathname').should(
@@ -221,7 +221,7 @@ describe('Managed Gateway WiFi profiles', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
       cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .and('contain', 'WiFi profile created')
       cy.location('pathname').should(
@@ -245,7 +245,7 @@ describe('Managed Gateway WiFi profiles', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
       cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .and('contain', 'WiFi profile created')
       cy.location('pathname').should(
@@ -288,7 +288,7 @@ describe('Managed Gateway WiFi profiles', () => {
       cy.findByRole('button', { name: 'Save changes' }).click()
       cy.wait('@create-profile').its('request.body').should('deep.equal', expectedRequest)
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .and('contain', 'WiFi profile created')
       cy.location('pathname').should(
@@ -348,7 +348,7 @@ describe('Managed Gateway WiFi profiles', () => {
           expect(body.profile).to.deep.equal(expectedRequest)
         })
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .and('contain', 'WiFi profile updated')
     })
@@ -376,7 +376,7 @@ describe('Managed Gateway WiFi profiles', () => {
         })
 
       cy.findByTestId('error-notification').should('not.exist')
-      cy.findByTestId('toast-notification')
+      cy.findByTestId('toast-notification-success')
         .should('be.visible')
         .and('contain', 'WiFi profile deleted')
       cy.findByRole('rowgroup').within(() => {

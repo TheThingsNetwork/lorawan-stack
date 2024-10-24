@@ -18,12 +18,17 @@ import {
 } from '@console/containers/gateway-managed-gateway/shared/validation-schema'
 
 import Yup from '@ttn-lw/lib/yup'
+import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 export const validationSchema = Yup.object().shape({
   wifi_profile: Yup.object()
     .shape({
       _override: Yup.boolean().default(false),
-      profile_id: Yup.string(),
+      _enable_wifi_connection: Yup.boolean().default(false),
+      profile_id: Yup.string().when('_enable_wifi_connection', {
+        is: true,
+        then: schema => schema.required().required(sharedMessages.validateRequired),
+      }),
     })
     .when('.profile_id', {
       is: profileId => profileId && profileId.includes('shared'),

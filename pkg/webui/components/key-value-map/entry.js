@@ -141,7 +141,7 @@ const Entry = ({
         value={indexAsKey ? value : value.value}
         readOnly={readOnly}
         code
-        options={options ? newOptions ?? options : undefined}
+        options={options ? (newOptions ?? options) : undefined}
         {...additionalInputPropsRest}
       />
       {showRemoveButton && (

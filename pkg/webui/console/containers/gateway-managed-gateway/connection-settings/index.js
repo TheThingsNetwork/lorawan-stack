@@ -193,8 +193,11 @@ const GatewayConnectionSettings = () => {
     (values, profile, entityId, isNonSharedProfile) => ({
       ...values.wifi_profile,
       ...(isNonSharedProfile && { ...profile.data }),
-      profile_id: isNonSharedProfile ? 'non-shared' : selectedManagedGateway.wifi_profile_id ?? '',
+      profile_id: isNonSharedProfile
+        ? 'non-shared'
+        : (selectedManagedGateway.wifi_profile_id ?? ''),
       _override: !Boolean(profile) && hasWifiProfileSet,
+      _enable_wifi_connection: Boolean(profile),
       _profile_of: entityId ?? '',
     }),
     [hasWifiProfileSet, selectedManagedGateway.wifi_profile_id],
@@ -247,7 +250,8 @@ const GatewayConnectionSettings = () => {
   const handleSubmit = useCallback(
     async (values, { resetForm, setSubmitting }, cleanValues) => {
       const getWifiProfileId = async (profile, shouldUpdateNonSharedWifiProfile) => {
-        const { profile_id, _profile_of, _override, ...wifiProfile } = profile
+        const { profile_id, _profile_of, _override, _enable_wifi_connection, ...wifiProfile } =
+          profile
         let wifiProfileId = profile_id
         // If the WiFi profile id contains 'shared', create/update that profile.
         // The id could be either shared or non-shared.
@@ -311,7 +315,9 @@ const GatewayConnectionSettings = () => {
         const { wifi_profile, ethernet_profile } = values
 
         const shouldUpdateNonSharedWifiProfile =
-          wifi_profile.profile_id === 'non-shared' && Boolean(nonSharedWifiProfileId)
+          wifi_profile.profile_id === 'non-shared' &&
+          Boolean(nonSharedWifiProfileId) &&
+          wifi_profile._enable_wifi_connection
 
         const wifiProfileId = await getWifiProfileId(wifi_profile, shouldUpdateNonSharedWifiProfile)
         const ethernetProfileId = await getEthernetProfileId(
@@ -319,7 +325,8 @@ const GatewayConnectionSettings = () => {
           cleanValues.ethernet_profile,
         )
         const body = {
-          ...(Boolean(wifiProfileId) && { wifi_profile_id: wifiProfileId }),
+          wifi_profile_id:
+            !wifi_profile._enable_wifi_connection && !wifi_profile._override ? null : wifiProfileId,
           ethernet_profile_id: ethernetProfileId,
         }
 
@@ -331,6 +338,7 @@ const GatewayConnectionSettings = () => {
           resetValues = {
             ...values,
             wifi_profile: {
+              ...values.wifi_profile,
               ...initialWifiProfile,
               profile_id: wifiProfileId,
               _profile_of: wifi_profile._profile_of,
@@ -342,7 +350,10 @@ const GatewayConnectionSettings = () => {
         resetForm({
           values: resetValues,
         })
-        setSaveFormClicked(true)
+
+        if (resetValues.wifi_profile._enable_wifi_connection) {
+          setSaveFormClicked(true)
+        }
 
         toast({
           title: selectedGateway.name,

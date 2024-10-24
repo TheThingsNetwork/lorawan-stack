@@ -32,7 +32,7 @@ const TotalEndDevicesUpsellerPanel = () => {
     <Panel
       title={sharedMessages.totalEndDevices}
       icon={IconDevice}
-      shortCutLinkTitle={sharedMessages.nocShortened}
+      shortCutLinkButton
       shortCutLinkPath="#"
       shortCutLinkDisabled
       className={style.panel}

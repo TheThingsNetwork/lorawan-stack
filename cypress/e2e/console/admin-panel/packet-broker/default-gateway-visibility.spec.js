@@ -43,7 +43,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save default gateway visibility' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .findByText('Default gateway visibility set')
       .should('be.visible')
     cy.get('@putCall').should('have.property', 'state', 'Complete')
@@ -67,7 +67,7 @@ describe('Packet Broker routing policies', () => {
     cy.findByRole('button', { name: 'Save default gateway visibility' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .findByText('Default gateway visibility set')
       .should('be.visible')
     cy.get('@putCall').should('have.property', 'state', 'Complete')

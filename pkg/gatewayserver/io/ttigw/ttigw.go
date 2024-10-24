@@ -424,7 +424,7 @@ func processGatewayMessage(
 	switch msg := envelope.Message.(type) {
 	case *lorav1.GatewayMessage_ErrorNotification:
 		txAckResult, isTxAckResult := toTxAcknowledgmentResult[msg.ErrorNotification.Code]
-		down, _, isTxResponse := dlTokens.Get(uint16(envelope.TransactionId), receivedAt)
+		down, _, isTxResponse := dlTokens.Get(uint16(envelope.TransactionId), receivedAt) //nolint:gosec
 		if isTxAckResult || isTxResponse {
 			if !isTxAckResult {
 				txAckResult = ttnpb.TxAcknowledgment_UNKNOWN_ERROR
@@ -476,7 +476,7 @@ func processGatewayMessage(
 		txAck := &ttnpb.TxAcknowledgment{
 			Result: ttnpb.TxAcknowledgment_SUCCESS,
 		}
-		if down, _, ok := dlTokens.Get(uint16(envelope.TransactionId), receivedAt); ok {
+		if down, _, ok := dlTokens.Get(uint16(envelope.TransactionId), receivedAt); ok { //nolint:gosec
 			txAck.DownlinkMessage = down
 			txAck.CorrelationIds = down.CorrelationIds
 		}

@@ -184,7 +184,7 @@ describe('Gateway general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText('Gateway updated').should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText('Gateway updated').should('be.visible')
     cy.reload()
 
     cy.findByLabelText('Gateway name').should('have.value', newGatewayName)
@@ -219,7 +219,7 @@ describe('Gateway general settings', () => {
       })
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText('Gateway updated').should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText('Gateway updated').should('be.visible')
     cy.reload()
 
     cy.findByText('LoRaWAN options', { selector: 'h3' })
@@ -266,7 +266,7 @@ describe('Gateway general settings', () => {
     cy.findByRole('button', { name: 'Save changes' }).click()
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText(`Gateway updated`).should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText(`Gateway updated`).should('be.visible')
   })
 
   it('succeeds setting current user as contact', () => {
@@ -317,7 +317,7 @@ describe('Gateway general settings', () => {
       })
 
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification').findByText('Gateway updated').should('be.visible')
+    cy.findByTestId('toast-notification-success').findByText('Gateway updated').should('be.visible')
     cy.reload()
 
     cy.findByText('LoRaWAN options', { selector: 'h3' })

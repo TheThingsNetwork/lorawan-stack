@@ -472,3 +472,43 @@ func (st *StoreTest) TestUserStorePagination(t *T) {
 		}
 	})
 }
+
+// TestUserStorePaginationDefaults tests the default pagination values.
+func (st *StoreTest) TestUserStorePaginationDefaults(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
+	for i := 0; i < 15; i++ {
+		st.population.NewUser()
+	}
+
+	s, ok := st.PrepareDB(t).(interface {
+		Store
+		is.UserStore
+	})
+	defer st.DestroyDB(t, false)
+	if !ok {
+		t.Skip("Store does not implement UserStore")
+	}
+	defer s.Close()
+
+	mask := ttnpb.ExcludeFields(fieldMask(ttnpb.UserFieldPathsTopLevel...), "contact_info")
+
+	t.Run("FindUsers_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.FindUsers(paginateCtx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.FindUsers(paginateCtx, nil, mask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+	})
+}

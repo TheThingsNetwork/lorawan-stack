@@ -147,16 +147,14 @@ describe('Managed Gateway connection settings', () => {
   it('succeeds to display UI elements in place', () => {
     cy.findByText('WiFi connection', { selector: 'h3' }).should('be.visible')
     cy.findByText('Ethernet connection', { selector: 'h3' }).should('be.visible')
-    cy.findByText('Connection settings profiles can be shared within the same organization').should(
-      'be.visible',
-    )
-    cy.findByLabelText('Show profiles of').should('have.attr', 'disabled')
+    cy.findByText('Enable WiFi connection').should('be.visible')
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
 
     cy.findByText(gatewayVersionIds.model_id, { selector: 'h3' }).should('be.visible')
   })
 
   it('succeeds to set WiFi connection with already created profile', () => {
+    cy.findByLabelText(/Enable WiFi connection/).check()
     cy.findByLabelText('Settings profile').selectOption(wifiProfileId)
     cy.findByText(
       'Please click "Save changes" to start using this WiFi profile for the gateway',
@@ -171,12 +169,31 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
+      .should('be.visible')
+      .and('contain', 'Connection settings updated')
+  })
+
+  it('succeeds to update connection settings with disabled WiFi connection', () => {
+    cy.findByRole('button', { name: 'Save changes' }).click()
+    cy.wait('@update-connection-settings')
+      .its('request.body')
+      .should(body => {
+        expect(body).to.have.nested.property('gateway.wifi_profile_id', null)
+      })
+    cy.findByText('The gateway WiFi is currently attempting to connect using this profile').should(
+      'not.exist',
+    )
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
 
   it('succeeds to validate new WiFi profile fields', () => {
+    cy.findByLabelText(/Enable WiFi connection/).check()
+    cy.findByRole('button', { name: 'Save changes' }).click()
+    cy.get('#wifi_profile\\.profile_id-field-error').should('be.visible')
     cy.findByLabelText('Settings profile').selectOption('shared')
     cy.wait('@scan-access-points')
     cy.findByLabelText(/Use default network interface settings/).uncheck()
@@ -194,6 +211,7 @@ describe('Managed Gateway connection settings', () => {
   })
 
   it('succeeds to set WiFi connection with new shared profile', () => {
+    cy.findByLabelText(/Enable WiFi connection/).check()
     cy.findByLabelText('Settings profile').selectOption('shared')
     cy.wait('@scan-access-points')
     cy.findByLabelText('Profile name').type('New WiFi profile')
@@ -211,12 +229,13 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
 
   it('succeeds to set WiFi connection with new non-shared profile', () => {
+    cy.findByLabelText(/Enable WiFi connection/).check()
     cy.findByLabelText('Settings profile').selectOption('non-shared')
     cy.wait('@scan-access-points')
     cy.findByText('AccessPoint1').click()
@@ -233,7 +252,7 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -246,7 +265,7 @@ describe('Managed Gateway connection settings', () => {
         expect(body).to.have.nested.property('gateway.ethernet_profile_id', ethernetProfileId)
       })
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -281,7 +300,7 @@ describe('Managed Gateway connection settings', () => {
         expect(body).to.have.nested.property('gateway.ethernet_profile_id', ethernetProfileId)
       })
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })
@@ -300,6 +319,7 @@ describe('Managed Gateway connection settings', () => {
       },
     })
     cy.reload()
+    cy.findByLabelText(/Enable WiFi connection/).check()
     cy.findByLabelText('Show profiles of').should('not.have.attr', 'disabled')
     cy.findByLabelText('Show profiles of').selectOption(organizationId)
     cy.findByLabelText('Settings profile').selectOption(wifiProfileId)
@@ -316,7 +336,7 @@ describe('Managed Gateway connection settings', () => {
       'be.visible',
     )
     cy.findByTestId('error-notification').should('not.exist')
-    cy.findByTestId('toast-notification')
+    cy.findByTestId('toast-notification-success')
       .should('be.visible')
       .and('contain', 'Connection settings updated')
   })

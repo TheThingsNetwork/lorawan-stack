@@ -25,6 +25,7 @@ import (
 	bunstore "go.thethings.network/lorawan-stack/v3/pkg/identityserver/bunstore"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
 	ismigrations "go.thethings.network/lorawan-stack/v3/pkg/identityserver/store/migrations"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
@@ -42,6 +43,36 @@ var (
 			return fmt.Errorf("init command deprecated, use migrate instead")
 		},
 	}
+	isDBStatusCommand = &cobra.Command{
+		Use:   "status",
+		Short: "Check the migration status of the Identity Server database",
+		RunE: func(cmd *cobra.Command, _ []string) error {
+			logger.WithField("URI", config.IS.DatabaseURI).Info("Connecting to Identity Server database...")
+
+			sqlDB, err := storeutil.OpenDB(cmd.Context(), config.IS.DatabaseURI)
+			if err != nil {
+				return err
+			}
+			defer sqlDB.Close()
+
+			bunDB := bun.NewDB(sqlDB, pgdialect.New())
+
+			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations, migrate.WithMarkAppliedOnSuccess(true))
+
+			group, err := migrator.MigrationsWithStatus(ctx)
+			if err != nil {
+				return err
+			}
+
+			log.FromContext(ctx).
+				WithField("migrations", group).
+				WithField("unapplied_migrations", group.Unapplied()).
+				WithField("applied_migrations", group.Applied()).
+				Info("Status fetched")
+
+			return nil
+		},
+	}
 	isDBMigrateCommand = &cobra.Command{
 		Use:   "migrate",
 		Short: "Migrate the Identity Server database",
@@ -56,7 +87,7 @@ var (
 
 			bunDB := bun.NewDB(sqlDB, pgdialect.New())
 
-			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations)
+			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations, migrate.WithMarkAppliedOnSuccess(true))
 
 			err = migrator.Init(cmd.Context())
 			if err != nil {
@@ -68,10 +99,10 @@ var (
 				return err
 			}
 			if migrations := status.Applied(); len(migrations) > 0 {
-				logger.Infof("Applied: %s", status)
+				logger.Infof("Applied: %s", migrations)
 			}
 			if migrations := status.Unapplied(); len(migrations) > 0 {
-				logger.Infof("Unapplied: %s", status)
+				logger.Infof("Unapplied: %s", migrations)
 			}
 
 			var group *migrate.MigrationGroup
@@ -373,6 +404,7 @@ func init() {
 	isDBCommand.AddCommand(isDBInitCommand)
 	isDBMigrateCommand.Flags().Bool("rollback", false, "Rollback most recent migration group")
 	isDBCommand.AddCommand(isDBMigrateCommand)
+	isDBCommand.AddCommand(isDBStatusCommand)
 	isDBCleanupCommand.Flags().Bool("dry-run", false, "Dry run")
 	isDBCommand.AddCommand(isDBCleanupCommand)
 	isDBEUIBlockCreationCommand.Flags().Bool("use-config", false, "Create block using values from config")
