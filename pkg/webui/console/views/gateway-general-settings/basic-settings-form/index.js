@@ -260,7 +260,11 @@ const BasicSettingsForm = React.memo(props => {
         <Require condition={mayDeleteGtw}>
           <Button
             onClick={handleOpenDeleteGatewayModal}
-            message={supportsClaiming ? m.unclaimAndDeleteGateway : sharedMessages.deleteGateway}
+            message={
+              supportsClaiming
+                ? sharedMessages.unclaimAndDeleteGateway
+                : sharedMessages.deleteGateway
+            }
             type="button"
             icon={IconTrash}
             naked
@@ -272,6 +276,7 @@ const BasicSettingsForm = React.memo(props => {
             entityName={gateway.name}
             setVisible={setDeleteGtwVisible}
             visible={deleteGtwVisible}
+            supportsClaiming={supportsClaiming}
           />
         </Require>
       </SubmitBar>

@@ -29,7 +29,6 @@ const messages = defineMessages({
     'Technical contact information for this gateway. Typically used to indicate who to contact with technical/security questions about the gateway.',
   deleteGatewayDefaultMessage:
     'This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations. It will also <strong>NOT BE POSSIBLE TO REUSE THE ENTITY ID</strong> until purged by an admin but the EUI can be reregistered later with a different ID.',
-  unclaimAndDeleteGateway: 'Unclaim and delete gateway',
 })
 
 export default messages

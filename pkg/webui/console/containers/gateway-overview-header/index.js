@@ -47,6 +47,7 @@ import {
 
 import { selectUser } from '@console/store/selectors/user'
 import { selectBookmarksList } from '@console/store/selectors/user-preferences'
+import { selectSelectedGatewayClaimable } from '@console/store/selectors/gateways'
 
 import style from './gateway-overview-header.styl'
 
@@ -69,6 +70,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
     selectFetchingEntry(state, DELETE_BOOKMARK_BASE),
   )
   const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
+  const supportsClaiming = useSelector(selectSelectedGatewayClaimable)
 
   const isBookmarked = useMemo(
     () => bookmarks.map(b => b.entity_ids?.gateway_ids?.gateway_id).some(b => b === gateway_id),
@@ -121,7 +123,12 @@ const GatewayOverviewHeader = ({ gateway }) => {
       <Dropdown.Item title={sharedMessages.downloadGlobalConf} action={handleGlobalConfDownload} />
       {/* <Dropdown.Item title={m.duplicateGateway} action={() => {}} />*/}
       {mayDeleteGtw && (
-        <Dropdown.Item title={sharedMessages.deleteGateway} action={handleOpenDeleteGatewayModal} />
+        <Dropdown.Item
+          title={
+            supportsClaiming ? sharedMessages.unclaimAndDeleteGateway : sharedMessages.deleteGateway
+          }
+          action={handleOpenDeleteGatewayModal}
+        />
       )}
     </>
   )
@@ -156,6 +163,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
             noDropdownIcon
             dropdownItems={menuDropdownItems}
             dropdownPosition="below left"
+            data-test-id="gateway-overview-menu"
           />
         </div>
         <DeleteEntityHeaderModal
@@ -164,6 +172,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
           entityName={name}
           setVisible={setDeleteGatewayVisible}
           visible={deleteGatewayVisible}
+          supportsClaiming={supportsClaiming}
         />
       </div>
     </div>

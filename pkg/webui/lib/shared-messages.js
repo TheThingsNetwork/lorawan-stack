@@ -175,6 +175,7 @@ export default defineMessages({
     'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
   deleteGateway: 'Delete gateway',
   unclaimAndDeleteDevice: 'Unclaim and delete end device',
+  unclaimAndDeleteGateway: 'Unclaim and delete gateway',
   deleteDevice: 'Delete end device',
   deleteApp: 'Delete application',
   deleteSuccess: 'Application deleted',
