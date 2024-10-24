@@ -76,14 +76,20 @@ const Camera = props => {
     }
   }, [cameras])
 
-  const setDeviceIdFromStream = useCallback(userStream => {
-    const videoTracks = userStream.getVideoTracks()
-
-    if (videoTracks.length > 0) {
-      const { deviceId } = videoTracks[0].getSettings()
-      setDeviceId(deviceId)
-    }
-  }, [])
+  const setDeviceIdFromStream = useCallback(
+    userStream => {
+      const videoTracks = userStream.getVideoTracks()
+      if (videoTracks.length > 0) {
+        const { deviceId } = videoTracks[0].getSettings()
+        if (deviceId) {
+          setDeviceId(deviceId)
+        } else if (cameras.length > 0) {
+          setDeviceId(cameras[0].deviceId)
+        }
+      }
+    },
+    [cameras],
+  )
 
   useEffect(() => {
     setHasFrontCamera(cameras.some(device => device.label.toLowerCase().includes('front')))

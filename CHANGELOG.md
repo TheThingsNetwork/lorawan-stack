@@ -31,7 +31,7 @@ For details about compatibility between different releases, see the **Commitment
   - Identity Server's store now marks a migration as successful after all its operations are finished. Previously it was possible to have a successful migration which not all of its queries were processed.
 - Enforce default page limit on IS List RPCs if a value is not provided in the request.
 
-## [3.32.1] - unreleased
+## [3.32.1] - 2024-10-24
 
 ### Added
 
@@ -45,6 +45,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - RX2 and Class C with The Things Industries gateway protocol in dynamic channel plan regions (including `EU868`).
+- Filtering the list end points for end devices and gateways using the HTTP API.
 
 ## [3.32.0] - 2024-09-05
 

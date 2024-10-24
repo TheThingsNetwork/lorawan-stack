@@ -142,10 +142,9 @@ const m = defineMessages({
     'Adjust the time that the Network Server schedules class C messages in advance. This is useful for gateways that have a known high latency backhaul, like 3G and satellite.',
   updateGtwLocationFromStatusDescription:
     'Instead of setting the location manually, you can alternatively choose to update the location of this gateway from status messages. This only works for gateways that send their locations within status messages while using an authenticated connection; gateways connected over UDP are not supported. Please refer to the manual of your gateway model to see whether sending location data is supported.',
-  claimAuthenticationCodeDescription:
-    'The claim authentication code is the proof of ownership of the gateway.',
+  claimAuthenticationCodeDescription: 'The owner token is the proof of ownership of the gateway.',
   claimAuthenticationCodeLocation:
-    'It is typically printed on the box or on the device. For example, for The Things Indoor Gateway, the claim authentication code is the WiFi password printed on the device.',
+    'It is typically printed on the box or on the gateway. For example, for The Things Indoor Gateway, the owner token is the WiFi password printed on the gateway.',
   disablePacketBrokerForwardingDescription:
     'When checked, uplink messages received from this gateway will not be forwarded to Packet Broker. This option takes effect only after the gateway reconnects.',
   rx1DelayDescription:

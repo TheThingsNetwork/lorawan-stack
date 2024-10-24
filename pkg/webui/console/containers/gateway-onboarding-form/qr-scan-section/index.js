@@ -67,7 +67,7 @@ const GatewayQRScanSection = () => {
       },
       authenticated_identifiers: {
         gateway_eui: gateway.gateway_eui,
-        authentication_code: gateway.owner_token ? gateway.owner_token : '',
+        authentication_code: gateway.owner_token ? btoa(gateway.owner_token) : '',
       },
     }))
 
@@ -89,7 +89,7 @@ const GatewayQRScanSection = () => {
             header: sharedMessages.qrCodeData,
             items: [
               {
-                key: sharedMessages.claimAuthCode,
+                key: sharedMessages.ownerToken,
                 value: gateway.owner_token,
                 type: 'code',
                 sensitive: true,
