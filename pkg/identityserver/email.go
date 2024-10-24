@@ -63,7 +63,7 @@ func (is *IdentityServer) SendEmail(ctx context.Context, message *email.Message)
 }
 
 // SendTemplateEmailToUsers sends an email to users.
-func (is *IdentityServer) SendTemplateEmailToUsers(ctx context.Context, templateName string, dataBuilder email.TemplateDataBuilder, receivers ...*ttnpb.User) error {
+func (is *IdentityServer) SendTemplateEmailToUsers(ctx context.Context, templateName ttnpb.NotificationType, dataBuilder email.TemplateDataBuilder, receivers ...*ttnpb.User) error {
 	networkConfig := is.configFromContext(ctx).Email.Network
 	emailTemplate := email.GetTemplate(ctx, templateName)
 
@@ -118,7 +118,7 @@ func (is *IdentityServer) SendNotificationEmailToUsers(ctx context.Context, noti
 var emailUserFields = store.FieldMask{"ids", "name", "primary_email_address"}
 
 // SendTemplateEmailToUserIDs looks up the users and sends them an email.
-func (is *IdentityServer) SendTemplateEmailToUserIDs(ctx context.Context, templateName string, dataBuilder email.TemplateDataBuilder, receiverIDs ...*ttnpb.UserIdentifiers) error {
+func (is *IdentityServer) SendTemplateEmailToUserIDs(ctx context.Context, templateName ttnpb.NotificationType, dataBuilder email.TemplateDataBuilder, receiverIDs ...*ttnpb.UserIdentifiers) error {
 	var receivers []*ttnpb.User
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		receivers, err = st.FindUsers(ctx, receiverIDs, emailUserFields)

@@ -259,12 +259,11 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	if usr.State == ttnpb.State_STATE_REQUESTED {
 		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetUser().GetIds().GetEntityIdentifiers(),
-			NotificationType: "user_requested",
+			NotificationType: ttnpb.NotificationType_USER_REQUESTED,
 			Data:             ttnpb.MustMarshalAny(req),
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 
@@ -510,13 +509,12 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        usr.GetIds().GetEntityIdentifiers(),
-			NotificationType: "entity_state_changed",
+			NotificationType: ttnpb.NotificationType_ENTITY_STATE_CHANGED,
 			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
 				State:            usr.State,
 				StateDescription: usr.StateDescription,
 			}),
 			Receivers: []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
-			Email:     true,
 		})
 	}
 
@@ -639,8 +637,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateMask))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
-		NotificationType: "password_changed",
-		Email:            true,
+		NotificationType: ttnpb.NotificationType_PASSWORD_CHANGED,
 		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
 	})
 	return ttnpb.Empty, nil
@@ -682,13 +679,15 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateTemporaryPasswordFieldMask))
-	go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), "temporary_password", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
-		return &templates.TemporaryPasswordData{
-			TemplateData:      data,
-			TemporaryPassword: temporaryPassword,
-			TTL:               ttl,
-		}, nil
-	}, req.GetUserIds())
+	go is.SendTemplateEmailToUserIDs( // nolint:errcheck
+		is.FromRequestContext(ctx), ttnpb.NotificationType_TEMPORARY_PASSWORD,
+		func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
+			return &templates.TemporaryPasswordData{
+				TemplateData:      data,
+				TemporaryPassword: temporaryPassword,
+				TTL:               ttl,
+			}, nil
+		}, req.GetUserIds())
 
 	return ttnpb.Empty, nil
 }

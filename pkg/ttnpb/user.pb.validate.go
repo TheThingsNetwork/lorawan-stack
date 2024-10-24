@@ -32,6 +32,113 @@ var (
 	_ = anypb.Any{}
 )
 
+// ValidateFields checks the field values on EmailNotificationPreferences with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *EmailNotificationPreferences) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = EmailNotificationPreferencesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "types":
+
+			_EmailNotificationPreferences_Types_Unique := make(map[NotificationType]struct{}, len(m.GetTypes()))
+
+			for idx, item := range m.GetTypes() {
+				_, _ = idx, item
+
+				if _, exists := _EmailNotificationPreferences_Types_Unique[item]; exists {
+					return EmailNotificationPreferencesValidationError{
+						field:  fmt.Sprintf("types[%v]", idx),
+						reason: "repeated value must contain unique items",
+					}
+				} else {
+					_EmailNotificationPreferences_Types_Unique[item] = struct{}{}
+				}
+
+				if _, ok := NotificationType_name[int32(item)]; !ok {
+					return EmailNotificationPreferencesValidationError{
+						field:  fmt.Sprintf("types[%v]", idx),
+						reason: "value must be one of the defined enum values",
+					}
+				}
+
+			}
+
+		default:
+			return EmailNotificationPreferencesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// EmailNotificationPreferencesValidationError is the validation error returned
+// by EmailNotificationPreferences.ValidateFields if the designated
+// constraints aren't met.
+type EmailNotificationPreferencesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e EmailNotificationPreferencesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e EmailNotificationPreferencesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e EmailNotificationPreferencesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e EmailNotificationPreferencesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e EmailNotificationPreferencesValidationError) ErrorName() string {
+	return "EmailNotificationPreferencesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e EmailNotificationPreferencesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sEmailNotificationPreferences.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = EmailNotificationPreferencesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = EmailNotificationPreferencesValidationError{}
+
 // ValidateFields checks the field values on UserConsolePreferences with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -401,6 +508,18 @@ func (m *User) ValidateFields(paths ...string) error {
 				if err := v.ValidateFields(subs...); err != nil {
 					return UserValidationError{
 						field:  "console_preferences",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "email_notification_preferences":
+
+			if v, ok := interface{}(m.GetEmailNotificationPreferences()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return UserValidationError{
+						field:  "email_notification_preferences",
 						reason: "embedded message failed validation",
 						cause:  err,
 					}

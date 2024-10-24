@@ -75,6 +75,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			ConsolePreferences: &ttnpb.UserConsolePreferences{
 				ConsoleTheme: ttnpb.ConsoleTheme_CONSOLE_THEME_LIGHT,
 			},
+			EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			},
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -101,6 +106,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			)
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+			a.So(created.EmailNotificationPreferences, should.Resemble, &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			})
 		}
 	})
 
@@ -222,6 +232,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 					ApiKey: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_LIST,
 				},
 			},
+			EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			},
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetUserId(), should.Equal, "foo")
@@ -250,6 +265,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 					},
 				},
 			)
+			a.So(updated.EmailNotificationPreferences, should.Resemble, &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			})
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}

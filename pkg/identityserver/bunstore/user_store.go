@@ -65,8 +65,9 @@ type User struct {
 	ProfilePictureID *string  `bun:"profile_picture_id"`
 	ProfilePicture   *Picture `bun:"rel:belongs-to,join:profile_picture_id=id"`
 
-	ConsolePreferences json.RawMessage `bun:"console_preferences"`
-	UniversalRights    []int           `bun:"universal_rights,array,nullzero"`
+	ConsolePreferences           json.RawMessage `bun:"console_preferences"`
+	UniversalRights              []int           `bun:"universal_rights,array,nullzero"`
+	EmailNotificationPreferences []int           `bun:"email_notification_preferences,array,nullzero"`
 }
 
 // BeforeAppendModel is a hook that modifies the model on SELECT and UPDATE queries.
@@ -107,6 +108,10 @@ func userToPB(m *User, fieldMask ...string) (*ttnpb.User, error) {
 		TemporaryPasswordExpiresAt: ttnpb.ProtoTime(m.TemporaryPasswordExpiresAt),
 
 		ConsolePreferences: &ttnpb.UserConsolePreferences{},
+
+		EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+			Types: convertIntSlice[int, ttnpb.NotificationType](m.EmailNotificationPreferences),
+		},
 	}
 
 	if len(m.Attributes) > 0 {
@@ -181,6 +186,7 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		TemporaryPassword:              pb.TemporaryPassword,
 		TemporaryPasswordCreatedAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordCreatedAt)),
 		TemporaryPasswordExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordExpiresAt)),
+		EmailNotificationPreferences:   convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.GetTypes()),
 	}
 
 	if pb.ProfilePicture != nil {
@@ -234,7 +240,6 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 	if err != nil {
 		return nil, storeutil.WrapDriverError(err)
 	}
-
 	if len(pb.Attributes) > 0 {
 		userModel.Attributes, err = s.replaceAttributes(
 			ctx, nil, pb.Attributes, "user", userModel.ID,
@@ -283,6 +288,8 @@ func (*userStore) selectWithFields(q *bun.SelectQuery, fieldMask store.FieldMask
 				"console_preferences.dashboard_layouts",
 				"console_preferences.sort_by":
 				columns = append(columns, "console_preferences")
+			case "email_notification_preferences", "email_notification_preferences.types":
+				columns = append(columns, "email_notification_preferences")
 			case "attributes":
 				q = q.Relation("Attributes")
 			case "administrative_contact":
@@ -599,6 +606,9 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 			consolePreferences.SortBy = pb.ConsolePreferences.GetSortBy()
 		case "universal_rights":
 			columns = append(columns, "universal_rights")
+		case "email_notification_preferences":
+			model.EmailNotificationPreferences = convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.Types)
+			columns = append(columns, "email_notification_preferences")
 		}
 	}
 

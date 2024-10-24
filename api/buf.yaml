@@ -31,6 +31,7 @@ lint:
       - ttn/lorawan/v3/messages.proto
       - ttn/lorawan/v3/metadata.proto
       - ttn/lorawan/v3/rights.proto
+      - ttn/lorawan/v3/notification_service.proto
     ENUM_VALUE_UPPER_SNAKE_CASE:
       - ttn/lorawan/v3/rights.proto
     ENUM_ZERO_VALUE_SUFFIX:
