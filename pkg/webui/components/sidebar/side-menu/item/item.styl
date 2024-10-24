@@ -48,8 +48,8 @@
     white-space: nowrap
 
   &.active
-    background: var(--c-bg-neutral-light)
-    color: var(--c-text-neutral-heavy)
+    background: var(--c-bg-brand-semilight)
+    color: var(--c-text-brand-normal)
 
     .icon
       color: inherit
@@ -60,8 +60,9 @@
     .icon
       color: inherit
 
-  &:hover
+  &:hover:not(&.active)
     color: var(--c-text-neutral-heavy)
+    background: var(--c-bg-neutral-light)
 
     .icon
       color: inherit

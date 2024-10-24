@@ -14,14 +14,15 @@
 
 .row
   display: table-row
+  border-radius: $br.s
   color: var(--c-text-neutral-light)
   transition: background-color $ad.xs linear
 
   &-head:not(.panel-style)
-    border-bottom: 1.5px solid var(--c-border-neutral-light)
+    background: var(--c-bg-neutral-min)
 
   &-body&:not(:last-child)
-    border-bottom: 1px solid var(--c-border-neutral-light)
+    border-bottom: 1px solid var(--c-border-neutral-extralight)
 
   &-footer
     display: flex
@@ -32,4 +33,4 @@
   color: unset
 
   &:hover
-    background-color: var(--c-bg-neutral-min-hover)
+    background: var(--c-bg-neutral-light)

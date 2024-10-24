@@ -39,10 +39,12 @@
 
   &-header
     position: sticky
-    background: var(--c-bg-neutral-min)
     z-index: $zi.slight
     top: 0
     display: table-header-group
+
+  &-header:not(.panel-style)
+    border-bottom: 1.5px solid var(--c-border-neutral-light)
 
   &-body
     display: table-row-group

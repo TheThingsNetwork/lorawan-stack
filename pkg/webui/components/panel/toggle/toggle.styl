@@ -21,7 +21,7 @@
   border-radius: $br.l
   border: 1px solid var(--c-border-neutral-light)
   color: var(--c-text-neutral-semilight)
-  background: var(--c-bg-neutral-min-hover)
+  background: var(--c-bg-neutral-light)
   box-sizing: border-box
   transition: background-color $ad.xs linear
 
@@ -29,6 +29,7 @@
     border-radius: $br.m
     padding: 0 $cs.s
     height: 2.25rem
+    font-weight: $fw.bold
     text-align: center
     border: 1px solid transparent
     transition: background 80ms ease-in-out
@@ -44,12 +45,11 @@
     &-active
       box-shadow: var(--shadow-box-button-normal)
       background: var(--c-bg-neutral-min)
-      font-weight: $fw.normal
-      border: 1px solid var(--c-border-neutral-light)
+      border: 1px solid var(--c-border-neutral-normal)
       color: var(--c-text-neutral-heavy)
 
     &:hover:not(.toggle-button-active)
-      background: var(--c-bg-neutral-extralight)
+      background: var(--c-bg-neutral-semilight)
 
 @container panel (max-width: 560px)
   .toggle
