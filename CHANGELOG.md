@@ -19,13 +19,17 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+### Security
+
+## [3.32.2] - unreleased
+
+### Fixed
+
 - Potential leak of end devices of other (owned) applications in the top end devices panel in the application overview of the Console.
 - Fix reversed Join Server dev nonce metrics.
 - Identity Server's store runs each migration within a transaction, so a migration's changes are only applied if all of its queries are successful.
   - Identity Server's store now marks a migration as successful after all its operations are finished. Previously it was possible to have a successful migration which not all of its queries were processed.
 - Enforce default page limit on IS List RPCs if a value is not provided in the request.
-
-### Security
 
 ## [3.32.1] - unreleased
 
@@ -2891,7 +2895,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.1...v3.32
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.2...v3.32
+[3.32.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.1...v3.32.2
 [3.32.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.0...v3.32.1
 [3.32.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.1...v3.32.0
 [3.31.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.0...v3.31.1
