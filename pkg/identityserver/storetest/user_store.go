@@ -265,6 +265,11 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 					},
 				},
 			)
+			a.So(updated.EmailNotificationPreferences, should.Resemble, &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			})
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}
