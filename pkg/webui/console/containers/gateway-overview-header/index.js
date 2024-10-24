@@ -123,7 +123,12 @@ const GatewayOverviewHeader = ({ gateway }) => {
       <Dropdown.Item title={sharedMessages.downloadGlobalConf} action={handleGlobalConfDownload} />
       {/* <Dropdown.Item title={m.duplicateGateway} action={() => {}} />*/}
       {mayDeleteGtw && (
-        <Dropdown.Item title={sharedMessages.deleteGateway} action={handleOpenDeleteGatewayModal} />
+        <Dropdown.Item
+          title={
+            supportsClaiming ? sharedMessages.unclaimAndDeleteGateway : sharedMessages.deleteGateway
+          }
+          action={handleOpenDeleteGatewayModal}
+        />
       )}
     </>
   )
@@ -158,6 +163,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
             noDropdownIcon
             dropdownItems={menuDropdownItems}
             dropdownPosition="below left"
+            data-test-id="gateway-overview-menu"
           />
         </div>
         <DeleteEntityHeaderModal

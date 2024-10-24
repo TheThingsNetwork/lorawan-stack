@@ -79,11 +79,6 @@ const path = {
   [GATEWAY]: '/gateways',
 }
 
-const deleteMessageMap = {
-  [APPLICATION]: sharedMessages.deleteApp,
-  [GATEWAY]: sharedMessages.deleteGateway,
-}
-
 const deletedMessageMap = {
   [APPLICATION]: sharedMessages.deleteSuccess,
   [GATEWAY]: sharedMessages.gatewayDeleted,
@@ -112,6 +107,14 @@ const DeleteEntityHeaderModal = props => {
   const [purgeEntity, setPurgeEntity] = React.useState(false)
   const dispatch = useDispatch()
   const navigate = useNavigate()
+
+  const deleteMessageMap = {
+    [APPLICATION]: sharedMessages.deleteApp,
+    [GATEWAY]:
+      supportsClaiming && isGateway
+        ? sharedMessages.unclaimAndDeleteGateway
+        : sharedMessages.deleteGateway,
+  }
 
   const mayPurgeEntity = useSelector(state => checkFromState(mayPurgeEntities, state))
   const mayDeleteEntity = useSelector(state =>
