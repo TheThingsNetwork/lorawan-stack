@@ -41,7 +41,7 @@ import {
   mayViewOrEditGatewayCollaborators,
 } from '@console/lib/feature-checks'
 
-import { updateGateway, getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
+import { updateGateway } from '@console/store/actions/gateways'
 import { getApiKeysList } from '@console/store/actions/api-keys'
 import { getIsConfiguration } from '@console/store/actions/identity-server'
 
@@ -131,9 +131,6 @@ const GatewayGeneralSettingsInner = () => {
 
 const GatewaySettings = () => {
   const gtwId = useSelector(selectSelectedGatewayId)
-  const {
-    ids: { eui },
-  } = useSelector(selectSelectedGateway)
   const mayDeleteGtw = useSelector(state => checkFromState(mayDeleteGateway, state))
   const mayViewApiKeys = useSelector(state => checkFromState(mayViewOrEditGatewayApiKeys, state))
   const mayViewCollaborators = useSelector(state =>
@@ -151,9 +148,8 @@ const GatewaySettings = () => {
         }
       }
       dispatch(attachPromise(getIsConfiguration()))
-      dispatch(attachPromise(getGatewayClaimInfoByEui(eui, true)))
     },
-    [mayDeleteGtw, eui, mayViewApiKeys, mayViewCollaborators, gtwId],
+    [mayDeleteGtw, mayViewApiKeys, mayViewCollaborators, gtwId],
   )
 
   useBreadcrumbs(

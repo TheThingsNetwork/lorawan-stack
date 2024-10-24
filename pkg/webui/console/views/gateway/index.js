@@ -44,6 +44,7 @@ import {
   getGateway,
   stopGatewayEventsStream,
   getGatewaysRightsList,
+  getGatewayClaimInfoByEui,
 } from '@console/store/actions/gateways'
 import { getGsFrequencyPlans } from '@console/store/actions/configuration'
 import { trackRecencyFrequencyItem } from '@console/store/actions/recency-frequency-items'
@@ -82,9 +83,11 @@ const Gateway = () => {
         selector.push('lbs_lns_secret')
       }
 
-      dispatch(getGsFrequencyPlans())
+      await dispatch(getGsFrequencyPlans())
 
-      return dispatch(attachPromise(getGateway(gtwId, selector)))
+      const { ids } = await dispatch(attachPromise(getGateway(gtwId, selector)))
+
+      await dispatch(attachPromise(getGatewayClaimInfoByEui(ids.eui, true)))
     },
     [gtwId],
   )
