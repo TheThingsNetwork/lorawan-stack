@@ -186,7 +186,7 @@ func (s *userStore) CreateUser(ctx context.Context, pb *ttnpb.User) (*ttnpb.User
 		TemporaryPassword:              pb.TemporaryPassword,
 		TemporaryPasswordCreatedAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordCreatedAt)),
 		TemporaryPasswordExpiresAt:     cleanTimePtr(ttnpb.StdTime(pb.TemporaryPasswordExpiresAt)),
-		EmailNotificationPreferences:   convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.GetTypes()),
+		EmailNotificationPreferences:   convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.GetTypes()), // nolint:lll
 	}
 
 	if pb.ProfilePicture != nil {
@@ -607,7 +607,8 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "universal_rights":
 			columns = append(columns, "universal_rights")
 		case "email_notification_preferences":
-			model.EmailNotificationPreferences = convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.Types)
+		case "email_notification_preferences.types":
+			model.EmailNotificationPreferences = convertIntSlice[ttnpb.NotificationType, int](pb.EmailNotificationPreferences.Types) // nolint:lll
 			columns = append(columns, "email_notification_preferences")
 		}
 	}
