@@ -28,6 +28,7 @@ import {
   IconApiKeys,
   IconShieldLock,
   IconLockOpen,
+  IconMailCog,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 
@@ -126,6 +127,13 @@ const GeneralSideNavigation = () => {
               title={sharedMessages.password}
               path="/user-settings/password"
               icon={IconPassword}
+            />
+          )}
+          {showProfileSettings && (
+            <SideNavigation.Item
+              title={'Email notifications'}
+              path="/user-settings/email-notifications-settings"
+              icon={IconMailCog}
             />
           )}
           {showUserApiKeys && (

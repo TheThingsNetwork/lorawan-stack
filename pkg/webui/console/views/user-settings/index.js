@@ -24,6 +24,7 @@ import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 import ProfileSettings from '@console/views/user-settings-profile'
 import UserApiKeys from '@console/views/user-api-keys'
 import ChangePassword from '@console/views/user-settings-password'
+import EmailNotificationsSettings from '@console/views/user-settings-email-notifications'
 import SessionManagement from '@console/views/user-settings-sessions'
 import OAuthClientAuthorizations from '@console/views/user-settings-oauth-client-authorizations'
 import OAuthClients from '@console/views/user-settings-oauth-clients'
@@ -34,7 +35,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 const UserSettings = () => {
   useBreadcrumbs(
     'user-settings',
-    <Breadcrumb path={`/user-settings`} content={sharedMessages.userSettings} />,
+    <Breadcrumb path="/user-settings" content={sharedMessages.userSettings} />,
   )
   return (
     <>
@@ -42,6 +43,7 @@ const UserSettings = () => {
       <Routes>
         <Route path="profile" Component={ProfileSettings} />
         <Route path="password" Component={ChangePassword} />
+        <Route path="email-notifications-settings" Component={EmailNotificationsSettings} />
         <Route path="api-keys/*" Component={UserApiKeys} />
         <Route path="sessions/*" Component={SessionManagement} />
         <Route path="authorizations/*" Component={OAuthClientAuthorizations} />

@@ -47,9 +47,4 @@ export default Yup.object().shape({
   primary_email_address: Yup.string()
     .email(sharedMessages.validateEmail)
     .required(sharedMessages.validateRequired),
-  email_notification_preferences: Yup.object()
-    .shape({
-      email_notification_types: Yup.array(),
-    })
-    .nullable(),
 })
