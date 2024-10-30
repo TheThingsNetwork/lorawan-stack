@@ -41,6 +41,11 @@ func TestEmailNotificationPreferences(t *testing.T) {
 	}
 
 	usr1 := p.NewUser()
+	usr1.EmailNotificationPreferences = &ttnpb.EmailNotificationPreferences{
+		Types: []ttnpb.NotificationType{
+			ttnpb.NotificationType_API_KEY_CREATED,
+		},
+	}
 	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
 		ttnpb.Right_RIGHT_APPLICATION_INFO,
 		ttnpb.Right_RIGHT_APPLICATION_LINK,

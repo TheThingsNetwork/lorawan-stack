@@ -55,7 +55,9 @@ func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.Noti
 	return false
 }
 
-func notificationTypeAllowed(notificationType ttnpb.NotificationType, allowedNotifications []ttnpb.NotificationType) bool { //nolint:lll
+func notificationTypeAllowed(
+	notificationType ttnpb.NotificationType, allowedNotifications []ttnpb.NotificationType,
+) bool {
 	for _, allowedType := range allowedNotifications {
 		if notificationType == allowedType {
 			return true
@@ -64,7 +66,9 @@ func notificationTypeAllowed(notificationType ttnpb.NotificationType, allowedNot
 	return false
 }
 
-func filterAllowedEmailReveivers(emailReceiverUsers []*ttnpb.User, notificationType ttnpb.NotificationType) []*ttnpb.UserIdentifiers { //nolint:lll
+func filterAllowedEmailReveivers(
+	emailReceiverUsers []*ttnpb.User, notificationType ttnpb.NotificationType,
+) []*ttnpb.UserIdentifiers {
 	var emailReceiverIDs []*ttnpb.UserIdentifiers
 
 	// Collect IDs of users that have email notifications enabled for that notification type.
@@ -291,7 +295,9 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	}
 
 	if len(emailReceiverIDs) > 0 && email.GetNotification(ctx, req.GetNotificationType()) == nil {
-		log.FromContext(ctx).WithField("notification_type", req.GetNotificationType()).Warn("email template for notification not registered") // nolint:lll
+		log.FromContext(ctx).
+			WithField("notification_type", req.GetNotificationType()).
+			Warn("email template for notification not registered")
 		emailReceiverIDs = nil
 	}
 
