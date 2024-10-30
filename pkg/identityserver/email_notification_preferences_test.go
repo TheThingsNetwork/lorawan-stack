@@ -143,6 +143,6 @@ func TestEmailNotificationPreferences(t *testing.T) {
 
 		entries, err = os.ReadDir(tempDir)
 		a.So(err, should.BeNil)
-		a.So(entries, should.HaveLength, 3)
+		a.So(entries, should.HaveLength, 2)
 	}, withPrivateTestDatabase(p))
 }
