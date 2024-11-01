@@ -46,12 +46,6 @@ func TestEmailNotificationPreferences(t *testing.T) {
 			ttnpb.NotificationType_API_KEY_CREATED,
 		},
 	}
-	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
-		ttnpb.Right_RIGHT_APPLICATION_INFO,
-		ttnpb.Right_RIGHT_APPLICATION_LINK,
-		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_API_KEYS,
-	)
-	usr1Creds := rpcCreds(usr1Key)
 
 	app1 := p.NewApplication(admin.GetOrganizationOrUserIdentifiers())
 	p.NewMembership(
@@ -106,6 +100,8 @@ func TestEmailNotificationPreferences(t *testing.T) {
 			})
 		}
 
+		time.Sleep(test.Delay * 1000)
+
 		entries, err := os.ReadDir(tempDir)
 		a.So(err, should.BeNil)
 		a.So(entries, should.HaveLength, 0)
@@ -127,24 +123,25 @@ func TestEmailNotificationPreferences(t *testing.T) {
 			a.So(updatedUser.State, should.Equal, ttnpb.State_STATE_REQUESTED)
 		}
 
+		time.Sleep(test.Delay * 1000)
+
 		entries, err = os.ReadDir(tempDir)
 		a.So(err, should.BeNil)
-		a.So(entries, should.HaveLength, 1)
+		// Creating a user send 2 email, one for the admin to approve and another for the user to confirm the email.
+		a.So(entries, should.HaveLength, 2)
 
-		time.Sleep(test.Delay)
-
-		// Test users receiving email notification because this notification type is in the list of preferences.
-		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}} {
-			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-				ApplicationIds: app1.GetIds(),
-				Name:           "api-key-name",
-				Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO},
-			}, opts...)
-			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
-				a.So(created.Name, should.Equal, "api-key-name")
-				a.So(created.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO})
-			}
+		// Test user receiving email notification because this notification type is in the list of preferences.
+		created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+			ApplicationIds: app1.GetIds(),
+			Name:           "api-key-name",
+			Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO},
+		}, adminCreds)
+		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
+			a.So(created.Name, should.Equal, "api-key-name")
+			a.So(created.Rights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO})
 		}
+
+		time.Sleep(test.Delay * 1000)
 
 		entries, err = os.ReadDir(tempDir)
 		a.So(err, should.BeNil)
