@@ -297,7 +297,7 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	}
 	events.Publish(evs...)
 
-	// From this point onwards its just the email receivers logic!
+	// Filter email receivers
 	var emailReceiverIDs []*ttnpb.UserIdentifiers
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// Get the email notification preferences of the receiver users.
@@ -317,11 +317,11 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
 		log.FromContext(ctx).
 			WithField("notification_type", req.GetNotificationType()).
-			Warn("email template for notification not registered")
+			Warn("Email template for notification not registered")
 		emailReceiverIDs = nil
 	}
 
-	if emailReceiverIDs != nil || len(emailReceiverIDs) > 0 {
+	if len(emailReceiverIDs) > 0 {
 		if err := is.SendNotificationEmailToUserIDs(ctx, notification, emailReceiverIDs...); err != nil {
 			return nil, err
 		}
@@ -345,7 +345,9 @@ func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.C
 	}
 
 	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
-		log.FromContext(ctx).WithField("notification_type", req.GetNotificationType()).Warn("email template for notification not registered")
+		log.FromContext(ctx).
+			WithField("notification_type", req.GetNotificationType()).
+			Warn("Email template for notification not registered")
 	}
 	var receivers []*ttnpb.User
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
