@@ -16,6 +16,8 @@ package ttnpb
 
 import "strings"
 
+// Convert the NotificationType enum into lowercase string.
+// TODO: Use the enum directly everywhere in v4.
 func GetNotificationTypeString(t NotificationType) string {
 	return strings.ToLower(t.String())
 }
