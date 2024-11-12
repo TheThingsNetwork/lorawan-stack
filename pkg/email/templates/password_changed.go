@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, ttnpb.NotificationType_PASSWORD_CHANGED,
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED),
 		email.FSTemplate{
 			SubjectTemplate:      "Your password on {{ .Network.Name }} has been changed",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -35,10 +35,11 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification(ttnpb.NotificationType_PASSWORD_CHANGED, &email.NotificationBuilder{
-		EmailTemplateName: ttnpb.NotificationType_PASSWORD_CHANGED,
-		DataBuilder:       newPasswordChangedData,
-	})
+	email.RegisterNotification(
+		ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED), &email.NotificationBuilder{
+			EmailTemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED),
+			DataBuilder:       newPasswordChangedData,
+		})
 }
 
 func newPasswordChangedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {

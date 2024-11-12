@@ -73,8 +73,8 @@ func (reg MapNotificationRegistry) GetNotification(_ context.Context, name strin
 var defaultNotificationRegistry = make(MapNotificationRegistry)
 
 // RegisterNotification registers an email notification on the default registry.
-func RegisterNotification(name ttnpb.NotificationType, builder *NotificationBuilder) {
-	defaultNotificationRegistry.RegisterNotification(name.String(), builder)
+func RegisterNotification(name string, builder *NotificationBuilder) {
+	defaultNotificationRegistry.RegisterNotification(name, builder)
 }
 
 // RegisteredNotifications returns the names of the registered email notifications in the default registry.
@@ -83,13 +83,13 @@ func RegisteredNotifications() []string {
 }
 
 // GetNotification returns a registered email notification from the registry in the context (if available), otherwise falling back to the default registry.
-func GetNotification(ctx context.Context, name ttnpb.NotificationType) *NotificationBuilder {
+func GetNotification(ctx context.Context, name string) *NotificationBuilder {
 	if reg, ok := notificationRegistryFromContext(ctx); ok {
-		if tmpl := reg.GetNotification(ctx, name.String()); tmpl != nil {
+		if tmpl := reg.GetNotification(ctx, name); tmpl != nil {
 			return tmpl
 		}
 	}
-	return defaultNotificationRegistry.GetNotification(ctx, name.String())
+	return defaultNotificationRegistry.GetNotification(ctx, name)
 }
 
 // NotificationTemplateData extends TemplateData for notifications.
@@ -169,6 +169,6 @@ func (d *notificationTemplateData) Receivers() string {
 
 // NotificationBuilder is used to build notifications.
 type NotificationBuilder struct {
-	EmailTemplateName ttnpb.NotificationType
+	EmailTemplateName string
 	DataBuilder       NotificationTemplateDataBuilder
 }

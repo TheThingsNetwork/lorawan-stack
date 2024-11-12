@@ -40,7 +40,7 @@ func TestEmail(t *testing.T) {
 	registry := email.NewTemplateRegistry()
 
 	welcomeEmailTemplate, err := email.NewTemplateFS(
-		os.DirFS("testdata"), ttnpb.NotificationType_UNKNOWN,
+		os.DirFS("testdata"), ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 		email.FSTemplate{
 			SubjectTemplate:      "Welcome to {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html",
@@ -53,8 +53,8 @@ func TestEmail(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	registry.RegisterTemplate(welcomeEmailTemplate)
-	a.So(registry.RegisteredTemplates(), should.Contain, "UNKNOWN")
-	returnedTemplate := registry.GetTemplate(ctx, ttnpb.NotificationType_UNKNOWN)
+	a.So(registry.RegisteredTemplates(), should.Contain, "unknown")
+	returnedTemplate := registry.GetTemplate(ctx, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN))
 
 	for i, template := range []*email.Template{welcomeEmailTemplate, returnedTemplate} {
 		template := template

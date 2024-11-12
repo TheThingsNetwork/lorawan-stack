@@ -173,10 +173,10 @@ func (x *Notification) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		s.WriteObjectField("entity_ids")
 		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
 	}
-	if x.NotificationType != 0 || s.HasField("notification_type") {
+	if x.NotificationType != "" || s.HasField("notification_type") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("notification_type")
-		x.NotificationType.MarshalProtoJSON(s)
+		s.WriteString(x.NotificationType)
 	}
 	if x.Data != nil || s.HasField("data") {
 		s.WriteMoreIf(&wroteField)
@@ -263,7 +263,7 @@ func (x *Notification) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
 		case "notification_type", "notificationType":
 			s.AddField("notification_type")
-			x.NotificationType.UnmarshalProtoJSON(s)
+			x.NotificationType = s.ReadString()
 		case "data":
 			s.AddField("data")
 			if s.ReadNil() {
@@ -335,10 +335,10 @@ func (x *CreateNotificationRequest) MarshalProtoJSON(s *jsonplugin.MarshalState)
 		s.WriteObjectField("entity_ids")
 		x.EntityIds.MarshalProtoJSON(s.WithField("entity_ids"))
 	}
-	if x.NotificationType != 0 || s.HasField("notification_type") {
+	if x.NotificationType != "" || s.HasField("notification_type") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("notification_type")
-		x.NotificationType.MarshalProtoJSON(s)
+		s.WriteString(x.NotificationType)
 	}
 	if x.Data != nil || s.HasField("data") {
 		s.WriteMoreIf(&wroteField)
@@ -397,7 +397,7 @@ func (x *CreateNotificationRequest) UnmarshalProtoJSON(s *jsonplugin.UnmarshalSt
 			x.EntityIds.UnmarshalProtoJSON(s.WithField("entity_ids", true))
 		case "notification_type", "notificationType":
 			s.AddField("notification_type")
-			x.NotificationType.UnmarshalProtoJSON(s)
+			x.NotificationType = s.ReadString()
 		case "data":
 			s.AddField("data")
 			if s.ReadNil() {

@@ -76,7 +76,7 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 		} {
 			created, err := s.CreateNotification(ctx, &ttnpb.Notification{
 				EntityIds:        ids.GetEntityIdentifiers(),
-				NotificationType: ttnpb.NotificationType_UNKNOWN,
+				NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 				Data:             notificationData,
 				SenderIds:        usr1.GetIds(),
 				Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
@@ -85,7 +85,7 @@ func (st *StoreTest) TestNotificationStore(t *T) {
 			if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
 				a.So(created.Id, should.NotBeBlank)
 				a.So(created.EntityIds, should.Resemble, ids.GetEntityIdentifiers())
-				a.So(created.NotificationType, should.Equal, ttnpb.NotificationType_UNKNOWN)
+				a.So(created.NotificationType, should.Equal, "unknown")
 				a.So(created.Data, should.Resemble, notificationData)
 				a.So(created.SenderIds, should.Resemble, usr1.GetIds())
 				a.So(created.Receivers, should.Resemble, []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR})

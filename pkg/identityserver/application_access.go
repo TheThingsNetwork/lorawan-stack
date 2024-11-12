@@ -104,7 +104,7 @@ func (is *IdentityServer) createApplicationAPIKey(
 	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.GetApplicationIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetApplicationIds().GetEntityIdentifiers(),
-		NotificationType: ttnpb.NotificationType_API_KEY_CREATED,
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
@@ -225,7 +225,7 @@ func (is *IdentityServer) updateApplicationAPIKey(
 	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.GetApplicationIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetApplicationIds().GetEntityIdentifiers(),
-		NotificationType: ttnpb.NotificationType_API_KEY_CHANGED,
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
@@ -368,7 +368,7 @@ func (is *IdentityServer) setApplicationCollaborator(
 		))
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetApplicationIds().GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_COLLABORATOR_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_COLLABORATOR_CHANGED),
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,

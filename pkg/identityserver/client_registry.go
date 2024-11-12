@@ -153,7 +153,7 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 	if !createdByAdmin && cli.State == ttnpb.State_STATE_REQUESTED {
 		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetClient().GetIds().GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_CLIENT_REQUESTED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_CLIENT_REQUESTED),
 			Data: ttnpb.MustMarshalAny(
 				&ttnpb.CreateClientEmailMessage{
 					CreateClientRequest: req,
@@ -367,7 +367,7 @@ func (is *IdentityServer) updateClient(
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        cli.GetIds().GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_ENTITY_STATE_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
 				State:            cli.State,
 				StateDescription: cli.StateDescription,

@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, ttnpb.NotificationType_VALIDATE,
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_VALIDATE),
 		email.FSTemplate{
 			SubjectTemplate:      "Please confirm your email address for {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",

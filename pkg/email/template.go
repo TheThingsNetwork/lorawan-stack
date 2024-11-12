@@ -44,7 +44,7 @@ func newContextWithTemplateRegistry(parent context.Context, reg TemplateRegistry
 // TemplateRegistry keeps track of email templates.
 type TemplateRegistry interface {
 	RegisteredTemplates() []*ttnpb.NotificationType
-	GetTemplate(ctx context.Context, name ttnpb.NotificationType) *Template
+	GetTemplate(ctx context.Context, name string) *Template
 }
 
 // NewTemplateRegistry returns a new empty template registry.
@@ -57,7 +57,7 @@ type MapTemplateRegistry map[string]*Template
 
 // RegisterTemplate registers a template.
 func (reg MapTemplateRegistry) RegisterTemplate(tmpl *Template) {
-	reg[tmpl.Name.String()] = tmpl
+	reg[tmpl.Name] = tmpl
 }
 
 // RegisteredTemplates returns a sorted list of the names of all registered templates.
@@ -71,8 +71,8 @@ func (reg MapTemplateRegistry) RegisteredTemplates() []string {
 }
 
 // GetTemplate returns a registered template from the registry.
-func (reg MapTemplateRegistry) GetTemplate(_ context.Context, name ttnpb.NotificationType) *Template {
-	return reg[name.String()]
+func (reg MapTemplateRegistry) GetTemplate(_ context.Context, name string) *Template {
+	return reg[name]
 }
 
 var defaultTemplateRegistry = make(MapTemplateRegistry)
@@ -88,7 +88,7 @@ func RegisteredTemplates() []string {
 }
 
 // GetTemplate returns a registered template from the registry in the context (if available), otherwise falling back to the default registry.
-func GetTemplate(ctx context.Context, name ttnpb.NotificationType) *Template {
+func GetTemplate(ctx context.Context, name string) *Template {
 	if reg, ok := templateRegistryFromContext(ctx); ok {
 		if tmpl := reg.GetTemplate(ctx, name); tmpl != nil {
 			return tmpl
@@ -99,7 +99,7 @@ func GetTemplate(ctx context.Context, name ttnpb.NotificationType) *Template {
 
 // Template is the template for an email message.
 type Template struct {
-	Name            ttnpb.NotificationType
+	Name            string
 	SubjectTemplate *template.Template
 	HTMLTemplate    *template.Template
 	TextTemplate    *template.Template
@@ -118,7 +118,7 @@ type FSTemplate struct {
 }
 
 // NewTemplateFS parses a new email template by reading files on fsys.
-func NewTemplateFS(fsys fs.FS, name ttnpb.NotificationType, opts FSTemplate) (*Template, error) {
+func NewTemplateFS(fsys fs.FS, name string, opts FSTemplate) (*Template, error) {
 	var (
 		shared = template.Must(shared.Clone())
 		err    error

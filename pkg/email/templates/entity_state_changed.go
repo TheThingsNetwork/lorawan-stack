@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, ttnpb.NotificationType_ENTITY_STATE_CHANGED,
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED),
 		email.FSTemplate{
 			SubjectTemplate:      "The state of your {{ .Notification.EntityIds.EntityType }} has been changed",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -35,10 +35,11 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification(ttnpb.NotificationType_ENTITY_STATE_CHANGED, &email.NotificationBuilder{
-		EmailTemplateName: ttnpb.NotificationType_ENTITY_STATE_CHANGED,
-		DataBuilder:       newEntityStateChangedData,
-	})
+	email.RegisterNotification(
+		ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED), &email.NotificationBuilder{
+			EmailTemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED),
+			DataBuilder:       newEntityStateChangedData,
+		})
 }
 
 func newEntityStateChangedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {

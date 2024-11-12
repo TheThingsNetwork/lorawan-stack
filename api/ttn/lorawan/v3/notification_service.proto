@@ -40,7 +40,23 @@ message Notification {
   EntityIdentifiers entity_ids = 3;
 
   // The type of this notification.
-  NotificationType notification_type = 4;
+  // TODO: Replace with type NotificationType in v4.
+  string notification_type = 4 [(validate.rules).string = {
+    in: [
+      "unknown",
+      "api_key_created",
+      "api_key_changed",
+      "client_requested",
+      "collaborator_changed",
+      "entity_state_changed",
+      "invitation",
+      "login_token",
+      "password_changed",
+      "temporary_password",
+      "user_requested",
+      "validate"
+    ]
+  }];
 
   // The data related to the notification.
   google.protobuf.Any data = 5;
@@ -120,7 +136,22 @@ message CreateNotificationRequest {
   EntityIdentifiers entity_ids = 1 [(validate.rules).message.required = true];
 
   // The type of this notification.
-  NotificationType notification_type = 2 [(validate.rules).enum.defined_only = true];
+  string notification_type = 2 [(validate.rules).string = {
+    in: [
+      "unknown",
+      "api_key_created",
+      "api_key_changed",
+      "client_requested",
+      "collaborator_changed",
+      "entity_state_changed",
+      "invitation",
+      "login_token",
+      "password_changed",
+      "temporary_password",
+      "user_requested",
+      "validate"
+    ]
+  }];
 
   // The data related to the notification.
   google.protobuf.Any data = 3;

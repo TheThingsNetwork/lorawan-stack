@@ -56,10 +56,10 @@ func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.Noti
 }
 
 func notificationTypeAllowed(
-	notificationType ttnpb.NotificationType, allowedNotifications []ttnpb.NotificationType,
+	notificationType string, allowedNotifications []ttnpb.NotificationType,
 ) bool {
 	for _, allowedType := range allowedNotifications {
-		if notificationType == allowedType {
+		if notificationType == ttnpb.GetNotificationTypeString(allowedType) {
 			return true
 		}
 	}
@@ -67,7 +67,7 @@ func notificationTypeAllowed(
 }
 
 func filterAllowedEmailReveivers(
-	emailReceiverUsers []*ttnpb.User, notificationType ttnpb.NotificationType,
+	emailReceiverUsers []*ttnpb.User, notificationType string,
 ) []*ttnpb.UserIdentifiers {
 	var emailReceiverIDs []*ttnpb.UserIdentifiers
 

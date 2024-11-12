@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, ttnpb.NotificationType_INVITATION,
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_INVITATION),
 		email.FSTemplate{
 			SubjectTemplate:      "You have been invited to join {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",

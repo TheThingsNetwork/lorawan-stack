@@ -65,7 +65,7 @@ func (is *IdentityServer) SendEmail(ctx context.Context, message *email.Message)
 // SendTemplateEmailToUsers sends an email to users.
 func (is *IdentityServer) SendTemplateEmailToUsers(
 	ctx context.Context,
-	templateName ttnpb.NotificationType,
+	templateName string,
 	dataBuilder email.TemplateDataBuilder,
 	receivers ...*ttnpb.User,
 ) error {
@@ -125,7 +125,7 @@ var emailUserFields = store.FieldMask{"ids", "name", "primary_email_address"}
 // SendTemplateEmailToUserIDs looks up the users and sends them an email.
 func (is *IdentityServer) SendTemplateEmailToUserIDs(
 	ctx context.Context,
-	templateName ttnpb.NotificationType,
+	templateName string,
 	dataBuilder email.TemplateDataBuilder,
 	receiverIDs ...*ttnpb.UserIdentifiers,
 ) error {

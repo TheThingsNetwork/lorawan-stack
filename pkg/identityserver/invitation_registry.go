@@ -70,7 +70,7 @@ func (is *IdentityServer) sendInvitation(ctx context.Context, in *ttnpb.SendInvi
 	events.Publish(evtCreateInvitation.NewWithIdentifiersAndData(ctx, nil, invitation))
 	go is.SendTemplateEmailToUsers( // nolint:errcheck
 		is.FromRequestContext(ctx),
-		ttnpb.NotificationType_INVITATION,
+		ttnpb.GetNotificationTypeString(ttnpb.NotificationType_INVITATION),
 		func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
 			return &templates.InvitationData{
 				TemplateData:    data,

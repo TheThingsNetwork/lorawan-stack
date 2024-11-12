@@ -62,11 +62,11 @@ func TestEmailTemplates(t *testing.T) {
 	}
 
 	for _, tc := range []struct {
-		TemplateName ttnpb.NotificationType
+		TemplateName string
 		TemplateData email.TemplateData
 	}{
 		{
-			TemplateName: ttnpb.NotificationType_INVITATION,
+			TemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_INVITATION),
 			TemplateData: &InvitationData{
 				TemplateData:    testTemplateData,
 				SenderIds:       usrIDs,
@@ -76,7 +76,7 @@ func TestEmailTemplates(t *testing.T) {
 		},
 
 		{
-			TemplateName: ttnpb.NotificationType_LOGIN_TOKEN,
+			TemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_LOGIN_TOKEN),
 			TemplateData: &LoginTokenData{
 				TemplateData: testTemplateData,
 				LoginToken:   "TOKEN",
@@ -85,7 +85,7 @@ func TestEmailTemplates(t *testing.T) {
 		},
 
 		{
-			TemplateName: ttnpb.NotificationType_TEMPORARY_PASSWORD,
+			TemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_TEMPORARY_PASSWORD),
 			TemplateData: &TemporaryPasswordData{
 				TemplateData:      testTemplateData,
 				TemporaryPassword: "TEMPORARY",
@@ -94,7 +94,7 @@ func TestEmailTemplates(t *testing.T) {
 		},
 
 		{
-			TemplateName: ttnpb.NotificationType_VALIDATE,
+			TemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_VALIDATE),
 			TemplateData: &ValidateData{
 				TemplateData:      testTemplateData,
 				EntityIdentifiers: usrIDs.GetEntityIdentifiers(),
@@ -105,7 +105,7 @@ func TestEmailTemplates(t *testing.T) {
 		},
 	} {
 		tc := tc
-		t.Run(tc.TemplateName.String(), func(t *testing.T) {
+		t.Run(tc.TemplateName, func(t *testing.T) {
 			t.Parallel()
 			a, ctx := test.New(t)
 
@@ -142,7 +142,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 	for _, notification := range []*ttnpb.Notification{
 		{
 			EntityIds:        appIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_API_KEY_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.APIKey{
 				Id:   "TEST",
 				Name: "API Key Name",
@@ -164,7 +164,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 		{
 			Id:               "with_sender_ids",
 			EntityIds:        appIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_API_KEY_CREATED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.APIKey{
 				Id:   "TEST",
 				Name: "API Key Name",
@@ -186,7 +186,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 		{
 			Id:               "with_api_key_name",
 			EntityIds:        cliIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_CLIENT_REQUESTED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_CLIENT_REQUESTED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientEmailMessage{
 				ApiKey: &ttnpb.APIKey{
 					Name: "My API key Name",
@@ -227,7 +227,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 		{
 			Id:               "with_api_key_id",
 			EntityIds:        cliIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_CLIENT_REQUESTED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_CLIENT_REQUESTED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientEmailMessage{
 				ApiKey: &ttnpb.APIKey{
 					Id: "My API key ID",
@@ -266,7 +266,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 		},
 		{
 			EntityIds:        cliIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_CLIENT_REQUESTED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_CLIENT_REQUESTED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.CreateClientEmailMessage{
 				CreateClientRequest: &ttnpb.CreateClientRequest{
 					Client: &ttnpb.Client{
@@ -303,7 +303,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 
 		{
 			EntityIds:        appIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_COLLABORATOR_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_COLLABORATOR_CHANGED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.Collaborator{
 				Ids: usrIDs.GetOrganizationOrUserIdentifiers(),
 				Rights: []ttnpb.Right{
@@ -318,7 +318,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 
 		{
 			EntityIds:        cliIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_ENTITY_STATE_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
 				State:            ttnpb.State_STATE_FLAGGED,
 				StateDescription: "This OAuch client has been sending a large number of invalid requests.",
@@ -328,12 +328,12 @@ func TestNotificationEmailTemplates(t *testing.T) {
 
 		{
 			EntityIds:        usrIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_PASSWORD_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED),
 		},
 
 		{
 			EntityIds:        usrIDs.GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_USER_REQUESTED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_USER_REQUESTED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.CreateUserRequest{
 				User: &ttnpb.User{
 					Ids:                 usrIDs,
@@ -349,7 +349,7 @@ func TestNotificationEmailTemplates(t *testing.T) {
 	} {
 		notification := ttnpb.Clone(notification)
 		notification.CreatedAt = now
-		t.Run(notification.NotificationType.String(), func(t *testing.T) {
+		t.Run(notification.NotificationType, func(t *testing.T) {
 			t.Parallel()
 			a, ctx := test.New(t)
 

@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, ttnpb.NotificationType_LOGIN_TOKEN,
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_LOGIN_TOKEN),
 		email.FSTemplate{
 			SubjectTemplate:      "Your login token for {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",

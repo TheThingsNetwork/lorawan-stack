@@ -1,4 +1,4 @@
-// Copyright © 2022 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2024 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,22 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package email provides an interface to send messages over email.
-package email
+package ttnpb
 
-// Message for sending over email.
-type Message struct {
-	TemplateName string
+import "strings"
 
-	RecipientName    string
-	RecipientAddress string
-
-	Subject  string
-	HTMLBody string
-	TextBody string
-}
-
-// Sender is the interface for sending messages over email.
-type Sender interface {
-	Send(message *Message) error
+func GetNotificationTypeString(t NotificationType) string {
+	return strings.ToLower(t.String())
 }

@@ -173,7 +173,7 @@ func (is *IdentityServer) setClientCollaborator(
 		)
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetClientIds().GetEntityIdentifiers(),
-			NotificationType: ttnpb.NotificationType_COLLABORATOR_CHANGED,
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_COLLABORATOR_CHANGED),
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,

@@ -27098,8 +27098,8 @@
           "description": "The entity this notification is about."
         },
         "notification_type": {
-          "$ref": "#/definitions/v3NotificationType",
-          "description": "The type of this notification."
+          "type": "string",
+          "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4."
         },
         "data": {
           "$ref": "#/definitions/protobufAny",

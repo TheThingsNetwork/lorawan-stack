@@ -23,7 +23,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, ttnpb.NotificationType_TEMPORARY_PASSWORD,
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_TEMPORARY_PASSWORD),
 		email.FSTemplate{
 			SubjectTemplate:      "Your temporary password for {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",

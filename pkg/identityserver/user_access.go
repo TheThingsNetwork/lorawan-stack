@@ -86,7 +86,7 @@ func (is *IdentityServer) createUserAPIKey(
 	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
-		NotificationType: ttnpb.NotificationType_API_KEY_CREATED,
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
@@ -202,7 +202,7 @@ func (is *IdentityServer) updateUserAPIKey(
 	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
-		NotificationType: ttnpb.NotificationType_API_KEY_CHANGED,
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
@@ -298,7 +298,7 @@ func (is *IdentityServer) createLoginToken(
 	if !canSkipEmail || !req.SkipEmail {
 		go is.SendTemplateEmailToUserIDs(
 			is.FromRequestContext(ctx),
-			ttnpb.NotificationType_LOGIN_TOKEN,
+			ttnpb.GetNotificationTypeString(ttnpb.NotificationType_LOGIN_TOKEN),
 			func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
 				return &templates.LoginTokenData{
 					TemplateData: data,

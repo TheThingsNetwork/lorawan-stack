@@ -41,7 +41,7 @@ func TestMailDir(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	err = mailer.Send(&email.Message{
-		TemplateName:     ttnpb.NotificationType_UNKNOWN,
+		TemplateName:     ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 		RecipientName:    "John Doe",
 		RecipientAddress: "john.doe@example.com",
 		Subject:          "Email Subject",

@@ -42865,9 +42865,9 @@
               "name": "notification_type",
               "description": "The type of this notification.",
               "label": "",
-              "type": "NotificationType",
-              "longType": "NotificationType",
-              "fullType": "ttn.lorawan.v3.NotificationType",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -42875,8 +42875,21 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "enum.defined_only",
-                    "value": true
+                    "name": "string.in",
+                    "value": [
+                      "unknown",
+                      "api_key_created",
+                      "api_key_changed",
+                      "client_requested",
+                      "collaborator_changed",
+                      "entity_state_changed",
+                      "invitation",
+                      "login_token",
+                      "password_changed",
+                      "temporary_password",
+                      "user_requested",
+                      "validate"
+                    ]
                   }
                 ]
               }
@@ -43186,15 +43199,36 @@
             },
             {
               "name": "notification_type",
-              "description": "The type of this notification.",
+              "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4.",
               "label": "",
-              "type": "NotificationType",
-              "longType": "NotificationType",
-              "fullType": "ttn.lorawan.v3.NotificationType",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "unknown",
+                      "api_key_created",
+                      "api_key_changed",
+                      "client_requested",
+                      "collaborator_changed",
+                      "entity_state_changed",
+                      "invitation",
+                      "login_token",
+                      "password_changed",
+                      "temporary_password",
+                      "user_requested",
+                      "validate"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "data",

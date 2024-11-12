@@ -47,7 +47,7 @@ func TestSendGrid(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	err = sg.Send(&email.Message{
-		TemplateName:     ttnpb.NotificationType_UNKNOWN,
+		TemplateName:     ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 		RecipientName:    "John Doe",
 		RecipientAddress: "john.doe@example.com",
 		Subject:          "Testing SendGrid",

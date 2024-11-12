@@ -74,7 +74,14 @@ func (m *Notification) ValidateFields(paths ...string) error {
 			}
 
 		case "notification_type":
-			// no validation rules for NotificationType
+
+			if _, ok := _Notification_NotificationType_InLookup[m.GetNotificationType()]; !ok {
+				return NotificationValidationError{
+					field:  "notification_type",
+					reason: "value must be in list [unknown api_key_created api_key_changed client_requested collaborator_changed entity_state_changed invitation login_token password_changed temporary_password user_requested validate]",
+				}
+			}
+
 		case "data":
 
 			if v, ok := interface{}(m.GetData()).(interface{ ValidateFields(...string) error }); ok {
@@ -181,6 +188,21 @@ var _ interface {
 	ErrorName() string
 } = NotificationValidationError{}
 
+var _Notification_NotificationType_InLookup = map[string]struct{}{
+	"unknown":              {},
+	"api_key_created":      {},
+	"api_key_changed":      {},
+	"client_requested":     {},
+	"collaborator_changed": {},
+	"entity_state_changed": {},
+	"invitation":           {},
+	"login_token":          {},
+	"password_changed":     {},
+	"temporary_password":   {},
+	"user_requested":       {},
+	"validate":             {},
+}
+
 // ValidateFields checks the field values on CreateNotificationRequest with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.
@@ -217,10 +239,10 @@ func (m *CreateNotificationRequest) ValidateFields(paths ...string) error {
 
 		case "notification_type":
 
-			if _, ok := NotificationType_name[int32(m.GetNotificationType())]; !ok {
+			if _, ok := _CreateNotificationRequest_NotificationType_InLookup[m.GetNotificationType()]; !ok {
 				return CreateNotificationRequestValidationError{
 					field:  "notification_type",
-					reason: "value must be one of the defined enum values",
+					reason: "value must be in list [unknown api_key_created api_key_changed client_requested collaborator_changed entity_state_changed invitation login_token password_changed temporary_password user_requested validate]",
 				}
 			}
 
@@ -348,6 +370,21 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = CreateNotificationRequestValidationError{}
+
+var _CreateNotificationRequest_NotificationType_InLookup = map[string]struct{}{
+	"unknown":              {},
+	"api_key_created":      {},
+	"api_key_changed":      {},
+	"client_requested":     {},
+	"collaborator_changed": {},
+	"entity_state_changed": {},
+	"invitation":           {},
+	"login_token":          {},
+	"password_changed":     {},
+	"temporary_password":   {},
+	"user_requested":       {},
+	"validate":             {},
+}
 
 // ValidateFields checks the field values on CreateNotificationResponse with
 // the rules defined in the proto definition for this message. If any rules
