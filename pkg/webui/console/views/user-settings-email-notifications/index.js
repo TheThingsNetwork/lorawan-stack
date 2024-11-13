@@ -30,7 +30,7 @@ import { mayViewOrEditUserSettings } from '@console/lib/feature-checks'
 const m = defineMessages({
   emailNotifications: 'Email notifications',
   customizeEmailNotifications:
-    'Customize your email notifications and make sure you stay aware of what you need',
+    'Customize the notifications for which you receive emails. To see all your notifications, head to the {link}notifications panel{link}.',
 })
 
 const EmailNotificationsSettings = () => {

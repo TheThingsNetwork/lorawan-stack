@@ -68,27 +68,18 @@ const decodePreferences = value => {
 }
 
 const m = defineMessages({
-  CLIENT_REQUESTED: 'OAuth client requested',
-  USER_REQUESTED: 'New user requested',
-  API_KEY_CREATED: 'API key created',
-  API_KEY_CHANGED: 'API key changed',
-  COLLABORATOR_CHANGED: 'Collaborator created or changed',
-  ENTITY_STATE_CHANGED: 'Entity state changed',
-  INVITATION: 'User invitation',
+  CLIENT_REQUESTED: 'New OAuth client requested',
+  USER_REQUESTED: 'New user requested to join',
+  API_KEY_CREATED: 'API Key created for an entity',
+  API_KEY_CHANGED: 'API key changed in an entity',
+  COLLABORATOR_CHANGED: 'Collaborator created or changed in an entity',
+  ENTITY_STATE_CHANGED: 'State of an entity has changed',
+  INVITATION: 'User invitation has been sent',
   PASSWORD_CHANGED: 'Password was changed',
-  API_KEY_CREATED_DESCRIPTION: 'Receive an email when an API has been created for an entity.',
-  API_KEY_CHANGED_DESCRIPTION: 'Receive an email when an API key has been changed in an entity.',
-  CLIENT_REQUESTED_DESCRIPTION: 'Receive an email when a new OAuth client has been requested.',
-  COLLABORATOR_CHANGED_DESCRIPTION:
-    'Receive an email when a collaborator has been changed in an entity.',
-  ENTITY_STATE_CHANGED_DESCRIPTION: 'Receive an email when the state of an entity has changed.',
-  INVITATION_DESCRIPTION: 'Receive an email when an invitation has been sent.',
-  PASSWORD_CHANGED_DESCRIPTION: 'Receive an email when a password has been changed.',
-  USER_REQUESTED_DESCRIPTION: 'Receive an email when a user has requested to join.',
   errorNotification:
     "Admins can't unsubscribe from all email notifications, since there are notifications that require admin action.",
   requiresAdminAction: "<i>Requires admin action, can't be unselected</i>",
-  unsubscribeFromEverything: 'Unsubscribe from everything',
+  unsubscribeFromEverything: 'Turn off all email notifications',
   unsubscribeDescription: 'You will continue to receive notifications in the console.',
   discardChanges: 'Discard changes',
   updateEmailPreferences: 'Updated email preferences',
@@ -128,7 +119,7 @@ const InnerForm = initialValues => {
     <div key={type}>
       <Checkbox
         name={type}
-        disabled={isAdminNotificationType(type)}
+        disabled={isUnsubscribeAll || isAdminNotificationType(type)}
         value={isAdminNotificationType(type)}
         label={m[type]}
         className="mb-0 mt-cs-s"
