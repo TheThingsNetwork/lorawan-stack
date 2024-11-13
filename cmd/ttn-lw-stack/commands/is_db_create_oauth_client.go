@@ -16,7 +16,6 @@ package commands
 
 import (
 	"context"
-	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/uptrace/bun"
@@ -32,7 +31,7 @@ var createOAuthClient = &cobra.Command{
 	Use:   "create-oauth-client",
 	Short: "Create an OAuth client in the Identity Server database",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")

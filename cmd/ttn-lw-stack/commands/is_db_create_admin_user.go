@@ -37,7 +37,7 @@ var createAdminUserCommand = &cobra.Command{
 	Use:   "create-admin-user",
 	Short: "Create an admin user in the Identity Server database",
 	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+		ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")

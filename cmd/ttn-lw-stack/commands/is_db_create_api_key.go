@@ -32,14 +32,17 @@ import (
 
 var (
 	errExpiryDateInPast  = errors.DefineInvalidArgument("expiry_date_invalid", "expiry date is in the past")
-	errInvalidDateFormat = errors.DefineInvalidArgument("expiry_date_format_invalid", "invalid expiry date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)")
+	errInvalidDateFormat = errors.DefineInvalidArgument(
+		"expiry_date_format_invalid",
+		"invalid expiry date format (RFC3339: YYYY-MM-DDTHH:MM:SSZ)",
+	)
 )
 
 var createAPIKeyCommand = &cobra.Command{
 	Use:   "create-user-api-key",
 	Short: "Create an API key with full rights on the user in the Identity Server database",
-	RunE: func(cmd *cobra.Command, args []string) error {
-		ctx, cancel := context.WithTimeout(ctx, 10*time.Second)
+	RunE: func(cmd *cobra.Command, _ []string) error {
+		ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
 		defer cancel()
 
 		logger.Info("Connecting to Identity Server database...")

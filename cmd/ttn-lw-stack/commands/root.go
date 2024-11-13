@@ -59,7 +59,7 @@ var (
 		SilenceErrors: true,
 		SilenceUsage:  true,
 		Short:         "The Things Stack for LoRaWAN",
-		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			if cmd.Name() == "__complete" {
 				return nil
 			}
@@ -166,7 +166,7 @@ var (
 	completeCommand    = commands.Complete()
 )
 
-func runNoop(cmd *cobra.Command, args []string) error { return nil }
+func runNoop(*cobra.Command, []string) error { return nil }
 
 func init() {
 	Root.PersistentFlags().AddFlagSet(mgr.Flags())

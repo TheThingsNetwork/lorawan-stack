@@ -15,6 +15,7 @@
 package commands
 
 import (
+	"context"
 	"fmt"
 	"time"
 
@@ -29,6 +30,10 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	ttntypes "go.thethings.network/lorawan-stack/v3/pkg/types"
 	storeutil "go.thethings.network/lorawan-stack/v3/pkg/util/store"
+)
+
+const (
+	isDBConnectionTimeout = 10 * time.Second
 )
 
 var (
@@ -47,9 +52,12 @@ var (
 		Use:   "status",
 		Short: "Check the migration status of the Identity Server database",
 		RunE: func(cmd *cobra.Command, _ []string) error {
+			ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
+			defer cancel()
+
 			logger.WithField("URI", config.IS.DatabaseURI).Info("Connecting to Identity Server database...")
 
-			sqlDB, err := storeutil.OpenDB(cmd.Context(), config.IS.DatabaseURI)
+			sqlDB, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
@@ -77,9 +85,12 @@ var (
 		Use:   "migrate",
 		Short: "Migrate the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
+			defer cancel()
+
 			logger.Info("Connecting to Identity Server database...")
 
-			sqlDB, err := storeutil.OpenDB(cmd.Context(), config.IS.DatabaseURI)
+			sqlDB, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
 			}
@@ -89,12 +100,12 @@ var (
 
 			migrator := migrate.NewMigrator(bunDB, ismigrations.Migrations, migrate.WithMarkAppliedOnSuccess(true))
 
-			err = migrator.Init(cmd.Context())
+			err = migrator.Init(ctx)
 			if err != nil {
 				return err
 			}
 
-			status, err := migrator.MigrationsWithStatus(cmd.Context())
+			status, err := migrator.MigrationsWithStatus(ctx)
 			if err != nil {
 				return err
 			}
@@ -110,9 +121,9 @@ var (
 			rollback, _ := cmd.Flags().GetBool("rollback")
 
 			if rollback {
-				group, err = migrator.Rollback(cmd.Context())
+				group, err = migrator.Rollback(ctx)
 			} else {
-				group, err = migrator.Migrate(cmd.Context())
+				group, err = migrator.Migrate(ctx)
 			}
 			if err != nil {
 				return err
@@ -129,7 +140,7 @@ var (
 				logger.WithField("group", group.ID).Info("Database migration done")
 			}
 
-			status, err = migrator.MigrationsWithStatus(cmd.Context())
+			status, err = migrator.MigrationsWithStatus(ctx)
 			if err != nil {
 				return err
 			}
@@ -147,7 +158,11 @@ var (
 		Use:   "cleanup",
 		Short: "Cleanup expired entities in the Identity Server database",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
+			defer cancel()
+
 			logger.Info("Connecting to Identity Server database...")
+
 			db, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
 			if err != nil {
 				return err
@@ -160,7 +175,7 @@ var (
 			defer db.Close()
 
 			expiryDate := time.Now().Add(-1 * config.IS.Delete.Restore)
-			ctx := store.WithSoftDeletedBetween(ctx, nil, &expiryDate)
+			ctx = store.WithSoftDeletedBetween(ctx, nil, &expiryDate)
 			dryRun, err := cmd.Flags().GetBool("dry-run")
 			if err != nil {
 				return err
@@ -348,6 +363,9 @@ var (
 		Use:   "create-eui-block",
 		Short: "Create an EUI block in IS db (currently only DevEUI block supported)",
 		RunE: func(cmd *cobra.Command, args []string) error {
+			ctx, cancel := context.WithTimeout(ctx, isDBConnectionTimeout)
+			defer cancel()
+
 			logger.Info("Connecting to Identity Server database...")
 
 			db, err := storeutil.OpenDB(ctx, config.IS.DatabaseURI)
@@ -410,6 +428,10 @@ func init() {
 	isDBEUIBlockCreationCommand.Flags().Bool("use-config", false, "Create block using values from config")
 	isDBEUIBlockCreationCommand.Flags().String("eui-type", "dev_eui", "EUI block type")
 	isDBEUIBlockCreationCommand.Flags().String("prefix", "", "Block prefix (format: 1234567800000000/32)")
-	isDBEUIBlockCreationCommand.Flags().Int64("init-counter", 0, "Initial counter (determines first address to be issued from block)")
+	isDBEUIBlockCreationCommand.Flags().Int64(
+		"init-counter",
+		0,
+		"Initial counter (determines first address to be issued from block)",
+	)
 	isDBCommand.AddCommand(isDBEUIBlockCreationCommand)
 }

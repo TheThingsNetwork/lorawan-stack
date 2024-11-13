@@ -231,8 +231,6 @@ var (
 		Use:   "purge",
 		Short: "Purge unused Application Server data",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx := cmd.Context()
-
 			logger.Info("Connecting to Redis database...")
 			cl := ttnredis.New(config.Redis.WithNamespace("as", "applicationups"))
 
