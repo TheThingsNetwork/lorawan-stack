@@ -16,6 +16,7 @@ package identityserver
 
 import (
 	"context"
+	"fmt"
 
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -23,7 +24,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
-	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -55,18 +55,7 @@ func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.Noti
 	return false
 }
 
-func notificationTypeAllowed(
-	notificationType string, allowedNotifications []ttnpb.NotificationType,
-) bool {
-	for _, allowedType := range allowedNotifications {
-		if notificationType == ttnpb.GetNotificationTypeString(allowedType) {
-			return true
-		}
-	}
-	return false
-}
-
-func filterAllowedEmailReveivers(
+func filterAllowedEmailReceivers(
 	emailReceiverUsers []*ttnpb.User, notificationType string,
 ) []*ttnpb.UserIdentifiers {
 	var emailReceiverIDs []*ttnpb.UserIdentifiers
@@ -74,8 +63,10 @@ func filterAllowedEmailReveivers(
 	// Collect IDs of users that have email notifications enabled for that notification type.
 	for _, user := range emailReceiverUsers {
 		userNotificationPreferences := user.GetEmailNotificationPreferences().GetTypes()
-		if notificationTypeAllowed(notificationType, userNotificationPreferences) {
-			emailReceiverIDs = append(emailReceiverIDs, user.GetIds())
+		for _, allowedType := range userNotificationPreferences {
+			if notificationType == ttnpb.GetNotificationTypeString(allowedType) {
+				emailReceiverIDs = append(emailReceiverIDs, user.GetIds())
+			}
 		}
 	}
 	return emailReceiverIDs
@@ -306,8 +297,7 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 			return err
 		}
 		// Filter only the users that have email notifications enabled for the notification type.
-		emailReceiverIDs = filterAllowedEmailReveivers(emailReceiverUsers, req.NotificationType)
-
+		emailReceiverIDs = filterAllowedEmailReceivers(emailReceiverUsers, req.NotificationType)
 		return nil
 	})
 	if err != nil {
@@ -315,10 +305,7 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	}
 
 	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
-		log.FromContext(ctx).
-			WithField("notification_type", req.GetNotificationType()).
-			Warn("Email template for notification not registered")
-		emailReceiverIDs = nil
+		panic(fmt.Errorf("invalid email template for notification: %s", req.GetNotificationType()))
 	}
 
 	if len(emailReceiverIDs) > 0 {
@@ -345,9 +332,7 @@ func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.C
 	}
 
 	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
-		log.FromContext(ctx).
-			WithField("notification_type", req.GetNotificationType()).
-			Warn("Email template for notification not registered")
+		panic(fmt.Errorf("invalid email template for notification: %s", req.GetNotificationType()))
 	}
 	var receivers []*ttnpb.User
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {

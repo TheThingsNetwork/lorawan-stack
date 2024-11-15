@@ -127,7 +127,7 @@ func TestEmailNotificationPreferences(t *testing.T) {
 
 		entries, err = os.ReadDir(tempDir)
 		a.So(err, should.BeNil)
-		// Creating a user send 2 email, one for the admin to approve and another for the user to confirm the email.
+		// Creating a user send two email, one for the admin to approve and another for the user to confirm the email.
 		a.So(entries, should.HaveLength, 2)
 
 		// Test user receiving email notification because this notification type is in the list of preferences.

@@ -142,7 +142,7 @@ func (DashboardLayout) EnumDescriptor() ([]byte, []int) {
 	return file_ttn_lorawan_v3_user_proto_rawDescGZIP(), []int{1}
 }
 
-// EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive.
+// EmailNotificationPreferences is the message that defines the types of notifications for which the user wants to receive an email.
 type EmailNotificationPreferences struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

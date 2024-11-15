@@ -43199,7 +43199,7 @@
             },
             {
               "name": "notification_type",
-              "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4.",
+              "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -52763,7 +52763,7 @@
           "name": "EmailNotificationPreferences",
           "longName": "EmailNotificationPreferences",
           "fullName": "ttn.lorawan.v3.EmailNotificationPreferences",
-          "description": "EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive.",
+          "description": "EmailNotificationPreferences is the message that defines the types of notifications for which the user wants to receive an email.",
           "hasExtensions": false,
           "hasFields": true,
           "hasOneofs": false,

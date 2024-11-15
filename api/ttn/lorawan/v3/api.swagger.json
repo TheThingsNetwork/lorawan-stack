@@ -22702,7 +22702,7 @@
           }
         }
       },
-      "description": "EmailNotificationPreferences is the message that defines the types of notifications the user wants to receive."
+      "description": "EmailNotificationPreferences is the message that defines the types of notifications for which the user wants to receive an email."
     },
     "v3EmailValidation": {
       "type": "object",
@@ -27099,7 +27099,7 @@
         },
         "notification_type": {
           "type": "string",
-          "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4."
+          "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384."
         },
         "data": {
           "$ref": "#/definitions/protobufAny",
