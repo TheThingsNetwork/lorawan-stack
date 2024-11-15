@@ -17,7 +17,7 @@ package ttnpb
 import "strings"
 
 // GetNotificationTypeString converts the NotificationType enum into lowercase string.
-// TODO: Use the enum directly everywhere in v4.
+// TODO: Use the enum directly everywhere in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384.
 func GetNotificationTypeString(t NotificationType) string {
 	return strings.ToLower(t.String())
 }
