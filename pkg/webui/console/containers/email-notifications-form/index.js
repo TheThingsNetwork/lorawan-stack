@@ -15,6 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
+import classNames from 'classnames'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Checkbox from '@ttn-lw/components/checkbox'
@@ -34,7 +35,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { updateUser } from '@console/store/actions/user'
 
-import { selectUser, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserId, selectUserIsAdmin } from '@console/store/selectors/logout'
+import { selectUserById } from '@console/store/selectors/users'
 
 import style from './email-notifications-form.styl'
 
@@ -115,23 +117,18 @@ const InnerForm = initialValues => {
     resetForm(initialValues)
   }, [resetForm, initialValues])
 
-  const cbs = allNotificationTypes.map(type => (
+  const cbs = allNotificationTypes.map((type, index) => (
     <div key={type}>
       <Checkbox
         name={type}
         disabled={isUnsubscribeAll || isAdminNotificationType(type)}
         value={isAdminNotificationType(type)}
         label={m[type]}
-        className="mb-0 mt-cs-s"
-      />
-      <Message
-        className="c-text-neutral-light w-full ml-cs-l"
-        component="div"
-        content={m[`${type}_DESCRIPTION`]}
+        className={classNames('mb-0', { 'mt-cs-s': index !== 0, 'mt-0': index === 0 })}
       />
       {isAdminNotificationType(type) && (
         <Message
-          className="c-text-neutral-light w-full ml-cs-l"
+          className={style.requiresAdminAction}
           component="div"
           content={m.requiresAdminAction}
           values={{ i: str => <i key="bold">{str}</i> }}
@@ -151,8 +148,8 @@ const InnerForm = initialValues => {
         >
           {cbs}
         </Form.Field>
-        <hr />
-        <label className="d-flex j-between al-center mt-cs-m">
+        <hr className="m-vert-cs-xl" />
+        <label className="d-flex j-between al-center gap-cs-m mt-cs-m">
           <div>
             <Message content={m.unsubscribeFromEverything} />
             <Message
@@ -164,7 +161,7 @@ const InnerForm = initialValues => {
           <Switch onChange={handleUnsubscribeAll} checked={isUnsubscribeAll} />
         </label>
         {showErrorNotification && (
-          <div>
+          <div className="mt-cs-xs">
             <Icon icon={IconAlertTriangle} small className={style.warningIcon} />
             <Message content={m.errorNotification} className="c-text-warning-normal" />
           </div>
@@ -181,7 +178,8 @@ const InnerForm = initialValues => {
 const EmailNotificationsForm = () => {
   const dispatch = useDispatch()
   const [error, setError] = useState()
-  const user = useSelector(selectUser)
+  const userId = useSelector(selectUserId)
+  const user = useSelector(state => selectUserById(state, userId))
   const isAdmin = useSelector(selectUserIsAdmin)
   const userEmailNotifications = user.email_notification_preferences
 

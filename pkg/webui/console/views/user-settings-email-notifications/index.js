@@ -14,12 +14,15 @@
 
 import React from 'react'
 import { defineMessages } from 'react-intl'
+import { useSelector } from 'react-redux'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
+import Link from '@ttn-lw/components/link'
 
 import Message from '@ttn-lw/lib/components/message'
+import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import EmailNotificationsForm from '@console/containers/email-notifications-form'
 
@@ -27,10 +30,14 @@ import Require from '@console/lib/components/require'
 
 import { mayViewOrEditUserSettings } from '@console/lib/feature-checks'
 
+import { getUser } from '@console/store/actions/users'
+
+import { selectUserId } from '@console/store/selectors/logout'
+
 const m = defineMessages({
   emailNotifications: 'Email notifications',
   customizeEmailNotifications:
-    'Customize the notifications for which you receive emails. To see all your notifications, head to the {link}notifications panel{link}.',
+    'Customize the notifications for which you receive emails. To see all your notifications, head to the <Link>notifications panel</Link>.',
 })
 
 const EmailNotificationsSettings = () => {
@@ -42,15 +49,28 @@ const EmailNotificationsSettings = () => {
     />,
   )
 
+  const userId = useSelector(selectUserId)
+
   return (
     <Require featureCheck={mayViewOrEditUserSettings} otherwise={{ redirect: '/' }}>
-      <div className="container container--xl grid">
-        <div className="item-6 item-start-4">
-          <PageTitle title={m.emailNotifications} className="mb-0" />
-          <Message content={m.customizeEmailNotifications} />
-          <EmailNotificationsForm />
+      <RequireRequest requestAction={getUser(userId, ['email_notification_preferences'])}>
+        <div className="container container--xl grid">
+          <div className="lg:item-6 lg:item-start-4 item-12 item-start-1">
+            <PageTitle title={m.emailNotifications} className="mb-0" />
+            <Message
+              content={m.customizeEmailNotifications}
+              values={{
+                Link: msg => (
+                  <Link to="/notifications/inbox" primary>
+                    {msg}
+                  </Link>
+                ),
+              }}
+            />
+            <EmailNotificationsForm />
+          </div>
         </div>
-      </div>
+      </RequireRequest>
     </Require>
   )
 }

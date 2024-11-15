@@ -1012,7 +1012,7 @@
   "console.views.gateway-general-settings.messages.deleteGatewayDefaultMessage": "This will <strong>PERMANENTLY DELETE THE ENTITY ITSELF AND ALL ASSOCIATED ENTITIES</strong>, including collaborator associations. It will also <strong>NOT BE POSSIBLE TO REUSE THE ENTITY ID</strong> until purged by an admin but the EUI can be reregistered later with a different ID.",
   "console.views.organization-add.index.orgDescription": "Organizations are used to group multiple users and assigning collective rights for them. An organization can then be set as collaborator of applications or gateways. This makes it easy to grant or revoke rights to entities for a group of users.{break} Learn more in our guide on <Link>Organization Management</Link>.",
   "console.views.user-settings-email-notifications.index.emailNotifications": "Email notifications",
-  "console.views.user-settings-email-notifications.index.customizeEmailNotifications": "Customize the notifications for which you receive emails. To see all your notifications, head to the {link}notifications panel{link}.",
+  "console.views.user-settings-email-notifications.index.customizeEmailNotifications": "Customize the notifications for which you receive emails. To see all your notifications, head to the <Link>notifications panel</Link>.",
   "console.views.user-settings-oauth-auth-settings.index.deleteButton": "Revoke authorization",
   "console.views.user-settings-oauth-auth-settings.index.deleteSuccess": "This authorization was successfully revoked",
   "console.views.user-settings-oauth-auth-settings.index.deleteFailure": "There was an error and this authorization could not be revoked",
