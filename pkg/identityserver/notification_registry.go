@@ -16,7 +16,6 @@ package identityserver
 
 import (
 	"context"
-	"fmt"
 
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -24,6 +23,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/store"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
 	"google.golang.org/protobuf/types/known/emptypb"
@@ -305,7 +305,10 @@ func (is *IdentityServer) createNotification(ctx context.Context, req *ttnpb.Cre
 	}
 
 	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
-		panic(fmt.Errorf("invalid email template for notification: %s", req.GetNotificationType()))
+		log.FromContext(ctx).
+			WithField("notification_type", req.GetNotificationType()).
+			Warn("Email template for notification not registered")
+		emailReceiverIDs = nil
 	}
 
 	if len(emailReceiverIDs) > 0 {
@@ -332,7 +335,9 @@ func (is *IdentityServer) notifyAdminsInternal(ctx context.Context, req *ttnpb.C
 	}
 
 	if email.GetNotification(ctx, req.GetNotificationType()) == nil {
-		panic(fmt.Errorf("invalid email template for notification: %s", req.GetNotificationType()))
+		log.FromContext(ctx).
+			WithField("notification_type", req.GetNotificationType()).
+			Warn("Email template for notification not registered")
 	}
 	var receivers []*ttnpb.User
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
