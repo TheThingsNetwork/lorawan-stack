@@ -237,7 +237,7 @@ type Notification struct {
 	// The entity this notification is about.
 	EntityIds *EntityIdentifiers `protobuf:"bytes,3,opt,name=entity_ids,json=entityIds,proto3" json:"entity_ids,omitempty"`
 	// The type of this notification.
-	// TODO: Replace with type NotificationType in v4.
+	// TODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384.
 	NotificationType string `protobuf:"bytes,4,opt,name=notification_type,json=notificationType,proto3" json:"notification_type,omitempty"`
 	// The data related to the notification.
 	Data *anypb.Any `protobuf:"bytes,5,opt,name=data,proto3" json:"data,omitempty"`

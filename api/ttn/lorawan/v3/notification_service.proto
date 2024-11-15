@@ -40,7 +40,7 @@ message Notification {
   EntityIdentifiers entity_ids = 3;
 
   // The type of this notification.
-  // TODO: Replace with type NotificationType in v4.
+  // TODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384.
   string notification_type = 4 [(validate.rules).string = {
     in: [
       "unknown",
