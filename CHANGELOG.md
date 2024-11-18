@@ -19,6 +19,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Subscription nudge not showing correct device count in the Console.
+- Parsers for newly added normalized payload fields.
+
 ### Security
 
 ## [3.34.2] - unreleased

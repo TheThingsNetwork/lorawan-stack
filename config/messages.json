@@ -7748,6 +7748,15 @@
       "file": "uplink.go"
     }
   },
+  "error:pkg/messageprocessors/normalizedpayload:field_not_allowed": {
+    "translations": {
+      "en": "`{path}` should be one of `{allowed}`"
+    },
+    "description": {
+      "package": "pkg/messageprocessors/normalizedpayload",
+      "file": "uplink.go"
+    }
+  },
   "error:pkg/messageprocessors/normalizedpayload:field_type": {
     "translations": {
       "en": "invalid field type of `{path}`"

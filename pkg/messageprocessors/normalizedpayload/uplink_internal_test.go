@@ -19,4 +19,5 @@ var (
 	ErrFieldExclusiveMinimum = errFieldExclusiveMinimum
 	ErrFieldMaximum          = errFieldMaximum
 	ErrFieldExclusiveMaximum = errFieldExclusiveMaximum
+	ErrFieldNotAllowed       = errFieldNotAllowed
 )
