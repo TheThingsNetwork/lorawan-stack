@@ -124,16 +124,21 @@ const InnerForm = initialValues => {
         disabled={isUnsubscribeAll || isAdminNotificationType(type)}
         value={isAdminNotificationType(type)}
         label={m[type]}
-        className={classNames('mb-0', { 'mt-cs-s': index !== 0, 'mt-0': index === 0 })}
+        className={classNames('mb-0 direction-column al-start', {
+          'mt-cs-s': index !== 0,
+          'mt-0': index === 0,
+        })}
+        children={
+          isAdminNotificationType(type) && (
+            <Message
+              className={style.requiresAdminAction}
+              component="div"
+              content={m.requiresAdminAction}
+              values={{ i: str => <i key="bold">{str}</i> }}
+            />
+          )
+        }
       />
-      {isAdminNotificationType(type) && (
-        <Message
-          className={style.requiresAdminAction}
-          component="div"
-          content={m.requiresAdminAction}
-          values={{ i: str => <i key="bold">{str}</i> }}
-        />
-      )}
     </div>
   ))
 
