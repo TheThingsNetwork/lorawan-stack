@@ -21,6 +21,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
+## [3.32.3] - unreleased
+
 ## [3.32.2] - unreleased
 
 ### Fixed
@@ -2896,7 +2898,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.2...v3.32
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.3...v3.32
+[3.32.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.2...v3.32.3
 [3.32.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.1...v3.32.2
 [3.32.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.0...v3.32.1
 [3.32.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.1...v3.32.0
