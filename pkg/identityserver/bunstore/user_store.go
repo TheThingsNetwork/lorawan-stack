@@ -598,16 +598,29 @@ func (s *userStore) updateUserModel( //nolint:gocyclo
 		case "console_preferences":
 			updateConsolePreferences = true
 			consolePreferences = pb.ConsolePreferences
+		case "console_preferences.dashboard_layouts.api_key",
+				 "console_preferences.dashboard_layouts.application",
+				 "console_preferences.dashboard_layouts.collaborator",
+				 "console_preferences.dashboard_layouts.end_device",
+				 "console_preferences.dashboard_layouts.gateway",
+				 "console_preferences.dashboard_layouts.organization",
+				 "console_preferences.dashboard_layouts.overview",
+				 "console_preferences.dashboard_layouts.user":
+			updateConsolePreferences = true
+			consolePreferences.DashboardLayouts = pb.ConsolePreferences.GetDashboardLayouts()
 		case "console_preferences.console_theme":
 			updateConsolePreferences = true
 			consolePreferences.ConsoleTheme = pb.ConsolePreferences.ConsoleTheme
-		case "console_preferences.dashboard_layouts":
-			updateConsolePreferences = true
-			consolePreferences.DashboardLayouts = pb.ConsolePreferences.GetDashboardLayouts()
-		case "console_preferences.sort_by":
+		case "console_preferences.sort_by.api_key",
+				 "console_preferences.sort_by.application",
+				 "console_preferences.sort_by.collaborator",
+				 "console_preferences.sort_by.end_device",
+				 "console_preferences.sort_by.gateway",
+				 "console_preferences.sort_by.organization",
+				 "console_preferences.sort_by.user":
 			updateConsolePreferences = true
 			consolePreferences.SortBy = pb.ConsolePreferences.GetSortBy()
-		case "console_preferences.tutorials":
+		case "console_preferences.tutorials.seen":
 			updateConsolePreferences = true
 			consolePreferences.Tutorials = pb.ConsolePreferences.GetTutorials()
 		case "universal_rights":
