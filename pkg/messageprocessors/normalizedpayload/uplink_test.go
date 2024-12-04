@@ -187,6 +187,35 @@ func TestUplink(t *testing.T) {
 			},
 		},
 		{
+			name: "water temperature",
+			normalizedPayload: []*structpb.Struct{
+				{
+					Fields: map[string]*structpb.Value{
+						"water": {
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"temperature": {
+											Kind: &structpb.Value_NumberValue{
+												NumberValue: 21.0,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []normalizedpayload.Measurement{
+				{
+					Water: normalizedpayload.Water{
+						Temperature: float64Ptr(21.0),
+					},
+				},
+			},
+		},
+		{
 			name: "motion detected",
 			normalizedPayload: []*structpb.Struct{
 				{

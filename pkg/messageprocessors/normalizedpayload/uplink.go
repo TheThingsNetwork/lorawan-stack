@@ -66,7 +66,8 @@ type Wind struct {
 
 // Water is a water measurement.
 type Water struct {
-	Leak *bool
+	Leak        *bool
+	Temperature *float64
 }
 
 // Position is a position measurement.
@@ -412,6 +413,11 @@ var fieldParsers = map[string]fieldParser{
 	"water.leak": parseBoolean(
 		func(dst *Measurement) **bool {
 			return &dst.Water.Leak
+		},
+	),
+	"water.temperature": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Water.Temperature
 		},
 	),
 	"action": object(
