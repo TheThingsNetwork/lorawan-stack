@@ -90,9 +90,9 @@ type ServerKeyVault struct {
 
 // Config represents TLS configuration.
 type Config struct {
-	Client     Client     `name:",squash"`
-	ServerAuth ServerAuth `name:",squash"`
-	ACME       ACME       `name:"acme"`
+	Client     `name:",squash"`
+	ServerAuth `name:",squash"`
+	ACME       ACME `name:"acme"`
 }
 
 // FileReader is the interface used to read TLS certificates and keys.
