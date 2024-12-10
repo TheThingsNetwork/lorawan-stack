@@ -63,12 +63,15 @@ import { updateManagedGateway } from '@console/store/actions/gateways'
 import {
   selectSelectedGateway,
   selectSelectedManagedGateway,
+  selectSelectedManagedGatewayHasWifi,
+  selectSelectedManagedGatewayHasEthernet,
 } from '@console/store/selectors/gateways'
 import { selectUserId } from '@account/store/selectors/user'
 
 const m = defineMessages({
   firstNotification:
-    'You have just claimed a managed gateway. To connect it to WiFi or ethernet you can configure those connections here. The preprovisioned cellular backhaul typically connects automatically.',
+    'You have just claimed a managed gateway. You can configure its connection settings here.',
+  noConnectionSettings: 'This gateway does not have any connection settings to configure.',
   updateSuccess: 'Connection settings updated',
   updateFailure: 'There was an error updating these connection settings',
 })
@@ -91,13 +94,15 @@ const GatewayConnectionSettings = () => {
 
   const connectionsData = useConnectionsData()
 
-  const [initialValues, setInitialValues] = useState({
-    wifi_profile: { ...initialWifiProfile },
-    ethernet_profile: { ...initialEthernetProfile },
-  })
+  const hasWifi = useSelector(selectSelectedManagedGatewayHasWifi)
+  const hasWifiProfileSet = hasWifi && Boolean(selectedManagedGateway.wifi_profile_id)
+  const hasEthernet = useSelector(selectSelectedManagedGatewayHasEthernet)
+  const hasEthernetProfileSet = hasEthernet && Boolean(selectedManagedGateway.ethernet_profile_id)
 
-  const hasWifiProfileSet = Boolean(selectedManagedGateway.wifi_profile_id)
-  const hasEthernetProfileSet = Boolean(selectedManagedGateway.ethernet_profile_id)
+  const [initialValues, setInitialValues] = useState({
+    ...(hasWifi && { wifi_profile: { ...initialWifiProfile } }),
+    ...(hasEthernet && { ethernet_profile: { ...initialEthernetProfile } }),
+  })
 
   useBreadcrumbs(
     'gtws.single.managed-gateway.connection-settings',
@@ -110,7 +115,7 @@ const GatewayConnectionSettings = () => {
   const fetchWifiProfile = useCallback(
     async collaborators => {
       let wifiProfile
-      let entityId
+      let wifiProfileEntityId
 
       if (hasWifiProfileSet) {
         setError(undefined)
@@ -125,7 +130,7 @@ const GatewayConnectionSettings = () => {
               ),
             ),
           )
-          entityId = userId
+          wifiProfileEntityId = userId
         } catch (e) {
           if (!isNotFoundError(e)) {
             setError(e)
@@ -150,7 +155,7 @@ const GatewayConnectionSettings = () => {
                   ),
                 ),
               )
-              entityId = orgId
+              wifiProfileEntityId = orgId
               break
             } catch (e) {
               if (!isNotFoundError(e)) {
@@ -161,7 +166,7 @@ const GatewayConnectionSettings = () => {
           }
         }
       }
-      return { wifiProfile, entityId }
+      return { wifiProfile, wifiProfileEntityId }
     },
     [dispatch, hasWifiProfileSet, selectedManagedGateway.wifi_profile_id, userId],
   )
@@ -190,8 +195,8 @@ const GatewayConnectionSettings = () => {
   }, [dispatch, hasEthernetProfileSet, selectedManagedGateway.ethernet_profile_id])
 
   const updateInitialWifiProfile = useCallback(
-    (values, profile, entityId, isNonSharedProfile) => ({
-      ...values.wifi_profile,
+    (profile, entityId, isNonSharedProfile) => ({
+      ...initialWifiProfile,
       ...(isNonSharedProfile && { ...profile.data }),
       profile_id: isNonSharedProfile
         ? 'non-shared'
@@ -204,8 +209,8 @@ const GatewayConnectionSettings = () => {
   )
 
   const updateInitialEthernetProfile = useCallback(
-    (values, profile) => ({
-      ...values.ethernet_profile,
+    profile => ({
+      ...initialEthernetProfile,
       ...revertEthernetProfile(profile?.data ?? {}),
       profile_id: selectedManagedGateway.ethernet_profile_id ?? '',
     }),
@@ -214,32 +219,45 @@ const GatewayConnectionSettings = () => {
 
   const loadData = useCallback(
     async dispatch => {
-      let collaborators = []
-      if (mayViewCollaborators) {
-        const { entities } = await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
-        collaborators = entities
+      const fetchCollaborators = async () => {
+        if (mayViewCollaborators) {
+          const { entities } = await dispatch(attachPromise(getCollaboratorsList('gateway', gtwId)))
+          return entities
+        }
+        return []
       }
-      const { wifiProfile, entityId } = await fetchWifiProfile(collaborators)
-      const { ethernetProfile } = await fetchEthernetProfile()
-      const isNonSharedProfile = Boolean(wifiProfile) && !Boolean(wifiProfile.data.shared)
-      if (isNonSharedProfile) {
-        setNonSharedWifiProfileId(selectedManagedGateway.wifi_profile_id)
-      }
-      setInitialValues(oldValues => ({
-        ...oldValues,
-        wifi_profile: updateInitialWifiProfile(
-          oldValues,
+
+      const newValues = {}
+
+      if (hasWifi) {
+        const collaborators = await fetchCollaborators()
+        const { wifiProfile, wifiProfileEntityId } = await fetchWifiProfile(collaborators)
+        const isNonSharedWifiProfile = Boolean(wifiProfile) && !Boolean(wifiProfile.data.shared)
+
+        if (isNonSharedWifiProfile) {
+          setNonSharedWifiProfileId(selectedManagedGateway.wifi_profile_id)
+        }
+
+        newValues.wifi_profile = updateInitialWifiProfile(
           wifiProfile,
-          entityId,
-          isNonSharedProfile,
-        ),
-        ethernet_profile: updateInitialEthernetProfile(oldValues, ethernetProfile),
-      }))
+          wifiProfileEntityId,
+          isNonSharedWifiProfile,
+        )
+      }
+
+      if (hasEthernet) {
+        const { ethernetProfile } = await fetchEthernetProfile()
+        newValues.ethernet_profile = updateInitialEthernetProfile(ethernetProfile)
+      }
+
+      setInitialValues(oldValues => ({ ...oldValues, ...newValues }))
     },
     [
       fetchEthernetProfile,
       fetchWifiProfile,
       gtwId,
+      hasEthernet,
+      hasWifi,
       mayViewCollaborators,
       selectedManagedGateway.wifi_profile_id,
       updateInitialEthernetProfile,
@@ -312,38 +330,45 @@ const GatewayConnectionSettings = () => {
 
       setError(undefined)
       try {
+        const body = {}
         const { wifi_profile, ethernet_profile } = values
 
-        const shouldUpdateNonSharedWifiProfile =
-          wifi_profile.profile_id === 'non-shared' &&
-          Boolean(nonSharedWifiProfileId) &&
-          wifi_profile._enable_wifi_connection
+        if (hasWifi) {
+          const shouldUpdateNonSharedWifiProfile =
+            wifi_profile.profile_id === 'non-shared' &&
+            Boolean(nonSharedWifiProfileId) &&
+            wifi_profile._enable_wifi_connection
 
-        const wifiProfileId = await getWifiProfileId(wifi_profile, shouldUpdateNonSharedWifiProfile)
-        const ethernetProfileId = await getEthernetProfileId(
-          ethernet_profile,
-          cleanValues.ethernet_profile,
-        )
-        const body = {
-          wifi_profile_id:
-            !wifi_profile._enable_wifi_connection && !wifi_profile._override ? null : wifiProfileId,
-          ethernet_profile_id: ethernetProfileId,
+          if (!wifi_profile._enable_wifi_connection && !wifi_profile._override) {
+            body.wifi_profile_id = null
+          } else {
+            body.wifi_profile_id = await getWifiProfileId(
+              wifi_profile,
+              shouldUpdateNonSharedWifiProfile,
+            )
+          }
+        }
+        if (hasEthernet) {
+          body.ethernet_profile_id = await getEthernetProfileId(
+            ethernet_profile,
+            cleanValues.ethernet_profile,
+          )
         }
 
         await dispatch(attachPromise(updateManagedGateway(gtwId, body)))
 
         // Reset the form and the initial values
-        let resetValues = { ...values }
-        if (wifi_profile.profile_id !== 'non-shared') {
-          resetValues = {
-            ...values,
-            wifi_profile: {
-              ...values.wifi_profile,
-              ...initialWifiProfile,
-              profile_id: wifiProfileId,
-              _profile_of: wifi_profile._profile_of,
-            },
-          }
+        const resetValues = {
+          ...values,
+          ...(hasWifi &&
+            wifi_profile.profile_id !== 'non-shared' && {
+              wifi_profile: {
+                ...wifi_profile,
+                ...initialWifiProfile,
+                profile_id: body.wifi_profile_id,
+                _profile_of: wifi_profile._profile_of,
+              },
+            }),
         }
 
         setInitialValues(resetValues)
@@ -351,7 +376,7 @@ const GatewayConnectionSettings = () => {
           values: resetValues,
         })
 
-        if (resetValues.wifi_profile._enable_wifi_connection) {
+        if (hasWifi && resetValues.wifi_profile._enable_wifi_connection) {
           setSaveFormClicked(true)
         }
 
@@ -373,6 +398,8 @@ const GatewayConnectionSettings = () => {
     [
       dispatch,
       gtwId,
+      hasEthernet,
+      hasWifi,
       hasEthernetProfileSet,
       initialValues.ethernet_profile,
       initialValues.wifi_profile,
@@ -386,31 +413,39 @@ const GatewayConnectionSettings = () => {
       <div className="item-12 d-flex gap-ls-s md:direction-column">
         <div className="w-full">
           <PageTitle title={sharedMessages.connectionSettings} />
-          {isFirstClaim && <Notification info small content={m.firstNotification} />}
-          <Form
-            error={error}
-            onSubmit={handleSubmit}
-            initialValues={initialValues}
-            validationSchema={validationSchema}
-          >
+          {hasWifi || hasEthernet ? (
             <>
-              <WifiSettingsFormFields
+              {isFirstClaim && <Notification info small content={m.firstNotification} />}
+              <Form
+                error={error}
+                onSubmit={handleSubmit}
                 initialValues={initialValues}
-                isWifiConnected={connectionsData.isWifiConnected}
-                saveFormClicked={saveFormClicked}
-              />
-              <hr />
-              <EthernetSettingsFormFields />
+                validationSchema={validationSchema}
+              >
+                <>
+                  {hasWifi && (
+                    <WifiSettingsFormFields
+                      initialValues={initialValues}
+                      isWifiConnected={connectionsData.isWifiConnected}
+                      saveFormClicked={saveFormClicked}
+                    />
+                  )}
+                  {hasWifi && hasEthernet && <hr />}
+                  {hasEthernet && <EthernetSettingsFormFields />}
 
-              <SubmitBar className="mb-cs-l">
-                <Form.Submit
-                  component={SubmitButton}
-                  message={sharedMessages.saveChanges}
-                  disabled={isLoading}
-                />
-              </SubmitBar>
+                  <SubmitBar className="mb-cs-l">
+                    <Form.Submit
+                      component={SubmitButton}
+                      message={sharedMessages.saveChanges}
+                      disabled={isLoading}
+                    />
+                  </SubmitBar>
+                </>
+              </Form>
             </>
-          </Form>
+          ) : (
+            <Notification info small content={m.noConnectionSettings} />
+          )}
         </div>
         <ManagedGatewayConnections connectionsData={connectionsData} />
       </div>

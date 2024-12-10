@@ -54,6 +54,7 @@ const getGatewayLogic = createRequestLogic({
     let managed = undefined
     try {
       managed = await tts.Gateways.getManagedGateway(id, [
+        'capabilities',
         'wifi_profile_id',
         'ethernet_profile_id',
         'version_ids',

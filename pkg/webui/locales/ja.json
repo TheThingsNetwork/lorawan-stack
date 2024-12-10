@@ -594,6 +594,7 @@
   "console.containers.gateway-managed-gateway.connection-settings.ethernet-settings-form-fields.ethernetConnection": "",
   "console.containers.gateway-managed-gateway.connection-settings.ethernet-settings-form-fields.useStaticIp": "",
   "console.containers.gateway-managed-gateway.connection-settings.index.firstNotification": "",
+  "console.containers.gateway-managed-gateway.connection-settings.index.noConnectionSettings": "",
   "console.containers.gateway-managed-gateway.connection-settings.index.updateSuccess": "",
   "console.containers.gateway-managed-gateway.connection-settings.index.updateFailure": "",
   "console.containers.gateway-managed-gateway.connection-settings.wifi-settings-form-fields.settingsProfile": "",

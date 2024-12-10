@@ -54,6 +54,16 @@ export const selectIsSelectedGatewayManaged = state =>
 export const selectSelectedGatewayClaimable = state =>
   selectGatewayStore(state).selectedGatewayClaimable
 export const selectSelectedManagedGateway = state => selectSelectedGateway(state)?.managed
+export const selectSelectedManagedGatewayHasCellular = state =>
+  Boolean(selectSelectedManagedGateway(state)?.capabilities?.cellular)
+export const selectSelectedManagedGatewayHasWifi = state => {
+  const capabilities = selectSelectedManagedGateway(state)?.capabilities
+  return Boolean(capabilities?.wifi_2_4_ghz) || Boolean(capabilities?.wifi_5_ghz)
+}
+export const selectSelectedManagedGatewayHasEthernet = state =>
+  Boolean(selectSelectedManagedGateway(state)?.capabilities?.ethernet)
+export const selectSelectedManagedGatewayHasBattery = state =>
+  Boolean(selectSelectedManagedGateway(state)?.capabilities?.battery)
 
 // Gateways.
 const selectGtwsIds = createPaginationIdsSelectorByEntity(ENTITY)

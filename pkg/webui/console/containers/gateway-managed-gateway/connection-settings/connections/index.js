@@ -42,7 +42,12 @@ import { CONNECTION_TYPES } from '@console/containers/gateway-managed-gateway/sh
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import { selectSelectedManagedGateway } from '@console/store/selectors/gateways'
+import {
+  selectSelectedManagedGateway,
+  selectSelectedManagedGatewayHasCellular,
+  selectSelectedManagedGatewayHasWifi,
+  selectSelectedManagedGatewayHasEthernet,
+} from '@console/store/selectors/gateways'
 
 import m from './messages'
 
@@ -119,6 +124,9 @@ ConnectionByType.defaultProps = {
 
 const ManagedGatewayConnections = ({ connectionsData }) => {
   const selectedManagedGateway = useSelector(selectSelectedManagedGateway)
+  const hasCellular = useSelector(selectSelectedManagedGatewayHasCellular)
+  const hasWifi = useSelector(selectSelectedManagedGatewayHasWifi)
+  const hasEthernet = useSelector(selectSelectedManagedGatewayHasEthernet)
   const {
     systemStatus,
     controllerConnection,
@@ -253,25 +261,31 @@ const ManagedGatewayConnections = ({ connectionsData }) => {
       </div>
 
       <div className="d-flex flex-column gap-ls-xs">
-        <ConnectionByType
-          isConnected={isCellularConnected}
-          type={CONNECTION_TYPES.CELLULAR}
-          details={isCellularConnected && getCellularDetails(cellularBackhaul)}
-          connectedVia={cellularBackhaul?.operator}
-        />
-        <ConnectionByType
-          isConnected={isWifiConnected}
-          type={CONNECTION_TYPES.WIFI}
-          details={isWifiConnected && getWifiDetails(wifiBackhaul)}
-          connectedVia={wifiBackhaul?.ssid}
-          macAddress={managedGateway.wifi_mac_address}
-        />
-        <ConnectionByType
-          isConnected={isEthernetConnected}
-          type={CONNECTION_TYPES.ETHERNET}
-          details={isEthernetConnected && getEthernetDetails(ethernetBackhaul)}
-          macAddress={managedGateway.ethernet_mac_address}
-        />
+        {hasCellular && (
+          <ConnectionByType
+            isConnected={isCellularConnected}
+            type={CONNECTION_TYPES.CELLULAR}
+            details={isCellularConnected && getCellularDetails(cellularBackhaul)}
+            connectedVia={cellularBackhaul?.operator}
+          />
+        )}
+        {hasWifi && (
+          <ConnectionByType
+            isConnected={isWifiConnected}
+            type={CONNECTION_TYPES.WIFI}
+            details={isWifiConnected && getWifiDetails(wifiBackhaul)}
+            connectedVia={wifiBackhaul?.ssid}
+            macAddress={managedGateway.wifi_mac_address}
+          />
+        )}
+        {hasEthernet && (
+          <ConnectionByType
+            isConnected={isEthernetConnected}
+            type={CONNECTION_TYPES.ETHERNET}
+            details={isEthernetConnected && getEthernetDetails(ethernetBackhaul)}
+            macAddress={managedGateway.ethernet_mac_address}
+          />
+        )}
       </div>
     </div>
   )

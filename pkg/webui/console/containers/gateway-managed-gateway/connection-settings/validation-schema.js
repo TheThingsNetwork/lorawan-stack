@@ -22,6 +22,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 export const validationSchema = Yup.object().shape({
   wifi_profile: Yup.object()
+    .nullable()
+    .default(undefined)
     .shape({
       _override: Yup.boolean().default(false),
       _enable_wifi_connection: Yup.boolean().default(false),
@@ -34,7 +36,7 @@ export const validationSchema = Yup.object().shape({
       is: profileId => profileId && profileId.includes('shared'),
       then: schema => schema.concat(wifiValidationSchema),
     }),
-  ethernet_profile: ethernetValidationSchema,
+  ethernet_profile: ethernetValidationSchema.nullable().default(undefined),
 })
 
 export default validationSchema
