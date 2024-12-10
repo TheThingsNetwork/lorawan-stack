@@ -3023,6 +3023,15 @@
         }
       ],
       "allowedFieldMaskPaths": [
+        "capabilities",
+        "capabilities.battery",
+        "capabilities.cellular",
+        "capabilities.ethernet",
+        "capabilities.firmware_update",
+        "capabilities.lora_8ch_concentrator",
+        "capabilities.scan_wifi_access_points",
+        "capabilities.wifi_2_4_ghz",
+        "capabilities.wifi_5_ghz",
         "cellular_imei",
         "cellular_imsi",
         "ethernet_mac_address",

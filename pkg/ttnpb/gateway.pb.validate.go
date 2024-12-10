@@ -1186,6 +1186,18 @@ func (m *ManagedGateway) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "capabilities":
+
+			if v, ok := interface{}(m.GetCapabilities()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return ManagedGatewayValidationError{
+						field:  "capabilities",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		case "cellular_imei":
 
 			if m.GetCellularImei() != "" {
@@ -5664,6 +5676,104 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = Gateway_LRFHSSValidationError{}
+
+// ValidateFields checks the field values on ManagedGateway_Capabilities with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *ManagedGateway_Capabilities) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = ManagedGateway_CapabilitiesFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "wifi_2_4_ghz":
+			// no validation rules for Wifi_2_4Ghz
+		case "wifi_5_ghz":
+			// no validation rules for Wifi_5Ghz
+		case "scan_wifi_access_points":
+			// no validation rules for ScanWifiAccessPoints
+		case "ethernet":
+			// no validation rules for Ethernet
+		case "cellular":
+			// no validation rules for Cellular
+		case "battery":
+			// no validation rules for Battery
+		case "lora_8ch_concentrator":
+			// no validation rules for Lora_8ChConcentrator
+		case "firmware_update":
+			// no validation rules for FirmwareUpdate
+		default:
+			return ManagedGateway_CapabilitiesValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// ManagedGateway_CapabilitiesValidationError is the validation error returned
+// by ManagedGateway_Capabilities.ValidateFields if the designated constraints
+// aren't met.
+type ManagedGateway_CapabilitiesValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e ManagedGateway_CapabilitiesValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e ManagedGateway_CapabilitiesValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e ManagedGateway_CapabilitiesValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e ManagedGateway_CapabilitiesValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e ManagedGateway_CapabilitiesValidationError) ErrorName() string {
+	return "ManagedGateway_CapabilitiesValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e ManagedGateway_CapabilitiesValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sManagedGateway_Capabilities.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = ManagedGateway_CapabilitiesValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = ManagedGateway_CapabilitiesValidationError{}
 
 // ValidateFields checks the field values on ListGatewaysRequest_Filter with
 // the rules defined in the proto definition for this message. If any rules

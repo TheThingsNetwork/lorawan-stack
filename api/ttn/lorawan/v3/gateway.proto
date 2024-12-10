@@ -265,6 +265,22 @@ message ManagedGateway {
   ];
   GatewayVersionIdentifiers version_ids = 2;
 
+  message Capabilities {
+    option (thethings.flags.message) = {
+      select: true
+      set: true
+    };
+    bool wifi_2_4_ghz = 1;
+    bool wifi_5_ghz = 2;
+    bool scan_wifi_access_points = 3;
+    bool ethernet = 4;
+    bool cellular = 5;
+    bool battery = 6;
+    bool lora_8ch_concentrator = 7;
+    bool firmware_update = 8;
+  }
+  Capabilities capabilities = 9;
+
   string cellular_imei = 3 [(validate.rules).string = {
     pattern: "^[0-9]{15}$"
     ignore_empty: true

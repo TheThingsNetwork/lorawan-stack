@@ -643,10 +643,134 @@ func (m *Gateway) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []str
 	return paths, nil
 }
 
+// AddSelectFlagsForManagedGateway_Capabilities adds flags to select fields in ManagedGateway_Capabilities.
+func AddSelectFlagsForManagedGateway_Capabilities(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("wifi-2-4-ghz", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("wifi-2-4-ghz", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("wifi-5-ghz", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("wifi-5-ghz", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("scan-wifi-access-points", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("scan-wifi-access-points", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ethernet", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("ethernet", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cellular", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cellular", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("battery", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("battery", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("lora-8ch-concentrator", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("lora-8ch-concentrator", prefix), false), flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("firmware-update", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("firmware-update", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forManagedGateway_Capabilities message from select flags.
+func PathsFromSelectFlagsForManagedGateway_Capabilities(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("wifi_2_4_ghz", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("wifi_2_4_ghz", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("wifi_5_ghz", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("wifi_5_ghz", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("scan_wifi_access_points", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("scan_wifi_access_points", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("ethernet", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("ethernet", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("cellular", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("cellular", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("battery", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("battery", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("lora_8ch_concentrator", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("lora_8ch_concentrator", prefix))
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("firmware_update", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("firmware_update", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForManagedGateway_Capabilities adds flags to select fields in ManagedGateway_Capabilities.
+func AddSetFlagsForManagedGateway_Capabilities(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("wifi-2-4-ghz", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("wifi-5-ghz", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("scan-wifi-access-points", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("ethernet", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cellular", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("battery", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("lora-8ch-concentrator", prefix), "", flagsplugin.WithHidden(hidden)))
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("firmware-update", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the ManagedGateway_Capabilities message from flags.
+func (m *ManagedGateway_Capabilities) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("wifi_2_4_ghz", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Wifi_2_4Ghz = val
+		paths = append(paths, flagsplugin.Prefix("wifi_2_4_ghz", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("wifi_5_ghz", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Wifi_5Ghz = val
+		paths = append(paths, flagsplugin.Prefix("wifi_5_ghz", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("scan_wifi_access_points", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ScanWifiAccessPoints = val
+		paths = append(paths, flagsplugin.Prefix("scan_wifi_access_points", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("ethernet", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Ethernet = val
+		paths = append(paths, flagsplugin.Prefix("ethernet", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("cellular", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Cellular = val
+		paths = append(paths, flagsplugin.Prefix("cellular", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("battery", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Battery = val
+		paths = append(paths, flagsplugin.Prefix("battery", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("lora_8ch_concentrator", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.Lora_8ChConcentrator = val
+		paths = append(paths, flagsplugin.Prefix("lora_8ch_concentrator", prefix))
+	}
+	if val, changed, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("firmware_update", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.FirmwareUpdate = val
+		paths = append(paths, flagsplugin.Prefix("firmware_update", prefix))
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForManagedGateway adds flags to select fields in ManagedGateway.
 func AddSelectFlagsForManagedGateway(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("version-ids", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("version-ids", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForGatewayVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("capabilities", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("capabilities", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForManagedGateway_Capabilities(flags, flagsplugin.Prefix("capabilities", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cellular-imei", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cellular-imei", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("cellular-imsi", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("cellular-imsi", prefix), false), flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("wifi-mac-address", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("wifi-mac-address", prefix), false), flagsplugin.WithHidden(hidden)))
@@ -663,6 +787,16 @@ func PathsFromSelectFlagsForManagedGateway(flags *pflag.FlagSet, prefix string) 
 		paths = append(paths, flagsplugin.Prefix("version_ids", prefix))
 	}
 	if selectPaths, err := PathsFromSelectFlagsForGatewayVersionIdentifiers(flags, flagsplugin.Prefix("version_ids", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("capabilities", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("capabilities", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForManagedGateway_Capabilities(flags, flagsplugin.Prefix("capabilities", prefix)); err != nil {
 		return nil, err
 	} else {
 		paths = append(paths, selectPaths...)
@@ -704,6 +838,7 @@ func PathsFromSelectFlagsForManagedGateway(flags *pflag.FlagSet, prefix string) 
 func AddSetFlagsForManagedGateway(flags *pflag.FlagSet, prefix string, hidden bool) {
 	AddSetFlagsForGatewayIdentifiers(flags, flagsplugin.Prefix("ids", prefix), true)
 	AddSetFlagsForGatewayVersionIdentifiers(flags, flagsplugin.Prefix("version-ids", prefix), hidden)
+	AddSetFlagsForManagedGateway_Capabilities(flags, flagsplugin.Prefix("capabilities", prefix), hidden)
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("cellular-imei", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("cellular-imsi", prefix), "", flagsplugin.WithHidden(hidden)))
 	flags.AddFlag(flagsplugin.NewBytesFlag(flagsplugin.Prefix("wifi-mac-address", prefix), "", flagsplugin.WithHidden(hidden)))
@@ -729,6 +864,16 @@ func (m *ManagedGateway) SetFromFlags(flags *pflag.FlagSet, prefix string) (path
 			m.VersionIds = &GatewayVersionIdentifiers{}
 		}
 		if setPaths, err := m.VersionIds.SetFromFlags(flags, flagsplugin.Prefix("version_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("capabilities", prefix)); changed {
+		if m.Capabilities == nil {
+			m.Capabilities = &ManagedGateway_Capabilities{}
+		}
+		if setPaths, err := m.Capabilities.SetFromFlags(flags, flagsplugin.Prefix("capabilities", prefix)); err != nil {
 			return nil, err
 		} else {
 			paths = append(paths, setPaths...)

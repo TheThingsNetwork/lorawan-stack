@@ -347,6 +347,7 @@
   - [Message `ListGatewaysRequest`](#ttn.lorawan.v3.ListGatewaysRequest)
   - [Message `ListGatewaysRequest.Filter`](#ttn.lorawan.v3.ListGatewaysRequest.Filter)
   - [Message `ManagedGateway`](#ttn.lorawan.v3.ManagedGateway)
+  - [Message `ManagedGateway.Capabilities`](#ttn.lorawan.v3.ManagedGateway.Capabilities)
   - [Message `ManagedGatewayCellularBackhaul`](#ttn.lorawan.v3.ManagedGatewayCellularBackhaul)
   - [Message `ManagedGatewayControllerConnection`](#ttn.lorawan.v3.ManagedGatewayControllerConnection)
   - [Message `ManagedGatewayEthernetBackhaul`](#ttn.lorawan.v3.ManagedGatewayEthernetBackhaul)
@@ -5441,6 +5442,7 @@ Filter gateways by fields.
 | ----- | ---- | ----- | ----------- |
 | `ids` | [`GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers) |  |  |
 | `version_ids` | [`GatewayVersionIdentifiers`](#ttn.lorawan.v3.GatewayVersionIdentifiers) |  |  |
+| `capabilities` | [`ManagedGateway.Capabilities`](#ttn.lorawan.v3.ManagedGateway.Capabilities) |  |  |
 | `cellular_imei` | [`string`](#string) |  |  |
 | `cellular_imsi` | [`string`](#string) |  |  |
 | `wifi_mac_address` | [`bytes`](#bytes) |  |  |
@@ -5459,6 +5461,19 @@ Filter gateways by fields.
 | `ethernet_mac_address` | <p>`bytes.len`: `6`</p> |
 | `wifi_profile_id` | <p>`string.uuid`: `true`</p> |
 | `ethernet_profile_id` | <p>`string.uuid`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ManagedGateway.Capabilities">Message `ManagedGateway.Capabilities`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `wifi_2_4_ghz` | [`bool`](#bool) |  |  |
+| `wifi_5_ghz` | [`bool`](#bool) |  |  |
+| `scan_wifi_access_points` | [`bool`](#bool) |  |  |
+| `ethernet` | [`bool`](#bool) |  |  |
+| `cellular` | [`bool`](#bool) |  |  |
+| `battery` | [`bool`](#bool) |  |  |
+| `lora_8ch_concentrator` | [`bool`](#bool) |  |  |
+| `firmware_update` | [`bool`](#bool) |  |  |
 
 ### <a name="ttn.lorawan.v3.ManagedGatewayCellularBackhaul">Message `ManagedGatewayCellularBackhaul`</a>
 

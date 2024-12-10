@@ -791,6 +791,31 @@ func (dst *ManagedGateway) SetFields(src *ManagedGateway, paths ...string) error
 					dst.VersionIds = nil
 				}
 			}
+		case "capabilities":
+			if len(subs) > 0 {
+				var newDst, newSrc *ManagedGateway_Capabilities
+				if (src == nil || src.Capabilities == nil) && dst.Capabilities == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Capabilities
+				}
+				if dst.Capabilities != nil {
+					newDst = dst.Capabilities
+				} else {
+					newDst = &ManagedGateway_Capabilities{}
+					dst.Capabilities = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Capabilities = src.Capabilities
+				} else {
+					dst.Capabilities = nil
+				}
+			}
 		case "cellular_imei":
 			if len(subs) > 0 {
 				return fmt.Errorf("'cellular_imei' has no subfields, but %s were specified", subs)
@@ -3005,6 +3030,97 @@ func (dst *Gateway_LRFHSS) SetFields(src *Gateway_LRFHSS, paths ...string) error
 			} else {
 				var zero bool
 				dst.Supported = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *ManagedGateway_Capabilities) SetFields(src *ManagedGateway_Capabilities, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "wifi_2_4_ghz":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wifi_2_4_ghz' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Wifi_2_4Ghz = src.Wifi_2_4Ghz
+			} else {
+				var zero bool
+				dst.Wifi_2_4Ghz = zero
+			}
+		case "wifi_5_ghz":
+			if len(subs) > 0 {
+				return fmt.Errorf("'wifi_5_ghz' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Wifi_5Ghz = src.Wifi_5Ghz
+			} else {
+				var zero bool
+				dst.Wifi_5Ghz = zero
+			}
+		case "scan_wifi_access_points":
+			if len(subs) > 0 {
+				return fmt.Errorf("'scan_wifi_access_points' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ScanWifiAccessPoints = src.ScanWifiAccessPoints
+			} else {
+				var zero bool
+				dst.ScanWifiAccessPoints = zero
+			}
+		case "ethernet":
+			if len(subs) > 0 {
+				return fmt.Errorf("'ethernet' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Ethernet = src.Ethernet
+			} else {
+				var zero bool
+				dst.Ethernet = zero
+			}
+		case "cellular":
+			if len(subs) > 0 {
+				return fmt.Errorf("'cellular' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Cellular = src.Cellular
+			} else {
+				var zero bool
+				dst.Cellular = zero
+			}
+		case "battery":
+			if len(subs) > 0 {
+				return fmt.Errorf("'battery' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Battery = src.Battery
+			} else {
+				var zero bool
+				dst.Battery = zero
+			}
+		case "lora_8ch_concentrator":
+			if len(subs) > 0 {
+				return fmt.Errorf("'lora_8ch_concentrator' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Lora_8ChConcentrator = src.Lora_8ChConcentrator
+			} else {
+				var zero bool
+				dst.Lora_8ChConcentrator = zero
+			}
+		case "firmware_update":
+			if len(subs) > 0 {
+				return fmt.Errorf("'firmware_update' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.FirmwareUpdate = src.FirmwareUpdate
+			} else {
+				var zero bool
+				dst.FirmwareUpdate = zero
 			}
 
 		default:

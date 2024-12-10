@@ -18790,6 +18790,35 @@
       ],
       "default": "AT_MOST_ONCE"
     },
+    "ManagedGatewayCapabilities": {
+      "type": "object",
+      "properties": {
+        "wifi_2_4_ghz": {
+          "type": "boolean"
+        },
+        "wifi_5_ghz": {
+          "type": "boolean"
+        },
+        "scan_wifi_access_points": {
+          "type": "boolean"
+        },
+        "ethernet": {
+          "type": "boolean"
+        },
+        "cellular": {
+          "type": "boolean"
+        },
+        "battery": {
+          "type": "boolean"
+        },
+        "lora_8ch_concentrator": {
+          "type": "boolean"
+        },
+        "firmware_update": {
+          "type": "boolean"
+        }
+      }
+    },
     "ManagedGatewayConfigurationServiceScanWiFiAccessPointsBody": {
       "type": "object",
       "properties": {
@@ -26744,6 +26773,9 @@
         "version_ids": {
           "$ref": "#/definitions/v3GatewayVersionIdentifiers"
         },
+        "capabilities": {
+          "$ref": "#/definitions/ManagedGatewayCapabilities"
+        },
         "cellular_imei": {
           "type": "string"
         },
@@ -26802,6 +26834,9 @@
             },
             "version_ids": {
               "$ref": "#/definitions/v3GatewayVersionIdentifiers"
+            },
+            "capabilities": {
+              "$ref": "#/definitions/ManagedGatewayCapabilities"
             },
             "cellular_imei": {
               "type": "string"

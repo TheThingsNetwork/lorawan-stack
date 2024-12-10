@@ -176,6 +176,15 @@ var GatewaysFieldPathsTopLevel = []string{
 	"gateways",
 }
 var ManagedGatewayFieldPathsNested = []string{
+	"capabilities",
+	"capabilities.battery",
+	"capabilities.cellular",
+	"capabilities.ethernet",
+	"capabilities.firmware_update",
+	"capabilities.lora_8ch_concentrator",
+	"capabilities.scan_wifi_access_points",
+	"capabilities.wifi_2_4_ghz",
+	"capabilities.wifi_5_ghz",
 	"cellular_imei",
 	"cellular_imsi",
 	"ethernet_mac_address",
@@ -194,6 +203,7 @@ var ManagedGatewayFieldPathsNested = []string{
 }
 
 var ManagedGatewayFieldPathsTopLevel = []string{
+	"capabilities",
 	"cellular_imei",
 	"cellular_imsi",
 	"ethernet_mac_address",
@@ -348,6 +358,15 @@ var ManagedGatewayEventDataFieldPathsNested = []string{
 	"data.controller_connection",
 	"data.controller_connection.network_interface_type",
 	"data.entity",
+	"data.entity.capabilities",
+	"data.entity.capabilities.battery",
+	"data.entity.capabilities.cellular",
+	"data.entity.capabilities.ethernet",
+	"data.entity.capabilities.firmware_update",
+	"data.entity.capabilities.lora_8ch_concentrator",
+	"data.entity.capabilities.scan_wifi_access_points",
+	"data.entity.capabilities.wifi_2_4_ghz",
+	"data.entity.capabilities.wifi_5_ghz",
 	"data.entity.cellular_imei",
 	"data.entity.cellular_imsi",
 	"data.entity.ethernet_mac_address",
@@ -887,6 +906,27 @@ var Gateway_LRFHSSFieldPathsNested = []string{
 
 var Gateway_LRFHSSFieldPathsTopLevel = []string{
 	"supported",
+}
+var ManagedGateway_CapabilitiesFieldPathsNested = []string{
+	"battery",
+	"cellular",
+	"ethernet",
+	"firmware_update",
+	"lora_8ch_concentrator",
+	"scan_wifi_access_points",
+	"wifi_2_4_ghz",
+	"wifi_5_ghz",
+}
+
+var ManagedGateway_CapabilitiesFieldPathsTopLevel = []string{
+	"battery",
+	"cellular",
+	"ethernet",
+	"firmware_update",
+	"lora_8ch_concentrator",
+	"scan_wifi_access_points",
+	"wifi_2_4_ghz",
+	"wifi_5_ghz",
 }
 var ListGatewaysRequest_FilterFieldPathsNested = []string{
 	"field",

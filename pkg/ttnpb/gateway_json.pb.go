@@ -686,6 +686,12 @@ func (x *ManagedGateway) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 		// NOTE: GatewayVersionIdentifiers does not seem to implement MarshalProtoJSON.
 		golang.MarshalMessage(s, x.VersionIds)
 	}
+	if x.Capabilities != nil || s.HasField("capabilities") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("capabilities")
+		// NOTE: ManagedGateway_Capabilities does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Capabilities)
+	}
 	if x.CellularImei != "" || s.HasField("cellular_imei") {
 		s.WriteMoreIf(&wroteField)
 		s.WriteObjectField("cellular_imei")
@@ -750,6 +756,16 @@ func (x *ManagedGateway) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
 			var v GatewayVersionIdentifiers
 			golang.UnmarshalMessage(s, &v)
 			x.VersionIds = &v
+		case "capabilities":
+			s.AddField("capabilities")
+			if s.ReadNil() {
+				x.Capabilities = nil
+				return
+			}
+			// NOTE: ManagedGateway_Capabilities does not seem to implement UnmarshalProtoJSON.
+			var v ManagedGateway_Capabilities
+			golang.UnmarshalMessage(s, &v)
+			x.Capabilities = &v
 		case "cellular_imei", "cellularImei":
 			s.AddField("cellular_imei")
 			x.CellularImei = s.ReadString()
