@@ -36,6 +36,16 @@ func toManagedGateway(
 			FirmwareVersion: gtw.FirmwareVersion,
 			RuntimeVersion:  gtw.RuntimeVersion,
 		},
+		Capabilities: &ttnpb.ManagedGateway_Capabilities{
+			Wifi_2_4Ghz:          gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_WIFI_2_4_GHZ != 0,
+			Wifi_5Ghz:            gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_WIFI_5_GHZ != 0,
+			ScanWifiAccessPoints: gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_SCAN_WIFI_ACCESS_POINTS != 0, //nolint:lll
+			Ethernet:             gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_ETHERNET != 0,
+			Cellular:             gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_CELLULAR != 0,
+			Battery:              gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_BATTERY != 0,
+			Lora_8ChConcentrator: gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_LORA_8CH_CONCENTRATOR != 0, //nolint:lll
+			FirmwareUpdate:       gtw.Capabilities&northboundv1.FirmwareCapabilities_FIRMWARE_CAPABILITY_FIRMWARE_UPDATE != 0,
+		},
 		CellularImei:       gtw.CellularImei,
 		CellularImsi:       gtw.CellularImsi,
 		WifiMacAddress:     gtw.WifiMacAddress,
