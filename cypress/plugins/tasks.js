@@ -25,7 +25,7 @@ const isCI = process.env.CI === 'true' || process.env.CI === '1'
 const pgConfig = {
   user: 'root',
   password: 'root',
-  host: 'localhost',
+  host: '127.0.0.1',
   database: 'ttn_lorawan_dev',
   port: 5432,
 }
