@@ -89,8 +89,8 @@ require (
 	go.packetbroker.org/api/mapping/v2 v2.3.2
 	go.packetbroker.org/api/routing v1.9.2
 	go.packetbroker.org/api/v3 v3.17.1
-	go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20241023114011-31c9c9f86834
-	go.thethings.industries/pkg/ca v0.0.0-20241023114011-31c9c9f86834
+	go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20241210141851-578880da9b08
+	go.thethings.industries/pkg/ca v0.0.0-20241210150448-19d8b0315f37
 	go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e
 	go.thethings.network/lorawan-stack-legacy/v2 v2.1.0
 	go.uber.org/automaxprocs v1.6.0

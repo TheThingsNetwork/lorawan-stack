@@ -255,8 +255,8 @@ github.com/fsnotify/fsnotify v1.4.9/go.mod h1:znqG4EE+3YCdAaPaxE2ZRY/06pZUdp0tY4
 github.com/fsnotify/fsnotify v1.8.0 h1:dAwr6QBTBZIkG8roQaJjGof0pp0EeF+tNV7YBP3F/8M=
 github.com/fsnotify/fsnotify v1.8.0/go.mod h1:8jBTzvmWwFyi3Pb8djgCCO5IBqzKJ/Jwo8TRcHyHii0=
 github.com/garyburd/redigo v1.1.1-0.20170914051019-70e1b1943d4f/go.mod h1:NR3MbYisc3/PwhQ00EMzDiPmrwpPxAn5GI05/YaO1SY=
-github.com/getsentry/sentry-go v0.30.0 h1:lWUwDnY7sKHaVIoZ9wYqRHJ5iEmoc0pqcRqFkosKzBo=
-github.com/getsentry/sentry-go v0.30.0/go.mod h1:WU9B9/1/sHDqeV8T+3VwwbjeR5MSXs/6aqG3mqZrezA=
+github.com/getsentry/sentry-go v0.29.1 h1:DyZuChN8Hz3ARxGVV8ePaNXh1dQ7d76AiB117xcREwA=
+github.com/getsentry/sentry-go v0.29.1/go.mod h1:x3AtIzN01d6SiWkderzaH28Tm0lgkafpJ5Bm3li39O0=
 github.com/glycerine/go-unsnap-stream v0.0.0-20181221182339-f9677308dec2/go.mod h1:/20jfyN9Y5QPEAprSgKAUr+glWDY39ZiUEAYOEv5dsE=
 github.com/glycerine/goconvey v0.0.0-20190410193231-58a59202ab31/go.mod h1:Ogl1Tioa0aV7gstGFO7KhffUsb9M4ydbEbbxpcEDc24=
 github.com/go-errors/errors v1.4.2 h1:J6MZopCL4uSllY1OfXM374weqZFFItUbrImctkmUxIA=
@@ -759,10 +759,10 @@ go.packetbroker.org/api/routing v1.9.2 h1:J4+4vYZxa60UWC70Y9yy7sktU7DXaAp9Q13Bfq
 go.packetbroker.org/api/routing v1.9.2/go.mod h1:kd2K7gieDI35YfPA8/zDmLX3qiKPuXia/MA77BEAeUA=
 go.packetbroker.org/api/v3 v3.17.1 h1:LcyFPUGqVubGWMvQ16tZlQIKd+noGx7urzEYhSLiEQA=
 go.packetbroker.org/api/v3 v3.17.1/go.mod h1:6bVbdWAYLnvZ5kgXxA7GBQvZTN7vxI0DoF1Di1NoAT4=
-go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20241023114011-31c9c9f86834 h1:ANhGlIwofZn/HfA6bNkAD5Oh6n3wCcEjXjhT1LmpMv0=
-go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20241023114011-31c9c9f86834/go.mod h1:2+WsMwIunNLh22oauBzGL56JazE3UY34W1fstqEbacw=
-go.thethings.industries/pkg/ca v0.0.0-20241023114011-31c9c9f86834 h1:I7oylW49wLHcUZOrxk9CmCzKAk0wyBCMIvxeiYUWXt4=
-go.thethings.industries/pkg/ca v0.0.0-20241023114011-31c9c9f86834/go.mod h1:89OU623VYKW9i3W4CZgIGFmtgb/jsN8JV2PAuCsj+7w=
+go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20241210141851-578880da9b08 h1:s+bICoNXKaPwjZTRG1QUGNYoQM/iypYjCzt3RXSWFH0=
+go.thethings.industries/pkg/api/gen/tti/gateway v0.0.0-20241210141851-578880da9b08/go.mod h1:j7/Mx4U9xAMR8tQysnuDtYWJLpSmOOj9Ljpp/2zjnbs=
+go.thethings.industries/pkg/ca v0.0.0-20241210150448-19d8b0315f37 h1:YAVZqCKGfrD1PKyX+512sZM6fTNJeodQU62btJcHv/Q=
+go.thethings.industries/pkg/ca v0.0.0-20241210150448-19d8b0315f37/go.mod h1:r258GXhMCjAhBVvJxd5AVmxuoiHZ/fSxY76WQpDwSB0=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e h1:TWGQ3lh7gI2W5hnb6qPdpoAa0d7s/XPwvgf2VVCMJaY=
 go.thethings.network/lorawan-application-payload v0.0.0-20220125153912-1198ff1e403e/go.mod h1:/smENFuESiJCyWRsHRLBjbZGMN889BORQXIPP6NlpZE=
 go.thethings.network/lorawan-stack-legacy/v2 v2.1.0 h1:xP1fElQiH8/6GWXg6JG8UqRD0uluhmicIRS4e/BzcAw=
