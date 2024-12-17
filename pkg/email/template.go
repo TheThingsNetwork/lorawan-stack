@@ -43,7 +43,7 @@ func newContextWithTemplateRegistry(parent context.Context, reg TemplateRegistry
 
 // TemplateRegistry keeps track of email templates.
 type TemplateRegistry interface {
-	RegisteredTemplates() []string
+	RegisteredTemplates() []*ttnpb.NotificationType
 	GetTemplate(ctx context.Context, name string) *Template
 }
 

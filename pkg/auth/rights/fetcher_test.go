@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rights
+package rights_test
 
 import (
 	"context"
@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	"github.com/smarty/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
@@ -30,7 +31,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res struct {
+func fetchEntityRights(ctx context.Context, id string, f rights.EntityFetcher) (res struct { // nolint:unparam
 	AppRights *ttnpb.Rights
 	AppErr    error
 	CliRights *ttnpb.Rights
@@ -69,7 +70,7 @@ func fetchEntityRights(ctx context.Context, id string, f EntityFetcher) (res str
 	return res
 }
 
-func fetchAuthInfo(ctx context.Context, f AuthInfoFetcher) (*ttnpb.AuthInfoResponse, error) {
+func fetchAuthInfo(ctx context.Context, f rights.AuthInfoFetcher) (*ttnpb.AuthInfoResponse, error) {
 	return f.AuthInfo(ctx)
 }
 
@@ -177,7 +178,7 @@ func TestEntityFetcherFunc(t *testing.T) {
 		err    error
 	}
 	fetcher.err = errors.New("test err")
-	f := EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
+	f := rights.EntityFetcherFunc(func(ctx context.Context, ids *ttnpb.EntityIdentifiers) (*ttnpb.Rights, error) {
 		fetcher.mu.Lock()
 		defer fetcher.mu.Unlock()
 		fetcher.ctx = append(fetcher.ctx, ctx)
@@ -211,7 +212,7 @@ func TestAuthInfoFetcherFunc(t *testing.T) {
 		err      error
 	}
 	fetcher.err = errors.New("test err")
-	f := AuthInfoFetcherFunc(func(ctx context.Context) (*ttnpb.AuthInfoResponse, error) {
+	f := rights.AuthInfoFetcherFunc(func(ctx context.Context) (*ttnpb.AuthInfoResponse, error) {
 		fetcher.mu.Lock()
 		defer fetcher.mu.Unlock()
 		fetcher.ctx = append(fetcher.ctx, ctx)
@@ -252,7 +253,7 @@ func TestAccessFetcher(t *testing.T) {
 	}
 
 	// Identity Server not available, return Unavailable error.
-	unavailableFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
+	unavailableFetcher := rights.NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return nil
 	}, false)
 	_, unavailableAuthInfoErr := fetchAuthInfo(test.Context(), unavailableFetcher)
@@ -264,7 +265,7 @@ func TestAccessFetcher(t *testing.T) {
 	a.So(errors.IsUnavailable(unavailableEntityRes.OrgErr), should.BeTrue)
 	a.So(errors.IsUnavailable(unavailableEntityRes.UsrErr), should.BeTrue)
 
-	onlySecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
+	onlySecureFetcher := rights.NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
 	}, false)
 
@@ -292,7 +293,7 @@ func TestAccessFetcher(t *testing.T) {
 	a.So(errors.IsUnauthenticated(authEntityRes.OrgErr), should.BeTrue)
 	a.So(errors.IsUnauthenticated(authEntityRes.UsrErr), should.BeTrue)
 
-	alsoInsecureFetcher := NewAccessFetcher(func(context.Context) *grpc.ClientConn {
+	alsoInsecureFetcher := rights.NewAccessFetcher(func(context.Context) *grpc.ClientConn {
 		return cc
 	}, true)
 

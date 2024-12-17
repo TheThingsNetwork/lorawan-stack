@@ -23,6 +23,7 @@ import "thethings/json/annotations.proto";
 import "ttn/lorawan/v3/contact_info.proto";
 import "ttn/lorawan/v3/enums.proto";
 import "ttn/lorawan/v3/identifiers.proto";
+import "ttn/lorawan/v3/notification_service.proto";
 import "ttn/lorawan/v3/picture.proto";
 import "ttn/lorawan/v3/rights.proto";
 import "validate/validate.proto";
@@ -43,6 +44,14 @@ enum ConsoleTheme {
   CONSOLE_THEME_DARK = 2;
 }
 
+// Tutorial is a set of possible tutorials in the Console.
+enum Tutorial {
+  option (thethings.json.enum) = {marshal_as_string: true};
+
+  TUTORIAL_UNKNOWN = 0;
+  TUTORIAL_LIVE_DATA_SPLIT_VIEW = 1;
+}
+
 // DashboardLayout is a set of possible layout values to be used in the Console.
 enum DashboardLayout {
   option (thethings.json.enum) = {
@@ -52,6 +61,16 @@ enum DashboardLayout {
   DASHBOARD_LAYOUT_TABLE = 0;
   DASHBOARD_LAYOUT_LIST = 1;
   DASHBOARD_LAYOUT_GRID = 2;
+}
+
+// EmailNotificationPreferences is the message that defines the types of notifications for which the user wants to receive an email.
+message EmailNotificationPreferences {
+  repeated NotificationType types = 1 [(validate.rules).repeated = {
+    unique: true,
+    items: {
+      enum: {defined_only: true}
+    }
+  }];
 }
 
 // UserConsolePreferences is the message that defines the user preferences for the Console.
@@ -171,6 +190,16 @@ message UserConsolePreferences {
     }];
   }
   SortBy sort_by = 3;
+
+  message Tutorials {
+    repeated Tutorial seen = 1 [(validate.rules).repeated = {
+      unique: true,
+      items: {
+        enum: {defined_only: true}
+      }
+    }];
+  }
+  Tutorials tutorials = 4;
 }
 
 // User is the message that defines a user on the network.
@@ -288,7 +317,12 @@ message User {
   // Console preferences contains the user's preferences regarding the behavior of the Console.
   UserConsolePreferences console_preferences = 25;
 
-  // next: 26
+  EmailNotificationPreferences email_notification_preferences = 26;
+
+  // Universal rights are capable of restricting the user's interactions with the API, be it an admin or not.
+  repeated Right universal_rights = 27;
+
+  // next: 28
 }
 
 message Users {

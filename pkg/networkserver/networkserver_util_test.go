@@ -25,4 +25,5 @@ func init() {
 	NewDownlinkTaskQueue = NewRedisDownlinkTaskQueue
 	NewUplinkDeduplicator = NewRedisUplinkDeduplicator
 	NewScheduledDownlinkMatcher = NewRedisScheduledDownlinkMatcher
+	NewMACSettingsProfileRegistry = NewRedisMACSettingsProfileRegistry
 }

@@ -30,4 +30,6 @@ type WebhookRegistry interface {
 	Set(ctx context.Context, ids *ttnpb.ApplicationWebhookIdentifiers, paths []string, f func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error)) (*ttnpb.ApplicationWebhook, error)
 	// Range ranges over the webhooks and calls the callback function, until false is returned.
 	Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.ApplicationIdentifiers, *ttnpb.ApplicationWebhook) bool) error
+	// WithPagination returns a new context with pagination parameters.
+	WithPagination(ctx context.Context, limit uint32, page uint32, total *int64) context.Context
 }

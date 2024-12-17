@@ -24,7 +24,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "api_key_changed",
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 		email.FSTemplate{
 			SubjectTemplate:      "An API key of your {{ .Notification.EntityIds.EntityType }} has been changed",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -36,10 +36,11 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification("api_key_changed", &email.NotificationBuilder{
-		EmailTemplateName: "api_key_changed",
-		DataBuilder:       newAPIKeyChangedData,
-	})
+	email.RegisterNotification(
+		ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED), &email.NotificationBuilder{
+			EmailTemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
+			DataBuilder:       newAPIKeyChangedData,
+		})
 }
 
 func newAPIKeyChangedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {

@@ -26,6 +26,95 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestClientCollaboratorsPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+
+	readAdmin := p.NewUser()
+	readAdmin.Admin = true
+	readAdminKey, _ := p.NewAPIKey(readAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readAdminCreds := rpcCreds(readAdminKey)
+
+	cli1 := p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
+	cliKey, _ := p.NewAPIKey(cli1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_LINK,
+	)
+	cliCreds := rpcCreds(cliKey)
+
+	p.NewMembership(
+		usr1.GetOrganizationOrUserIdentifiers(),
+		cli1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
+	)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewClientAccessClient(cc)
+
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {cliCreds}} {
+				_, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+					ClientIds:    cli1.GetIds(),
+					Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				})
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+				_, err = reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+					ClientIds: cli1.GetIds(),
+				})
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+
+				_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
+					ClientIds: cli1.GetIds(),
+					Collaborator: &ttnpb.Collaborator{
+						Ids:    usr1.GetOrganizationOrUserIdentifiers(),
+						Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+					},
+				}, opts...)
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
+				ClientIds:    cli1.GetIds(),
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			}, readAdminCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+			// ListCollaborators without credentials.
+			_, err = reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+				ClientIds: cli1.GetIds(),
+			}, readAdminCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
+				ClientIds: cli1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids:    usr1.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+				},
+			}, readAdminCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+
+		t.Run("cluster auth", func(t *testing.T) { // nolint:paralleltest
+			rights, err := reg.ListRights(ctx, cli1.GetIds(), is.WithClusterAuth())
+			if a.So(err, should.BeNil) && a.So(rights, should.NotBeNil) {
+				a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllClientRights).Sub(rights).Rights, should.BeEmpty)
+			}
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestClientCollaborators(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -39,11 +128,6 @@ func TestClientCollaborators(t *testing.T) { // nolint:gocyclo
 	usr1Creds := rpcCreds(usr1Key)
 
 	cli1 := p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
-	cliKey, _ := p.NewAPIKey(cli1.GetEntityIdentifiers(),
-		ttnpb.Right_RIGHT_GATEWAY_INFO,
-		ttnpb.Right_RIGHT_GATEWAY_LINK,
-	)
-	cliCreds := rpcCreds(cliKey)
 
 	usr2 := p.NewUser()
 	p.NewMembership(
@@ -72,59 +156,6 @@ func TestClientCollaborators(t *testing.T) { // nolint:gocyclo
 		}
 		a.So(got, should.BeNil)
 
-		// SetCollaborator without credentials.
-		_, err = reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-			ClientIds: cli1.GetIds(),
-			Collaborator: &ttnpb.Collaborator{
-				Ids: usr2.GetOrganizationOrUserIdentifiers(),
-				Rights: []ttnpb.Right{
-					ttnpb.Right_RIGHT_CLIENT_SETTINGS_COLLABORATORS,
-				},
-			},
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-
-		// GetCollaborator without credentials.
-		got, err = reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
-			ClientIds:    cli1.GetIds(),
-			Collaborator: usr2.GetOrganizationOrUserIdentifiers(),
-		})
-		if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-			a.So(got, should.BeNil)
-		}
-
-		// ListCollaborators without credentials.
-		list, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
-			ClientIds: cli1.GetIds(),
-		})
-		if a.So(err, should.NotBeNil) && a.So(errors.IsUnauthenticated(err), should.BeTrue) {
-			a.So(list, should.BeNil)
-		}
-
-		// Collaborator CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {cliCreds}} {
-			_, err := reg.SetCollaborator(ctx, &ttnpb.SetClientCollaboratorRequest{
-				ClientIds: cli1.GetIds(),
-				Collaborator: &ttnpb.Collaborator{
-					Ids:    usr2.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
-				},
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsPermissionDenied(err), should.BeTrue)
-			}
-
-			got, err := reg.GetCollaborator(ctx, &ttnpb.GetClientCollaboratorRequest{
-				ClientIds:    cli1.GetIds(),
-				Collaborator: usr2.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-		}
-
 		// Collaborator CRUD with different valid credentials.
 		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}} {
 			// Adds `usr3` as a collaborator of `cli1` client.
@@ -138,7 +169,7 @@ func TestClientCollaborators(t *testing.T) { // nolint:gocyclo
 			a.So(err, should.BeNil)
 
 			// Lists collaborators of the `cli1` client.
-			list, err = reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
+			list, err := reg.ListCollaborators(ctx, &ttnpb.ListClientCollaboratorsRequest{
 				ClientIds: cli1.GetIds(),
 			}, opts...)
 			if a.So(err, should.BeNil) && a.So(list, should.NotBeNil) && a.So(list.Collaborators, should.HaveLength, 3) {
@@ -226,23 +257,6 @@ func TestClientCollaborators(t *testing.T) { // nolint:gocyclo
 		}, usr1Creds)
 		if a.So(err, should.NotBeNil) {
 			a.So(errors.IsFailedPrecondition(err), should.BeTrue)
-		}
-	}, withPrivateTestDatabase(p))
-}
-
-func TestClientAccessClusterAuth(t *testing.T) {
-	p := &storetest.Population{}
-	cli1 := p.NewClient(nil)
-
-	t.Parallel()
-	a, ctx := test.New(t)
-
-	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
-		reg := ttnpb.NewClientAccessClient(cc)
-
-		rights, err := reg.ListRights(ctx, cli1.GetIds(), is.WithClusterAuth())
-		if a.So(err, should.BeNil) && a.So(rights, should.NotBeNil) {
-			a.So(ttnpb.AllClusterRights.Intersect(ttnpb.AllClientRights).Sub(rights).Rights, should.BeEmpty)
 		}
 	}, withPrivateTestDatabase(p))
 }

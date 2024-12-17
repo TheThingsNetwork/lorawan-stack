@@ -77,7 +77,7 @@ func TestCacheUsed(t *testing.T) {
 	m := &mockKeyService{}
 
 	ctx := test.Context()
-	ck := NewCacheKeyService(m, test.Delay, 1)
+	ck := NewCacheKeyService(m, test.Delay<<4, 1)
 
 	// Cache is empty, expect a miss
 	m.results.key = []byte{0x01, 0x02, 0x03}

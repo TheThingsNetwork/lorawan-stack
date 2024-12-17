@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package rights
+package rights_test
 
 import (
 	"context"
@@ -20,6 +20,7 @@ import (
 	"time"
 
 	"github.com/smarty/assertions"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -32,9 +33,9 @@ func timeTravel(d time.Duration) {
 }
 
 func TestCache(t *testing.T) {
-	now = func() time.Time {
+	rights.OverrideNowForTest(func() time.Time {
 		return currentTime
-	}
+	})
 
 	a := assertions.New(t)
 
@@ -42,7 +43,10 @@ func TestCache(t *testing.T) {
 
 	mockFetcher := &mockFetcher{}
 
-	c := NewInMemoryCache(mockFetcher, 5*time.Minute, time.Minute).(*inMemoryCache)
+	c, ok := rights.NewInMemoryCache(mockFetcher, 5*time.Minute, time.Minute).(*rights.InMemoryCache)
+	if !ok {
+		t.Fatal("Failed to create in-memory cache")
+	}
 
 	mockFetcher.authInfoError = mockErr
 	mockFetcher.applicationError = mockErr
@@ -114,10 +118,10 @@ func TestCache(t *testing.T) {
 
 	timeTravel(time.Hour)
 
-	c.maybeCleanup()
+	c.MaybeCleanupTest()
 
-	a.So(c.authInfo, should.BeEmpty)
-	a.So(c.applicationRights, should.BeEmpty)
-	a.So(c.gatewayRights, should.BeEmpty)
-	a.So(c.organizationRights, should.BeEmpty)
+	a.So(c.AuthInfoTest(), should.BeEmpty)
+	a.So(c.ApplicationRightsTest(), should.BeEmpty)
+	a.So(c.GatewayRightsTest(), should.BeEmpty)
+	a.So(c.OrganizationRightsTest(), should.BeEmpty)
 }

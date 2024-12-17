@@ -128,6 +128,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
             supportsClaiming ? sharedMessages.unclaimAndDeleteGateway : sharedMessages.deleteGateway
           }
           action={handleOpenDeleteGatewayModal}
+          messageClassName="c-text-error-normal"
         />
       )}
     </>

@@ -26,6 +26,80 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestOrganizationAPIKeysPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	org1 := p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+	orgKey, _ := p.NewAPIKey(org1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+		ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+	)
+	orgCreds := rpcCreds(orgKey)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewOrganizationAccessClient(cc)
+
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {orgCreds}, {readOnlyAdminKeyCreds}} {
+				created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					Name:            "api-key-name",
+					Rights:          []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO},
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(created, should.BeNil)
+				}
+
+				list, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
+					OrganizationIds: org1.GetIds(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(list, should.BeNil)
+				}
+
+				got, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					KeyId:           orgKey.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(got, should.BeNil)
+				}
+
+				updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					ApiKey: &ttnpb.APIKey{
+						Id:   orgKey.GetId(),
+						Name: "api-key-name-updated",
+					},
+					FieldMask: ttnpb.FieldMask("name"),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(updated, should.BeNil)
+				}
+
+				_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteOrganizationAPIKeyRequest{
+					OrganizationIds: org1.GetIds(),
+					KeyId:           created.GetId(),
+				}, opts...)
+				if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.FailNow()
+				}
+			}
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestOrganizationAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -50,7 +124,6 @@ func TestOrganizationAPIKeys(t *testing.T) { // nolint:gocyclo
 		ttnpb.Right_RIGHT_ORGANIZATION_INFO,
 		ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
 	)
-	orgCreds := rpcCreds(orgKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -147,53 +220,6 @@ func TestOrganizationAPIKeys(t *testing.T) { // nolint:gocyclo
 			})
 		}
 
-		// API Key CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {orgCreds}} {
-			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
-				OrganizationIds: org1.GetIds(),
-				Name:            "api-key-name",
-				Rights:          []ttnpb.Right{ttnpb.Right_RIGHT_ORGANIZATION_INFO},
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(created, should.BeNil)
-			}
-
-			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListOrganizationAPIKeysRequest{
-				OrganizationIds: org1.GetIds(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(list, should.BeNil)
-			}
-
-			got, err := reg.GetAPIKey(ctx, &ttnpb.GetOrganizationAPIKeyRequest{
-				OrganizationIds: org1.GetIds(),
-				KeyId:           orgKey.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-
-			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateOrganizationAPIKeyRequest{
-				OrganizationIds: org1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id:   orgKey.GetId(),
-					Name: "api-key-name-updated",
-				},
-				FieldMask: ttnpb.FieldMask("name"),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(updated, should.BeNil)
-			}
-
-			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteOrganizationAPIKeyRequest{
-				OrganizationIds: org1.GetIds(),
-				KeyId:           created.GetId(),
-			}, opts...)
-			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				t.FailNow()
-			}
-		}
-
 		// API Key CRUD with different valid credentials.
 		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}, {limitedCreds}} {
 			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateOrganizationAPIKeyRequest{
@@ -287,6 +313,92 @@ func TestOrganizationAPIKeys(t *testing.T) { // nolint:gocyclo
 	}, withPrivateTestDatabase(p))
 }
 
+func TestOrganizationCollaboratorsPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	admin := p.NewUser()
+	admin.Admin = true
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	org1 := p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+
+	orgKey, _ := p.NewAPIKey(org1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+		ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+	)
+	orgCreds := rpcCreds(orgKey)
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		org1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+		ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
+	)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewOrganizationAccessClient(cc)
+
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {orgCreds}, {readOnlyAdminKeyCreds}} {
+				_, err := reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					Collaborator: &ttnpb.Collaborator{
+						Ids: usr2.GetOrganizationOrUserIdentifiers(),
+						Rights: []ttnpb.Right{
+							ttnpb.Right_RIGHT_ORGANIZATION_INFO,
+						},
+					},
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+
+				got, err := reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					Collaborator:    usr2.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(got, should.BeNil)
+				}
+
+				_, err = reg.DeleteCollaborator(ctx, &ttnpb.DeleteOrganizationCollaboratorRequest{
+					OrganizationIds: org1.GetIds(),
+					CollaboratorIds: usr2.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+			}
+
+			// ListCollaborators without credentials.
+			list, err := reg.ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
+				OrganizationIds: org1.GetIds(),
+			})
+			if a.So(err, should.NotBeNil) && a.So(errors.IsUnauthenticated(err), should.BeTrue) {
+				a.So(list, should.BeNil)
+			}
+
+			// ListCollaborators with read-only credentials. Returns only safe fields.
+			list, err = reg.ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{
+				OrganizationIds: org1.GetIds(),
+			}, readOnlyAdminKeyCreds)
+			a.So(err, should.BeNil)
+			a.So(list, should.NotBeNil)
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestOrganizationCollaborators(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -307,12 +419,6 @@ func TestOrganizationCollaborators(t *testing.T) { // nolint:gocyclo
 		ttnpb.Right_RIGHT_ORGANIZATION_SETTINGS_MEMBERS,
 	)
 	limitedCreds := rpcCreds(limitedKey)
-
-	orgKey, _ := p.NewAPIKey(org1.GetEntityIdentifiers(),
-		ttnpb.Right_RIGHT_ORGANIZATION_INFO,
-		ttnpb.Right_RIGHT_ORGANIZATION_APPLICATIONS_LIST,
-	)
-	orgCreds := rpcCreds(orgKey)
 
 	usr2 := p.NewUser()
 	p.NewMembership(
@@ -382,30 +488,6 @@ func TestOrganizationCollaborators(t *testing.T) { // nolint:gocyclo
 			},
 		}, limitedCreds)
 		a.So(err, should.BeNil)
-
-		// Collaborator CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {orgCreds}} {
-			_, err := reg.SetCollaborator(ctx, &ttnpb.SetOrganizationCollaboratorRequest{
-				OrganizationIds: org1.GetIds(),
-				Collaborator: &ttnpb.Collaborator{
-					Ids: usr2.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_ORGANIZATION_INFO,
-					},
-				},
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsPermissionDenied(err), should.BeTrue)
-			}
-
-			got, err := reg.GetCollaborator(ctx, &ttnpb.GetOrganizationCollaboratorRequest{
-				OrganizationIds: org1.GetIds(),
-				Collaborator:    usr2.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-		}
 
 		// ListCollaborators without credentials.
 		list, err := reg.ListCollaborators(ctx, &ttnpb.ListOrganizationCollaboratorsRequest{

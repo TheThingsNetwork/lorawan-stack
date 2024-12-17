@@ -16,6 +16,10 @@ import React, { useCallback } from 'react'
 import classnames from 'classnames'
 import { NavLink } from 'react-router-dom'
 
+import Tooltip from '@ttn-lw/components/tooltip'
+
+import Message from '@ttn-lw/lib/components/message'
+
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import style from './tab.styl'
@@ -33,6 +37,7 @@ const Tab = props => {
     exact = true,
     tabClassName,
     toggleStyle,
+    tooltip,
     ...rest
   } = props
 
@@ -76,9 +81,17 @@ const Tab = props => {
     componentProps.onClick = handleClick
   }
 
+  const wrappedChildren = tooltip ? (
+    <Tooltip content={<Message content={tooltip} />} delay={0} small>
+      <Component {...componentProps} children={children} />
+    </Tooltip>
+  ) : (
+    <Component {...componentProps} children={children} />
+  )
+
   return (
     <li {...rest} className={tabClassNames}>
-      <Component {...componentProps} children={children} />
+      {wrappedChildren}
     </li>
   )
 }
@@ -103,6 +116,8 @@ Tab.propTypes = {
   tabClassName: PropTypes.string,
   /** A flag specifying whether the tab should render a toggle style. */
   toggleStyle: PropTypes.bool,
+  /** A tooltip to be displayed on hover. */
+  tooltip: PropTypes.message,
 }
 
 Tab.defaultProps = {
@@ -116,6 +131,7 @@ Tab.defaultProps = {
   narrow: false,
   exact: true,
   toggleStyle: false,
+  tooltip: undefined,
 }
 
 export default Tab

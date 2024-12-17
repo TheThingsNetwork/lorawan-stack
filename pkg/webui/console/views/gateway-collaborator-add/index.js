@@ -34,9 +34,9 @@ const GatewayCollaboratorAdd = () => {
   )
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xl grid">
       <PageTitle title={sharedMessages.addCollaborator} />
-      <div className="item-12 xl:item-8">
+      <div className="item-12">
         <ConsoleCollaboratorsForm entity={GATEWAY} entityId={gtwId} />
       </div>
     </div>

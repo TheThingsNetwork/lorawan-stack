@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React from 'react'
-import classnames from 'classnames'
 
 import { IconBolt, IconDevice } from '@ttn-lw/components/icon'
 import Panel from '@ttn-lw/components/panel'
@@ -48,15 +47,11 @@ const TotalEndDevicesUpsellerPanel = () => {
           content={sharedMessages.quicklyTroubleshoot}
         />
         <Button.AnchorLink
-          naked
+          tertiary
           message={sharedMessages.upgradeNow}
           icon={IconBolt}
           href={upgradeUrl}
           target="_blank"
-          className={classnames(
-            style.upgradeButton,
-            'c-bg-brand-extralight c-text-brand-normal fw-bold',
-          )}
         />
       </div>
     </Panel>

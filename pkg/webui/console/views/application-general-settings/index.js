@@ -85,9 +85,9 @@ const ApplicationGeneralSettings = () => {
       {/* The request getApplicationLink returns 404 when there is no `skip_payload_crypto`. */}
       {/* This is expected behavior and should not be treated as an error. */}
       <RequireRequest requestAction={requestsList} handleErrors={false}>
-        <div className="container container--xxl grid">
+        <div className="container container--xl grid">
           <PageTitle title={sharedMessages.generalSettings} />
-          <div className="item-12 xl:item-8">
+          <div className="item-12">
             <ApplicationGeneralSettingsContainer appId={appId} />
           </div>
         </div>

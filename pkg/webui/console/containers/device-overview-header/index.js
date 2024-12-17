@@ -294,30 +294,36 @@ const DeviceOverviewHeader = ({ device }) => {
     })
   }, [device_id])
 
-  const onDeviceDelete = React.useCallback(async () => {
-    // Check if device is claimable and if so, try to unclaim.
-    if (supportsClaiming) {
-      try {
-        await handleUnclaim()
-      } catch {
-        return handleUnclaimFailure()
+  const onDeviceDelete = React.useCallback(
+    async confirmed => {
+      if (confirmed) {
+        // Check if device is claimable and if so, try to unclaim.
+        if (supportsClaiming) {
+          try {
+            await handleUnclaim()
+          } catch {
+            return handleUnclaimFailure()
+          }
+        }
+        // Delete device.
+        try {
+          await handleDelete()
+          handleDeleteSuccess()
+        } catch (error) {
+          handleDeleteFailure()
+        }
       }
-    }
-    // Delete device.
-    try {
-      await handleDelete()
-      handleDeleteSuccess()
-    } catch (error) {
-      handleDeleteFailure()
-    }
-  }, [
-    handleDelete,
-    handleDeleteFailure,
-    handleDeleteSuccess,
-    handleUnclaim,
-    handleUnclaimFailure,
-    supportsClaiming,
-  ])
+      setDeleteDeviceVisible(false)
+    },
+    [
+      handleDelete,
+      handleDeleteFailure,
+      handleDeleteSuccess,
+      handleUnclaim,
+      handleUnclaimFailure,
+      supportsClaiming,
+    ],
+  )
 
   const handleOpenDeleteDeviceModal = useCallback(() => {
     setDeleteDeviceVisible(true)
@@ -335,6 +341,7 @@ const DeviceOverviewHeader = ({ device }) => {
           supportsClaiming ? sharedMessages.unclaimAndDeleteDevice : sharedMessages.deleteDevice
         }
         action={handleOpenDeleteDeviceModal}
+        messageClassName="c-text-error-normal"
       />
     </>
   )

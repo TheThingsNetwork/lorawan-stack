@@ -124,7 +124,7 @@ const DropdownItem = ({
 }) => {
   const ref = useRef()
   const iconElement = icon && <Icon className={style.icon} icon={icon} nudgeUp />
-  const ItemElement = action ? (
+  const itemElement = action ? (
     <button
       onClick={action}
       onKeyPress={action}
@@ -133,16 +133,16 @@ const DropdownItem = ({
       className={classnames(style.button, { [style.buttonActive]: active })}
     >
       {iconElement}
-      <Message content={title} />
+      <Message content={title} component="span" className={messageClassName} />
     </button>
   ) : external ? (
     <Link.Anchor href={path} external tabIndex={tabIndex} className={style.button}>
-      {Boolean(iconElement) ? iconElement : null}
+      {iconElement}
       <Message content={title} component="span" className={messageClassName} />
     </Link.Anchor>
   ) : (
     <Link to={path} tabIndex={tabIndex} className={style.button}>
-      {Boolean(iconElement) ? iconElement : null}
+      {iconElement}
       <Message content={title} component="span" className={messageClassName} />
     </Link>
   )
@@ -152,7 +152,7 @@ const DropdownItem = ({
       <button className={classnames(style.button, 'd-flex', 'j-between')}>
         <div className="d-flex al-center">
           {iconElement}
-          <Message content={title} />
+          <Message content={title} component="span" className={messageClassName} />
         </div>
         <Icon className={style.submenuDropdownIcon} icon={IconChevronRight} />
       </button>
@@ -164,7 +164,7 @@ const DropdownItem = ({
 
   return (
     <li className={style.dropdownItem} key={title.id || title} {...rest} ref={ref}>
-      {submenu || ItemElement}
+      {submenu || itemElement}
     </li>
   )
 }

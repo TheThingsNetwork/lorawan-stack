@@ -44,9 +44,9 @@ const ApplicationApiKeyEditInner = () => {
   )
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xl grid">
       <PageTitle title={sharedMessages.keyEdit} />
-      <div className="item-12 xl:item-8">
+      <div className="item-12">
         <ApiKeyEditForm entity={APPLICATION} entityId={appId} />
       </div>
     </div>

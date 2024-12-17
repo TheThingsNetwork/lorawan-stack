@@ -54,6 +54,12 @@ func TestEntityAccess(t *testing.T) {
 	adminUsrKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	adminUsrCreds := rpcCreds(adminUsrKey)
 
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdmin.UniversalRights = ttnpb.AllReadAdminRights.GetRights()
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
 	expiredKey, storedKey := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	storedKey.ExpiresAt = timestamppb.New(time.Now().Add(-10 * time.Minute))
 	expiredCreds := rpcCreds(expiredKey)
@@ -72,7 +78,14 @@ func TestEntityAccess(t *testing.T) {
 				a.So(md.Get("warning"), should.Contain, "Restricted rights while account pending")
 				if a.So(authInfo, should.NotBeNil) && a.So(authInfo.GetApiKey(), should.NotBeNil) {
 					rights := ttnpb.RightsFrom(authInfo.GetApiKey().GetApiKey().GetRights()...)
-					a.So(rights.IncludesAll(ttnpb.Right_RIGHT_USER_INFO, ttnpb.Right_RIGHT_USER_SETTINGS_BASIC, ttnpb.Right_RIGHT_USER_DELETE), should.BeTrue)
+					a.So(
+						rights.IncludesAll(
+							ttnpb.Right_RIGHT_USER_INFO,
+							ttnpb.Right_RIGHT_USER_SETTINGS_BASIC,
+							ttnpb.Right_RIGHT_USER_DELETE,
+						),
+						should.BeTrue,
+					)
 				}
 			}
 		})
@@ -114,6 +127,25 @@ func TestEntityAccess(t *testing.T) {
 			if a.So(err, should.BeNil) && a.So(authInfo, should.NotBeNil) {
 				a.So(authInfo.GetIsAdmin(), should.BeTrue)
 				a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
+			}
+		})
+
+		t.Run("Read-only Admin User", func(t *testing.T) {
+			a, ctx := test.New(t)
+			var md metadata.MD
+			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, readOnlyAdminKeyCreds, grpc.Header(&md))
+			if a.So(err, should.BeNil) && a.So(authInfo, should.NotBeNil) {
+				a.So(authInfo.GetIsAdmin(), should.BeTrue)
+				a.So(authInfo.GetUniversalRights().GetRights(), should.NotBeEmpty)
+				a.So(
+					authInfo.GetUniversalRights().IncludesAll(ttnpb.AllReadAdminRights.GetRights()...),
+					should.BeTrue,
+				)
+				a.So(
+					authInfo.GetUniversalRights().IncludesAll(ttnpb.Right_RIGHT_USER_APPLICATIONS_CREATE),
+					should.BeFalse,
+				)
+
 			}
 		})
 

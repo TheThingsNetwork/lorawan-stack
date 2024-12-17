@@ -383,35 +383,35 @@ const GatewayConnectionSettings = () => {
 
   return (
     <RequireRequest requestAction={loadData}>
-      <div className="item-12 lg:item-6 lg-xl:item-6 xl:item-7">
-        <PageTitle title={sharedMessages.connectionSettings} />
-        {isFirstClaim && <Notification info small content={m.firstNotification} />}
-        <Form
-          error={error}
-          onSubmit={handleSubmit}
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-        >
-          <>
-            <WifiSettingsFormFields
-              initialValues={initialValues}
-              isWifiConnected={connectionsData.isWifiConnected}
-              saveFormClicked={saveFormClicked}
-            />
-            <hr />
-            <EthernetSettingsFormFields />
-
-            <SubmitBar className="mb-cs-l">
-              <Form.Submit
-                component={SubmitButton}
-                message={sharedMessages.saveChanges}
-                disabled={isLoading}
+      <div className="item-12 d-flex gap-ls-s md:direction-column">
+        <div className="w-full">
+          <PageTitle title={sharedMessages.connectionSettings} />
+          {isFirstClaim && <Notification info small content={m.firstNotification} />}
+          <Form
+            error={error}
+            onSubmit={handleSubmit}
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+          >
+            <>
+              <WifiSettingsFormFields
+                initialValues={initialValues}
+                isWifiConnected={connectionsData.isWifiConnected}
+                saveFormClicked={saveFormClicked}
               />
-            </SubmitBar>
-          </>
-        </Form>
-      </div>
-      <div className="item-12 lg:item-6 lg-xl:item-6 xl:item-5">
+              <hr />
+              <EthernetSettingsFormFields />
+
+              <SubmitBar className="mb-cs-l">
+                <Form.Submit
+                  component={SubmitButton}
+                  message={sharedMessages.saveChanges}
+                  disabled={isLoading}
+                />
+              </SubmitBar>
+            </>
+          </Form>
+        </div>
         <ManagedGatewayConnections connectionsData={connectionsData} />
       </div>
     </RequireRequest>

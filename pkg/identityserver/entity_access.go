@@ -122,7 +122,13 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 
 	var fetch func(ctx context.Context, st store.Store) error
 	res := &ttnpb.AuthInfoResponse{}
-	userFieldMask := []string{"admin", "state", "state_description", "primary_email_address_validated_at"}
+	userFieldMask := []string{
+		"admin",
+		"state",
+		"state_description",
+		"primary_email_address_validated_at",
+		"universal_rights",
+	}
 	clientFieldMask := []string{"state", "state_description"}
 	var user *ttnpb.User
 	var userRights *ttnpb.Rights
@@ -302,6 +308,10 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 					res.UniversalRights = ttnpb.AllRights.Implied().Intersect(userRights)
 				} else {
 					res.UniversalRights = ttnpb.AllAdminRights.Implied().Intersect(userRights)
+				}
+
+				if len(user.UniversalRights) > 0 {
+					res.UniversalRights = res.UniversalRights.Intersect(ttnpb.RightsFrom(user.UniversalRights...))
 				}
 			}
 		case ttnpb.State_STATE_REJECTED:

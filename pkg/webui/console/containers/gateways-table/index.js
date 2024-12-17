@@ -44,6 +44,8 @@ const m = defineMessages({
   restoreFail: 'There was an error and the gateway could not be restored',
   purgeSuccess: 'Gateway purged',
   purgeFail: 'There was an error and the gateway could not be purged',
+  myGateways: 'My gateways',
+  myGatewaysTooltip: 'Gateways that you are a collaborator to',
 })
 
 const OWNED_TAB = 'owned'
@@ -51,8 +53,9 @@ const ALL_TAB = 'all'
 const DELETED_TAB = 'deleted'
 const tabs = [
   {
-    title: sharedMessages.ownedByMe,
+    title: m.myGateways,
     name: OWNED_TAB,
+    description: m.myGatewaysTooltip,
   },
   {
     title: sharedMessages.allAdmin,

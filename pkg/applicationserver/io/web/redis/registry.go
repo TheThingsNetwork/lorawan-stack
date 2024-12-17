@@ -17,6 +17,7 @@ package redis
 import (
 	"context"
 	"regexp"
+	"runtime/trace"
 	"strings"
 	"time"
 
@@ -99,19 +100,55 @@ func (r WebhookRegistry) Get(ctx context.Context, ids *ttnpb.ApplicationWebhookI
 func (r WebhookRegistry) List(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationWebhook, error) {
 	var pbs []*ttnpb.ApplicationWebhook
 	appUID := unique.ID(ctx, ids)
-	err := ttnredis.FindProtos(ctx, r.Redis, r.appKey(appUID), r.makeIDKeyFunc(appUID)).Range(func() (proto.Message, func() (bool, error)) {
-		pb := &ttnpb.ApplicationWebhook{}
-		return pb, func() (bool, error) {
-			pb, err := applyWebhookFieldMask(nil, pb, appendImplicitWebhookGetPaths(paths...)...)
-			if err != nil {
-				return false, err
-			}
-			pbs = append(pbs, pb)
-			return true, nil
+	uidKey := r.appKey(appUID)
+
+	opts := []ttnredis.FindProtosOption{}
+	limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
+	if limit != 0 {
+		opts = append(opts,
+			ttnredis.FindProtosSorted(true),
+			ttnredis.FindProtosWithOffsetAndCount(offset, limit),
+		)
+	}
+
+	rangeProtos := func(c redis.Cmdable) error {
+		return ttnredis.FindProtos(ctx, c, uidKey, r.makeIDKeyFunc(appUID), opts...).Range(
+			func() (proto.Message, func() (bool, error)) {
+				pb := &ttnpb.ApplicationWebhook{}
+				return pb, func() (bool, error) {
+					pb, err := applyWebhookFieldMask(nil, pb, appendImplicitWebhookGetPaths(paths...)...)
+					if err != nil {
+						return false, err
+					}
+					pbs = append(pbs, pb)
+					return true, nil
+				}
+			})
+	}
+
+	defer trace.StartRegion(ctx, "list webhooks by application id").End()
+
+	var err error
+	if limit != 0 {
+		var lockerID string
+		lockerID, err = ttnredis.GenerateLockerID()
+		if err != nil {
+			return nil, err
 		}
-	})
+		err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
+			total, err := tx.SCard(ctx, uidKey).Result()
+			if err != nil {
+				return err
+			}
+			ttnredis.SetPaginationTotal(ctx, total)
+			return rangeProtos(tx)
+		})
+	} else {
+		err = rangeProtos(r.Redis)
+	}
+
 	if err != nil {
-		return nil, err
+		return nil, ttnredis.ConvertError(err)
 	}
 	return pbs, nil
 }
@@ -266,4 +303,14 @@ func (r WebhookRegistry) Range(ctx context.Context, paths []string, f func(conte
 		}
 		return true, nil
 	})
+}
+
+// WithPagination returns a new context with pagination parameters.
+func (WebhookRegistry) WithPagination(
+	ctx context.Context,
+	limit uint32,
+	page uint32,
+	total *int64,
+) context.Context {
+	return ttnredis.NewContextWithPagination(ctx, int64(limit), int64(page), total)
 }

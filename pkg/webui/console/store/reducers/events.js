@@ -27,6 +27,9 @@ import {
   createStatusFilterEnabled,
   createStatusFilterDisabled,
   EVENT_STATUS_RESUMED,
+  EVENT_STATUS_CLOSED,
+  EVENT_NETWORK_ERROR,
+  EVENT_STATUS_RECONNECTED,
 } from '@console/lib/events/definitions'
 import { createSyntheticEventFromError } from '@console/lib/events/utils'
 
@@ -70,6 +73,31 @@ const addEvent = (state, event) => {
   // timestamped before it. This is to avoid showing events before the synthetic
   // resumption event.
   if (events[0] && events[0].name === EVENT_STATUS_RESUMED && event.time < events[0].time) {
+    return {}
+  }
+
+  // Avoid consecutive disconnect/reconnect messages by not adding another disconnect event
+  // if the events immediately before are of a diconnect or reconnect.
+  // Keep the first disconnect event of the consecutive group,
+  // remove the previous reconnect and only add the last reconnect event.
+  if (
+    events[0] &&
+    events[1] &&
+    events[0].name === EVENT_STATUS_RECONNECTED &&
+    (events[1].name === EVENT_NETWORK_ERROR || events[1].name === EVENT_STATUS_CLOSED) &&
+    (event.name === EVENT_NETWORK_ERROR || event.name === EVENT_STATUS_CLOSED)
+  ) {
+    const newEvents = events.slice(1)
+
+    return { events: newEvents, truncated: events.length + 1 > EVENT_STORE_LIMIT }
+  }
+  if (
+    events[0] &&
+    events[1] &&
+    (events[0].name === EVENT_STATUS_CLOSED || events[0].name === EVENT_NETWORK_ERROR) &&
+    (events[1].name === EVENT_NETWORK_ERROR || events[1].name === EVENT_STATUS_CLOSED) &&
+    (event.name === EVENT_NETWORK_ERROR || event.name === EVENT_STATUS_CLOSED)
+  ) {
     return {}
   }
 

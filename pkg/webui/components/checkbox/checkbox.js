@@ -104,22 +104,24 @@ const Checkbox = props => {
 
   return (
     <label className={cls}>
-      <span className={style.checkbox}>
-        <input
-          type="checkbox"
-          ref={inputRef}
-          name={name}
-          readOnly={readOnly}
-          autoFocus={autoFocus}
-          onChange={handleChange}
-          id={id}
-          aria-describedby={rest['aria-describedby']}
-          aria-invalid={rest['aria-invalid']}
-          {...checkboxProps}
-        />
-        <span className={style.checkmark} />
-      </span>
-      {label && <Message className={labelCls} content={label} />}
+      <div>
+        <span className={style.checkbox}>
+          <input
+            type="checkbox"
+            ref={inputRef}
+            name={name}
+            readOnly={readOnly}
+            autoFocus={autoFocus}
+            onChange={handleChange}
+            id={id}
+            aria-describedby={rest['aria-describedby']}
+            aria-invalid={rest['aria-invalid']}
+            {...checkboxProps}
+          />
+          <span className={style.checkmark} />
+        </span>
+        {label && <Message className={labelCls} content={label} />}
+      </div>
       {children}
     </label>
   )

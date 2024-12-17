@@ -17,6 +17,7 @@ package api
 import (
 	"context"
 	"crypto/tls"
+	"crypto/x509"
 	"sync"
 	"time"
 
@@ -133,6 +134,24 @@ var (
 	connMu sync.RWMutex
 	conns  = make(map[string]*grpc.ClientConn)
 )
+
+// AddCA adds the CA certificate file.
+func AddCA(pemBytes []byte) (err error) {
+	if tlsConfig == nil {
+		tlsConfig = &tls.Config{
+			MinVersion: tls.VersionTLS12,
+		}
+	}
+	rootCAs := tlsConfig.RootCAs
+	if rootCAs == nil {
+		if rootCAs, err = x509.SystemCertPool(); err != nil {
+			rootCAs = x509.NewCertPool()
+		}
+	}
+	rootCAs.AppendCertsFromPEM(pemBytes)
+	tlsConfig.RootCAs = rootCAs
+	return nil
+}
 
 // Dial dials a gRPC connection to the target.
 func Dial(ctx context.Context, target string) (*grpc.ClientConn, error) {

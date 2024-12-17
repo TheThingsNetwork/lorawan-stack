@@ -2555,6 +2555,125 @@ var _ interface {
 	ErrorName() string
 } = MACSettingsValidationError{}
 
+// ValidateFields checks the field values on MACSettingsProfile with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *MACSettingsProfile) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACSettingsProfileFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "ids":
+
+			if m.GetIds() == nil {
+				return MACSettingsProfileValidationError{
+					field:  "ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsProfileValidationError{
+						field:  "ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "mac_settings":
+
+			if m.GetMacSettings() == nil {
+				return MACSettingsProfileValidationError{
+					field:  "mac_settings",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetMacSettings()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsProfileValidationError{
+						field:  "mac_settings",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		default:
+			return MACSettingsProfileValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACSettingsProfileValidationError is the validation error returned by
+// MACSettingsProfile.ValidateFields if the designated constraints aren't met.
+type MACSettingsProfileValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACSettingsProfileValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACSettingsProfileValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACSettingsProfileValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACSettingsProfileValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACSettingsProfileValidationError) ErrorName() string {
+	return "MACSettingsProfileValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACSettingsProfileValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACSettingsProfile.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACSettingsProfileValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACSettingsProfileValidationError{}
+
 // ValidateFields checks the field values on MACState with the rules defined in
 // the proto definition for this message. If any rules are violated, an error
 // is returned.

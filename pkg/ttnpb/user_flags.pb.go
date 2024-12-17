@@ -19,6 +19,8 @@ func AddSelectFlagsForUserConsolePreferences(flags *pflag.FlagSet, prefix string
 	// NOTE: dashboard_layouts (UserConsolePreferences_DashboardLayouts) does not seem to have select flags.
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("sort-by", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("sort-by", prefix), true), flagsplugin.WithHidden(hidden)))
 	// NOTE: sort_by (UserConsolePreferences_SortBy) does not seem to have select flags.
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("tutorials", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("tutorials", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: tutorials (UserConsolePreferences_Tutorials) does not seem to have select flags.
 }
 
 // SelectFromFlags outputs the fieldmask paths forUserConsolePreferences message from select flags.
@@ -40,6 +42,12 @@ func PathsFromSelectFlagsForUserConsolePreferences(flags *pflag.FlagSet, prefix 
 		paths = append(paths, flagsplugin.Prefix("sort_by", prefix))
 	}
 	// NOTE: sort_by (UserConsolePreferences_SortBy) does not seem to have select flags.
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("tutorials", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("tutorials", prefix))
+	}
+	// NOTE: tutorials (UserConsolePreferences_Tutorials) does not seem to have select flags.
 	return paths, nil
 }
 
@@ -48,6 +56,7 @@ func AddSetFlagsForUserConsolePreferences(flags *pflag.FlagSet, prefix string, h
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("console-theme", prefix), flagsplugin.EnumValueDesc(ConsoleTheme_value), flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping DashboardLayouts because it does not seem to implement AddSetFlags.
 	// FIXME: Skipping SortBy because it does not seem to implement AddSetFlags.
+	// FIXME: Skipping Tutorials because it does not seem to implement AddSetFlags.
 }
 
 // SetFromFlags sets the UserConsolePreferences message from flags.
@@ -64,6 +73,7 @@ func (m *UserConsolePreferences) SetFromFlags(flags *pflag.FlagSet, prefix strin
 	}
 	// FIXME: Skipping DashboardLayouts because it does not seem to implement AddSetFlags.
 	// FIXME: Skipping SortBy because it does not seem to implement AddSetFlags.
+	// FIXME: Skipping Tutorials because it does not seem to implement AddSetFlags.
 	return paths, nil
 }
 
@@ -89,6 +99,9 @@ func AddSelectFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	// NOTE: profile_picture (Picture) does not seem to have select flags.
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("console-preferences", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("console-preferences", prefix), true), flagsplugin.WithHidden(hidden)))
 	AddSelectFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console-preferences", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("email-notification-preferences", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("email-notification-preferences", prefix), true), flagsplugin.WithHidden(hidden)))
+	// NOTE: email_notification_preferences (EmailNotificationPreferences) does not seem to have select flags.
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("universal-rights", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("universal-rights", prefix), false), flagsplugin.WithHidden(hidden)))
 }
 
 // SelectFromFlags outputs the fieldmask paths forUser message from select flags.
@@ -189,6 +202,17 @@ func PathsFromSelectFlagsForUser(flags *pflag.FlagSet, prefix string) (paths []s
 	} else {
 		paths = append(paths, selectPaths...)
 	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("email_notification_preferences", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("email_notification_preferences", prefix))
+	}
+	// NOTE: email_notification_preferences (EmailNotificationPreferences) does not seem to have select flags.
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("universal_rights", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("universal_rights", prefix))
+	}
 	return paths, nil
 }
 
@@ -209,6 +233,8 @@ func AddSetFlagsForUser(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("temporary-password", prefix), "", flagsplugin.WithHidden(hidden)))
 	// FIXME: Skipping ProfilePicture because it does not seem to implement AddSetFlags.
 	AddSetFlagsForUserConsolePreferences(flags, flagsplugin.Prefix("console-preferences", prefix), hidden)
+	// FIXME: Skipping EmailNotificationPreferences because it does not seem to implement AddSetFlags.
+	flags.AddFlag(flagsplugin.NewStringSliceFlag(flagsplugin.Prefix("universal-rights", prefix), flagsplugin.EnumValueDesc(Right_value), flagsplugin.WithHidden(hidden)))
 }
 
 // SetFromFlags sets the User message from flags.
@@ -304,6 +330,20 @@ func (m *User) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string
 		} else {
 			paths = append(paths, setPaths...)
 		}
+	}
+	// FIXME: Skipping EmailNotificationPreferences because it does not seem to implement AddSetFlags.
+	if val, changed, err := flagsplugin.GetStringSlice(flags, flagsplugin.Prefix("universal_rights", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.UniversalRights = make([]Right, len(val))
+		for i, v := range val {
+			enumValue, err := flagsplugin.SetEnumString(v, Right_value)
+			if err != nil {
+				return nil, err
+			}
+			m.UniversalRights[i] = Right(enumValue)
+		}
+		paths = append(paths, flagsplugin.Prefix("universal_rights", prefix))
 	}
 	return paths, nil
 }

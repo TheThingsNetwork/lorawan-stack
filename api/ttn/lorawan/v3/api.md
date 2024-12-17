@@ -267,6 +267,7 @@
   - [Message `MACParameters`](#ttn.lorawan.v3.MACParameters)
   - [Message `MACParameters.Channel`](#ttn.lorawan.v3.MACParameters.Channel)
   - [Message `MACSettings`](#ttn.lorawan.v3.MACSettings)
+  - [Message `MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile)
   - [Message `MACState`](#ttn.lorawan.v3.MACState)
   - [Message `MACState.DataRateRange`](#ttn.lorawan.v3.MACState.DataRateRange)
   - [Message `MACState.DataRateRanges`](#ttn.lorawan.v3.MACState.DataRateRanges)
@@ -417,6 +418,7 @@
   - [Message `GatewayIdentifiers`](#ttn.lorawan.v3.GatewayIdentifiers)
   - [Message `GatewayIdentifiersList`](#ttn.lorawan.v3.GatewayIdentifiersList)
   - [Message `LoRaAllianceProfileIdentifiers`](#ttn.lorawan.v3.LoRaAllianceProfileIdentifiers)
+  - [Message `MACSettingsProfileIdentifiers`](#ttn.lorawan.v3.MACSettingsProfileIdentifiers)
   - [Message `NetworkIdentifiers`](#ttn.lorawan.v3.NetworkIdentifiers)
   - [Message `OrganizationIdentifiers`](#ttn.lorawan.v3.OrganizationIdentifiers)
   - [Message `OrganizationOrUserIdentifiers`](#ttn.lorawan.v3.OrganizationOrUserIdentifiers)
@@ -637,6 +639,18 @@
   - [Service `Ns`](#ttn.lorawan.v3.Ns)
   - [Service `NsEndDeviceBatchRegistry`](#ttn.lorawan.v3.NsEndDeviceBatchRegistry)
   - [Service `NsEndDeviceRegistry`](#ttn.lorawan.v3.NsEndDeviceRegistry)
+- [File `ttn/lorawan/v3/networkserver_mac_settings_profile.proto`](#ttn/lorawan/v3/networkserver_mac_settings_profile.proto)
+  - [Message `CreateMACSettingsProfileRequest`](#ttn.lorawan.v3.CreateMACSettingsProfileRequest)
+  - [Message `CreateMACSettingsProfileResponse`](#ttn.lorawan.v3.CreateMACSettingsProfileResponse)
+  - [Message `DeleteMACSettingsProfileRequest`](#ttn.lorawan.v3.DeleteMACSettingsProfileRequest)
+  - [Message `DeleteMACSettingsProfileResponse`](#ttn.lorawan.v3.DeleteMACSettingsProfileResponse)
+  - [Message `GetMACSettingsProfileRequest`](#ttn.lorawan.v3.GetMACSettingsProfileRequest)
+  - [Message `GetMACSettingsProfileResponse`](#ttn.lorawan.v3.GetMACSettingsProfileResponse)
+  - [Message `ListMACSettingsProfilesRequest`](#ttn.lorawan.v3.ListMACSettingsProfilesRequest)
+  - [Message `ListMACSettingsProfilesResponse`](#ttn.lorawan.v3.ListMACSettingsProfilesResponse)
+  - [Message `UpdateMACSettingsProfileRequest`](#ttn.lorawan.v3.UpdateMACSettingsProfileRequest)
+  - [Message `UpdateMACSettingsProfileResponse`](#ttn.lorawan.v3.UpdateMACSettingsProfileResponse)
+  - [Service `NsMACSettingsProfileRegistry`](#ttn.lorawan.v3.NsMACSettingsProfileRegistry)
 - [File `ttn/lorawan/v3/networkserver_relay.proto`](#ttn/lorawan/v3/networkserver_relay.proto)
   - [Message `CreateRelayRequest`](#ttn.lorawan.v3.CreateRelayRequest)
   - [Message `CreateRelayResponse`](#ttn.lorawan.v3.CreateRelayResponse)
@@ -667,6 +681,7 @@
   - [Message `UpdateNotificationStatusRequest`](#ttn.lorawan.v3.UpdateNotificationStatusRequest)
   - [Enum `NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver)
   - [Enum `NotificationStatus`](#ttn.lorawan.v3.NotificationStatus)
+  - [Enum `NotificationType`](#ttn.lorawan.v3.NotificationType)
   - [Service `NotificationService`](#ttn.lorawan.v3.NotificationService)
 - [File `ttn/lorawan/v3/oauth.proto`](#ttn/lorawan/v3/oauth.proto)
   - [Message `ListOAuthAccessTokensRequest`](#ttn.lorawan.v3.ListOAuthAccessTokensRequest)
@@ -798,6 +813,7 @@
   - [Message `DeleteInvitationRequest`](#ttn.lorawan.v3.DeleteInvitationRequest)
   - [Message `DeleteUserAPIKeyRequest`](#ttn.lorawan.v3.DeleteUserAPIKeyRequest)
   - [Message `DeleteUserBookmarkRequest`](#ttn.lorawan.v3.DeleteUserBookmarkRequest)
+  - [Message `EmailNotificationPreferences`](#ttn.lorawan.v3.EmailNotificationPreferences)
   - [Message `GetUserAPIKeyRequest`](#ttn.lorawan.v3.GetUserAPIKeyRequest)
   - [Message `GetUserRequest`](#ttn.lorawan.v3.GetUserRequest)
   - [Message `Invitation`](#ttn.lorawan.v3.Invitation)
@@ -819,12 +835,14 @@
   - [Message `UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences)
   - [Message `UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts)
   - [Message `UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy)
+  - [Message `UserConsolePreferences.Tutorials`](#ttn.lorawan.v3.UserConsolePreferences.Tutorials)
   - [Message `UserSession`](#ttn.lorawan.v3.UserSession)
   - [Message `UserSessionIdentifiers`](#ttn.lorawan.v3.UserSessionIdentifiers)
   - [Message `UserSessions`](#ttn.lorawan.v3.UserSessions)
   - [Message `Users`](#ttn.lorawan.v3.Users)
   - [Enum `ConsoleTheme`](#ttn.lorawan.v3.ConsoleTheme)
   - [Enum `DashboardLayout`](#ttn.lorawan.v3.DashboardLayout)
+  - [Enum `Tutorial`](#ttn.lorawan.v3.Tutorial)
 - [File `ttn/lorawan/v3/user_services.proto`](#ttn/lorawan/v3/user_services.proto)
   - [Service `UserAccess`](#ttn.lorawan.v3.UserAccess)
   - [Service `UserBookmarkRegistry`](#ttn.lorawan.v3.UserBookmarkRegistry)
@@ -4334,6 +4352,20 @@ This is used internally by the Network Server.
 | ----- | ----------- |
 | `factory_preset_frequencies` | <p>`repeated.max_items`: `96`</p> |
 
+### <a name="ttn.lorawan.v3.MACSettingsProfile">Message `MACSettingsProfile`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `ids` | [`MACSettingsProfileIdentifiers`](#ttn.lorawan.v3.MACSettingsProfileIdentifiers) |  | Profile identifiers. |
+| `mac_settings` | [`MACSettings`](#ttn.lorawan.v3.MACSettings) |  | MAC settings. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `ids` | <p>`message.required`: `true`</p> |
+| `mac_settings` | <p>`message.required`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.MACState">Message `MACState`</a>
 
 MACState represents the state of MAC layer of the device.
@@ -6341,6 +6373,20 @@ EntityIdentifiers contains one of the possible entity identifiers.
 | ----- | ---- | ----- | ----------- |
 | `vendor_id` | [`uint32`](#uint32) |  | VendorID managed by the LoRa Alliance, as defined in TR005. |
 | `vendor_profile_id` | [`uint32`](#uint32) |  | ID of the LoRaWAN end device profile assigned by the vendor. |
+
+### <a name="ttn.lorawan.v3.MACSettingsProfileIdentifiers">Message `MACSettingsProfileIdentifiers`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | Application IDs. |
+| `profile_id` | [`string`](#string) |  | Profile ID. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `profile_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
 ### <a name="ttn.lorawan.v3.NetworkIdentifiers">Message `NetworkIdentifiers`</a>
 
@@ -9261,6 +9307,145 @@ The NsEndDeviceRegistry service allows clients to manage their end devices on th
 | `ResetFactoryDefaults` | `PATCH` | `/api/v3/ns/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/ns/applications/{application_ids.application_id}/devices/{device_id}` |  |
 
+## <a name="ttn/lorawan/v3/networkserver_mac_settings_profile.proto">File `ttn/lorawan/v3/networkserver_mac_settings_profile.proto`</a>
+
+### <a name="ttn.lorawan.v3.CreateMACSettingsProfileRequest">Message `CreateMACSettingsProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile` | [`MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile) |  | The MAC settings profile to create. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CreateMACSettingsProfileResponse">Message `CreateMACSettingsProfileResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile` | [`MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile) |  | The MAC settings profile. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteMACSettingsProfileRequest">Message `DeleteMACSettingsProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile_ids` | [`MACSettingsProfileIdentifiers`](#ttn.lorawan.v3.MACSettingsProfileIdentifiers) |  | The identifiers of the MAC settings profile. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.DeleteMACSettingsProfileResponse">Message `DeleteMACSettingsProfileResponse`</a>
+
+### <a name="ttn.lorawan.v3.GetMACSettingsProfileRequest">Message `GetMACSettingsProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile_ids` | [`MACSettingsProfileIdentifiers`](#ttn.lorawan.v3.MACSettingsProfileIdentifiers) |  | The identifiers of the MAC settings profile. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the fields that should be returned. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.GetMACSettingsProfileResponse">Message `GetMACSettingsProfileResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile` | [`MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile) |  | The MAC settings profile. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.ListMACSettingsProfilesRequest">Message `ListMACSettingsProfilesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  | The identifiers of the application. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the fields that should be returned. |
+| `order` | [`string`](#string) |  | Order the results by this field path (must be present in the field mask). Default ordering is by ID. Prepend with a minus (-) to reverse the order. |
+| `limit` | [`uint32`](#uint32) |  | Limit the number of results per page. |
+| `page` | [`uint32`](#uint32) |  | Page number for pagination. 0 is interpreted as 1. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `order` | <p>`string.in`: `[ ids.profile_id -ids.profile_id]`</p> |
+| `limit` | <p>`uint32.lte`: `1000`</p> |
+
+### <a name="ttn.lorawan.v3.ListMACSettingsProfilesResponse">Message `ListMACSettingsProfilesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profiles` | [`MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile) | repeated | The MAC settings profiles. |
+
+### <a name="ttn.lorawan.v3.UpdateMACSettingsProfileRequest">Message `UpdateMACSettingsProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile_ids` | [`MACSettingsProfileIdentifiers`](#ttn.lorawan.v3.MACSettingsProfileIdentifiers) |  | The identifiers of the MAC settings profile. |
+| `mac_settings_profile` | [`MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile) |  | The MAC settings profile to update. |
+| `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the fields that should be updated. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile_ids` | <p>`message.required`: `true`</p> |
+| `mac_settings_profile` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.UpdateMACSettingsProfileResponse">Message `UpdateMACSettingsProfileResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `mac_settings_profile` | [`MACSettingsProfile`](#ttn.lorawan.v3.MACSettingsProfile) |  | The MAC settings profile. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `mac_settings_profile` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.NsMACSettingsProfileRegistry">Service `NsMACSettingsProfileRegistry`</a>
+
+The NsMACSettingsProfileRegistry service allows clients to manage MAC settings profiles on the Network Server.
+EXPERIMENTAL: This service is subject to change.
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+| `Create` | [`CreateMACSettingsProfileRequest`](#ttn.lorawan.v3.CreateMACSettingsProfileRequest) | [`CreateMACSettingsProfileResponse`](#ttn.lorawan.v3.CreateMACSettingsProfileResponse) | Create creates a new MAC settings profile. |
+| `Get` | [`GetMACSettingsProfileRequest`](#ttn.lorawan.v3.GetMACSettingsProfileRequest) | [`GetMACSettingsProfileResponse`](#ttn.lorawan.v3.GetMACSettingsProfileResponse) | Get returns the MAC settings profile that matches the given identifiers. |
+| `Update` | [`UpdateMACSettingsProfileRequest`](#ttn.lorawan.v3.UpdateMACSettingsProfileRequest) | [`UpdateMACSettingsProfileResponse`](#ttn.lorawan.v3.UpdateMACSettingsProfileResponse) | Update updates the MAC settings profile that matches the given identifiers. |
+| `Delete` | [`DeleteMACSettingsProfileRequest`](#ttn.lorawan.v3.DeleteMACSettingsProfileRequest) | [`DeleteMACSettingsProfileResponse`](#ttn.lorawan.v3.DeleteMACSettingsProfileResponse) | Delete deletes the MAC settings profile that matches the given identifiers. |
+| `List` | [`ListMACSettingsProfilesRequest`](#ttn.lorawan.v3.ListMACSettingsProfilesRequest) | [`ListMACSettingsProfilesResponse`](#ttn.lorawan.v3.ListMACSettingsProfilesResponse) | List lists the MAC settings profiles. |
+
+#### HTTP bindings
+
+| Method Name | Method | Pattern | Body |
+| ----------- | ------ | ------- | ---- |
+| `Create` | `POST` | `/api/v3/ns/applications/{mac_settings_profile.ids.application_ids.application_id}/mac_settings_profiles` | `*` |
+| `Get` | `GET` | `/api/v3/ns/applications/{mac_settings_profile_ids.application_ids.application_id}/mac_settings_profiles/{mac_settings_profile_ids.profile_id}` |  |
+| `Update` | `PUT` | `/api/v3/ns/applications/{mac_settings_profile_ids.application_ids.application_id}/mac_settings_profiles/{mac_settings_profile_ids.profile_id}` | `*` |
+| `Delete` | `DELETE` | `/api/v3/ns/applications/{mac_settings_profile_ids.application_ids.application_id}/mac_settings_profiles/{mac_settings_profile_ids.profile_id}` |  |
+| `List` | `GET` | `/api/v3/ns/applications/{application_ids.application_id}/mac_settings_profiles` |  |
+
 ## <a name="ttn/lorawan/v3/networkserver_relay.proto">File `ttn/lorawan/v3/networkserver_relay.proto`</a>
 
 ### <a name="ttn.lorawan.v3.CreateRelayRequest">Message `CreateRelayRequest`</a>
@@ -9486,7 +9671,7 @@ The NsRelayConfigurationService provides configuration management capabilities f
 | Field | Validations |
 | ----- | ----------- |
 | `entity_ids` | <p>`message.required`: `true`</p> |
-| `notification_type` | <p>`string.min_len`: `1`</p><p>`string.max_len`: `100`</p> |
+| `notification_type` | <p>`string.in`: `[unknown api_key_created api_key_changed client_requested collaborator_changed entity_state_changed invitation login_token password_changed temporary_password user_requested validate]`</p> |
 | `receivers` | <p>`repeated.min_items`: `1`</p><p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.CreateNotificationResponse">Message `CreateNotificationResponse`</a>
@@ -9539,13 +9724,19 @@ The NsRelayConfigurationService provides configuration management capabilities f
 | `id` | [`string`](#string) |  | The immutable ID of the notification. Generated by the server. |
 | `created_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | The time when the notification was triggered. |
 | `entity_ids` | [`EntityIdentifiers`](#ttn.lorawan.v3.EntityIdentifiers) |  | The entity this notification is about. |
-| `notification_type` | [`string`](#string) |  | The type of this notification. |
+| `notification_type` | [`string`](#string) |  | The type of this notification. TODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384. |
 | `data` | [`google.protobuf.Any`](#google.protobuf.Any) |  | The data related to the notification. |
 | `sender_ids` | [`UserIdentifiers`](#ttn.lorawan.v3.UserIdentifiers) |  | If the notification was triggered by a user action, this contains the identifiers of the user that triggered the notification. |
 | `receivers` | [`NotificationReceiver`](#ttn.lorawan.v3.NotificationReceiver) | repeated | Relation of the notification receiver to the entity. |
 | `email` | [`bool`](#bool) |  | Whether an email was sent for the notification. |
 | `status` | [`NotificationStatus`](#ttn.lorawan.v3.NotificationStatus) |  | The status of the notification. |
 | `status_updated_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  | The time when the notification status was updated. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `notification_type` | <p>`string.in`: `[unknown api_key_created api_key_changed client_requested collaborator_changed entity_state_changed invitation login_token password_changed temporary_password user_requested validate]`</p> |
 
 ### <a name="ttn.lorawan.v3.UpdateNotificationStatusRequest">Message `UpdateNotificationStatusRequest`</a>
 
@@ -9579,6 +9770,23 @@ The NsRelayConfigurationService provides configuration management capabilities f
 | `NOTIFICATION_STATUS_UNSEEN` | 0 |  |
 | `NOTIFICATION_STATUS_SEEN` | 1 |  |
 | `NOTIFICATION_STATUS_ARCHIVED` | 2 |  |
+
+### <a name="ttn.lorawan.v3.NotificationType">Enum `NotificationType`</a>
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `UNKNOWN` | 0 |  |
+| `API_KEY_CREATED` | 1 |  |
+| `API_KEY_CHANGED` | 2 |  |
+| `CLIENT_REQUESTED` | 3 |  |
+| `COLLABORATOR_CHANGED` | 4 |  |
+| `ENTITY_STATE_CHANGED` | 5 |  |
+| `INVITATION` | 6 |  |
+| `LOGIN_TOKEN` | 7 |  |
+| `PASSWORD_CHANGED` | 8 |  |
+| `TEMPORARY_PASSWORD` | 9 |  |
+| `USER_REQUESTED` | 10 |  |
+| `VALIDATE` | 11 |  |
 
 ### <a name="ttn.lorawan.v3.NotificationService">Service `NotificationService`</a>
 
@@ -10766,8 +10974,11 @@ Right is the enum that defines all the different rights to do something in the n
 | `right_invalid` | 0 |  |
 | `RIGHT_USER_INFO` | 1 | The right to view user information. |
 | `RIGHT_USER_SETTINGS_BASIC` | 2 | The right to edit basic user settings. |
+| `RIGHT_USER_LIST` | 87 | The right to list users accounts. |
+| `RIGHT_USER_CREATE` | 88 | The right to create an user account. |
 | `RIGHT_USER_SETTINGS_API_KEYS` | 3 | The right to view and edit user API keys. |
 | `RIGHT_USER_DELETE` | 4 | The right to delete user account. |
+| `RIGHT_USER_PURGE` | 66 | The right to delete user account. |
 | `RIGHT_USER_AUTHORIZED_CLIENTS` | 5 | The right to view and edit authorized OAuth clients of the user. |
 | `RIGHT_USER_APPLICATIONS_LIST` | 6 | The right to list applications the user is a collaborator of. |
 | `RIGHT_USER_APPLICATIONS_CREATE` | 7 | The right to create an application under the user account. |
@@ -10785,6 +10996,7 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_APPLICATION_SETTINGS_COLLABORATORS` | 18 | The right to view and edit application collaborators. |
 | `RIGHT_APPLICATION_SETTINGS_PACKAGES` | 56 | The right to view and edit application packages and associations. |
 | `RIGHT_APPLICATION_DELETE` | 19 | The right to delete application. |
+| `RIGHT_APPLICATION_PURGE` | 64 | The right to purge application. |
 | `RIGHT_APPLICATION_DEVICES_READ` | 20 | The right to view devices in application. |
 | `RIGHT_APPLICATION_DEVICES_WRITE` | 21 | The right to create devices in application. |
 | `RIGHT_APPLICATION_DEVICES_READ_KEYS` | 22 | The right to view device keys in application. Note that keys may not be stored in a way that supports viewing them. |
@@ -10799,11 +11011,13 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_CLIENT_SETTINGS_BASIC` | 61 | The right to edit basic client settings. |
 | `RIGHT_CLIENT_SETTINGS_COLLABORATORS` | 62 | The right to view and edit client collaborators. |
 | `RIGHT_CLIENT_DELETE` | 63 | The right to delete a client. |
+| `RIGHT_CLIENT_PURGE` | 68 | The right to purge a client. |
 | `RIGHT_GATEWAY_INFO` | 30 | The right to view gateway information. |
 | `RIGHT_GATEWAY_SETTINGS_BASIC` | 31 | The right to edit basic gateway settings. |
 | `RIGHT_GATEWAY_SETTINGS_API_KEYS` | 32 | The right to view and edit gateway API keys. |
 | `RIGHT_GATEWAY_SETTINGS_COLLABORATORS` | 33 | The right to view and edit gateway collaborators. |
 | `RIGHT_GATEWAY_DELETE` | 34 | The right to delete gateway. |
+| `RIGHT_GATEWAY_PURGE` | 67 | The right to purge gateway. |
 | `RIGHT_GATEWAY_TRAFFIC_READ` | 35 | The right to read gateway traffic. |
 | `RIGHT_GATEWAY_TRAFFIC_DOWN_WRITE` | 36 | The right to write downlink gateway traffic. |
 | `RIGHT_GATEWAY_LINK` | 37 | The right to link as Gateway to a Gateway Server for traffic exchange, i.e. write uplink and read downlink (API keys only) This right is typically only given to a gateway. This right implies RIGHT_GATEWAY_INFO. |
@@ -10817,6 +11031,7 @@ Right is the enum that defines all the different rights to do something in the n
 | `RIGHT_ORGANIZATION_SETTINGS_API_KEYS` | 43 | The right to view and edit organization API keys. |
 | `RIGHT_ORGANIZATION_SETTINGS_MEMBERS` | 44 | The right to view and edit organization members. |
 | `RIGHT_ORGANIZATION_DELETE` | 45 | The right to delete organization. |
+| `RIGHT_ORGANIZATION_PURGE` | 65 | The right to purge organization. |
 | `RIGHT_ORGANIZATION_APPLICATIONS_LIST` | 46 | The right to list the applications the organization is a collaborator of. |
 | `RIGHT_ORGANIZATION_APPLICATIONS_CREATE` | 47 | The right to create an application under the organization. |
 | `RIGHT_ORGANIZATION_GATEWAYS_LIST` | 48 | The right to list the gateways the organization is a collaborator of. |
@@ -11346,6 +11561,20 @@ Secret contains a secret value. It also contains the ID of the Encryption key us
 | `user_ids` | <p>`message.required`: `true`</p> |
 | `entity_ids` | <p>`message.required`: `true`</p> |
 
+### <a name="ttn.lorawan.v3.EmailNotificationPreferences">Message `EmailNotificationPreferences`</a>
+
+EmailNotificationPreferences is the message that defines the types of notifications for which the user wants to receive an email.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `types` | [`NotificationType`](#ttn.lorawan.v3.NotificationType) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `types` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
+
 ### <a name="ttn.lorawan.v3.GetUserAPIKeyRequest">Message `GetUserAPIKeyRequest`</a>
 
 | Field | Type | Label | Description |
@@ -11581,6 +11810,8 @@ User is the message that defines a user on the network.
 | `temporary_password_expires_at` | [`google.protobuf.Timestamp`](#google.protobuf.Timestamp) |  |  |
 | `profile_picture` | [`Picture`](#ttn.lorawan.v3.Picture) |  | A profile picture for the user. This information is public and can be seen by any authenticated user in the network. |
 | `console_preferences` | [`UserConsolePreferences`](#ttn.lorawan.v3.UserConsolePreferences) |  | Console preferences contains the user's preferences regarding the behavior of the Console. |
+| `email_notification_preferences` | [`EmailNotificationPreferences`](#ttn.lorawan.v3.EmailNotificationPreferences) |  |  |
+| `universal_rights` | [`Right`](#ttn.lorawan.v3.Right) | repeated | Universal rights are capable of restricting the user's interactions with the API, be it an admin or not. |
 
 #### Field Rules
 
@@ -11634,6 +11865,7 @@ UserConsolePreferences is the message that defines the user preferences for the 
 | `console_theme` | [`ConsoleTheme`](#ttn.lorawan.v3.ConsoleTheme) |  |  |
 | `dashboard_layouts` | [`UserConsolePreferences.DashboardLayouts`](#ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts) |  |  |
 | `sort_by` | [`UserConsolePreferences.SortBy`](#ttn.lorawan.v3.UserConsolePreferences.SortBy) |  |  |
+| `tutorials` | [`UserConsolePreferences.Tutorials`](#ttn.lorawan.v3.UserConsolePreferences.Tutorials) |  |  |
 
 ### <a name="ttn.lorawan.v3.UserConsolePreferences.DashboardLayouts">Message `UserConsolePreferences.DashboardLayouts`</a>
 
@@ -11673,6 +11905,18 @@ SortBy defines the field to which the Console will sort the display of entities.
 | `gateway` | <p>`string.in`: `[ gateway_id -gateway_id gateway_eui -gateway_eui name -name created_at -created_at]`</p> |
 | `organization` | <p>`string.in`: `[ organization_id -organization_id name -name created_at -created_at]`</p> |
 | `user` | <p>`string.in`: `[ user_id -user_id name -name primary_email_address -primary_email_address state -state admin -admin created_at -created_at]`</p> |
+
+### <a name="ttn.lorawan.v3.UserConsolePreferences.Tutorials">Message `UserConsolePreferences.Tutorials`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `seen` | [`Tutorial`](#ttn.lorawan.v3.Tutorial) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `seen` | <p>`repeated.unique`: `true`</p><p>`repeated.items.enum.defined_only`: `true`</p> |
 
 ### <a name="ttn.lorawan.v3.UserSession">Message `UserSession`</a>
 
@@ -11737,6 +11981,15 @@ DashboardLayout is a set of possible layout values to be used in the Console.
 | `DASHBOARD_LAYOUT_TABLE` | 0 |  |
 | `DASHBOARD_LAYOUT_LIST` | 1 |  |
 | `DASHBOARD_LAYOUT_GRID` | 2 |  |
+
+### <a name="ttn.lorawan.v3.Tutorial">Enum `Tutorial`</a>
+
+Tutorial is a set of possible tutorials in the Console.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| `TUTORIAL_UNKNOWN` | 0 |  |
+| `TUTORIAL_LIVE_DATA_SPLIT_VIEW` | 1 |  |
 
 ## <a name="ttn/lorawan/v3/user_services.proto">File `ttn/lorawan/v3/user_services.proto`</a>
 

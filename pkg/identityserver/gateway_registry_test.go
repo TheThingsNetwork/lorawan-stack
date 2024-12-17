@@ -31,10 +31,15 @@ import (
 
 const noOfGateways = 3
 
-func TestGatewaysPermissionDenied(t *testing.T) {
+func TestGatewaysPermissions(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
 	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -42,55 +47,102 @@ func TestGatewaysPermissionDenied(t *testing.T) {
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayRegistryClient(cc)
 
-		_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
-			Gateway: &ttnpb.Gateway{
-				Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
-			},
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+				Gateway: &ttnpb.Gateway{
+					Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
-			GatewayIds: gtw1.GetIds(),
-			FieldMask:  ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
+			_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIds: gtw1.GetIds(),
+				FieldMask:  ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
 
-		listRes, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		a.So(err, should.BeNil)
-		if a.So(listRes, should.NotBeNil) {
-			a.So(listRes.Gateways, should.BeEmpty)
-		}
+			listRes, err := reg.List(ctx, &ttnpb.ListGatewaysRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			a.So(err, should.BeNil)
+			if a.So(listRes, should.NotBeNil) {
+				a.So(listRes.Gateways, should.BeEmpty)
+			}
 
-		_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-			FieldMask:    ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
-			Gateway: &ttnpb.Gateway{
-				Ids:  gtw1.GetIds(),
-				Name: "Updated Name",
-			},
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
+				Gateway: &ttnpb.Gateway{
+					Ids:  gtw1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Delete(ctx, gtw1.GetIds())
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.Delete(ctx, gtw1.GetIds())
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateGatewayRequest{
+				Gateway: &ttnpb.Gateway{
+					Ids: &ttnpb.GatewayIdentifiers{GatewayId: "foo-gtw"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIds: gtw1.GetIds(),
+				FieldMask:  ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.List(ctx, &ttnpb.ListGatewaysRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateGatewayRequest{
+				Gateway: &ttnpb.Gateway{
+					Ids:  gtw1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Delete(ctx, gtw1.GetIds(), readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
 	}, withPrivateTestDatabase(p))
 }
 
@@ -396,6 +448,11 @@ func TestGatewayBatchOperations(t *testing.T) {
 	usr2Key, _ := p.NewAPIKey(usr2.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	usr2Creds := rpcCreds(usr2Key)
 
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewGatewayBatchRegistryClient(cc)
 		readReg := ttnpb.NewGatewayRegistryClient(cc)
@@ -417,6 +474,12 @@ func TestGatewayBatchOperations(t *testing.T) {
 		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
 			GatewayIds: gtwIDs,
 		}, limitedCreds)
+		a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+		// Read-only admin rights.
+		_, err = reg.Delete(ctx, &ttnpb.BatchDeleteGatewaysRequest{
+			GatewayIds: gtwIDs,
+		}, readOnlyAdminKeyCreds)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
 		// User without rights on gateways.

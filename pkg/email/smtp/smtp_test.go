@@ -22,6 +22,7 @@ import (
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -64,7 +65,7 @@ func TestSMTP(t *testing.T) {
 	a.So(err, should.BeNil)
 
 	mail := &email.Message{
-		TemplateName:     "test",
+		TemplateName:     ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 		RecipientName:    "John Doe",
 		RecipientAddress: "john.doe@example.com",
 		Subject:          "Testing SMTP",

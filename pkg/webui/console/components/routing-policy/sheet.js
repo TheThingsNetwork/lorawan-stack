@@ -15,7 +15,7 @@
 import React from 'react'
 import classnames from 'classnames'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconCheck, IconX } from '@ttn-lw/components/icon'
 import Tooltip from '@ttn-lw/components/tooltip'
 
 import Message from '@ttn-lw/lib/components/message'
@@ -29,12 +29,12 @@ import style from './routing-policy-sheet.styl'
 
 const RoutingPolicy = ({ enabled, message, positiveMessage, negativeMessage }) => (
   <Tooltip content={<Message content={enabled ? positiveMessage : negativeMessage} />}>
-    <span className={style.policy} data-enabled={enabled}>
+    <span className={classnames(style.policy, 'd-flex al-center')} data-enabled={enabled}>
       <Icon
-        icon={enabled ? 'check' : 'clear'}
+        icon={enabled ? IconCheck : IconX}
         className={classnames('mr-cs-xxs', {
-          'c-bg-success-normal': enabled,
-          'c-bg-error-normal': !enabled,
+          'c-text-success-normal': enabled,
+          'c-text-error-normal': !enabled,
         })}
       />
       <Message content={message} />

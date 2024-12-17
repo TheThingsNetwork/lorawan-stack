@@ -126,7 +126,6 @@ const Modal = props => {
   let buttons = (
     <div>
       <Button
-        primary
         message={approveButtonMessage}
         onClick={handleApprove}
         icon={IconCheck}

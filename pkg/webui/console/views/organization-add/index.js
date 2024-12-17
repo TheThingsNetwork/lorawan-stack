@@ -53,7 +53,7 @@ const OrganizationAdd = () => {
 
   return (
     <Require featureCheck={mayCreateOrganizations} otherwise={{ redirect: '/organizations' }}>
-      <div className="container container--xxl grid">
+      <div className="container container--xl grid">
         <PageTitle
           colProps={{ md: 10, lg: 9 }}
           className="mb-cs-s"
@@ -73,7 +73,7 @@ const OrganizationAdd = () => {
           />
           <hr className="mb-ls-s" />
         </PageTitle>
-        <div className="item-10 xl:item-9">
+        <div className="item-10">
           <OrganizationAddForm onSuccess={handleSuccess} />
         </div>
       </div>

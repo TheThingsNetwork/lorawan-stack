@@ -28,6 +28,7 @@ var (
 	AllGatewayRights      = &Rights{}
 	AllOrganizationRights = &Rights{}
 	AllClusterRights      = &Rights{}
+	AllReadAdminRights    = &Rights{}
 	AllAdminRights        = &Rights{}
 	AllRights             = &Rights{}
 )
@@ -54,6 +55,12 @@ func init() {
 		}
 		if strings.HasSuffix(k, "_READ") || strings.HasSuffix(k, "_INFO") {
 			AllClusterRights.Rights = append(AllClusterRights.Rights, Right(v))
+		}
+		if strings.HasSuffix(k, "_READ") ||
+			strings.HasSuffix(k, "_INFO") ||
+			strings.HasSuffix(k, "_LIST") ||
+			strings.HasSuffix(k, "_GET") {
+			AllReadAdminRights.Rights = append(AllReadAdminRights.Rights, Right(v))
 		}
 		if !strings.HasSuffix(k, "_KEYS") && !strings.HasSuffix(k, "_ALL") {
 			AllAdminRights.Rights = append(AllAdminRights.Rights, Right(v))

@@ -19,10 +19,10 @@
   // where the button is used as a container.
   reset-button()
 
-  &.primary, &.secondary, &.naked
+  &.primary, &.secondary, &.tertiary, &.naked
     position: relative
     display: inline-flex
-    transition: 80ms background ease-in-out, 80ms color ease-in-out, 80ms border-color ease-in-out, 80ms box-shadow ease-in-out
+    transition: .1s background ease-in-out, .1s color ease-in-out, .1s border-color ease-in-out, .1s box-shadow ease-in-out
     border-radius: $br.m
     outline: 0
     cursor: pointer
@@ -31,6 +31,7 @@
     gap: $cs.xxs
     height: $default-input-height
     text-decoration: none
+    font-weight: $fw.bold
     padding: 0 $cs.m
     white-space: nowrap
     box-sizing: border-box
@@ -72,7 +73,6 @@
 
     &.primary:not(.naked)
       color: var(--c-text-neutral-min)
-
       background-color: var(--c-text-brand-normal)
 
       &:disabled
@@ -123,19 +123,17 @@
     &.secondary
       color: var(--c-text-neutral-heavy)
       background-color: var(--c-bg-neutral-min)
-      box-shadow: 0px 2px 2px 0px rgba(0 0 0 4.5%), inset 0px 0px 0px 1px var(--c-bg-neutral-min)
-      gradient-border(var(--c-bg-neutral-min), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
-      border: 1px solid transparent
+      border: solid 1px var(--c-border-neutral-light)
 
       &:not(:disabled)
         &:hover
-          gradient-border(var(--c-bg-neutral-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+          background-color: var(--c-bg-neutral-light)
 
         +focus-visible()
-          gradient-border(var(--c-bg-neutral-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+          gradient-border(var(--c-bg-neutral-light), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
 
         &:active
-          gradient-border(var(--c-bg-neutral-extralight), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
+          gradient-border(var(--c-bg-neutral-light), var(--c-gradient-neutral-light-01), var(--c-gradient-neutral-light-02))
           box-shadow: none
 
       &.warning
@@ -181,6 +179,58 @@
         .icon
           width: 1.2rem
           height: 1.2rem
+
+    &.tertiary
+      color: var(--c-text-brand-normal)
+      background-color: var(--c-bg-brand-light)
+
+      &:disabled
+        color: var(--c-text-neutral-light)
+        background-color: var(--c-border-neutral-light)
+
+      &:not(:disabled)
+        &:hover
+          background-color: var(--c-bg-brand-semilight)
+
+        +focus-visible()
+          background-color: var(--c-bg-brand-light)
+
+        &:active
+          background-color: var(--c-text-brand-light)
+
+      &.warning
+        color: var(--c-text-warning-normal)
+        background-color: var(--c-bg-warning-light)
+
+        &:not(:disabled)
+          &:hover
+            background-color: var(--c-bg-warning-semilight)
+
+          +focus-visible()
+            background-color: var(--c-bg-warning-semilight)
+
+          &:active
+            background-color: var(--c-bg-warning-ligth)
+
+        &:disabled
+          background-color: var(--c-bg-warning-normal-disabled)
+
+      &.danger
+        color: var(--c-text-danger-normal)
+        background-color: var(--c-bg-error-light)
+
+        &:not(:disabled)
+          &:hover
+            background-color: var(--c-bg-error-semilight)
+
+          +focus-visible()
+            background-color: var(--c-bg-error-semilight)
+
+          &:active
+            background-color: var(--c-bg-error-normal-active)
+
+        &:disabled
+          background-color: var(--c-bg-error-normal-disabled)
 
     &.naked:not(.primary)
       color: var(--c-text-neutral-light)

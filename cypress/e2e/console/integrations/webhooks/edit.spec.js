@@ -180,6 +180,26 @@ describe('Application Webhook', () => {
       .and('eq', '1234QUERTY!')
   })
 
+  it('succeeds pausing and activating webhook', () => {
+    cy.findByRole('button', { name: /Pause/ }).click()
+
+    cy.findByTestId('modal-window')
+      .should('be.visible')
+      .within(() => {
+        cy.findByText('Pause webhook?', { selector: 'h1' }).should('be.visible')
+        cy.findByRole('button', { name: /Pause webhook/ }).click()
+      })
+    cy.findByTestId('toast-notification-success').findByText('Webhook paused').should('be.visible')
+
+    cy.findAllByRole('button', { name: /Activate/ }).should('have.length', 2)
+    cy.findByTestId('notification')
+      .should('exist')
+      .findByRole('button', { name: /Activate/ })
+      .click()
+
+    cy.findByTestId('toast-notification-success').findByText('Webhook active').should('be.visible')
+  })
+
   it('succeeds deleting webhook', () => {
     cy.findByRole('button', { name: /Delete Webhook/ }).click()
 

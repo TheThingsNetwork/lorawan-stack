@@ -161,6 +161,7 @@ type NetworkServer struct {
 
 	batchDevices       ttnpb.NsEndDeviceBatchRegistryServer
 	relayConfiguration ttnpb.NsRelayConfigurationServiceServer
+	macSettingsProfile ttnpb.NsMACSettingsProfileRegistryServer
 
 	netID           netIDFunc
 	nsID            nsIDFunc
@@ -238,6 +239,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		return nil, errInvalidConfiguration.WithCause(errors.New("Downlink queue capacity must be greater than or equal to 0"))
 	case conf.DownlinkQueueCapacity > maxInt/2:
 		return nil, errInvalidConfiguration.WithCause(errors.New(fmt.Sprintf("Downlink queue capacity must be below %d", maxInt/2)))
+	case conf.MACSettingsProfileRegistry == nil:
+		panic(errInvalidConfiguration.WithCause(errors.New("MACSettingsProfileRegistry is not specified")))
 	}
 
 	devAddrPrefixes := conf.DevAddrPrefixes
@@ -288,6 +291,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		devices:                  wrapEndDeviceRegistryWithReplacedFields(conf.Devices, replacedEndDeviceFields...),
 		batchDevices:             &nsEndDeviceBatchRegistry{devices: conf.Devices},
 		relayConfiguration:       &nsRelayConfigurationService{devices: conf.Devices, frequencyPlans: c.FrequencyPlansStore},
+		macSettingsProfile:       &NsMACSettingsProfileRegistry{registry: conf.MACSettingsProfileRegistry},
 		downlinkTasks:            conf.DownlinkTaskQueue.Queue,
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       defaultMACSettings,
@@ -328,6 +332,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			"/ttn.lorawan.v3.NsEndDeviceBatchRegistry",
 			"/ttn.lorawan.v3.Ns",
 			"/ttn.lorawan.v3.RelayConfigurationService",
+			"/ttn.lorawan.v3.NsMACSettingsProfileRegistry",
 		} {
 			c.GRPC.RegisterUnaryHook(filter, hook.name, hook.middleware)
 		}
@@ -398,6 +403,7 @@ func (ns *NetworkServer) RegisterServices(s *grpc.Server) {
 	ttnpb.RegisterNsEndDeviceBatchRegistryServer(s, ns.batchDevices)
 	ttnpb.RegisterNsServer(s, ns)
 	ttnpb.RegisterNsRelayConfigurationServiceServer(s, ns.relayConfiguration)
+	ttnpb.RegisterNsMACSettingsProfileRegistryServer(s, ns.macSettingsProfile)
 }
 
 // RegisterHandlers registers gRPC handlers.
@@ -405,7 +411,8 @@ func (ns *NetworkServer) RegisterHandlers(s *runtime.ServeMux, conn *grpc.Client
 	ttnpb.RegisterNsEndDeviceRegistryHandler(ns.Context(), s, conn)
 	ttnpb.RegisterNsEndDeviceBatchRegistryHandler(ns.Context(), s, conn) // nolint:errcheck
 	ttnpb.RegisterNsHandler(ns.Context(), s, conn)
-	ttnpb.RegisterNsRelayConfigurationServiceHandler(ns.Context(), s, conn) // nolint:errcheck
+	ttnpb.RegisterNsRelayConfigurationServiceHandler(ns.Context(), s, conn)  // nolint:errcheck
+	ttnpb.RegisterNsMACSettingsProfileRegistryHandler(ns.Context(), s, conn) // nolint:errcheck
 }
 
 // Roles returns the roles that the Network Server fulfills.

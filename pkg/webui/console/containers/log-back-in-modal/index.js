@@ -36,7 +36,10 @@ const LogBackInModal = () => (
     message={m.modalMessage}
     title={m.modalTitle}
     onComplete={reload}
-    approveButtonProps={{ icon: IconRefresh }}
+    approveButtonProps={{
+      icon: IconRefresh,
+      primary: true,
+    }}
   />
 )
 

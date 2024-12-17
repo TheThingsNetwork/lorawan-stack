@@ -233,6 +233,9 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 			}
 			rootCAs.AppendCertsFromPEM(pemBytes)
 			http.DefaultTransport.(*http.Transport).TLSClientConfig.RootCAs = rootCAs
+			if err = api.AddCA(pemBytes); err != nil {
+				return err
+			}
 		}
 
 		// OAuth

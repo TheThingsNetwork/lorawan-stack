@@ -26,6 +26,127 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestGatewayAPIKeysPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+
+	gtwKey, _ := p.NewAPIKey(gtw1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_LINK,
+	)
+	gtwCreds := rpcCreds(gtwKey)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewGatewayAccessClient(cc)
+
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {gtwCreds}} {
+				created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					Name:       "api-key-name",
+					Rights:     []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(created, should.BeNil)
+				}
+
+				list, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
+					GatewayIds: gtw1.GetIds(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(list, should.BeNil)
+				}
+
+				got, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					KeyId:      gtwKey.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(got, should.BeNil)
+				}
+
+				updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					ApiKey: &ttnpb.APIKey{
+						Id:   gtwKey.GetId(),
+						Name: "api-key-name-updated",
+					},
+					FieldMask: ttnpb.FieldMask("name"),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(updated, should.BeNil)
+				}
+
+				_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteGatewayAPIKeyRequest{
+					GatewayIds: gtw1.GetIds(),
+					KeyId:      created.GetId(),
+				}, opts...)
+				if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.FailNow()
+				}
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
+				GatewayIds: gtw1.GetIds(),
+				Name:       "api-key-name",
+				Rights:     []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
+				GatewayIds: gtw1.GetIds(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
+				GatewayIds: gtw1.GetIds(),
+				KeyId:      gtwKey.GetId(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
+				GatewayIds: gtw1.GetIds(),
+				ApiKey: &ttnpb.APIKey{
+					Id:   gtwKey.GetId(),
+					Name: "api-key-name-updated",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteGatewayAPIKeyRequest{
+				GatewayIds: gtw1.GetIds(),
+				KeyId:      "unknown-key",
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestGatewayAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -50,7 +171,6 @@ func TestGatewayAPIKeys(t *testing.T) { // nolint:gocyclo
 		ttnpb.Right_RIGHT_GATEWAY_INFO,
 		ttnpb.Right_RIGHT_GATEWAY_LINK,
 	)
-	gtwCreds := rpcCreds(gtwKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -147,53 +267,6 @@ func TestGatewayAPIKeys(t *testing.T) { // nolint:gocyclo
 			})
 		}
 
-		// API Key CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {gtwCreds}} {
-			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
-				GatewayIds: gtw1.GetIds(),
-				Name:       "api-key-name",
-				Rights:     []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(created, should.BeNil)
-			}
-
-			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListGatewayAPIKeysRequest{
-				GatewayIds: gtw1.GetIds(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(list, should.BeNil)
-			}
-
-			got, err := reg.GetAPIKey(ctx, &ttnpb.GetGatewayAPIKeyRequest{
-				GatewayIds: gtw1.GetIds(),
-				KeyId:      gtwKey.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-
-			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateGatewayAPIKeyRequest{
-				GatewayIds: gtw1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id:   gtwKey.GetId(),
-					Name: "api-key-name-updated",
-				},
-				FieldMask: ttnpb.FieldMask("name"),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(updated, should.BeNil)
-			}
-
-			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteGatewayAPIKeyRequest{
-				GatewayIds: gtw1.GetIds(),
-				KeyId:      created.GetId(),
-			}, opts...)
-			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				t.FailNow()
-			}
-		}
-
 		// API Key CRUD with different valid credentials.
 		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}, {limitedCreds}} {
 			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
@@ -284,6 +357,99 @@ func TestGatewayAPIKeys(t *testing.T) { // nolint:gocyclo
 				a.So(got, should.BeNil)
 			})
 		}
+	}, withPrivateTestDatabase(p))
+}
+
+func TestGatewayCollaboratorsPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	gtw1 := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
+
+	gtwKey, _ := p.NewAPIKey(gtw1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_LINK,
+	)
+	gtwCreds := rpcCreds(gtwKey)
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		gtw1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_GATEWAY_INFO,
+		ttnpb.Right_RIGHT_GATEWAY_LINK,
+	)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewGatewayAccessClient(cc)
+
+		t.Run("Permission denied", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {gtwCreds}} {
+				_, err := reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
+					GatewayIds: gtw1.GetIds(),
+					Collaborator: &ttnpb.Collaborator{
+						Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+						Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+					},
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+
+				got, err := reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+					GatewayIds:   gtw1.GetIds(),
+					Collaborator: usr2.GetOrganizationOrUserIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(got, should.BeNil)
+				}
+
+				// ListCollaborators without credentials.
+				list, err := reg.ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
+					GatewayIds: gtw1.GetIds(),
+				})
+				if a.So(err, should.NotBeNil) && a.So(errors.IsUnauthenticated(err), should.BeTrue) {
+					a.So(list, should.BeNil)
+				}
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.SetCollaborator(ctx, &ttnpb.SetGatewayCollaboratorRequest{
+				GatewayIds: gtw1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids:    usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{ttnpb.Right_RIGHT_GATEWAY_INFO},
+				},
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.GetCollaborator(ctx, &ttnpb.GetGatewayCollaboratorRequest{
+				GatewayIds:   gtw1.GetIds(),
+				Collaborator: usr2.GetOrganizationOrUserIdentifiers(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			// ListCollaborators without credentials.
+			_, err = reg.ListCollaborators(ctx, &ttnpb.ListGatewayCollaboratorsRequest{
+				GatewayIds: gtw1.GetIds(),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+		})
 	}, withPrivateTestDatabase(p))
 }
 

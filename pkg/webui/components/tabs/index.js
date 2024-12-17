@@ -44,7 +44,7 @@ const Tabs = ({
     data-test-id="tabs"
   >
     {tabs.map(
-      ({ name, disabled, narrow: nrw, link, exact, icon, title, hidden }, index) =>
+      ({ name, disabled, narrow: nrw, link, exact, icon, title, hidden, description }, index) =>
         !Boolean(hidden) && (
           <Tab
             key={index}
@@ -58,6 +58,7 @@ const Tabs = ({
             tabClassName={individualTabClassName}
             className={tabItemClassName}
             toggleStyle={toggleStyle}
+            tooltip={description}
           >
             {icon && <Icon icon={icon} className={style.icon} />}
             <Message content={title} />

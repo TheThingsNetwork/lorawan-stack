@@ -40,9 +40,9 @@ const GatewayLocation = () => {
       featureCheck={mayViewOrEditGatewayLocation}
       otherwise={{ redirect: `/gateways/${gtwId}` }}
     >
-      <div className="container container--xxl grid">
-        <PageTitle title={sharedMessages.location} />
-        <div className="item-12 xl:item-8">
+      <div className="container container--xl grid">
+        <div className="item-12">
+          <PageTitle title={sharedMessages.location} />
           <GatewayLocationForm />
         </div>
       </div>

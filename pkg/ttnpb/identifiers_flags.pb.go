@@ -532,3 +532,57 @@ func (m *NetworkIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix string) (
 	}
 	return paths, nil
 }
+
+// AddSelectFlagsForMACSettingsProfileIdentifiers adds flags to select fields in MACSettingsProfileIdentifiers.
+func AddSelectFlagsForMACSettingsProfileIdentifiers(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("application-ids", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("application-ids", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForApplicationIdentifiers(flags, flagsplugin.Prefix("application-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("profile-id", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("profile-id", prefix), false), flagsplugin.WithHidden(hidden)))
+}
+
+// SelectFromFlags outputs the fieldmask paths forMACSettingsProfileIdentifiers message from select flags.
+func PathsFromSelectFlagsForMACSettingsProfileIdentifiers(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("application_ids", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("application_ids", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForApplicationIdentifiers(flags, flagsplugin.Prefix("application_ids", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("profile_id", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("profile_id", prefix))
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForMACSettingsProfileIdentifiers adds flags to select fields in MACSettingsProfileIdentifiers.
+func AddSetFlagsForMACSettingsProfileIdentifiers(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForApplicationIdentifiers(flags, flagsplugin.Prefix("application-ids", prefix), hidden)
+	flags.AddFlag(flagsplugin.NewStringFlag(flagsplugin.Prefix("profile-id", prefix), "", flagsplugin.WithHidden(hidden)))
+}
+
+// SetFromFlags sets the MACSettingsProfileIdentifiers message from flags.
+func (m *MACSettingsProfileIdentifiers) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("application_ids", prefix)); changed {
+		if m.ApplicationIds == nil {
+			m.ApplicationIds = &ApplicationIdentifiers{}
+		}
+		if setPaths, err := m.ApplicationIds.SetFromFlags(flags, flagsplugin.Prefix("application_ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if val, changed, err := flagsplugin.GetString(flags, flagsplugin.Prefix("profile_id", prefix)); err != nil {
+		return nil, err
+	} else if changed {
+		m.ProfileId = val
+		paths = append(paths, flagsplugin.Prefix("profile_id", prefix))
+	}
+	return paths, nil
+}

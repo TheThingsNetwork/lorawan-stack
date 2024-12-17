@@ -199,12 +199,6 @@ const BasicSettingsForm = React.memo(props => {
         decode={decodeAttributes}
       />
       <Form.Field
-        title={sharedMessages.automaticUpdates}
-        name="auto_update"
-        component={Checkbox}
-        description={sharedMessages.autoUpdateDescription}
-      />
-      <Form.Field
         title={sharedMessages.channel}
         description={sharedMessages.updateChannelDescription}
         placeholder={sharedMessages.stable}

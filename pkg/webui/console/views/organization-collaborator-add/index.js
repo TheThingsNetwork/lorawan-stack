@@ -34,9 +34,9 @@ const OrganizationCollaboratorAdd = () => {
   )
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xl grid">
       <PageTitle title={sharedMessages.addMember} />
-      <div className="item-12 xl:item-8">
+      <div className="item-12">
         <ConsoleCollaboratorsForm entity={ORGANIZATION} entityId={orgId} isMember />
       </div>
     </div>

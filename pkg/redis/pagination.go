@@ -18,6 +18,18 @@ import (
 	"context"
 )
 
+// PaginationDefaults sets default values for paginations options within the Redis store.
+type PaginationDefaults struct {
+	DefaultLimit int64
+}
+
+var paginationDefaults = PaginationDefaults{}
+
+// SetPaginationDefaults should only be called at the initialization of the server.
+func SetPaginationDefaults(d PaginationDefaults) {
+	paginationDefaults = d
+}
+
 type paginationOptionsKeyType struct{}
 
 var paginationOptionsKey paginationOptionsKeyType
@@ -32,6 +44,9 @@ type paginationOptions struct {
 func NewContextWithPagination(ctx context.Context, limit, page int64, total *int64) context.Context {
 	if page == 0 {
 		page = 1
+	}
+	if limit == 0 {
+		limit = paginationDefaults.DefaultLimit
 	}
 	return context.WithValue(ctx, paginationOptionsKey, paginationOptions{
 		limit:  limit,

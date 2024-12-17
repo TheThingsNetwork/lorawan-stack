@@ -27,7 +27,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { updateWebhook } from '@console/store/actions/webhooks'
+import { updateWebhook, getWebhook } from '@console/store/actions/webhooks'
 
 const WebhookEdit = props => {
   const {
@@ -110,12 +110,34 @@ const WebhookEdit = props => {
     [appId, dispatch, webhookId],
   )
 
+  const handlePauseWebhook = React.useCallback(async () => {
+    try {
+      await dispatch(
+        attachPromise(updateWebhook(appId, webhookId, { paused: !selectedWebhook.paused })),
+      )
+      await dispatch(attachPromise(getWebhook(appId, webhookId, ['paused'])))
+
+      toast({
+        message: !selectedWebhook.paused
+          ? sharedMessages.webhookPaused
+          : sharedMessages.webhookActive,
+        type: toast.types.SUCCESS,
+      })
+    } catch (error) {
+      toast({
+        message: sharedMessages.webhookError,
+        type: toast.types.ERROR,
+      })
+    }
+  }, [appId, dispatch, selectedWebhook.paused, webhookId])
+
   return (
     <WebhookForm
       update
       appId={appId}
       initialWebhookValue={selectedWebhook}
       webhookTemplate={webhookTemplate}
+      onPause={handlePauseWebhook}
       onSubmit={handleWebhookSubmit}
       onDelete={handleDelete}
       onDeleteSuccess={handleDeleteSuccess}

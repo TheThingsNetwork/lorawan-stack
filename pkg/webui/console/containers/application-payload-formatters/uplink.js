@@ -102,8 +102,8 @@ const ApplicationPayloadFormatters = () => {
   const hasError = Boolean(linkError) && !isNotFoundError(linkError)
 
   return (
-    <div className="container container--xxl grid gap-ls-xxs box-border">
-      <div className="item-6">
+    <div className="container container--xl grid gap-ls-xxs box-border">
+      <div className="item-12">
         <PageTitle title={m.title} />
         {hasError && <ErrorNotification content={linkError} small />}
         {!isNoneType && <Notification className="mb-ls-s" small info content={m.infoText} />}

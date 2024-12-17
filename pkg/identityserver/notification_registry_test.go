@@ -56,7 +56,7 @@ func TestNotificationRegistry(t *testing.T) {
 		for _, entityIds := range entityIDs {
 			res, err := svc.Create(ctx, &ttnpb.CreateNotificationRequest{
 				EntityIds:        entityIds,
-				NotificationType: "test_notification",
+				NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 				Receivers: []ttnpb.NotificationReceiver{
 					ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR,
 					ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
@@ -159,7 +159,7 @@ func TestNotificationRegistryWithOrganizationFanout(t *testing.T) {
 			entityID := entityID
 			res, err := svc.Create(ctx, &ttnpb.CreateNotificationRequest{
 				EntityIds:        entityID,
-				NotificationType: "test_notification",
+				NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
 				Receivers: []ttnpb.NotificationReceiver{
 					ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 					ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_TECHNICAL_CONTACT,

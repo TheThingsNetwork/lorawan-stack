@@ -84,4 +84,16 @@ func TestPagination(t *testing.T) {
 		redis.SetPaginationTotal(ctx, total)
 		a.So(totalCount, should.Equal, total)
 	})
+
+	t.Run("SetPaginationDefaults", func(t *testing.T) {
+		t.Parallel()
+		redis.SetPaginationDefaults(redis.PaginationDefaults{DefaultLimit: 20})
+
+		ctx := test.Context()
+		ctx = redis.NewContextWithPagination(ctx, 0, 0, nil)
+
+		limit, _ := redis.PaginationLimitAndOffsetFromContext(ctx)
+
+		a.So(limit, should.Equal, uint64(20))
+	})
 }

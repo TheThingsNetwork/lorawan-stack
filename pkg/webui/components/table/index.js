@@ -144,7 +144,7 @@ const Tabular = ({
             : getByPath(row, headers[index].name)
           return (
             <Table.DataCell key={index} align={header.align} small={small} panelStyle={panelStyle}>
-              {headers[index].render ? headers[index].render(value) : value}
+              {headers[index].render ? headers[index].render(value, row) : value}
             </Table.DataCell>
           )
         })}

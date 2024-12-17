@@ -82,6 +82,11 @@ var (
 		"insufficient rights for user `{uid}`",
 		"missing",
 	)
+	ErrInsufficientRights = errors.DefinePermissionDenied(
+		"insufficient_rights",
+		"insufficient rights for {entity_type} `{uid}`",
+		"missing",
+	)
 )
 
 func rightsNames(rights ...ttnpb.Right) []string {

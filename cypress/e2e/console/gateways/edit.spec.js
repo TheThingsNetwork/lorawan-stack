@@ -116,25 +116,17 @@ describe('Gateway general settings', () => {
         .should('be.visible')
         .and('have.attr', 'value', gateway.attributes.key)
     })
-    cy.findByLabelText('Automatic updates').should('exist').and('have.attr', 'value', 'false')
-    cy.findDescriptionByLabelText('LoRa Basics Station LNS Authentication Key')
-      .should(
-        'contain',
-        'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.',
-      )
-      .and('be.visible')
-    cy.findDescriptionByLabelText('Automatic updates')
-      .should('contain', 'Gateway can be updated automatically')
-      .and('be.visible')
+    cy.findDescriptionByLabelText('LoRa Basics Station LNS Authentication Key').should(
+      'contain',
+      'The Authentication Key for Lora Basics Station LNS connections. This field is ignored for other gateways.',
+    )
     cy.findByLabelText('Channel')
       .should('be.visible')
       .and('have.attr', 'placeholder')
       .and('eq', 'Stable')
-    cy.findDescriptionByLabelText('Channel')
-      .should('contain', 'Channel for gateway automatic updates')
-      .and('be.visible')
     cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
     cy.findByRole('button', { name: /Delete gateway/ }).should('be.visible')
+    cy.get('button[type="submit').scrollIntoView()
     cy.findByRole('heading', { name: 'LoRaWAN options' }).should('be.visible')
     cy.findByText('Frequency plan').should('not.exist')
     cy.findByRole('button', { name: 'Expand' }).click()
@@ -177,7 +169,6 @@ describe('Gateway general settings', () => {
     cy.findByLabelText('Gateway location').check()
     cy.findByPlaceholderText('key').type('-changed')
     cy.findByPlaceholderText('value').type('-changed')
-    cy.findByLabelText('Automatic updates').check()
     cy.findByLabelText('Channel').type('test')
     cy.findByLabelText('Packet Broker').check()
 
@@ -198,7 +189,6 @@ describe('Gateway general settings', () => {
     cy.findByLabelText('Gateway location').should('have.attr', 'value', 'true')
     cy.findByPlaceholderText('key').should('have.value', 'key-changed')
     cy.findByPlaceholderText('value').should('have.value', 'value-changed')
-    cy.findByLabelText('Automatic updates').should('have.attr', 'value', 'true')
     cy.findByLabelText('Channel').should('have.value', 'test')
     cy.findByLabelText('Packet Broker').should('have.attr', 'value', 'true')
 

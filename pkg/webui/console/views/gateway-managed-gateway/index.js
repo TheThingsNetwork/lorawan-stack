@@ -40,7 +40,7 @@ const GatewayManagedGateway = () => {
 
   return (
     <Require featureCheck={mayViewManagedGateway} otherwise={{ redirect: `/gateways/${gtwId}` }}>
-      <div className="container container--xl p-vert-ls-s grid ml-0">
+      <div className="container container--xxl grid">
         <Routes>
           <Route index element={<Navigate to="connection-settings" replace />} />
           <Route path="connection-settings" Component={GatewayConnectionSettings} />

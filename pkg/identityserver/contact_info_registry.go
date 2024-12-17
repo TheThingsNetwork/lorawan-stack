@@ -261,7 +261,7 @@ func (is *IdentityServer) requestContactInfoValidation(
 		}
 		go is.SendTemplateEmailToUsers( // nolint:errcheck
 			is.FromRequestContext(ctx),
-			"validate",
+			ttnpb.GetNotificationTypeString(ttnpb.NotificationType_VALIDATE),
 			func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
 				validateData.TemplateData = data
 				return validateData, nil

@@ -62,10 +62,15 @@ func TestOrganizationsNestedError(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
-func TestOrganizationsPermissionDenied(t *testing.T) {
+func TestOrganizationsPermissions(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
 	org1 := p.NewOrganization(usr1.GetOrganizationOrUserIdentifiers())
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -73,56 +78,106 @@ func TestOrganizationsPermissionDenied(t *testing.T) {
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewOrganizationRegistryClient(cc)
 
-		_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
-			Organization: &ttnpb.Organization{
-				Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
-			},
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
-			OrganizationIds: org1.GetIds(),
-			FieldMask:       ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
+			_, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
+				OrganizationIds: org1.GetIds(),
+				FieldMask:       ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
 
-		listRes, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		a.So(err, should.BeNil)
-		if a.So(listRes, should.NotBeNil) {
-			a.So(listRes.Organizations, should.BeEmpty)
-		}
+			listRes, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			a.So(err, should.BeNil)
+			if a.So(listRes, should.NotBeNil) {
+				a.So(listRes.Organizations, should.BeEmpty)
+			}
 
-		_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-			FieldMask:    ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
-			Organization: &ttnpb.Organization{
-				Ids:  org1.GetIds(),
-				Name: "Updated Name",
-			},
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids:  org1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Delete(ctx, org1.GetIds())
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-	})
+			_, err = reg.Delete(ctx, org1.GetIds())
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids: &ttnpb.OrganizationIdentifiers{OrganizationId: "foo-org"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Get(ctx, &ttnpb.GetOrganizationRequest{
+				OrganizationIds: org1.GetIds(),
+				FieldMask:       ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			listRes, err := reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(err, should.BeNil)
+			if a.So(listRes, should.NotBeNil) {
+				a.So(listRes.Organizations, should.BeEmpty)
+			}
+
+			_, err = reg.List(ctx, &ttnpb.ListOrganizationsRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateOrganizationRequest{
+				Organization: &ttnpb.Organization{
+					Ids:  org1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Delete(ctx, org1.GetIds(), readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+	}, withPrivateTestDatabase(p))
 }
 
 func TestOrganizationsCRUD(t *testing.T) {

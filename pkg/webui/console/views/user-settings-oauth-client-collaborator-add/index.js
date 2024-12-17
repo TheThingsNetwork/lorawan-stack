@@ -41,7 +41,7 @@ const OAuthClientCollaboratorAddInner = () => {
 
   return (
     <div className="container container--xl grid">
-      <div className="item-12 xl:item-8">
+      <div className="item-12">
         <AccountCollaboratorsForm entity={CLIENT} entityId={clientId} />
       </div>
     </div>

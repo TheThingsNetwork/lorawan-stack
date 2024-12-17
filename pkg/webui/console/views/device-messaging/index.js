@@ -61,14 +61,14 @@ const DeviceMessaging = () => {
       featureCheck={mayWriteTraffic}
       otherwise={{ redirect: `/applications/${appId}/devices/${devId}` }}
     >
-      <div className="container container--xxl grid">
+      <div className="container container--xl grid">
         <IntlHelmet title={sharedMessages.messaging} />
         {tabs.length > 0 && (
           <div className="item-12">
             <Tabs className="mt-0 mb-ls-s md-lg:bg-none md-lg:mr-0" tabs={tabs} divider />
           </div>
         )}
-        <div className="item-12 xl:item-8">
+        <div className="item-12">
           <Routes>
             {mayScheduleDown && <Route path="downlink" Component={DownlinkForm} />}
             {maySendUp && <Route path="uplink" Component={UplinkForm} />}

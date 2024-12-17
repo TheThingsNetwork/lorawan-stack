@@ -74,13 +74,12 @@ func New(c *component.Component, conf *Config) (*Server, error) {
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", rpclog.NamespaceHook, rpclog.UnaryNamespaceHook("gatewayconfigurationserver")) //nolint:lll
 	c.GRPC.RegisterUnaryHook("/ttn.lorawan.v3.GatewayConfigurationService", cluster.HookName, c.ClusterAuthUnaryHook())
 
-	if ttgcConf := c.GetBaseConfig(c.Context()).TTGC; ttgcConf.Enabled {
-		var err error
-		gcs.managedServer, err = managed.New(c.Context(), c, ttgcConf)
-		if err != nil {
-			return nil, err
-		}
+	ttgcConf := c.GetBaseConfig(c.Context()).TTGC
+	managedServer, err := managed.New(c.Context(), c, ttgcConf)
+	if err != nil {
+		return nil, err
 	}
+	gcs.managedServer = managedServer
 
 	c.RegisterGRPC(gcs)
 	c.RegisterWeb(gcs)

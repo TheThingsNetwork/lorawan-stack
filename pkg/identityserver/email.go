@@ -63,7 +63,12 @@ func (is *IdentityServer) SendEmail(ctx context.Context, message *email.Message)
 }
 
 // SendTemplateEmailToUsers sends an email to users.
-func (is *IdentityServer) SendTemplateEmailToUsers(ctx context.Context, templateName string, dataBuilder email.TemplateDataBuilder, receivers ...*ttnpb.User) error {
+func (is *IdentityServer) SendTemplateEmailToUsers(
+	ctx context.Context,
+	templateName string,
+	dataBuilder email.TemplateDataBuilder,
+	receivers ...*ttnpb.User,
+) error {
 	networkConfig := is.configFromContext(ctx).Email.Network
 	emailTemplate := email.GetTemplate(ctx, templateName)
 
@@ -97,6 +102,18 @@ func (is *IdentityServer) SendNotificationEmailToUsers(ctx context.Context, noti
 	var wg errgroup.Group
 	for _, receiver := range receivers {
 		receiver := receiver // shadow range variable.
+
+		// Skips over the possible `support` user.
+		// This user can only be created via the API endpoints defined in the tenant access service.
+		if receiver.Ids.IDString() == ttnpb.SupportUserID {
+			continue
+		}
+
+		// Skips over non approved users.
+		if receiver.State != ttnpb.State_STATE_APPROVED {
+			continue
+		}
+
 		wg.Go(func() error {
 			templateData, err := emailNotification.DataBuilder(
 				ctx,
@@ -118,7 +135,12 @@ func (is *IdentityServer) SendNotificationEmailToUsers(ctx context.Context, noti
 var emailUserFields = store.FieldMask{"ids", "name", "primary_email_address"}
 
 // SendTemplateEmailToUserIDs looks up the users and sends them an email.
-func (is *IdentityServer) SendTemplateEmailToUserIDs(ctx context.Context, templateName string, dataBuilder email.TemplateDataBuilder, receiverIDs ...*ttnpb.UserIdentifiers) error {
+func (is *IdentityServer) SendTemplateEmailToUserIDs(
+	ctx context.Context,
+	templateName string,
+	dataBuilder email.TemplateDataBuilder,
+	receiverIDs ...*ttnpb.UserIdentifiers,
+) error {
 	var receivers []*ttnpb.User
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		receivers, err = st.FindUsers(ctx, receiverIDs, emailUserFields)
@@ -130,7 +152,7 @@ func (is *IdentityServer) SendTemplateEmailToUserIDs(ctx context.Context, templa
 	return is.SendTemplateEmailToUsers(ctx, templateName, dataBuilder, receivers...)
 }
 
-var notificationEmailUserFields = store.FieldMask{"ids", "name", "primary_email_address", "admin"}
+var notificationEmailUserFields = store.FieldMask{"ids", "name", "primary_email_address", "admin", "state"}
 
 // SendNotificationEmailToUserIDs looks up the users and sends them a notification email.
 func (is *IdentityServer) SendNotificationEmailToUserIDs(ctx context.Context, notification *ttnpb.Notification, receiverIDs ...*ttnpb.UserIdentifiers) error {

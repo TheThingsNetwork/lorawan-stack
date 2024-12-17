@@ -83,6 +83,7 @@ const QRModalButton = props => {
         children: modalData,
         buttonMessage: m.apply,
         approveButtonProps: {
+          primary: true,
           disabled: !qrData.valid,
         },
         cancelButtonMessage: qrData.data ? sharedMessages.scanAgain : sharedMessages.cancel,

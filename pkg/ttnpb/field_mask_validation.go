@@ -1599,6 +1599,21 @@ var RPCFieldMaskPaths = map[string]RPCFieldMaskPathValue{
 		Allowed: nsEndDeviceReadFieldPaths[:],
 	},
 
+	// MAC settings profiles:
+	"/ttn.lorawan.v3.NsMACSettingsProfileRegistry/Get": {
+		All:     MACSettingsProfileFieldPathsNested,
+		Allowed: MACSettingsProfileFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.NsMACSettingsProfileRegistry/List": {
+		All:     MACSettingsProfileFieldPathsNested,
+		Allowed: MACSettingsProfileFieldPathsNested,
+	},
+	"/ttn.lorawan.v3.NsMACSettingsProfileRegistry/Update": {
+		All:     MACSettingsProfileFieldPathsNested,
+		Allowed: MACSettingsProfileFieldPathsNested,
+		Set:     true,
+	},
+
 	// Relays:
 	"/ttn.lorawan.v3.NsRelayConfigurationService/GetRelay": {
 		All:     RelaySettingsFieldPathsNested,

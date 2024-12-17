@@ -593,6 +593,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_APPLICATION_PURGE": {
+    "translations": {
+      "en": "purge application"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_APPLICATION_SETTINGS_API_KEYS": {
     "translations": {
       "en": "view and edit application API keys"
@@ -683,6 +692,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_CLIENT_PURGE": {
+    "translations": {
+      "en": "purge OAuth client"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_CLIENT_SETTINGS_BASIC": {
     "translations": {
       "en": "edit OAuth client basic settings"
@@ -740,6 +758,15 @@
   "enum:RIGHT_GATEWAY_LOCATION_READ": {
     "translations": {
       "en": "view gateway location"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_GATEWAY_PURGE": {
+    "translations": {
+      "en": "purge gateway"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -908,6 +935,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_ORGANIZATION_PURGE": {
+    "translations": {
+      "en": "purge organization"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_ORGANIZATION_SETTINGS_API_KEYS": {
     "translations": {
       "en": "view and edit organization API keys"
@@ -998,6 +1034,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_USER_CREATE": {
+    "translations": {
+      "en": "create user account"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_USER_DELETE": {
     "translations": {
       "en": "delete user account"
@@ -1034,6 +1079,15 @@
       "file": "i18n.go"
     }
   },
+  "enum:RIGHT_USER_LIST": {
+    "translations": {
+      "en": "list user accounts"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
   "enum:RIGHT_USER_NOTIFICATIONS_READ": {
     "translations": {
       "en": "read user notifications"
@@ -1055,6 +1109,15 @@
   "enum:RIGHT_USER_ORGANIZATIONS_LIST": {
     "translations": {
       "en": "list organizations the user is a member of"
+    },
+    "description": {
+      "package": "pkg/ttnpb",
+      "file": "i18n.go"
+    }
+  },
+  "enum:RIGHT_USER_PURGE": {
+    "translations": {
+      "en": "purge user account"
     },
     "description": {
       "package": "pkg/ttnpb",
@@ -3230,6 +3293,15 @@
       "file": "require.go"
     }
   },
+  "error:pkg/auth/rights:insufficient_rights": {
+    "translations": {
+      "en": "insufficient rights for {entity_type} `{uid}`"
+    },
+    "description": {
+      "package": "pkg/auth/rights",
+      "file": "require.go"
+    }
+  },
   "error:pkg/auth/rights:insufficient_universal_rights": {
     "translations": {
       "en": "insufficient universal rights"
@@ -4760,6 +4832,15 @@
       "file": "pattern.go"
     }
   },
+  "error:pkg/events:marshal_data": {
+    "translations": {
+      "en": "marshal data"
+    },
+    "description": {
+      "package": "pkg/events",
+      "file": "events.go"
+    }
+  },
   "error:pkg/events:no_matching_events": {
     "translations": {
       "en": "no matching events for regexp `{regexp}`"
@@ -4947,6 +5028,15 @@
     "description": {
       "package": "pkg/gatewayconfigurationserver/managed",
       "file": "grpc.go"
+    }
+  },
+  "error:pkg/gatewayconfigurationserver/managed:managed_gateway_configuration_server_not_enabled": {
+    "translations": {
+      "en": "managed gateway configuration server is not enabled"
+    },
+    "description": {
+      "package": "pkg/gatewayconfigurationserver/managed",
+      "file": "grpc_disabled.go"
     }
   },
   "error:pkg/gatewayconfigurationserver/managed:no_profile_name": {
@@ -8196,6 +8286,24 @@
     "description": {
       "package": "pkg/networkserver",
       "file": "errors.go"
+    }
+  },
+  "error:pkg/networkserver:mac_settings_profile_already_exists": {
+    "translations": {
+      "en": "MAC settings profile already exists"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_mac_settings_profile.go"
+    }
+  },
+  "error:pkg/networkserver:mac_settings_profile_not_found": {
+    "translations": {
+      "en": "MAC settings profile not found"
+    },
+    "description": {
+      "package": "pkg/networkserver",
+      "file": "grpc_mac_settings_profile.go"
     }
   },
   "error:pkg/networkserver:no_downlink": {

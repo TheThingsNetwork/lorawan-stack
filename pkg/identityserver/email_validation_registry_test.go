@@ -29,6 +29,11 @@ import (
 func TestEmailValidation(t *testing.T) {
 	p := &storetest.Population{}
 
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
 	usr1 := p.NewUser()
 	usr1.PrimaryEmailAddress = "usr1@email.com"
 	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
@@ -55,6 +60,11 @@ func TestEmailValidation(t *testing.T) {
 
 			// No rights.
 			_, err := reg.RequestValidation(ctx, usr1.Ids)
+			a.So(err, should.NotBeNil)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+			// Only reader rights.
+			_, err = reg.RequestValidation(ctx, usr1.Ids, readOnlyAdminKeyCreds)
 			a.So(err, should.NotBeNil)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 

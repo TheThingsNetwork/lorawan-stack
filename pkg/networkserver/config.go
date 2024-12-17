@@ -131,23 +131,30 @@ type InteropConfig struct {
 	ID                   *types.EUI64 `name:"id" description:"NSID of this Network Server (EUI)"`
 }
 
+// PaginationConfig represents the configuration for pagination.
+type PaginationConfig struct {
+	DefaultLimit int64 `name:"default-limit" description:"Default limit for pagination"`
+}
+
 // Config represents the NetworkServer configuration.
 type Config struct {
-	ApplicationUplinkQueue   ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
-	Devices                  DeviceRegistry               `name:"-"`
-	DownlinkTaskQueue        DownlinkTaskQueueConfig      `name:"downlink-task-queue"`
-	UplinkDeduplicator       UplinkDeduplicator           `name:"-"`
-	ScheduledDownlinkMatcher ScheduledDownlinkMatcher     `name:"-"`
-	NetID                    types.NetID                  `name:"net-id" description:"NetID of this Network Server"`
-	ClusterID                string                       `name:"cluster-id" description:"Cluster ID of this Network Server"`
-	DevAddrPrefixes          []types.DevAddrPrefix        `name:"dev-addr-prefixes" description:"Device address prefixes of this Network Server"`
-	DeduplicationWindow      time.Duration                `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`
-	CooldownWindow           time.Duration                `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"`
-	DownlinkPriorities       DownlinkPriorityConfig       `name:"downlink-priorities" description:"Downlink message priorities"`
-	DefaultMACSettings       MACSettingConfig             `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`
-	Interop                  InteropConfig                `name:"interop" description:"Interop client configuration"`
-	DeviceKEKLabel           string                       `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
-	DownlinkQueueCapacity    int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`
+	ApplicationUplinkQueue     ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
+	Devices                    DeviceRegistry               `name:"-"`
+	DownlinkTaskQueue          DownlinkTaskQueueConfig      `name:"downlink-task-queue"`
+	UplinkDeduplicator         UplinkDeduplicator           `name:"-"`
+	ScheduledDownlinkMatcher   ScheduledDownlinkMatcher     `name:"-"`
+	NetID                      types.NetID                  `name:"net-id" description:"NetID of this Network Server"`                                                                                   // nolint: lll
+	ClusterID                  string                       `name:"cluster-id" description:"Cluster ID of this Network Server"`                                                                          // nolint: lll
+	DevAddrPrefixes            []types.DevAddrPrefix        `name:"dev-addr-prefixes" description:"Device address prefixes of this Network Server"`                                                      // nolint: lll
+	DeduplicationWindow        time.Duration                `name:"deduplication-window" description:"Time window during which, duplicate messages are collected for metadata"`                          // nolint: lll
+	CooldownWindow             time.Duration                `name:"cooldown-window" description:"Time window starting right after deduplication window, during which, duplicate messages are discarded"` // nolint: lll
+	DownlinkPriorities         DownlinkPriorityConfig       `name:"downlink-priorities" description:"Downlink message priorities"`                                                                       // nolint: lll
+	DefaultMACSettings         MACSettingConfig             `name:"default-mac-settings" description:"Default MAC settings to fallback to if not specified by device, band or frequency plan"`           // nolint: lll
+	Interop                    InteropConfig                `name:"interop" description:"Interop client configuration"`                                                                                  // nolint: lll
+	DeviceKEKLabel             string                       `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`                                                     // nolint: lll
+	DownlinkQueueCapacity      int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`                                                       // nolint: lll
+	MACSettingsProfileRegistry MACSettingsProfileRegistry   `name:"-"`
+	Pagination                 PaginationConfig             `name:"pagination" description:"Pagination configuration"`
 }
 
 // DefaultConfig is the default Network Server configuration.

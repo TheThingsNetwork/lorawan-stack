@@ -727,6 +727,11 @@ func (is *IdentityServer) purgeGateway(ctx context.Context, ids *ttnpb.GatewayId
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeGateways.New()
 	}
+	if err := rights.RequireGateway(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_GATEWAY_PURGE,
+	); err != nil {
+		return nil, err
+	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// delete related API keys before purging the gateway
 		err := st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())

@@ -38,7 +38,9 @@ func allPotentialRights(eIDs *ttnpb.EntityIdentifiers, rights *ttnpb.Rights) *tt
 	return nil
 }
 
-func (is *IdentityServer) getRights(ctx context.Context, entityID *ttnpb.EntityIdentifiers) (entityRights, universalRights *ttnpb.Rights, err error) {
+func (is *IdentityServer) getRights(
+	ctx context.Context, entityID *ttnpb.EntityIdentifiers,
+) (entityRights, universalRights *ttnpb.Rights, err error) {
 	authInfo, err := is.authInfo(ctx)
 	if err != nil {
 		return nil, nil, err

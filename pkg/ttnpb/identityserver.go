@@ -14,6 +14,10 @@
 
 package ttnpb
 
+// SupportUserID is the userID used for creating the support user and for validation of operation in which this user
+// should be present.
+const SupportUserID = "support"
+
 // GetEntityIdentifiers returns the EntityIdentifiers for the used access method.
 func (m *AuthInfoResponse) GetEntityIdentifiers() *EntityIdentifiers {
 	if m == nil {
@@ -37,17 +41,36 @@ func (m *AuthInfoResponse) GetRights() []Right {
 	if m == nil {
 		return nil
 	}
+
+	var rights []Right
+	var limitRights bool
+
 	switch accessMethod := m.GetAccessMethod().(type) {
 	case *AuthInfoResponse_ApiKey:
-		return accessMethod.ApiKey.GetApiKey().GetRights()
+		if accessMethod.ApiKey.GetEntityIds().GetUserIds().GetUserId() == SupportUserID {
+			limitRights = true
+		}
+		rights = accessMethod.ApiKey.GetApiKey().GetRights()
 	case *AuthInfoResponse_OauthAccessToken:
-		return accessMethod.OauthAccessToken.GetRights()
+		if accessMethod.OauthAccessToken.GetUserIds().GetUserId() == SupportUserID {
+			limitRights = true
+		}
+		rights = accessMethod.OauthAccessToken.GetRights()
 	case *AuthInfoResponse_UserSession:
-		return RightsFrom(Right_RIGHT_ALL).Implied().GetRights()
+		if accessMethod.UserSession.GetUserIds().GetUserId() == SupportUserID {
+			limitRights = true
+		}
+		rights = RightsFrom(Right_RIGHT_ALL).Implied().GetRights()
 	case *AuthInfoResponse_GatewayToken_:
-		return accessMethod.GatewayToken.GetRights()
+		rights = accessMethod.GatewayToken.GetRights()
 	}
-	return nil
+
+	universalRights := m.GetUniversalRights()
+	if universalRights != nil && limitRights {
+		return RightsFrom(rights...).Intersect(universalRights).GetRights()
+	}
+
+	return rights
 }
 
 // GetOrganizationOrUserIdentifiers returns the OrganizationOrUserIdentifiers for the used access method.

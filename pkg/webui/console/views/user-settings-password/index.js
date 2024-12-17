@@ -40,7 +40,7 @@ const ChangePassword = () => {
 
   return (
     <div className="container container--xl grid">
-      <div className="item-12 xl:item-8">
+      <div className="item-12">
         <PageTitle title={sharedMessages.changePassword} />
         <Overlay after={350} visible={fetching} loading>
           <ChangePasswordForm />

@@ -18,7 +18,7 @@ import { defineMessages } from 'react-intl'
 
 import QRModalButton from '@ttn-lw/components/qr-modal-button'
 import { useFormContext } from '@ttn-lw/components/form'
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconCheck, IconX } from '@ttn-lw/components/icon'
 import ModalButton from '@ttn-lw/components/button/modal-button'
 import ButtonGroup from '@ttn-lw/components/button/group'
 
@@ -119,8 +119,8 @@ const GatewayQRScanSection = () => {
   return (
     <>
       {qrData.approved ? (
-        <div className="mb-cs-xs">
-          <Icon icon="check" textPaddedRight className="c-success" />
+        <div className="mb-cs-xs d-flex al-center">
+          <Icon icon={IconCheck} textPaddedRight className="c-text-success-normal" />
           <Message content={sharedMessages.scanSuccess} />
         </div>
       ) : (
@@ -141,7 +141,7 @@ const GatewayQRScanSection = () => {
               buttonMessage: sharedMessages.qrCodeDataReset,
               children: <Message content={sharedMessages.resetConfirm} component="span" />,
               approveButtonProps: {
-                icon: 'close',
+                icon: IconX,
               },
             }}
           />

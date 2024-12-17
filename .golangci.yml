@@ -17,8 +17,8 @@ linters:
     # Enabled manually:
     - asciicheck # Finds non-ASCII identifiers.
     - bodyclose # Finds HTTP response bodies that are not closed.
+    - copyloopvar # Finds for loop variables that are overwritten.
     - errorlint # Finds problems with error wrapping.
-    - exportloopref # Finds pointers to range variables.
     - goconst # Finds repeated strings that could be replaced by a const.
     - gocyclo # Finds funcs with high cyclomatic complexity.
     - godot # Finds comments that do not end with a period.

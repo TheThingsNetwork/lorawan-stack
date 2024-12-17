@@ -753,3 +753,49 @@ func (dst *GatewayIdentifiersList) SetFields(src *GatewayIdentifiersList, paths 
 	}
 	return nil
 }
+
+func (dst *MACSettingsProfileIdentifiers) SetFields(src *MACSettingsProfileIdentifiers, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "profile_id":
+			if len(subs) > 0 {
+				return fmt.Errorf("'profile_id' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.ProfileId = src.ProfileId
+			} else {
+				var zero string
+				dst.ProfileId = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}

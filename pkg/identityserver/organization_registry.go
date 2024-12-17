@@ -378,6 +378,11 @@ func (is *IdentityServer) purgeOrganization(
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeOrganizations.New()
 	}
+	if err := rights.RequireOrganization(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_ORGANIZATION_DELETE,
+	); err != nil {
+		return nil, err
+	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// Delete related API keys before purging the organization.
 		err := st.DeleteEntityAPIKeys(ctx, ids.GetEntityIdentifiers())

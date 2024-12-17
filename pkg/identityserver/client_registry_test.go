@@ -26,8 +26,14 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func TestClientsPermissionDenied(t *testing.T) {
+func TestClientsPermissions(t *testing.T) {
 	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
 	usr1 := p.NewUser()
 	cli1 := p.NewClient(usr1.GetOrganizationOrUserIdentifiers())
 
@@ -37,55 +43,82 @@ func TestClientsPermissionDenied(t *testing.T) {
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewClientRegistryClient(cc)
 
-		_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
-			Client: &ttnpb.Client{
-				Ids: &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
-			},
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-		})
-		if a.So(err, should.NotBeNil) {
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
+				Client: &ttnpb.Client{
+					Ids: &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			})
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
 
-		_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
-			ClientIds: cli1.GetIds(),
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
+			_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
+				ClientIds: cli1.GetIds(),
+				FieldMask: ttnpb.FieldMask("name"),
+			})
 			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
 
-		listRes, err := reg.List(ctx, &ttnpb.ListClientsRequest{
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		a.So(err, should.BeNil)
-		if a.So(listRes, should.NotBeNil) {
-			a.So(listRes.Clients, should.BeEmpty)
-		}
+			listRes, err := reg.List(ctx, &ttnpb.ListClientsRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			a.So(err, should.BeNil)
+			if a.So(listRes, should.NotBeNil) {
+				a.So(listRes.Clients, should.BeEmpty)
+			}
 
-		_, err = reg.List(ctx, &ttnpb.ListClientsRequest{
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-			FieldMask:    ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
+			_, err = reg.List(ctx, &ttnpb.ListClientsRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			})
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
-			Client: &ttnpb.Client{
-				Ids:  cli1.GetIds(),
-				Name: "Updated Name",
-			},
-			FieldMask: ttnpb.FieldMask("name"),
+			_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
+				Client: &ttnpb.Client{
+					Ids:  cli1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+			_, err = reg.Delete(ctx, cli1.GetIds())
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
 
-		_, err = reg.Delete(ctx, cli1.GetIds())
-		if a.So(err, should.NotBeNil) {
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateClientRequest{
+				Client: &ttnpb.Client{
+					Ids: &ttnpb.ClientIdentifiers{ClientId: "foo-cli"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			}, readOnlyAdminKeyCreds)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+
+			_, err = reg.Get(ctx, &ttnpb.GetClientRequest{
+				ClientIds: cli1.GetIds(),
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			// NOTE: This will always be nil because there are no client fields which are not public.
+			// Meaning that even without the proper rights the response is `nil`.
+			a.So(err, should.BeNil)
+
+			_, err = reg.List(ctx, &ttnpb.ListClientsRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateClientRequest{
+				Client: &ttnpb.Client{
+					Ids:  cli1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+
+			_, err = reg.Delete(ctx, cli1.GetIds(), readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		})
 	}, withPrivateTestDatabase(p))
 }
 

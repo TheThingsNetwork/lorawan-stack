@@ -26,10 +26,15 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-func TestApplicationsPermissionDenied(t *testing.T) {
+func TestApplicationsPermissions(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	readAdminUsr := p.NewUser()
+	readAdminUsr.Admin = true
+	readAdminUsrKey, _ := p.NewAPIKey(readAdminUsr.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readAdminUsrCreds := rpcCreds(readAdminUsrKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -37,55 +42,98 @@ func TestApplicationsPermissionDenied(t *testing.T) {
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewApplicationRegistryClient(cc)
 
-		_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
-			Application: &ttnpb.Application{
-				Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
-			},
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+		t.Run("Permission denied", func(t *testing.T) { // nolint:paralleltest
+			reg := ttnpb.NewApplicationRegistryClient(cc)
+
+			_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
+				ApplicationIds: app1.GetIds(),
+				FieldMask:      ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
+
+			listRes, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			a.So(err, should.BeNil)
+			if a.So(listRes, should.NotBeNil) {
+				a.So(listRes.Applications, should.BeEmpty)
+			}
+
+			_, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids:  app1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Delete(ctx, app1.GetIds())
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 		})
-		if a.So(err, should.NotBeNil) {
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids: &ttnpb.ApplicationIdentifiers{ApplicationId: "foo-app"},
+				},
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+			}, readAdminUsrCreds)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
 
-		_, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
-			ApplicationIds: app1.GetIds(),
-			FieldMask:      ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsUnauthenticated(err), should.BeTrue)
-		}
+			_, err = reg.Get(ctx, &ttnpb.GetApplicationRequest{
+				ApplicationIds: app1.GetIds(),
+				FieldMask:      ttnpb.FieldMask("name"),
+			}, readAdminUsrCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
 
-		listRes, err := reg.List(ctx, &ttnpb.ListApplicationsRequest{
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		a.So(err, should.BeNil)
-		if a.So(listRes, should.NotBeNil) {
-			a.So(listRes.Applications, should.BeEmpty)
-		}
+			_, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readAdminUsrCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
 
-		_, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
-			Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
-			FieldMask:    ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
+			_, err = reg.List(ctx, &ttnpb.ListApplicationsRequest{
+				Collaborator: usr1.GetOrganizationOrUserIdentifiers(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			}, readAdminUsrCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
+				Application: &ttnpb.Application{
+					Ids:  app1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readAdminUsrCreds)
 			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateApplicationRequest{
-			Application: &ttnpb.Application{
-				Ids:  app1.GetIds(),
-				Name: "Updated Name",
-			},
-			FieldMask: ttnpb.FieldMask("name"),
+			_, err = reg.Delete(ctx, app1.GetIds(), readAdminUsrCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
 		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
-
-		_, err = reg.Delete(ctx, app1.GetIds())
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
 	}, withPrivateTestDatabase(p))
 }
 

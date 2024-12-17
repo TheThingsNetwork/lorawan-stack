@@ -105,6 +105,11 @@ type DownlinksConfig struct {
 	ConfirmationConfig ConfirmationConfig `name:"confirmation" description:"Configuration for confirmed downlink"`
 }
 
+// PaginationConfig represents the configuration for pagination.
+type PaginationConfig struct {
+	DefaultLimit int64 `name:"default-limit" description:"Default limit for pagination"`
+}
+
 // Config represents the ApplicationServer configuration.
 type Config struct {
 	LinkMode                 string                         `name:"link-mode" description:"Deprecated - mode to link applications to their Network Server (all, explicit)"`
@@ -123,6 +128,7 @@ type Config struct {
 	DeviceKEKLabel           string                         `name:"device-kek-label" description:"Label of KEK used to encrypt device keys at rest"`
 	DeviceLastSeen           LastSeenConfig                 `name:"device-last-seen" description:"End Device last seen batch update configuration"`
 	Downlinks                DownlinksConfig                `name:"downlinks" description:"Downlink configuration"`
+	Pagination               PaginationConfig               `name:"pagination" description:"Pagination configuration"`
 }
 
 func (c Config) toProto() *ttnpb.AsConfiguration {

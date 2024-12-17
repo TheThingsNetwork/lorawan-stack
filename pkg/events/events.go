@@ -25,7 +25,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/getsentry/sentry-go"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -176,7 +178,27 @@ func New(ctx context.Context, name, description string, opts ...Option) Event {
 	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
+var errMarshalData = errors.Define("marshal_data", "marshal data")
+
 func marshalData(data any) (anyPB *anypb.Any, err error) {
+	// TODO: https://github.com/TheThingsIndustries/lorawan-stack-support/issues/1163.
+	// Remove this after the issue is fixed.
+	defer func() {
+		if p := recover(); p != nil {
+			if pErr, ok := p.(error); ok {
+				err = errMarshalData.WithCause(pErr)
+			} else {
+				err = errMarshalData.WithAttributes("panic", p)
+			}
+			event := sentryerrors.NewEvent(err)
+			sentry.CaptureEvent(event)
+		}
+	}()
+
+	return mustMarshalData(data)
+}
+
+func mustMarshalData(data any) (anyPB *anypb.Any, err error) {
 	if protoMessage, ok := data.(proto.Message); ok {
 		anyPB, err = anypb.New(protoMessage)
 		if err != nil {

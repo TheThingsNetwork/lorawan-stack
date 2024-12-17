@@ -104,12 +104,11 @@ func (is *IdentityServer) createApplicationAPIKey(
 	events.Publish(evtCreateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.GetApplicationIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetApplicationIds().GetEntityIdentifiers(),
-		NotificationType: "api_key_created",
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -226,12 +225,11 @@ func (is *IdentityServer) updateApplicationAPIKey(
 	events.Publish(evtUpdateApplicationAPIKey.NewWithIdentifiersAndData(ctx, req.GetApplicationIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetApplicationIds().GetEntityIdentifiers(),
-		NotificationType: "api_key_changed",
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil
@@ -370,12 +368,11 @@ func (is *IdentityServer) setApplicationCollaborator(
 		))
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetApplicationIds().GetEntityIdentifiers(),
-			NotificationType: "collaborator_changed",
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_COLLABORATOR_CHANGED),
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteApplicationCollaborator.New(

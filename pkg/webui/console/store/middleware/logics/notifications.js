@@ -19,6 +19,8 @@ import tts from '@console/api/tts'
 
 import toast from '@ttn-lw/components/toast'
 
+import { validateNotification } from '@console/components/notifications/utils'
+
 import NOTIFICATION_STATUS from '@console/containers/notifications/notification-status'
 
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
@@ -74,10 +76,17 @@ const getInboxNotificationsLogic = createRequestLogic({
     const filter = [NOTIFICATION_STATUS.UNSEEN, NOTIFICATION_STATUS.SEEN]
     const userId = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
+    // Remove unknown notification types from the result and send error to Sentry.
+    // When a new notification type is introduced in the backend, this will prevent
+    // the Console from crashing.
+    const validatedResult = result.notifications.filter(notification =>
+      validateNotification(notification.notification_type, 'getInboxNotificationsLogic'),
+    )
 
     return {
-      notifications: result.notifications,
-      totalCount: result.totalCount,
+      notifications: validatedResult,
+      // Subtract the number of unknown notification types from the total count.
+      totalCount: result.totalCount - (result.notifications.length - validatedResult.length),
       page,
       limit,
     }
@@ -106,9 +115,18 @@ const refreshNotificationsLogic = createRequestLogic({
       1,
       1,
     )
+    // Remove unknown notification types from the result and send error to Sentry.
+    // When a new notification type is introduced in the backend, this will prevent
+    // the Console from crashing.
+    const validatedUnseen = unseen.notifications.filter(notification =>
+      validateNotification(notification.notification_type, 'refreshNotificationsLogic'),
+    )
 
+    // Subtract the number of unknown notification types from the total count.
+    const validatedUnseenCount =
+      unseen.totalCount - (unseen.notifications.length - validatedUnseen.length)
     // If there are new unseen notifications, show a toast and fetch the notifications.
-    if (unseen && unseen.totalCount > prevTotalUnseenCount) {
+    if (unseen && validatedUnseenCount > prevTotalUnseenCount) {
       toast({
         title: m.newNotifications,
         type: toast.types.INFO,
@@ -116,7 +134,7 @@ const refreshNotificationsLogic = createRequestLogic({
       await dispatch(attachPromise(notifications.getInboxNotifications()))
     }
 
-    return { unseenTotalCount: unseen?.totalCount }
+    return { unseenTotalCount: validatedUnseenCount }
   },
 })
 
@@ -129,8 +147,20 @@ const getArchivedNotificationsLogic = createRequestLogic({
     const filter = [NOTIFICATION_STATUS.ARCHIVED]
     const userId = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
+    // Remove unknown notification types from the result and send error to Sentry.
+    // When a new notification type is introduced in the backend, this will prevent
+    // the Console from crashing.
+    const validatedResult = result.notifications.filter(notification =>
+      validateNotification(notification.notification_type, 'getArchivedNotificationsLogic'),
+    )
 
-    return { notifications: result.notifications, totalCount: result.totalCount, page, limit }
+    return {
+      notifications: validatedResult,
+      // Subtract the number of unknown notification types from the total count.
+      totalCount: result.totalCount - (result.notifications.length - validatedResult.length),
+      page,
+      limit,
+    }
   },
 })
 
@@ -143,8 +173,20 @@ const getUnseenNotificationsLogic = createRequestLogic({
     const filter = [NOTIFICATION_STATUS.UNSEEN]
     const userId = selectUserId(getState())
     const result = await tts.Notifications.getAllNotifications(userId, filter, page, limit)
+    // Remove unknown notification types from the result and send error to Sentry.
+    // When a new notification type is introduced in the backend, this will prevent
+    // the Console from crashing.
+    const validatedResult = result.notifications.filter(notification =>
+      validateNotification(notification.notification_type, 'getUnseenNotificationsLogic'),
+    )
 
-    return { notifications: result.notifications, totalCount: result.totalCount, page, limit }
+    return {
+      notifications: validatedResult,
+      // Subtract the number of unknown notification types from the total count.
+      totalCount: result.totalCount - (result.notifications.length - validatedResult.length),
+      page,
+      limit,
+    }
   },
 })
 

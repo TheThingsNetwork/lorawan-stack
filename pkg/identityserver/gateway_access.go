@@ -101,12 +101,11 @@ func (is *IdentityServer) createGatewayAPIKey(
 	events.Publish(evtCreateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
-		NotificationType: "api_key_created",
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -219,12 +218,11 @@ func (is *IdentityServer) updateGatewayAPIKey(
 	events.Publish(evtUpdateGatewayAPIKey.NewWithIdentifiersAndData(ctx, req.GetGatewayIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
-		NotificationType: "api_key_changed",
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil
@@ -360,12 +358,11 @@ func (is *IdentityServer) setGatewayCollaborator(
 		))
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetGatewayIds().GetEntityIdentifiers(),
-			NotificationType: "collaborator_changed",
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_COLLABORATOR_CHANGED),
 			Data:             ttnpb.MustMarshalAny(req.GetCollaborator()),
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: false,
 		})
 	} else {
 		events.Publish(evtDeleteGatewayCollaborator.New(

@@ -37,13 +37,15 @@ const m = defineMessages({
   healthy: 'Healthy',
   pending: 'Pending',
   requestsFailing: 'Requests failing',
+  paused: 'Paused',
+  active: 'Active',
 })
 
 const WebhooksTable = () => {
   const { appId } = useParams()
   const healthStatusEnabled = useSelector(selectWebhooksHealthStatusEnabled)
   const getWebhooksListCallback = useCallback(
-    () => getWebhooksList(appId, ['template_ids', 'health_status']),
+    () => getWebhooksList(appId, ['template_ids', 'health_status', 'paused']),
     [appId],
   )
 
@@ -78,16 +80,19 @@ const WebhooksTable = () => {
     },
   ]
 
-  if (healthStatusEnabled) {
-    headers.push({
-      name: 'health_status',
-      displayName: sharedMessages.status,
-      width: 8,
-      render: value => {
-        let indicator = 'unknown'
-        let label = sharedMessages.unknown
+  headers.push({
+    name: 'health_status',
+    displayName: sharedMessages.status,
+    width: 8,
+    render: (value, webhook) => {
+      let indicator = 'unknown'
+      let label = sharedMessages.unknown
 
-        if (value && value.healthy) {
+      if (healthStatusEnabled) {
+        if (webhook && webhook.paused) {
+          indicator = 'mediocre'
+          label = m.paused
+        } else if (value && value.healthy) {
           indicator = 'good'
           label = m.healthy
         } else if (value && value.unhealthy) {
@@ -97,11 +102,17 @@ const WebhooksTable = () => {
           indicator = 'mediocre'
           label = m.pending
         }
+      } else if (webhook && webhook.paused) {
+        indicator = 'mediocre'
+        label = m.paused
+      } else {
+        indicator = 'green'
+        label = m.active
+      }
 
-        return <Status status={indicator} label={label} pulse={false} />
-      },
-    })
-  }
+      return <Status status={indicator} label={label} pulse={false} />
+    },
+  })
 
   headers.push({
     name: 'created_at',

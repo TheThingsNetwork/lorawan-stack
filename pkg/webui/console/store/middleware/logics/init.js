@@ -74,6 +74,7 @@ const consoleAppLogic = createRequestLogic({
           'primary_email_address_validated_at',
           'profile_picture',
           'console_preferences',
+          'email_notification_preferences',
         ])
         userResult.isAdmin = info.is_admin || false
         dispatch(user.getUserMeSuccess(userResult))

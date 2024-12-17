@@ -66,7 +66,7 @@ const GatewayAdd = () => {
   return (
     <Require featureCheck={mayCreateGateways} otherwise={{ redirect: '/gateways' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <div className="container container--xxl grid">
+        <div className="container container--xl grid">
           <PageTitle className="mb-cs-s" title={sharedMessages.registerGateway}>
             <Message
               component="p"
@@ -74,7 +74,7 @@ const GatewayAdd = () => {
               values={{ Link: GatewayGuideLink, break: <br /> }}
             />
           </PageTitle>
-          <div className="item-12 xl:item-9">
+          <div className="item-12">
             <GatewayOnboardingForm onSuccess={handleSuccess} />
           </div>
         </div>

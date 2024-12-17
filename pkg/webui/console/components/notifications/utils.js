@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { ingestError } from '@ttn-lw/lib/errors/utils'
+
 import notificationMap from './constants'
 
 export const getNotification = notificationType => notificationMap[notificationType]
@@ -23,6 +25,17 @@ const idToEntityMap = {
   user_ids: 'user',
   organization_ids: 'organization',
   client_ids: 'client',
+}
+
+export const validateNotification = (notificationType, ingestedBy) => {
+  if (!(notificationType in notificationMap)) {
+    ingestError(new Error(`Notification type "${notificationType}" does not exist`), {
+      ingestedBy,
+    })
+    return false
+  }
+
+  return true
 }
 
 export const getEntity = entity_ids =>

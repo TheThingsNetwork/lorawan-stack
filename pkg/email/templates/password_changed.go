@@ -18,11 +18,12 @@ import (
 	"context"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "password_changed",
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED),
 		email.FSTemplate{
 			SubjectTemplate:      "Your password on {{ .Network.Name }} has been changed",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -34,10 +35,11 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification("password_changed", &email.NotificationBuilder{
-		EmailTemplateName: "password_changed",
-		DataBuilder:       newPasswordChangedData,
-	})
+	email.RegisterNotification(
+		ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED), &email.NotificationBuilder{
+			EmailTemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED),
+			DataBuilder:       newPasswordChangedData,
+		})
 }
 
 func newPasswordChangedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {

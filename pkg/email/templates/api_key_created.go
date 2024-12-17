@@ -24,7 +24,7 @@ import (
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "api_key_created",
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 		email.FSTemplate{
 			SubjectTemplate:      "A new API key has been created for your {{ .Notification.EntityIds.EntityType }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",
@@ -36,10 +36,11 @@ func init() {
 		panic(err)
 	}
 	email.RegisterTemplate(tmpl)
-	email.RegisterNotification("api_key_created", &email.NotificationBuilder{
-		EmailTemplateName: "api_key_created",
-		DataBuilder:       newAPIKeyCreatedData,
-	})
+	email.RegisterNotification(
+		ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED), &email.NotificationBuilder{
+			EmailTemplateName: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
+			DataBuilder:       newAPIKeyCreatedData,
+		})
 }
 
 func newAPIKeyCreatedData(_ context.Context, data email.NotificationTemplateData) (email.NotificationTemplateData, error) {

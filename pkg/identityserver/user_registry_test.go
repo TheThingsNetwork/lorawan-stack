@@ -239,6 +239,66 @@ func TestUserUpdateInvalidPassword(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
+func TestUsersCRUDReadOnlyAdmin(t *testing.T) {
+	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	usr1.Attributes = map[string]string{"foo": "bar"}
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewUserRegistryClient(cc)
+
+		// Fetch only public safe fields.
+		got, err := reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIds:   usr1.GetIds(),
+			FieldMask: ttnpb.FieldMask("ids"),
+		}, readOnlyAdminCreds)
+		if a.So(err, should.BeNil) {
+			a.So(got.GetIds(), should.Resemble, usr1.GetIds())
+			a.So(got.Attributes, should.BeEmpty)
+		}
+
+		// Fetch non-public fields.
+		got, err = reg.Get(ctx, &ttnpb.GetUserRequest{
+			UserIds:   usr1.GetIds(),
+			FieldMask: ttnpb.FieldMask("attributes"),
+		}, readOnlyAdminCreds)
+		if a.So(err, should.BeNil) {
+			a.So(got.GetIds(), should.Resemble, usr1.GetIds())
+			a.So(got.GetAttributes(), should.Resemble, usr1.Attributes)
+		}
+
+		_, err = reg.Update(ctx, &ttnpb.UpdateUserRequest{
+			User: &ttnpb.User{
+				Ids:  usr1.GetIds(),
+				Name: "Updated Name",
+			},
+			FieldMask: ttnpb.FieldMask("name"),
+		}, readOnlyAdminCreds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		_, err = reg.Delete(ctx, usr1.GetIds(), readOnlyAdminCreds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+
+		_, err = reg.Purge(ctx, usr1.GetIds(), readOnlyAdminCreds)
+		if a.So(err, should.NotBeNil) {
+			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+		}
+	}, withPrivateTestDatabase(p))
+}
+
 func TestUsersCRUD(t *testing.T) {
 	t.Parallel()
 
@@ -424,12 +484,18 @@ func TestUsersCRUD(t *testing.T) {
 								User:         ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
 								Overview:     ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
 							},
+							Tutorials: &ttnpb.UserConsolePreferences_Tutorials{
+								Seen: []ttnpb.Tutorial{
+									ttnpb.Tutorial_TUTORIAL_LIVE_DATA_SPLIT_VIEW,
+								},
+							},
 						},
 					},
 					FieldMask: ttnpb.FieldMask(
 						"console_preferences.console_theme",
 						"console_preferences.dashboard_layouts",
 						"console_preferences.sort_by",
+						"console_preferences.tutorials",
 					),
 				}, creds)
 				if a.So(err, should.BeNil) {
@@ -455,6 +521,15 @@ func TestUsersCRUD(t *testing.T) {
 							Organization: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
 							User:         ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
 							Overview:     ttnpb.DashboardLayout_DASHBOARD_LAYOUT_GRID,
+						},
+					)
+					a.So(
+						got.ConsolePreferences.GetTutorials(),
+						should.Resemble,
+						&ttnpb.UserConsolePreferences_Tutorials{
+							Seen: []ttnpb.Tutorial{
+								ttnpb.Tutorial_TUTORIAL_LIVE_DATA_SPLIT_VIEW,
+							},
 						},
 					)
 				}

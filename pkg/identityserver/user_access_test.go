@@ -26,6 +26,77 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestUserAPIKeysPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	usr1Key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_USER_INFO,
+		ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
+	)
+	usr1Creds := rpcCreds(usr1Key)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewUserAccessClient(cc)
+
+		for _, opts := range [][]grpc.CallOption{nil, {usr1Creds}, {readOnlyAdminKeyCreds}} {
+			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
+				UserIds: usr1.GetIds(),
+				Name:    "api-key-name",
+				Rights:  []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(created, should.BeNil)
+			}
+
+			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
+				UserIds: usr1.GetIds(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(list, should.BeNil)
+			}
+
+			got, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
+				UserIds: usr1.GetIds(),
+				KeyId:   usr1Key.GetId(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(got, should.BeNil)
+			}
+
+			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
+				UserIds: usr1.GetIds(),
+				ApiKey: &ttnpb.APIKey{
+					Id:   usr1Key.GetId(),
+					Name: "api-key-name-updated",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(updated, should.BeNil)
+			}
+
+			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteUserAPIKeyRequest{
+				UserIds: usr1.GetIds(),
+				KeyId:   usr1Key.GetId(),
+			}, opts...)
+			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				t.FailNow()
+			}
+		}
+	}, withPrivateTestDatabase(p))
+}
+
 func TestUserAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -39,7 +110,6 @@ func TestUserAPIKeys(t *testing.T) { // nolint:gocyclo
 		ttnpb.Right_RIGHT_USER_INFO,
 		ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
 	)
-	usr1Creds := rpcCreds(usr1Key)
 	limitedKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(),
 		ttnpb.Right_RIGHT_USER_INFO,
 		ttnpb.Right_RIGHT_USER_SETTINGS_BASIC,
@@ -140,53 +210,6 @@ func TestUserAPIKeys(t *testing.T) { // nolint:gocyclo
 				ttnpb.Right_RIGHT_USER_SETTINGS_BASIC,
 				ttnpb.Right_RIGHT_USER_APPLICATIONS_LIST,
 			})
-		}
-
-		// API Key CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {usr1Creds}} {
-			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateUserAPIKeyRequest{
-				UserIds: usr1.GetIds(),
-				Name:    "api-key-name",
-				Rights:  []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(created, should.BeNil)
-			}
-
-			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListUserAPIKeysRequest{
-				UserIds: usr1.GetIds(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(list, should.BeNil)
-			}
-
-			got, err := reg.GetAPIKey(ctx, &ttnpb.GetUserAPIKeyRequest{
-				UserIds: usr1.GetIds(),
-				KeyId:   usr1Key.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-
-			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateUserAPIKeyRequest{
-				UserIds: usr1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id:   usr1Key.GetId(),
-					Name: "api-key-name-updated",
-				},
-				FieldMask: ttnpb.FieldMask("name"),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(updated, should.BeNil)
-			}
-
-			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteUserAPIKeyRequest{
-				UserIds: usr1.GetIds(),
-				KeyId:   usr1Key.GetId(),
-			}, opts...)
-			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				t.FailNow()
-			}
 		}
 
 		// API Key CRUD with different valid credentials.

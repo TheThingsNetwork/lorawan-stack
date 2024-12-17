@@ -39,7 +39,7 @@ const GatewayWifiProfiles = () => {
   )
 
   return (
-    <div className="item-12 xl:item-8">
+    <div className="item-12">
       <Routes>
         <Route index Component={GatewayWifiProfilesOverview} />
         <Route path="add" Component={GatewayWifiProfilesForm} />

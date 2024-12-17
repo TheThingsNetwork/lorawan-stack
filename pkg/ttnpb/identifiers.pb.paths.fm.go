@@ -150,3 +150,13 @@ var GatewayIdentifiersListFieldPathsNested = []string{
 var GatewayIdentifiersListFieldPathsTopLevel = []string{
 	"gateway_ids",
 }
+var MACSettingsProfileIdentifiersFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"profile_id",
+}
+
+var MACSettingsProfileIdentifiersFieldPathsTopLevel = []string{
+	"application_ids",
+	"profile_id",
+}

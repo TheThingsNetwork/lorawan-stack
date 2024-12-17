@@ -186,6 +186,7 @@ const ApplicationOverviewHeader = () => {
           <Dropdown.Item
             title={sharedMessages.deleteApp}
             action={handleOpenDeleteApplicationModal}
+            messageClassName="c-text-error-normal"
           />
         </Require>
       }

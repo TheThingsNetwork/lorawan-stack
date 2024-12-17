@@ -66,13 +66,9 @@ const INVITATIONS_TAB = 'invitations'
 const tabs = [
   {
     title: sharedMessages.users,
-    name: 'users',
+    name: USERS_TAB,
   },
   { title: sharedMessages.deleted, name: DELETED_TAB },
-  {
-    title: sharedMessages.userInvitations,
-    name: 'invitations',
-  },
 ]
 
 const state = {
@@ -115,6 +111,10 @@ const UsersTable = props => {
   const currentUserId = useSelector(selectUserId)
   const mayInvite = useSelector(state => checkFromState(maySendInvites, state))
 
+  const tabsWithInvitations = [
+    ...tabs,
+    { title: sharedMessages.userInvitations, name: INVITATIONS_TAB },
+  ]
   const [tab, setTab] = React.useState(USERS_TAB)
   const isInvitationsTab = tab === INVITATIONS_TAB
   const isDeletedTab = tab === DELETED_TAB
@@ -349,7 +349,7 @@ const UsersTable = props => {
       baseDataSelector={isInvitationsTab ? invitationsBaseDataSelector : usersBaseDataSelector}
       pageSize={pageSize}
       clickable={!isDeletedTab}
-      tabs={maySendInvites ? tabs : []}
+      tabs={mayInvite ? tabsWithInvitations : tabs}
       searchable={!isInvitationsTab}
     />
   )

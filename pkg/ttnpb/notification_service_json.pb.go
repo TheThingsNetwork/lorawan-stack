@@ -11,6 +11,46 @@ import (
 	jsonplugin "github.com/TheThingsIndustries/protoc-gen-go-json/jsonplugin"
 )
 
+// MarshalProtoJSON marshals the NotificationType to JSON.
+func (x NotificationType) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	s.WriteEnumString(int32(x), NotificationType_name)
+}
+
+// MarshalText marshals the NotificationType to text.
+func (x NotificationType) MarshalText() ([]byte, error) {
+	return []byte(jsonplugin.GetEnumString(int32(x), NotificationType_name)), nil
+}
+
+// MarshalJSON marshals the NotificationType to JSON.
+func (x NotificationType) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the NotificationType from JSON.
+func (x *NotificationType) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	v := s.ReadEnum(NotificationType_value)
+	if err := s.Err(); err != nil {
+		s.SetErrorf("could not read NotificationType enum: %v", err)
+		return
+	}
+	*x = NotificationType(v)
+}
+
+// UnmarshalText unmarshals the NotificationType from text.
+func (x *NotificationType) UnmarshalText(b []byte) error {
+	i, err := jsonplugin.ParseEnumString(string(b), NotificationType_value)
+	if err != nil {
+		return err
+	}
+	*x = NotificationType(i)
+	return nil
+}
+
+// UnmarshalJSON unmarshals the NotificationType from JSON.
+func (x *NotificationType) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the NotificationReceiver to JSON.
 func (x NotificationReceiver) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	s.WriteEnumString(int32(x), NotificationReceiver_name)

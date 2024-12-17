@@ -3239,6 +3239,58 @@ func (m *MACSettings) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths [
 	return paths, nil
 }
 
+// AddSelectFlagsForMACSettingsProfile adds flags to select fields in MACSettingsProfile.
+func AddSelectFlagsForMACSettingsProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
+	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("mac-settings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("mac-settings", prefix), true), flagsplugin.WithHidden(hidden)))
+	AddSelectFlagsForMACSettings(flags, flagsplugin.Prefix("mac-settings", prefix), hidden)
+}
+
+// SelectFromFlags outputs the fieldmask paths forMACSettingsProfile message from select flags.
+func PathsFromSelectFlagsForMACSettingsProfile(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if val, selected, err := flagsplugin.GetBool(flags, flagsplugin.Prefix("mac_settings", prefix)); err != nil {
+		return nil, err
+	} else if selected && val {
+		paths = append(paths, flagsplugin.Prefix("mac_settings", prefix))
+	}
+	if selectPaths, err := PathsFromSelectFlagsForMACSettings(flags, flagsplugin.Prefix("mac_settings", prefix)); err != nil {
+		return nil, err
+	} else {
+		paths = append(paths, selectPaths...)
+	}
+	return paths, nil
+}
+
+// AddSetFlagsForMACSettingsProfile adds flags to select fields in MACSettingsProfile.
+func AddSetFlagsForMACSettingsProfile(flags *pflag.FlagSet, prefix string, hidden bool) {
+	AddSetFlagsForMACSettingsProfileIdentifiers(flags, flagsplugin.Prefix("ids", prefix), true)
+	AddSetFlagsForMACSettings(flags, flagsplugin.Prefix("mac-settings", prefix), hidden)
+}
+
+// SetFromFlags sets the MACSettingsProfile message from flags.
+func (m *MACSettingsProfile) SetFromFlags(flags *pflag.FlagSet, prefix string) (paths []string, err error) {
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("ids", prefix)); changed {
+		if m.Ids == nil {
+			m.Ids = &MACSettingsProfileIdentifiers{}
+		}
+		if setPaths, err := m.Ids.SetFromFlags(flags, flagsplugin.Prefix("ids", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	if changed := flagsplugin.IsAnyPrefixSet(flags, flagsplugin.Prefix("mac_settings", prefix)); changed {
+		if m.MacSettings == nil {
+			m.MacSettings = &MACSettings{}
+		}
+		if setPaths, err := m.MacSettings.SetFromFlags(flags, flagsplugin.Prefix("mac_settings", prefix)); err != nil {
+			return nil, err
+		} else {
+			paths = append(paths, setPaths...)
+		}
+	}
+	return paths, nil
+}
+
 // AddSelectFlagsForMACState_JoinRequest adds flags to select fields in MACState_JoinRequest.
 func AddSelectFlagsForMACState_JoinRequest(flags *pflag.FlagSet, prefix string, hidden bool) {
 	flags.AddFlag(flagsplugin.NewBoolFlag(flagsplugin.Prefix("downlink-settings", prefix), flagsplugin.SelectDesc(flagsplugin.Prefix("downlink-settings", prefix), true), flagsplugin.WithHidden(hidden)))

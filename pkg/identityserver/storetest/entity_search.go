@@ -630,30 +630,34 @@ func (st *StoreTest) TestEntitySearch(t *T) {
 }
 
 func (st *StoreTest) TestEntitySearchPagination(t *T) {
+	store.SetPaginationDefaults(store.PaginationDefaults{
+		DefaultLimit: 7,
+	})
+
 	var users []*ttnpb.User
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 9; i++ {
 		users = append(users, st.population.NewUser())
 	}
 
 	var applications []*ttnpb.Application
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 9; i++ {
 		applications = append(applications, st.population.NewApplication(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 	var clients []*ttnpb.Client
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 9; i++ {
 		clients = append(clients, st.population.NewClient(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 	var gateways []*ttnpb.Gateway
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 9; i++ {
 		gateways = append(gateways, st.population.NewGateway(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 	var organizations []*ttnpb.Organization
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 9; i++ {
 		organizations = append(organizations, st.population.NewOrganization(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 
 	var endDevices []*ttnpb.EndDevice
-	for i := 0; i < 7; i++ {
+	for i := 0; i < 9; i++ {
 		endDevices = append(endDevices, st.population.NewEndDevice(applications[0].GetIds()))
 	}
 
@@ -676,17 +680,30 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 
 			got, err := s.SearchApplications(paginateCtx, nil, &ttnpb.SearchApplicationsRequest{})
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, applications[i+2*int(page-1)].Ids)
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 9)
+		}
+	})
+
+	t.Run("Applications_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.SearchApplications(paginateCtx, nil, &ttnpb.SearchApplicationsRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.SearchApplications(paginateCtx, nil, &ttnpb.SearchApplicationsRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 2)
 		}
 	})
 
@@ -699,17 +716,30 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 
 			got, err := s.SearchClients(paginateCtx, nil, &ttnpb.SearchClientsRequest{})
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, clients[i+2*int(page-1)].Ids)
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 9)
+		}
+	})
+
+	t.Run("Clients_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.SearchClients(paginateCtx, nil, &ttnpb.SearchClientsRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.SearchClients(paginateCtx, nil, &ttnpb.SearchClientsRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 2)
 		}
 	})
 
@@ -724,17 +754,34 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 				ApplicationIds: applications[0].GetIds(),
 			})
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, endDevices[i+2*int(page-1)].Ids)
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 9)
+		}
+	})
+
+	t.Run("EndDevices_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.SearchEndDevices(paginateCtx, &ttnpb.SearchEndDevicesRequest{
+			ApplicationIds: applications[0].GetIds(),
+		})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.SearchEndDevices(paginateCtx, &ttnpb.SearchEndDevicesRequest{
+			ApplicationIds: applications[0].GetIds(),
+		})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 2)
 		}
 	})
 
@@ -747,17 +794,30 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 
 			got, err := s.SearchGateways(paginateCtx, nil, &ttnpb.SearchGatewaysRequest{})
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, gateways[i+2*int(page-1)].Ids)
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 9)
+		}
+	})
+
+	t.Run("Gateways_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.SearchGateways(paginateCtx, nil, &ttnpb.SearchGatewaysRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.SearchGateways(paginateCtx, nil, &ttnpb.SearchGatewaysRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 2)
 		}
 	})
 
@@ -770,17 +830,30 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 
 			got, err := s.SearchOrganizations(paginateCtx, nil, &ttnpb.SearchOrganizationsRequest{})
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, organizations[i+2*int(page-1)].Ids)
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 9)
+		}
+	})
+
+	t.Run("Organizations_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.SearchOrganizations(paginateCtx, nil, &ttnpb.SearchOrganizationsRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.SearchOrganizations(paginateCtx, nil, &ttnpb.SearchOrganizationsRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 2)
 		}
 	})
 
@@ -793,17 +866,30 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 
 			got, err := s.SearchUsers(paginateCtx, &ttnpb.SearchUsersRequest{})
 			if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
-				if page == 4 {
-					a.So(got, should.HaveLength, 1)
-				} else {
-					a.So(got, should.HaveLength, 2)
-				}
+				a.So(got, should.HaveLength, 2)
 				for i, e := range got {
 					a.So(e, should.Resemble, users[i+2*int(page-1)].Ids)
 				}
 			}
 
-			a.So(total, should.Equal, 7)
+			a.So(total, should.Equal, 9)
+		}
+	})
+
+	t.Run("Users_PageLimit", func(t *T) {
+		a, ctx := test.New(t)
+
+		var total uint64
+		paginateCtx := store.WithPagination(ctx, 0, 0, &total)
+		got, err := s.SearchUsers(paginateCtx, &ttnpb.SearchUsersRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 7)
+		}
+
+		paginateCtx = store.WithPagination(ctx, 0, 2, &total)
+		got, err = s.SearchUsers(paginateCtx, &ttnpb.SearchUsersRequest{})
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.HaveLength, 2)
 		}
 	})
 }

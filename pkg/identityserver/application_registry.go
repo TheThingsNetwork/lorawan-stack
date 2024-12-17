@@ -422,6 +422,11 @@ func (is *IdentityServer) purgeApplication(
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeApplications.New()
 	}
+	if err := rights.RequireApplication(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_APPLICATION_PURGE,
+	); err != nil {
+		return nil, err
+	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		total, err := st.CountEndDevices(ctx, ids)
 		if err != nil {

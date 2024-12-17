@@ -16,7 +16,7 @@ import React from 'react'
 import classnames from 'classnames'
 import { defineMessages, useIntl } from 'react-intl'
 
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconChevronDown, IconChevronUp } from '@ttn-lw/components/icon'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -65,7 +65,7 @@ const FormCollapseSection = props => {
         disabled={disabled}
       >
         <Message content={title} className={style.title} />
-        <Icon className={style.icon} icon={isSectionClosed ? 'expand_down' : 'expand_up'} />
+        <Icon className={style.icon} icon={isSectionClosed ? IconChevronDown : IconChevronUp} />
       </button>
       <div className={classnames(style.content, { [style.expanded]: !isSectionClosed })} id={id}>
         {children}

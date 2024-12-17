@@ -126,6 +126,7 @@ const CodeEditor = ({
         editorProps={{ $blockScrolling: Infinity }}
         commands={commands}
         ref={editorRef ? combineRefs([aceRef, editorRef]) : aceRef}
+        wrapEnabled
       />
     </div>
   )

@@ -40,9 +40,9 @@ const UserApiKeyAddInner = () => {
   )
 
   return (
-    <div className="container container--xxl grid">
+    <div className="container container--xl grid">
       <PageTitle title={sharedMessages.addApiKey} />
-      <div className="item-12 xl:item-8">
+      <div className="item-12">
         <ApiKeyCreateForm entity={USER} entityId={userId} />
       </div>
     </div>

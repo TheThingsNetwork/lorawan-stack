@@ -2,6 +2,13 @@
 
 package ttnpb
 
+var EmailNotificationPreferencesFieldPathsNested = []string{
+	"types",
+}
+
+var EmailNotificationPreferencesFieldPathsTopLevel = []string{
+	"types",
+}
 var UserConsolePreferencesFieldPathsNested = []string{
 	"console_theme",
 	"dashboard_layouts",
@@ -21,12 +28,15 @@ var UserConsolePreferencesFieldPathsNested = []string{
 	"sort_by.gateway",
 	"sort_by.organization",
 	"sort_by.user",
+	"tutorials",
+	"tutorials.seen",
 }
 
 var UserConsolePreferencesFieldPathsTopLevel = []string{
 	"console_theme",
 	"dashboard_layouts",
 	"sort_by",
+	"tutorials",
 }
 var UserFieldPathsNested = []string{
 	"admin",
@@ -50,10 +60,14 @@ var UserFieldPathsNested = []string{
 	"console_preferences.sort_by.gateway",
 	"console_preferences.sort_by.organization",
 	"console_preferences.sort_by.user",
+	"console_preferences.tutorials",
+	"console_preferences.tutorials.seen",
 	"contact_info",
 	"created_at",
 	"deleted_at",
 	"description",
+	"email_notification_preferences",
+	"email_notification_preferences.types",
 	"ids",
 	"ids.email",
 	"ids.user_id",
@@ -73,6 +87,7 @@ var UserFieldPathsNested = []string{
 	"temporary_password",
 	"temporary_password_created_at",
 	"temporary_password_expires_at",
+	"universal_rights",
 	"updated_at",
 }
 
@@ -84,6 +99,7 @@ var UserFieldPathsTopLevel = []string{
 	"created_at",
 	"deleted_at",
 	"description",
+	"email_notification_preferences",
 	"ids",
 	"name",
 	"password",
@@ -97,6 +113,7 @@ var UserFieldPathsTopLevel = []string{
 	"temporary_password",
 	"temporary_password_created_at",
 	"temporary_password_expires_at",
+	"universal_rights",
 	"updated_at",
 }
 var UsersFieldPathsNested = []string{
@@ -156,10 +173,14 @@ var CreateUserRequestFieldPathsNested = []string{
 	"user.console_preferences.sort_by.gateway",
 	"user.console_preferences.sort_by.organization",
 	"user.console_preferences.sort_by.user",
+	"user.console_preferences.tutorials",
+	"user.console_preferences.tutorials.seen",
 	"user.contact_info",
 	"user.created_at",
 	"user.deleted_at",
 	"user.description",
+	"user.email_notification_preferences",
+	"user.email_notification_preferences.types",
 	"user.ids",
 	"user.ids.email",
 	"user.ids.user_id",
@@ -179,6 +200,7 @@ var CreateUserRequestFieldPathsNested = []string{
 	"user.temporary_password",
 	"user.temporary_password_created_at",
 	"user.temporary_password_expires_at",
+	"user.universal_rights",
 	"user.updated_at",
 }
 
@@ -210,10 +232,14 @@ var UpdateUserRequestFieldPathsNested = []string{
 	"user.console_preferences.sort_by.gateway",
 	"user.console_preferences.sort_by.organization",
 	"user.console_preferences.sort_by.user",
+	"user.console_preferences.tutorials",
+	"user.console_preferences.tutorials.seen",
 	"user.contact_info",
 	"user.created_at",
 	"user.deleted_at",
 	"user.description",
+	"user.email_notification_preferences",
+	"user.email_notification_preferences.types",
 	"user.ids",
 	"user.ids.email",
 	"user.ids.user_id",
@@ -233,6 +259,7 @@ var UpdateUserRequestFieldPathsNested = []string{
 	"user.temporary_password",
 	"user.temporary_password_created_at",
 	"user.temporary_password_expires_at",
+	"user.universal_rights",
 	"user.updated_at",
 }
 
@@ -647,4 +674,11 @@ var UserConsolePreferences_SortByFieldPathsTopLevel = []string{
 	"gateway",
 	"organization",
 	"user",
+}
+var UserConsolePreferences_TutorialsFieldPathsNested = []string{
+	"seen",
+}
+
+var UserConsolePreferences_TutorialsFieldPathsTopLevel = []string{
+	"seen",
 }

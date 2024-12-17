@@ -18,7 +18,7 @@ import { uniq } from 'lodash'
 
 import tts from '@console/api/tts'
 
-import { IconTrash, IconRefresh } from '@ttn-lw/components/icon'
+import { IconTrash, IconRefresh, IconPlayerPlay, IconPlayerPause } from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -81,6 +81,12 @@ const m = defineMessages({
     'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval}. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.',
+  pausedInfo:
+    'This webhook is currently paused and no messages are forwarded to the configured end point.',
+  pauseWebhook: 'Pause webhook',
+  pauseWebhookQuestion: 'Pause webhook?',
+  pauseWebhookDescription:
+    'When a webhook is paused, messages will not be forwarded to the configured end point and will be dropped.',
   messagePathValidateTooLong: 'Enabled message path must be at most 64 characters',
   basicAuthCheckbox: 'Use basic access authentication (basic auth)',
   requestBasicAuth: 'Request authentication',
@@ -94,6 +100,8 @@ const m = defineMessages({
   filterEventData: 'Filter event data',
   fieldMaskPlaceholder: 'Select a filter path',
   filtersAdd: 'Add filter path',
+  pause: 'Pause',
+  activate: 'Activate',
 })
 
 // We can use the allowed field masks of the `ApplicationUpStorage` API as
@@ -249,6 +257,7 @@ const WebhookForm = props => {
     onDeleteFailure,
     onReactivate,
     onReactivateSuccess,
+    onPause,
   } = props
 
   const form = useRef(null)
@@ -279,6 +288,8 @@ const WebhookForm = props => {
   const healthStatus = initialWebhookValue?.health_status
   const mayReactivate = update && hasUnhealthyWebhookConfig && healthStatus?.unhealthy
   const isPending = update && healthStatusEnabled && !healthStatus
+
+  const isPaused = initialWebhookValue?.paused
 
   const handleReplaceModalDecision = useCallback(mayReplace => {
     if (mayReplace) {
@@ -373,32 +384,52 @@ const WebhookForm = props => {
           <hr className="mb-ls-m" />
         </>
       )}
-      {mayReactivate && (
+      {isPaused ? (
         <Notification
-          warning
-          content={m.suspendedWebhookMessage}
-          messageValues={{
-            webhookRetryInterval: (
-              <FormattedRelativeTime
-                style="long"
-                value={retryIntervalValue}
-                unit={retryIntervalIntlUnit}
-              />
-            ),
-          }}
+          info
+          content={m.pausedInfo}
           children={
             <Button
-              onClick={handleReactivate}
-              icon={IconRefresh}
-              message={m.reactivateButtonMessage}
+              icon={IconPlayerPlay}
+              onClick={onPause}
+              message={m.activate}
               className="mt-cs-m"
               secondary
             />
           }
           small
         />
+      ) : (
+        <>
+          {mayReactivate && (
+            <Notification
+              warning
+              content={m.suspendedWebhookMessage}
+              messageValues={{
+                webhookRetryInterval: (
+                  <FormattedRelativeTime
+                    style="long"
+                    value={retryIntervalValue}
+                    unit={retryIntervalIntlUnit}
+                  />
+                ),
+              }}
+              children={
+                <Button
+                  onClick={handleReactivate}
+                  icon={IconRefresh}
+                  message={m.reactivateButtonMessage}
+                  className="mt-cs-m"
+                  secondary
+                />
+              }
+              small
+            />
+          )}
+          {isPending && <Notification info content={m.pendingInfo} small />}
+        </>
       )}
-      {isPending && <Notification info content={m.pendingInfo} small />}
+
       <PortalledModal
         title={sharedMessages.idAlreadyExists}
         message={{
@@ -622,20 +653,42 @@ const WebhookForm = props => {
             message={update ? sharedMessages.saveChanges : sharedMessages.addWebhook}
           />
           {update && (
-            <ModalButton
-              type="button"
-              icon={IconTrash}
-              danger
-              naked
-              message={m.deleteWebhook}
-              modalData={{
-                message: {
-                  values: { webhookId: initialWebhookValue.ids.webhook_id },
-                  ...m.modalWarning,
-                },
-              }}
-              onApprove={handleDelete}
-            />
+            <div className="d-flex gap-cs-s">
+              {isPaused ? (
+                <Button secondary icon={IconPlayerPlay} onClick={onPause} message={m.activate} />
+              ) : (
+                <ModalButton
+                  type="button"
+                  icon={IconPlayerPause}
+                  onApprove={onPause}
+                  message={m.pause}
+                  modalData={{
+                    title: m.pauseWebhookQuestion,
+                    noTitleLine: true,
+                    buttonMessage: m.pauseWebhook,
+                    children: <Message content={m.pauseWebhookDescription} component="span" />,
+                    approveButtonProps: {
+                      icon: 'close',
+                      danger: false,
+                    },
+                  }}
+                />
+              )}
+              <ModalButton
+                type="button"
+                icon={IconTrash}
+                danger
+                naked
+                message={m.deleteWebhook}
+                modalData={{
+                  message: {
+                    values: { webhookId: initialWebhookValue.ids.webhook_id },
+                    ...m.modalWarning,
+                  },
+                }}
+                onApprove={handleDelete}
+              />
+            </div>
           )}
         </SubmitBar>
       </Form>
@@ -659,10 +712,12 @@ WebhookForm.propTypes = {
     headers: PropTypes.shape({
       Authorization: PropTypes.string,
     }),
+    paused: PropTypes.bool,
   }),
   onDelete: PropTypes.func,
   onDeleteFailure: PropTypes.func,
   onDeleteSuccess: PropTypes.func,
+  onPause: PropTypes.func.isRequired,
   onReactivate: PropTypes.func,
   onReactivateSuccess: PropTypes.func,
   onSubmit: PropTypes.func.isRequired,

@@ -75,6 +75,12 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 			ConsolePreferences: &ttnpb.UserConsolePreferences{
 				ConsoleTheme: ttnpb.ConsoleTheme_CONSOLE_THEME_LIGHT,
 			},
+			EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			},
+			UniversalRights: []ttnpb.Right{ttnpb.Right_RIGHT_ALL},
 		})
 
 		if a.So(err, should.BeNil) && a.So(created, should.NotBeNil) {
@@ -99,8 +105,14 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 				should.Resemble,
 				&ttnpb.UserConsolePreferences{ConsoleTheme: ttnpb.ConsoleTheme_CONSOLE_THEME_LIGHT},
 			)
+			a.So(created.UniversalRights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_ALL})
 			a.So(*ttnpb.StdTime(created.CreatedAt), should.HappenWithin, 5*time.Second, start)
 			a.So(*ttnpb.StdTime(created.UpdatedAt), should.HappenWithin, 5*time.Second, start)
+			a.So(created.EmailNotificationPreferences, should.Resemble, &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			})
 		}
 	})
 
@@ -221,7 +233,16 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 				DashboardLayouts: &ttnpb.UserConsolePreferences_DashboardLayouts{
 					ApiKey: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_LIST,
 				},
+				Tutorials: &ttnpb.UserConsolePreferences_Tutorials{
+					Seen: []ttnpb.Tutorial{ttnpb.Tutorial_TUTORIAL_LIVE_DATA_SPLIT_VIEW},
+				},
 			},
+			EmailNotificationPreferences: &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			},
+			UniversalRights: []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO},
 		}, mask)
 		if a.So(err, should.BeNil) && a.So(updated, should.NotBeNil) {
 			a.So(updated.GetIds().GetUserId(), should.Equal, "foo")
@@ -248,8 +269,17 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 					DashboardLayouts: &ttnpb.UserConsolePreferences_DashboardLayouts{
 						ApiKey: ttnpb.DashboardLayout_DASHBOARD_LAYOUT_LIST,
 					},
+					Tutorials: &ttnpb.UserConsolePreferences_Tutorials{
+						Seen: []ttnpb.Tutorial{ttnpb.Tutorial_TUTORIAL_LIVE_DATA_SPLIT_VIEW},
+					},
 				},
 			)
+			a.So(updated.EmailNotificationPreferences, should.Resemble, &ttnpb.EmailNotificationPreferences{
+				Types: []ttnpb.NotificationType{
+					ttnpb.NotificationType_API_KEY_CREATED,
+				},
+			})
+			a.So(updated.UniversalRights, should.Resemble, []ttnpb.Right{ttnpb.Right_RIGHT_USER_INFO})
 			a.So(*ttnpb.StdTime(updated.CreatedAt), should.Equal, *ttnpb.StdTime(created.CreatedAt))
 			a.So(*ttnpb.StdTime(updated.UpdatedAt), should.HappenWithin, 5*time.Second, start)
 		}

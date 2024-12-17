@@ -1609,3 +1609,122 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = GatewayIdentifiersListValidationError{}
+
+// ValidateFields checks the field values on MACSettingsProfileIdentifiers with
+// the rules defined in the proto definition for this message. If any rules
+// are violated, an error is returned.
+func (m *MACSettingsProfileIdentifiers) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = MACSettingsProfileIdentifiersFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return MACSettingsProfileIdentifiersValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return MACSettingsProfileIdentifiersValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "profile_id":
+
+			if utf8.RuneCountInString(m.GetProfileId()) > 36 {
+				return MACSettingsProfileIdentifiersValidationError{
+					field:  "profile_id",
+					reason: "value length must be at most 36 runes",
+				}
+			}
+
+			if !_MACSettingsProfileIdentifiers_ProfileId_Pattern.MatchString(m.GetProfileId()) {
+				return MACSettingsProfileIdentifiersValidationError{
+					field:  "profile_id",
+					reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+				}
+			}
+
+		default:
+			return MACSettingsProfileIdentifiersValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// MACSettingsProfileIdentifiersValidationError is the validation error
+// returned by MACSettingsProfileIdentifiers.ValidateFields if the designated
+// constraints aren't met.
+type MACSettingsProfileIdentifiersValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e MACSettingsProfileIdentifiersValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e MACSettingsProfileIdentifiersValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e MACSettingsProfileIdentifiersValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e MACSettingsProfileIdentifiersValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e MACSettingsProfileIdentifiersValidationError) ErrorName() string {
+	return "MACSettingsProfileIdentifiersValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e MACSettingsProfileIdentifiersValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sMACSettingsProfileIdentifiers.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = MACSettingsProfileIdentifiersValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = MACSettingsProfileIdentifiersValidationError{}
+
+var _MACSettingsProfileIdentifiers_ProfileId_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")

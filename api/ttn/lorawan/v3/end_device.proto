@@ -690,6 +690,23 @@ message MACSettings {
   RelaySettings desired_relay = 37;
 }
 
+message MACSettingsProfile {
+  option (thethings.flags.message) = {
+    select: true,
+    set: true
+  };
+  // Profile identifiers.
+  MACSettingsProfileIdentifiers ids = 1 [
+    (validate.rules).message.required = true,
+    (thethings.flags.field) = {
+      select: false,
+      hidden: true
+    }
+  ];
+  // MAC settings.
+  MACSettings mac_settings = 2 [(validate.rules).message.required = true];
+}
+
 // MACState represents the state of MAC layer of the device.
 // MACState is reset on each join for OTAA or ResetInd for ABP devices.
 // This is used internally by the Network Server.

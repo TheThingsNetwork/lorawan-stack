@@ -299,3 +299,11 @@ type ScheduledDownlinkMatcher interface {
 	// successful, for example if a long time has passed since the downlink was scheduled.
 	Match(ctx context.Context, ack *ttnpb.TxAcknowledgment) (*ttnpb.DownlinkMessage, error)
 }
+
+// MACSettingsProfileRegistry is a registry, containing MAC settings profiles.
+type MACSettingsProfileRegistry interface {
+	Get(ctx context.Context, ids *ttnpb.MACSettingsProfileIdentifiers, paths []string) (*ttnpb.MACSettingsProfile, error)                                                                                                  // nolint: lll
+	Set(ctx context.Context, ids *ttnpb.MACSettingsProfileIdentifiers, paths []string, f func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error)) (*ttnpb.MACSettingsProfile, error) // nolint: lll
+	List(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.MACSettingsProfile, error)                                                                                                      // nolint: lll
+	WithPagination(ctx context.Context, limit uint32, page uint32, total *int64) context.Context
+}

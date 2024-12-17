@@ -40,7 +40,23 @@ message Notification {
   EntityIdentifiers entity_ids = 3;
 
   // The type of this notification.
-  string notification_type = 4;
+  // TODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384.
+  string notification_type = 4 [(validate.rules).string = {
+    in: [
+      "unknown",
+      "api_key_created",
+      "api_key_changed",
+      "client_requested",
+      "collaborator_changed",
+      "entity_state_changed",
+      "invitation",
+      "login_token",
+      "password_changed",
+      "temporary_password",
+      "user_requested",
+      "validate"
+    ]
+  }];
 
   // The data related to the notification.
   google.protobuf.Any data = 5;
@@ -57,13 +73,30 @@ message Notification {
   repeated NotificationReceiver receivers = 8;
 
   // Whether an email was sent for the notification.
-  bool email = 9;
+  bool email = 9 [deprecated = true];
 
   // The status of the notification.
   NotificationStatus status = 10;
 
   // The time when the notification status was updated.
   google.protobuf.Timestamp status_updated_at = 11;
+}
+
+enum NotificationType {
+  option (thethings.json.enum) = {marshal_as_string: true};
+
+  UNKNOWN = 0;
+  API_KEY_CREATED = 1;
+  API_KEY_CHANGED = 2;
+  CLIENT_REQUESTED = 3;
+  COLLABORATOR_CHANGED = 4;
+  ENTITY_STATE_CHANGED = 5;
+  INVITATION = 6;
+  LOGIN_TOKEN = 7;
+  PASSWORD_CHANGED = 8;
+  TEMPORARY_PASSWORD = 9;
+  USER_REQUESTED = 10;
+  VALIDATE = 11;
 }
 
 enum NotificationReceiver {
@@ -104,8 +137,20 @@ message CreateNotificationRequest {
 
   // The type of this notification.
   string notification_type = 2 [(validate.rules).string = {
-    min_len: 1,
-    max_len: 100,
+    in: [
+      "unknown",
+      "api_key_created",
+      "api_key_changed",
+      "client_requested",
+      "collaborator_changed",
+      "entity_state_changed",
+      "invitation",
+      "login_token",
+      "password_changed",
+      "temporary_password",
+      "user_requested",
+      "validate"
+    ]
   }];
 
   // The data related to the notification.
@@ -124,7 +169,7 @@ message CreateNotificationRequest {
   }];
 
   // Whether an email should be sent for the notification.
-  bool email = 6;
+  bool email = 6 [deprecated = true];
 }
 
 message CreateNotificationResponse {

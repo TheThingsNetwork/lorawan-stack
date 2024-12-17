@@ -58,6 +58,8 @@ const m = defineMessages({
   purgeFail: 'There was an error and the application could not be purged',
   otherClusterTooltip:
     'This application is registered on a different cluster (`{host}`). To access this application, use the Console of the cluster that this application was registered on.',
+  myApplications: 'My applications',
+  myApplicationsTooltip: 'Applications that you are a collaborator to',
 })
 
 const OWNED_TAB = 'owned'
@@ -65,8 +67,9 @@ const ALL_TAB = 'all'
 const DELETED_TAB = 'deleted'
 const tabs = [
   {
-    title: sharedMessages.ownedByMe,
+    title: m.myApplications,
     name: OWNED_TAB,
+    description: m.myApplicationsTooltip,
   },
   {
     title: sharedMessages.allAdmin,

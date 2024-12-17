@@ -18607,6 +18607,58 @@
           ]
         },
         {
+          "name": "MACSettingsProfile",
+          "longName": "MACSettingsProfile",
+          "fullName": "ttn.lorawan.v3.MACSettingsProfile",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "ids",
+              "description": "Profile identifiers.",
+              "label": "",
+              "type": "MACSettingsProfileIdentifiers",
+              "longType": "MACSettingsProfileIdentifiers",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfileIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "mac_settings",
+              "description": "MAC settings.",
+              "label": "",
+              "type": "MACSettings",
+              "longType": "MACSettings",
+              "fullType": "ttn.lorawan.v3.MACSettings",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
           "name": "MACState",
           "longName": "MACState",
           "fullName": "ttn.lorawan.v3.MACState",
@@ -28365,6 +28417,62 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "MACSettingsProfileIdentifiers",
+          "longName": "MACSettingsProfileIdentifiers",
+          "fullName": "ttn.lorawan.v3.MACSettingsProfileIdentifiers",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "Application IDs.",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "profile_id",
+              "description": "Profile ID.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.max_len",
+                    "value": 36
+                  },
+                  {
+                    "name": "string.pattern",
+                    "value": "^[a-z0-9](?:[-]?[a-z0-9]){2,}$"
+                  }
+                ]
+              }
             }
           ]
         },
@@ -41778,6 +41886,544 @@
       ]
     },
     {
+      "name": "ttn/lorawan/v3/networkserver_mac_settings_profile.proto",
+      "description": "",
+      "package": "ttn.lorawan.v3",
+      "hasEnums": false,
+      "hasExtensions": false,
+      "hasMessages": true,
+      "hasServices": true,
+      "enums": [],
+      "extensions": [],
+      "messages": [
+        {
+          "name": "CreateMACSettingsProfileRequest",
+          "longName": "CreateMACSettingsProfileRequest",
+          "fullName": "ttn.lorawan.v3.CreateMACSettingsProfileRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile",
+              "description": "The MAC settings profile to create.",
+              "label": "",
+              "type": "MACSettingsProfile",
+              "longType": "MACSettingsProfile",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfile",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "CreateMACSettingsProfileResponse",
+          "longName": "CreateMACSettingsProfileResponse",
+          "fullName": "ttn.lorawan.v3.CreateMACSettingsProfileResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile",
+              "description": "The MAC settings profile.",
+              "label": "",
+              "type": "MACSettingsProfile",
+              "longType": "MACSettingsProfile",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfile",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DeleteMACSettingsProfileRequest",
+          "longName": "DeleteMACSettingsProfileRequest",
+          "fullName": "ttn.lorawan.v3.DeleteMACSettingsProfileRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile_ids",
+              "description": "The identifiers of the MAC settings profile.",
+              "label": "",
+              "type": "MACSettingsProfileIdentifiers",
+              "longType": "MACSettingsProfileIdentifiers",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfileIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "DeleteMACSettingsProfileResponse",
+          "longName": "DeleteMACSettingsProfileResponse",
+          "fullName": "ttn.lorawan.v3.DeleteMACSettingsProfileResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": false,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": []
+        },
+        {
+          "name": "GetMACSettingsProfileRequest",
+          "longName": "GetMACSettingsProfileRequest",
+          "fullName": "ttn.lorawan.v3.GetMACSettingsProfileRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile_ids",
+              "description": "The identifiers of the MAC settings profile.",
+              "label": "",
+              "type": "MACSettingsProfileIdentifiers",
+              "longType": "MACSettingsProfileIdentifiers",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfileIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the fields that should be returned.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "GetMACSettingsProfileResponse",
+          "longName": "GetMACSettingsProfileResponse",
+          "fullName": "ttn.lorawan.v3.GetMACSettingsProfileResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile",
+              "description": "The MAC settings profile.",
+              "label": "",
+              "type": "MACSettingsProfile",
+              "longType": "MACSettingsProfile",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfile",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "ListMACSettingsProfilesRequest",
+          "longName": "ListMACSettingsProfilesRequest",
+          "fullName": "ttn.lorawan.v3.ListMACSettingsProfilesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "The identifiers of the application.",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the fields that should be returned.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "order",
+              "description": "Order the results by this field path (must be present in the field mask).\nDefault ordering is by ID. Prepend with a minus (-) to reverse the order.",
+              "label": "",
+              "type": "string",
+              "longType": "string",
+              "fullType": "string",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "",
+                      "ids.profile_id",
+                      "-ids.profile_id"
+                    ]
+                  }
+                ]
+              }
+            },
+            {
+              "name": "limit",
+              "description": "Limit the number of results per page.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "uint32.lte",
+                    "value": 1000
+                  }
+                ]
+              }
+            },
+            {
+              "name": "page",
+              "description": "Page number for pagination. 0 is interpreted as 1.",
+              "label": "",
+              "type": "uint32",
+              "longType": "uint32",
+              "fullType": "uint32",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "ListMACSettingsProfilesResponse",
+          "longName": "ListMACSettingsProfilesResponse",
+          "fullName": "ttn.lorawan.v3.ListMACSettingsProfilesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profiles",
+              "description": "The MAC settings profiles.",
+              "label": "repeated",
+              "type": "MACSettingsProfile",
+              "longType": "MACSettingsProfile",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfile",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UpdateMACSettingsProfileRequest",
+          "longName": "UpdateMACSettingsProfileRequest",
+          "fullName": "ttn.lorawan.v3.UpdateMACSettingsProfileRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile_ids",
+              "description": "The identifiers of the MAC settings profile.",
+              "label": "",
+              "type": "MACSettingsProfileIdentifiers",
+              "longType": "MACSettingsProfileIdentifiers",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfileIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "mac_settings_profile",
+              "description": "The MAC settings profile to update.",
+              "label": "",
+              "type": "MACSettingsProfile",
+              "longType": "MACSettingsProfile",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfile",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "field_mask",
+              "description": "The names of the fields that should be updated.",
+              "label": "",
+              "type": "FieldMask",
+              "longType": "google.protobuf.FieldMask",
+              "fullType": "google.protobuf.FieldMask",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "UpdateMACSettingsProfileResponse",
+          "longName": "UpdateMACSettingsProfileResponse",
+          "fullName": "ttn.lorawan.v3.UpdateMACSettingsProfileResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "mac_settings_profile",
+              "description": "The MAC settings profile.",
+              "label": "",
+              "type": "MACSettingsProfile",
+              "longType": "MACSettingsProfile",
+              "fullType": "ttn.lorawan.v3.MACSettingsProfile",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ],
+      "services": [
+        {
+          "name": "NsMACSettingsProfileRegistry",
+          "longName": "NsMACSettingsProfileRegistry",
+          "fullName": "ttn.lorawan.v3.NsMACSettingsProfileRegistry",
+          "description": "The NsMACSettingsProfileRegistry service allows clients to manage MAC settings profiles on the Network Server.\nEXPERIMENTAL: This service is subject to change.",
+          "methods": [
+            {
+              "name": "Create",
+              "description": "Create creates a new MAC settings profile.",
+              "requestType": "CreateMACSettingsProfileRequest",
+              "requestLongType": "CreateMACSettingsProfileRequest",
+              "requestFullType": "ttn.lorawan.v3.CreateMACSettingsProfileRequest",
+              "requestStreaming": false,
+              "responseType": "CreateMACSettingsProfileResponse",
+              "responseLongType": "CreateMACSettingsProfileResponse",
+              "responseFullType": "ttn.lorawan.v3.CreateMACSettingsProfileResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "POST",
+                      "pattern": "/ns/applications/{mac_settings_profile.ids.application_ids.application_id}/mac_settings_profiles",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get",
+              "description": "Get returns the MAC settings profile that matches the given identifiers.",
+              "requestType": "GetMACSettingsProfileRequest",
+              "requestLongType": "GetMACSettingsProfileRequest",
+              "requestFullType": "ttn.lorawan.v3.GetMACSettingsProfileRequest",
+              "requestStreaming": false,
+              "responseType": "GetMACSettingsProfileResponse",
+              "responseLongType": "GetMACSettingsProfileResponse",
+              "responseFullType": "ttn.lorawan.v3.GetMACSettingsProfileResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/applications/{mac_settings_profile_ids.application_ids.application_id}/mac_settings_profiles/{mac_settings_profile_ids.profile_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Update",
+              "description": "Update updates the MAC settings profile that matches the given identifiers.",
+              "requestType": "UpdateMACSettingsProfileRequest",
+              "requestLongType": "UpdateMACSettingsProfileRequest",
+              "requestFullType": "ttn.lorawan.v3.UpdateMACSettingsProfileRequest",
+              "requestStreaming": false,
+              "responseType": "UpdateMACSettingsProfileResponse",
+              "responseLongType": "UpdateMACSettingsProfileResponse",
+              "responseFullType": "ttn.lorawan.v3.UpdateMACSettingsProfileResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "PUT",
+                      "pattern": "/ns/applications/{mac_settings_profile_ids.application_ids.application_id}/mac_settings_profiles/{mac_settings_profile_ids.profile_id}",
+                      "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Delete",
+              "description": "Delete deletes the MAC settings profile that matches the given identifiers.",
+              "requestType": "DeleteMACSettingsProfileRequest",
+              "requestLongType": "DeleteMACSettingsProfileRequest",
+              "requestFullType": "ttn.lorawan.v3.DeleteMACSettingsProfileRequest",
+              "requestStreaming": false,
+              "responseType": "DeleteMACSettingsProfileResponse",
+              "responseLongType": "DeleteMACSettingsProfileResponse",
+              "responseFullType": "ttn.lorawan.v3.DeleteMACSettingsProfileResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "DELETE",
+                      "pattern": "/ns/applications/{mac_settings_profile_ids.application_ids.application_id}/mac_settings_profiles/{mac_settings_profile_ids.profile_id}"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "List",
+              "description": "List lists the MAC settings profiles.",
+              "requestType": "ListMACSettingsProfilesRequest",
+              "requestLongType": "ListMACSettingsProfilesRequest",
+              "requestFullType": "ttn.lorawan.v3.ListMACSettingsProfilesRequest",
+              "requestStreaming": false,
+              "responseType": "ListMACSettingsProfilesResponse",
+              "responseLongType": "ListMACSettingsProfilesResponse",
+              "responseFullType": "ttn.lorawan.v3.ListMACSettingsProfilesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/ns/applications/{application_ids.application_id}/mac_settings_profiles"
+                    }
+                  ]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
       "name": "ttn/lorawan/v3/networkserver_relay.proto",
       "description": "",
       "package": "ttn.lorawan.v3",
@@ -42759,6 +43405,74 @@
               "description": ""
             }
           ]
+        },
+        {
+          "name": "NotificationType",
+          "longName": "NotificationType",
+          "fullName": "ttn.lorawan.v3.NotificationType",
+          "description": "",
+          "values": [
+            {
+              "name": "UNKNOWN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "API_KEY_CREATED",
+              "number": "1",
+              "description": ""
+            },
+            {
+              "name": "API_KEY_CHANGED",
+              "number": "2",
+              "description": ""
+            },
+            {
+              "name": "CLIENT_REQUESTED",
+              "number": "3",
+              "description": ""
+            },
+            {
+              "name": "COLLABORATOR_CHANGED",
+              "number": "4",
+              "description": ""
+            },
+            {
+              "name": "ENTITY_STATE_CHANGED",
+              "number": "5",
+              "description": ""
+            },
+            {
+              "name": "INVITATION",
+              "number": "6",
+              "description": ""
+            },
+            {
+              "name": "LOGIN_TOKEN",
+              "number": "7",
+              "description": ""
+            },
+            {
+              "name": "PASSWORD_CHANGED",
+              "number": "8",
+              "description": ""
+            },
+            {
+              "name": "TEMPORARY_PASSWORD",
+              "number": "9",
+              "description": ""
+            },
+            {
+              "name": "USER_REQUESTED",
+              "number": "10",
+              "description": ""
+            },
+            {
+              "name": "VALIDATE",
+              "number": "11",
+              "description": ""
+            }
+          ]
         }
       ],
       "extensions": [],
@@ -42807,12 +43521,21 @@
               "options": {
                 "validate.rules": [
                   {
-                    "name": "string.min_len",
-                    "value": 1
-                  },
-                  {
-                    "name": "string.max_len",
-                    "value": 100
+                    "name": "string.in",
+                    "value": [
+                      "unknown",
+                      "api_key_created",
+                      "api_key_changed",
+                      "client_requested",
+                      "collaborator_changed",
+                      "entity_state_changed",
+                      "invitation",
+                      "login_token",
+                      "password_changed",
+                      "temporary_password",
+                      "user_requested",
+                      "validate"
+                    ]
                   }
                 ]
               }
@@ -42879,7 +43602,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             }
           ]
         },
@@ -43119,7 +43845,7 @@
             },
             {
               "name": "notification_type",
-              "description": "The type of this notification.",
+              "description": "The type of this notification.\nTODO: Replace with type NotificationType in v4 https://github.com/TheThingsNetwork/lorawan-stack/issues/7384.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -43127,7 +43853,28 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "string.in",
+                    "value": [
+                      "unknown",
+                      "api_key_created",
+                      "api_key_changed",
+                      "client_requested",
+                      "collaborator_changed",
+                      "entity_state_changed",
+                      "invitation",
+                      "login_token",
+                      "password_changed",
+                      "temporary_password",
+                      "user_requested",
+                      "validate"
+                    ]
+                  }
+                ]
+              }
             },
             {
               "name": "data",
@@ -43175,7 +43922,10 @@
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
-              "defaultValue": ""
+              "defaultValue": "",
+              "options": {
+                "deprecated": true
+              }
             },
             {
               "name": "status",
@@ -48980,6 +49730,16 @@
               "description": "The right to edit basic user settings."
             },
             {
+              "name": "RIGHT_USER_LIST",
+              "number": "87",
+              "description": "The right to list users accounts."
+            },
+            {
+              "name": "RIGHT_USER_CREATE",
+              "number": "88",
+              "description": "The right to create an user account."
+            },
+            {
               "name": "RIGHT_USER_SETTINGS_API_KEYS",
               "number": "3",
               "description": "The right to view and edit user API keys."
@@ -48987,6 +49747,11 @@
             {
               "name": "RIGHT_USER_DELETE",
               "number": "4",
+              "description": "The right to delete user account."
+            },
+            {
+              "name": "RIGHT_USER_PURGE",
+              "number": "66",
               "description": "The right to delete user account."
             },
             {
@@ -49075,6 +49840,11 @@
               "description": "The right to delete application."
             },
             {
+              "name": "RIGHT_APPLICATION_PURGE",
+              "number": "64",
+              "description": "The right to purge application."
+            },
+            {
               "name": "RIGHT_APPLICATION_DEVICES_READ",
               "number": "20",
               "description": "The right to view devices in application."
@@ -49145,6 +49915,11 @@
               "description": "The right to delete a client."
             },
             {
+              "name": "RIGHT_CLIENT_PURGE",
+              "number": "68",
+              "description": "The right to purge a client."
+            },
+            {
               "name": "RIGHT_GATEWAY_INFO",
               "number": "30",
               "description": "The right to view gateway information."
@@ -49168,6 +49943,11 @@
               "name": "RIGHT_GATEWAY_DELETE",
               "number": "34",
               "description": "The right to delete gateway."
+            },
+            {
+              "name": "RIGHT_GATEWAY_PURGE",
+              "number": "67",
+              "description": "The right to purge gateway."
             },
             {
               "name": "RIGHT_GATEWAY_TRAFFIC_READ",
@@ -49233,6 +50013,11 @@
               "name": "RIGHT_ORGANIZATION_DELETE",
               "number": "45",
               "description": "The right to delete organization."
+            },
+            {
+              "name": "RIGHT_ORGANIZATION_PURGE",
+              "number": "65",
+              "description": "The right to purge organization."
             },
             {
               "name": "RIGHT_ORGANIZATION_APPLICATIONS_LIST",
@@ -52171,6 +52956,24 @@
               "description": ""
             }
           ]
+        },
+        {
+          "name": "Tutorial",
+          "longName": "Tutorial",
+          "fullName": "ttn.lorawan.v3.Tutorial",
+          "description": "Tutorial is a set of possible tutorials in the Console.",
+          "values": [
+            {
+              "name": "TUTORIAL_UNKNOWN",
+              "number": "0",
+              "description": ""
+            },
+            {
+              "name": "TUTORIAL_LIVE_DATA_SPLIT_VIEW",
+              "number": "1",
+              "description": ""
+            }
+          ]
         }
       ],
       "extensions": [],
@@ -52648,6 +53451,42 @@
                 "validate.rules": [
                   {
                     "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "EmailNotificationPreferences",
+          "longName": "EmailNotificationPreferences",
+          "fullName": "ttn.lorawan.v3.EmailNotificationPreferences",
+          "description": "EmailNotificationPreferences is the message that defines the types of notifications for which the user wants to receive an email.",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "types",
+              "description": "",
+              "label": "repeated",
+              "type": "NotificationType",
+              "longType": "NotificationType",
+              "fullType": "ttn.lorawan.v3.NotificationType",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
                     "value": true
                   }
                 ]
@@ -54006,6 +54845,30 @@
               "isoneof": false,
               "oneofdecl": "",
               "defaultValue": ""
+            },
+            {
+              "name": "email_notification_preferences",
+              "description": "",
+              "label": "",
+              "type": "EmailNotificationPreferences",
+              "longType": "EmailNotificationPreferences",
+              "fullType": "ttn.lorawan.v3.EmailNotificationPreferences",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "universal_rights",
+              "description": "Universal rights are capable of restricting the user's interactions with the API, be it an admin or not.",
+              "label": "repeated",
+              "type": "Right",
+              "longType": "Right",
+              "fullType": "ttn.lorawan.v3.Right",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },
@@ -54174,6 +55037,18 @@
               "type": "SortBy",
               "longType": "UserConsolePreferences.SortBy",
               "fullType": "ttn.lorawan.v3.UserConsolePreferences.SortBy",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            },
+            {
+              "name": "tutorials",
+              "description": "",
+              "label": "",
+              "type": "Tutorials",
+              "longType": "UserConsolePreferences.Tutorials",
+              "fullType": "ttn.lorawan.v3.UserConsolePreferences.Tutorials",
               "ismap": false,
               "isoneof": false,
               "oneofdecl": "",
@@ -54507,6 +55382,42 @@
                       "created_at",
                       "-created_at"
                     ]
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tutorials",
+          "longName": "UserConsolePreferences.Tutorials",
+          "fullName": "ttn.lorawan.v3.UserConsolePreferences.Tutorials",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "seen",
+              "description": "",
+              "label": "repeated",
+              "type": "Tutorial",
+              "longType": "Tutorial",
+              "fullType": "ttn.lorawan.v3.Tutorial",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "repeated.unique",
+                    "value": true
+                  },
+                  {
+                    "name": "repeated.items.enum.defined_only",
+                    "value": true
                   }
                 ]
               }

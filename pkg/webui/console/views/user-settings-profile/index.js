@@ -43,7 +43,7 @@ const ProfileSettings = () => {
     <Require featureCheck={mayViewOrEditUserSettings} otherwise={{ redirect: '/' }}>
       <RequireRequest requestAction={getIsConfiguration()}>
         <div className="container container--xl grid">
-          <div className="item-12 xl:item-8">
+          <div className="item-12">
             <PageTitle title={m.profileEdit} />
             <ProfileSettingsForm />
           </div>

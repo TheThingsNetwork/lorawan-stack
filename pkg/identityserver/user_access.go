@@ -86,12 +86,11 @@ func (is *IdentityServer) createUserAPIKey(
 	events.Publish(evtCreateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
-		NotificationType: "api_key_created",
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CREATED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	key.Key = token
@@ -203,12 +202,11 @@ func (is *IdentityServer) updateUserAPIKey(
 	events.Publish(evtUpdateUserAPIKey.NewWithIdentifiersAndData(ctx, req.GetUserIds(), key))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
-		NotificationType: "api_key_changed",
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_API_KEY_CHANGED),
 		Data:             ttnpb.MustMarshalAny(key),
 		Receivers: []ttnpb.NotificationReceiver{
 			ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 		},
-		Email: true,
 	})
 
 	return key, nil
@@ -249,49 +247,45 @@ func (is *IdentityServer) createLoginToken(
 		return nil, errLoginTokensDisabled.New()
 	}
 
-	var canCreateMoreTokens bool
-	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		activeTokens, err := st.FindActiveLoginTokens(ctx, req.GetUserIds())
-		if err != nil {
-			return err
-		}
-		canCreateMoreTokens = len(activeTokens) < maxActiveLoginTokens
-		return nil
-	})
-	if err != nil {
-		return nil, err
-	}
-	if !canCreateMoreTokens {
-		return nil, errLoginTokensStillValid.New()
-	}
-
-	var canSkipEmail, canReturnToken bool
-	if is.IsAdmin(ctx) {
-		canSkipEmail = true // Admin callers can skip sending emails.
-		err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-			usr, err := st.GetUser(ctx, req.GetUserIds(), []string{"admin"})
-			if !usr.Admin {
-				canReturnToken = true // Admin callers can get login tokens for non-admin users.
-			}
-			return err
-		})
-		if err != nil {
-			return nil, err
-		}
-	}
+	// Admin callers can skip sending emails.
+	canSkipEmail := is.IsAdmin(ctx)
+	var canReturnToken bool
 
 	token, err := auth.GenerateKey(ctx)
 	if err != nil {
 		return nil, err
 	}
 	expiresAt := time.Now().Add(loginTokenConfig.TokenTTL)
+
 	err = is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
-		_, err := st.CreateLoginToken(ctx, &ttnpb.LoginToken{
+		activeTokens, err := st.FindActiveLoginTokens(ctx, req.GetUserIds())
+		if err != nil {
+			return err
+		}
+		if len(activeTokens) >= maxActiveLoginTokens {
+			return errLoginTokensStillValid.New()
+		}
+
+		if is.IsAdmin(ctx) {
+			usr, err := st.GetUser(ctx, req.GetUserIds(), []string{"admin"})
+			if err != nil {
+				return err
+			}
+
+			// Admin callers can get login tokens for non-admin users.
+			canReturnToken = !usr.GetAdmin()
+		}
+
+		_, err = st.CreateLoginToken(ctx, &ttnpb.LoginToken{
 			UserIds:   req.GetUserIds(),
 			ExpiresAt: timestamppb.New(expiresAt),
 			Token:     token,
 		})
-		return err
+		if err != nil {
+			return err
+		}
+
+		return nil
 	})
 	if err != nil {
 		return nil, err
@@ -300,7 +294,7 @@ func (is *IdentityServer) createLoginToken(
 	if !canSkipEmail || !req.SkipEmail {
 		go is.SendTemplateEmailToUserIDs(
 			is.FromRequestContext(ctx),
-			"login_token",
+			ttnpb.GetNotificationTypeString(ttnpb.NotificationType_LOGIN_TOKEN),
 			func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
 				return &templates.LoginTokenData{
 					TemplateData: data,

@@ -63,7 +63,6 @@ const GatewayGeneralInformationPanel = () => {
     frequency_plan_ids,
     location_public,
     status_public,
-    auto_update,
     update_location_from_status,
     require_authenticated_connection,
     disable_packet_broker_forwarding,
@@ -120,11 +119,6 @@ const GatewayGeneralInformationPanel = () => {
     {
       header: m.networkSettings,
       items: [
-        {
-          key: sharedMessages.automaticUpdates,
-          tooltipMessage: m.autoUpdateDescription,
-          value: getNetworkSettingsInfo(auto_update),
-        },
         {
           key: sharedMessages.requireAuthenticatedConnection,
           tooltipMessage: m.requireAuthenticatedConnectionDescription,

@@ -153,7 +153,7 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 	if !createdByAdmin && cli.State == ttnpb.State_STATE_REQUESTED {
 		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetClient().GetIds().GetEntityIdentifiers(),
-			NotificationType: "client_requested",
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_CLIENT_REQUESTED),
 			Data: ttnpb.MustMarshalAny(
 				&ttnpb.CreateClientEmailMessage{
 					CreateClientRequest: req,
@@ -163,7 +163,6 @@ func (is *IdentityServer) createClient( //nolint:gocyclo
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 
@@ -368,7 +367,7 @@ func (is *IdentityServer) updateClient(
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        cli.GetIds().GetEntityIdentifiers(),
-			NotificationType: "entity_state_changed",
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
 				State:            cli.State,
 				StateDescription: cli.StateDescription,
@@ -376,7 +375,6 @@ func (is *IdentityServer) updateClient(
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 	return cli, nil
@@ -430,6 +428,11 @@ func (is *IdentityServer) restoreClient(ctx context.Context, ids *ttnpb.ClientId
 func (is *IdentityServer) purgeClient(ctx context.Context, ids *ttnpb.ClientIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeClients.New()
+	}
+	if err := rights.RequireClient(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_CLIENT_PURGE,
+	); err != nil {
+		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// delete related authorizations before purging the client

@@ -1430,6 +1430,12 @@ var DefaultMACCommands = MACCommandSpec{
 		UplinkLength: 6,
 		AppendUplink: func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) ([]byte, error) {
 			pld := cmd.GetRelayNotifyNewEndDeviceReq()
+			if n := len(pld.DevAddr); n != 4 {
+				return nil, errExpectedLengthEncodedEqual("DevAddr", 4)(n)
+			}
+			devAddr := make([]byte, 4)
+			copyReverse(devAddr, pld.DevAddr)
+			b = append(b, devAddr...)
 			var powerLevel uint16
 			if pld.Snr < -20 || pld.Snr > 11 {
 				return nil, errExpectedBetween("SNR", -20, 11)(pld.Snr)
@@ -1440,12 +1446,6 @@ var DefaultMACCommands = MACCommandSpec{
 			}
 			powerLevel |= uint16(-pld.Rssi-15) & 0x7f << 5
 			b = byteutil.AppendUint16(b, powerLevel, 2)
-			if n := len(pld.DevAddr); n != 4 {
-				return nil, errExpectedLengthEncodedEqual("DevAddr", 4)(n)
-			}
-			devAddr := make([]byte, 4)
-			copyReverse(devAddr, pld.DevAddr)
-			b = append(b, devAddr...)
 			return b, nil
 		},
 		UnmarshalUplink: newMACUnmarshaler(
@@ -1457,11 +1457,11 @@ var DefaultMACCommands = MACCommandSpec{
 				cmd.Payload = &ttnpb.MACCommand_RelayNotifyNewEndDeviceReq_{
 					RelayNotifyNewEndDeviceReq: req,
 				}
-				powerLevel := byteutil.ParseUint16(b[0:2])
+				req.DevAddr = make([]byte, 4)
+				copyReverse(req.DevAddr, b[0:4])
+				powerLevel := byteutil.ParseUint16(b[4:6])
 				req.Snr = int32(powerLevel&0x1f) - 20
 				req.Rssi = -int32(powerLevel>>5&0x7f) - 15
-				req.DevAddr = make([]byte, 4)
-				copyReverse(req.DevAddr, b[2:6])
 				return nil
 			},
 		),

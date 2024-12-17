@@ -2339,6 +2339,68 @@ func (x *MACSettings) UnmarshalJSON(b []byte) error {
 	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
 }
 
+// MarshalProtoJSON marshals the MACSettingsProfile message to JSON.
+func (x *MACSettingsProfile) MarshalProtoJSON(s *jsonplugin.MarshalState) {
+	if x == nil {
+		s.WriteNil()
+		return
+	}
+	s.WriteObjectStart()
+	var wroteField bool
+	if x.Ids != nil || s.HasField("ids") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("ids")
+		// NOTE: MACSettingsProfileIdentifiers does not seem to implement MarshalProtoJSON.
+		golang.MarshalMessage(s, x.Ids)
+	}
+	if x.MacSettings != nil || s.HasField("mac_settings") {
+		s.WriteMoreIf(&wroteField)
+		s.WriteObjectField("mac_settings")
+		x.MacSettings.MarshalProtoJSON(s.WithField("mac_settings"))
+	}
+	s.WriteObjectEnd()
+}
+
+// MarshalJSON marshals the MACSettingsProfile to JSON.
+func (x *MACSettingsProfile) MarshalJSON() ([]byte, error) {
+	return jsonplugin.DefaultMarshalerConfig.Marshal(x)
+}
+
+// UnmarshalProtoJSON unmarshals the MACSettingsProfile message from JSON.
+func (x *MACSettingsProfile) UnmarshalProtoJSON(s *jsonplugin.UnmarshalState) {
+	if s.ReadNil() {
+		return
+	}
+	s.ReadObject(func(key string) {
+		switch key {
+		default:
+			s.ReadAny() // ignore unknown field
+		case "ids":
+			s.AddField("ids")
+			if s.ReadNil() {
+				x.Ids = nil
+				return
+			}
+			// NOTE: MACSettingsProfileIdentifiers does not seem to implement UnmarshalProtoJSON.
+			var v MACSettingsProfileIdentifiers
+			golang.UnmarshalMessage(s, &v)
+			x.Ids = &v
+		case "mac_settings", "macSettings":
+			if s.ReadNil() {
+				x.MacSettings = nil
+				return
+			}
+			x.MacSettings = &MACSettings{}
+			x.MacSettings.UnmarshalProtoJSON(s.WithField("mac_settings", true))
+		}
+	})
+}
+
+// UnmarshalJSON unmarshals the MACSettingsProfile from JSON.
+func (x *MACSettingsProfile) UnmarshalJSON(b []byte) error {
+	return jsonplugin.DefaultUnmarshalerConfig.Unmarshal(b, x)
+}
+
 // MarshalProtoJSON marshals the MACState_JoinRequest message to JSON.
 func (x *MACState_JoinRequest) MarshalProtoJSON(s *jsonplugin.MarshalState) {
 	if x == nil {

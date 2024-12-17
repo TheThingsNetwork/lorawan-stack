@@ -4,6 +4,26 @@ package ttnpb
 
 import fmt "fmt"
 
+func (dst *EmailNotificationPreferences) SetFields(src *EmailNotificationPreferences, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "types":
+			if len(subs) > 0 {
+				return fmt.Errorf("'types' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Types = src.Types
+			} else {
+				dst.Types = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *UserConsolePreferences) SetFields(src *UserConsolePreferences, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
@@ -64,6 +84,31 @@ func (dst *UserConsolePreferences) SetFields(src *UserConsolePreferences, paths 
 					dst.SortBy = src.SortBy
 				} else {
 					dst.SortBy = nil
+				}
+			}
+		case "tutorials":
+			if len(subs) > 0 {
+				var newDst, newSrc *UserConsolePreferences_Tutorials
+				if (src == nil || src.Tutorials == nil) && dst.Tutorials == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Tutorials
+				}
+				if dst.Tutorials != nil {
+					newDst = dst.Tutorials
+				} else {
+					newDst = &UserConsolePreferences_Tutorials{}
+					dst.Tutorials = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Tutorials = src.Tutorials
+				} else {
+					dst.Tutorials = nil
 				}
 			}
 
@@ -321,6 +366,40 @@ func (dst *User) SetFields(src *User, paths ...string) error {
 				} else {
 					dst.ConsolePreferences = nil
 				}
+			}
+		case "email_notification_preferences":
+			if len(subs) > 0 {
+				var newDst, newSrc *EmailNotificationPreferences
+				if (src == nil || src.EmailNotificationPreferences == nil) && dst.EmailNotificationPreferences == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.EmailNotificationPreferences
+				}
+				if dst.EmailNotificationPreferences != nil {
+					newDst = dst.EmailNotificationPreferences
+				} else {
+					newDst = &EmailNotificationPreferences{}
+					dst.EmailNotificationPreferences = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.EmailNotificationPreferences = src.EmailNotificationPreferences
+				} else {
+					dst.EmailNotificationPreferences = nil
+				}
+			}
+		case "universal_rights":
+			if len(subs) > 0 {
+				return fmt.Errorf("'universal_rights' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UniversalRights = src.UniversalRights
+			} else {
+				dst.UniversalRights = nil
 			}
 
 		default:
@@ -1987,6 +2066,26 @@ func (dst *UserConsolePreferences_SortBy) SetFields(src *UserConsolePreferences_
 			} else {
 				var zero string
 				dst.User = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *UserConsolePreferences_Tutorials) SetFields(src *UserConsolePreferences_Tutorials, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "seen":
+			if len(subs) > 0 {
+				return fmt.Errorf("'seen' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Seen = src.Seen
+			} else {
+				dst.Seen = nil
 			}
 
 		default:

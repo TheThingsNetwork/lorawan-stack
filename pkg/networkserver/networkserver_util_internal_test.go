@@ -103,11 +103,12 @@ var (
 	EvtScheduleJoinAcceptSuccess   = evtScheduleJoinAcceptSuccess
 	EvtUpdateEndDevice             = evtUpdateEndDevice
 
-	NewDeviceRegistry           func(context.Context) (DeviceRegistry, func())
-	NewApplicationUplinkQueue   func(context.Context) (ApplicationUplinkQueue, func())
-	NewDownlinkTaskQueue        func(context.Context) (DownlinkTaskQueue, func())
-	NewUplinkDeduplicator       func(context.Context) (UplinkDeduplicator, func())
-	NewScheduledDownlinkMatcher func(context.Context) (ScheduledDownlinkMatcher, func())
+	NewDeviceRegistry             func(context.Context) (DeviceRegistry, func())
+	NewApplicationUplinkQueue     func(context.Context) (ApplicationUplinkQueue, func())
+	NewDownlinkTaskQueue          func(context.Context) (DownlinkTaskQueue, func())
+	NewUplinkDeduplicator         func(context.Context) (UplinkDeduplicator, func())
+	NewScheduledDownlinkMatcher   func(context.Context) (ScheduledDownlinkMatcher, func())
+	NewMACSettingsProfileRegistry func(context.Context) (MACSettingsProfileRegistry, func())
 )
 
 type DownlinkPath = downlinkPath
@@ -2103,6 +2104,13 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 		}
 		conf.NetworkServer.ScheduledDownlinkMatcher = v
 	}
+	if conf.NetworkServer.MACSettingsProfileRegistry == nil {
+		v, closeFn := NewMACSettingsProfileRegistry(ctx)
+		if closeFn != nil {
+			closeFuncs = append(closeFuncs, closeFn)
+		}
+		conf.NetworkServer.MACSettingsProfileRegistry = v
+	}
 
 	ns := test.Must(New(
 		componenttest.NewComponent(tb, &conf.Component, cmpOpts...),
@@ -2587,4 +2595,75 @@ func (m MockDeviceRegistry) BatchDelete(
 		panic("BatchDeleteFunc called, but not set")
 	}
 	return m.BatchDeleteFunc(ctx, appIDs, deviceIDs)
+}
+
+type MockMACSettingsProfileRegistry struct {
+	GetFunc func(
+		ctx context.Context,
+		ids *ttnpb.MACSettingsProfileIdentifiers,
+		paths []string,
+	) (*ttnpb.MACSettingsProfile, error)
+	SetFunc func(
+		ctx context.Context,
+		ids *ttnpb.MACSettingsProfileIdentifiers,
+		paths []string,
+		f func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error),
+	) (*ttnpb.MACSettingsProfile, error)
+	ListFunc func(
+		ctx context.Context,
+		ids *ttnpb.ApplicationIdentifiers,
+		paths []string,
+	) ([]*ttnpb.MACSettingsProfile, error)
+	WithPaginationFunc func(
+		ctx context.Context,
+		limit uint32,
+		page uint32,
+		total *int64,
+	) context.Context
+}
+
+func (m MockMACSettingsProfileRegistry) Get(
+	ctx context.Context,
+	ids *ttnpb.MACSettingsProfileIdentifiers,
+	paths []string,
+) (*ttnpb.MACSettingsProfile, error) {
+	if m.GetFunc == nil {
+		panic("GetFunc not set")
+	}
+	return m.GetFunc(ctx, ids, paths)
+}
+
+func (m MockMACSettingsProfileRegistry) Set(
+	ctx context.Context,
+	ids *ttnpb.MACSettingsProfileIdentifiers,
+	paths []string,
+	f func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error),
+) (*ttnpb.MACSettingsProfile, error) {
+	if m.SetFunc == nil {
+		panic("SetFunc not set")
+	}
+	return m.SetFunc(ctx, ids, paths, f)
+}
+
+func (m MockMACSettingsProfileRegistry) List(
+	ctx context.Context,
+	ids *ttnpb.ApplicationIdentifiers,
+	paths []string,
+) ([]*ttnpb.MACSettingsProfile, error) {
+	if m.ListFunc == nil {
+		panic("ListFunc not set")
+	}
+	return m.ListFunc(ctx, ids, paths)
+}
+
+func (m MockMACSettingsProfileRegistry) WithPagination(
+	ctx context.Context,
+	limit uint32,
+	page uint32,
+	total *int64,
+) context.Context {
+	if m.WithPaginationFunc == nil {
+		panic("WithPaginationFunc not set")
+	}
+	return m.WithPaginationFunc(ctx, limit, page, total)
 }

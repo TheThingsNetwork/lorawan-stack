@@ -26,6 +26,106 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestUsersBookmarksPermissions(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	usr1.Password = "OldPassword"
+	usr1.PrimaryEmailAddress = "user-1@email.com"
+	validatedAtTime := time.Now().Truncate(time.Millisecond)
+	usr1.PrimaryEmailAddressValidatedAt = ttnpb.ProtoTime(&validatedAtTime)
+
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	app2 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+
+	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
+	credsWithoutRights := rpcCreds(keyWithoutRights)
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewUserBookmarkRegistryClient(cc)
+
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {credsWithoutRights}} {
+				_, err := reg.Create(ctx, &ttnpb.CreateUserBookmarkRequest{
+					UserIds:   usr1.Ids,
+					EntityIds: app1.GetEntityIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+
+				_, err = reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
+					UserIds: usr1.Ids,
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+
+				_, err = reg.Delete(ctx, &ttnpb.DeleteUserBookmarkRequest{
+					UserIds:   usr1.Ids,
+					EntityIds: app1.GetEntityIdentifiers(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+
+				_, err = reg.BatchDelete(ctx, &ttnpb.BatchDeleteUserBookmarksRequest{
+					UserIds: usr1.Ids,
+					EntityIds: []*ttnpb.EntityIdentifiers{
+						app1.GetEntityIdentifiers(),
+						app2.GetEntityIdentifiers(),
+					},
+				}, opts...)
+				if a.So(err, should.NotBeNil) {
+					a.So(errors.IsPermissionDenied(err), should.BeTrue)
+				}
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateUserBookmarkRequest{
+				UserIds:   usr1.Ids,
+				EntityIds: app1.GetEntityIdentifiers(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
+				UserIds: usr1.Ids,
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.Delete(ctx, &ttnpb.DeleteUserBookmarkRequest{
+				UserIds:   usr1.Ids,
+				EntityIds: app1.GetEntityIdentifiers(),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.BatchDelete(ctx, &ttnpb.BatchDeleteUserBookmarksRequest{
+				UserIds: usr1.Ids,
+				EntityIds: []*ttnpb.EntityIdentifiers{
+					app1.GetEntityIdentifiers(),
+					app2.GetEntityIdentifiers(),
+				},
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestUsersBookmarksOperations(t *testing.T) {
 	t.Parallel()
 
@@ -43,21 +143,9 @@ func TestUsersBookmarksOperations(t *testing.T) {
 	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	creds := rpcCreds(key)
 
-	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
-	credsWithoutRights := rpcCreds(keyWithoutRights)
-
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserBookmarkRegistryClient(cc)
 
-		t.Run("Create/WithoutRights", func(t *testing.T) { // nolint:paralleltest
-			a, ctx := test.New(t)
-			got, err := reg.Create(ctx, &ttnpb.CreateUserBookmarkRequest{
-				UserIds:   usr1.Ids,
-				EntityIds: app1.GetEntityIdentifiers(),
-			}, credsWithoutRights)
-			a.So(got, should.BeNil)
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		})
 		t.Run("Create", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			got, err := reg.Create(ctx, &ttnpb.CreateUserBookmarkRequest{
@@ -99,14 +187,6 @@ func TestUsersBookmarksOperations(t *testing.T) {
 			a.So(got, should.Resemble, &ttnpb.UserBookmark{UserIds: usr1.Ids, EntityIds: app2.GetEntityIdentifiers()})
 		})
 
-		t.Run("FindBookmarks/WithoutRights", func(t *testing.T) { // nolint:paralleltest
-			a, ctx := test.New(t)
-			got, err := reg.List(ctx, &ttnpb.ListUserBookmarksRequest{
-				UserIds: usr1.Ids,
-			}, credsWithoutRights)
-			a.So(got, should.BeNil)
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		})
 		t.Run("FindBookmarks/HasEntityType", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 
@@ -162,14 +242,6 @@ func TestUsersBookmarksOperations(t *testing.T) {
 			}
 		})
 
-		t.Run("Delete/WithoutRights", func(t *testing.T) { // nolint:paralleltest
-			a, ctx := test.New(t)
-			_, err := reg.Delete(ctx, &ttnpb.DeleteUserBookmarkRequest{
-				UserIds:   usr1.Ids,
-				EntityIds: app1.GetEntityIdentifiers(),
-			}, credsWithoutRights)
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		})
 		t.Run("Delete", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			_, err := reg.Delete(ctx, &ttnpb.DeleteUserBookmarkRequest{
@@ -192,17 +264,6 @@ func TestUsersBookmarksOperations(t *testing.T) {
 			}
 		})
 
-		t.Run("BatchDelete/WithoutRights", func(t *testing.T) { // nolint:paralleltest
-			a, ctx := test.New(t)
-			_, err := reg.BatchDelete(ctx, &ttnpb.BatchDeleteUserBookmarksRequest{
-				UserIds: usr1.Ids,
-				EntityIds: []*ttnpb.EntityIdentifiers{
-					app1.GetEntityIdentifiers(),
-					app2.GetEntityIdentifiers(),
-				},
-			}, credsWithoutRights)
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		})
 		t.Run("BatchDelete", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			_, err := reg.BatchDelete(ctx, &ttnpb.BatchDeleteUserBookmarksRequest{

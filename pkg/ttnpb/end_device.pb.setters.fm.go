@@ -2511,6 +2511,67 @@ func (dst *MACSettings) SetFields(src *MACSettings, paths ...string) error {
 	return nil
 }
 
+func (dst *MACSettingsProfile) SetFields(src *MACSettingsProfile, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACSettingsProfileIdentifiers
+				if (src == nil || src.Ids == nil) && dst.Ids == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.Ids
+				}
+				if dst.Ids != nil {
+					newDst = dst.Ids
+				} else {
+					newDst = &MACSettingsProfileIdentifiers{}
+					dst.Ids = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.Ids = src.Ids
+				} else {
+					dst.Ids = nil
+				}
+			}
+		case "mac_settings":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACSettings
+				if (src == nil || src.MacSettings == nil) && dst.MacSettings == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.MacSettings
+				}
+				if dst.MacSettings != nil {
+					newDst = dst.MacSettings
+				} else {
+					newDst = &MACSettings{}
+					dst.MacSettings = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MacSettings = src.MacSettings
+				} else {
+					dst.MacSettings = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *MACState) SetFields(src *MACState, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

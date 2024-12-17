@@ -30,11 +30,16 @@ import (
 
 const noOfDevices = 3
 
-func TestEndDevicesPermissionDenied(t *testing.T) {
+func TestEndDevicesPermissions(t *testing.T) {
 	p := &storetest.Population{}
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 	dev1 := p.NewEndDevice(app1.GetIds())
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -42,49 +47,93 @@ func TestEndDevicesPermissionDenied(t *testing.T) {
 	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceRegistryClient(cc)
 
-		_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
-			EndDevice: &ttnpb.EndDevice{
-				Ids: &ttnpb.EndDeviceIdentifiers{
-					ApplicationIds: app1.GetIds(),
-					DeviceId:       "foo-dev",
+		t.Run("Invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
+				EndDevice: &ttnpb.EndDevice{
+					Ids: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: app1.GetIds(),
+						DeviceId:       "foo-dev",
+					},
 				},
-			},
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
-			EndDeviceIds: dev1.GetIds(),
-			FieldMask:    ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIds: dev1.GetIds(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
-			ApplicationIds: app1.GetIds(),
-			FieldMask:      ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+				FieldMask:      ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
-			EndDevice: &ttnpb.EndDevice{
-				Ids:  dev1.GetIds(),
-				Name: "Updated Name",
-			},
-			FieldMask: ttnpb.FieldMask("name"),
-		})
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+				EndDevice: &ttnpb.EndDevice{
+					Ids:  dev1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Delete(ctx, dev1.GetIds())
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+			_, err = reg.Delete(ctx, dev1.GetIds())
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
+				EndDevice: &ttnpb.EndDevice{
+					Ids: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: app1.GetIds(),
+						DeviceId:       "foo-dev",
+					},
+				},
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Get(ctx, &ttnpb.GetEndDeviceRequest{
+				EndDeviceIds: dev1.GetIds(),
+				FieldMask:    ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.List(ctx, &ttnpb.ListEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+				FieldMask:      ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			a.So(errors.IsPermissionDenied(err), should.BeFalse)
+
+			_, err = reg.Update(ctx, &ttnpb.UpdateEndDeviceRequest{
+				EndDevice: &ttnpb.EndDevice{
+					Ids:  dev1.GetIds(),
+					Name: "Updated Name",
+				},
+				FieldMask: ttnpb.FieldMask("name"),
+			}, readOnlyAdminKeyCreds)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			_, err = reg.Delete(ctx, dev1.GetIds())
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
 	}, withPrivateTestDatabase(p))
 }
 
@@ -219,7 +268,7 @@ func TestEndDevicesPagination(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
-func TestEndDevicesBatchOperations(t *testing.T) {
+func TestEndDevicesBatchOperationsPermissions(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
 	p := &storetest.Population{}
@@ -245,6 +294,11 @@ func TestEndDevicesBatchOperations(t *testing.T) {
 
 	writeKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
 	writeCreds := rpcCreds(writeKey)
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
 
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewEndDeviceBatchRegistryClient(cc)
@@ -276,8 +330,50 @@ func TestEndDevicesBatchOperations(t *testing.T) {
 		}, writeCreds)
 		a.So(errors.IsPermissionDenied(err), should.BeTrue)
 
+		t.Run("Admin read-only", func(t *testing.T) { // nolint:paralleltest
+			devs, err := reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+				DeviceIds:      devIDs,
+			}, readOnlyAdminKeyCreds)
+			a.So(err, should.BeNil)
+			a.So(devs, should.NotBeNil)
+			a.So(devs.GetEndDevices(), should.HaveLength, noOfDevices)
+		})
+	}, withPrivateTestDatabase(p))
+}
+
+func TestEndDevicesBatchOperations(t *testing.T) {
+	t.Parallel()
+	a, ctx := test.New(t)
+	p := &storetest.Population{}
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	devIDs := make([]string, 0, noOfDevices)
+	for i := 0; i < noOfDevices; i++ {
+		dev := p.NewEndDevice(app1.GetIds())
+		dev.Attributes = map[string]string{
+			"foo": "bar",
+		}
+		dev.Locations = map[string]*ttnpb.Location{
+			"foo": {
+				Latitude:  1,
+				Longitude: 2,
+				Altitude:  3,
+			},
+		}
+		devIDs = append(devIDs, dev.GetIds().DeviceId)
+	}
+	readKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
+	readCreds := rpcCreds(readKey)
+
+	writeKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE)
+	writeCreds := rpcCreds(writeKey)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewEndDeviceBatchRegistryClient(cc)
+
 		// Unknown device ignored.
-		_, err = reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
+		_, err := reg.Get(ctx, &ttnpb.BatchGetEndDevicesRequest{
 			ApplicationIds: app1.GetIds(),
 			DeviceIds: []string{
 				"unknown",

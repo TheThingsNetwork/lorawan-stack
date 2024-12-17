@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
+	ttnredis "go.thethings.network/lorawan-stack/v3/pkg/redis"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -371,6 +372,8 @@ func TestAssociations(t *testing.T) {
 	t.Run("Pagination", func(t *testing.T) {
 		a := assertions.New(t)
 
+		ttnredis.SetPaginationDefaults(ttnredis.PaginationDefaults{DefaultLimit: 10})
+
 		for i := 1; i < 21; i++ {
 			association := &ttnpb.ApplicationPackageAssociation{
 				Ids: &ttnpb.ApplicationPackageAssociationIdentifiers{
@@ -424,8 +427,8 @@ func TestAssociations(t *testing.T) {
 				limit:    0,
 				page:     0,
 				portLow:  1,
-				portHigh: 20,
-				length:   20,
+				portHigh: 10,
+				length:   10,
 			},
 		} {
 			t.Run(fmt.Sprintf("limit:%v_page:%v", tc.limit, tc.page),

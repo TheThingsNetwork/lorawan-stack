@@ -34,10 +34,17 @@ func TestUserSessionsRegistry(t *testing.T) {
 	p := &storetest.Population{}
 
 	usr1 := p.NewUser()
+
 	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	creds := rpcCreds(key)
+
 	keyWithoutRights, _ := p.NewAPIKey(usr1.GetEntityIdentifiers())
 	credsWithoutRights := rpcCreds(keyWithoutRights)
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
 
 	a, ctx := test.New(t)
 
@@ -46,19 +53,22 @@ func TestUserSessionsRegistry(t *testing.T) {
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
 		reg := ttnpb.NewUserSessionRegistryClient(cc)
 
-		_, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{
-			UserIds: usr1.GetIds(),
-		}, credsWithoutRights)
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
-		}
+		// Invalid credentials
+		for _, opts := range [][]grpc.CallOption{nil, {credsWithoutRights}, {readOnlyAdminKeyCreds}} {
+			_, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{
+				UserIds: usr1.GetIds(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 
-		_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
-			UserIds:   usr1.GetIds(),
-			SessionId: randomUUID,
-		}, credsWithoutRights)
-		if a.So(err, should.NotBeNil) {
-			a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			_, err = reg.Delete(ctx, &ttnpb.UserSessionIdentifiers{
+				UserIds:   usr1.GetIds(),
+				SessionId: randomUUID,
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
 		}
 
 		sessions, err := reg.List(ctx, &ttnpb.ListUserSessionsRequest{

@@ -105,3 +105,21 @@ func NewRedisScheduledDownlinkMatcher(ctx context.Context) (ScheduledDownlinkMat
 			cl.Close()
 		}
 }
+
+// NewRedisMACSettingsProfileRegistry initialize a new test Redis for MAC Settings Profile Registry.
+func NewRedisMACSettingsProfileRegistry(ctx context.Context) (MACSettingsProfileRegistry, func()) {
+	tb := test.MustTBFromContext(ctx)
+	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "mac-settings-profile")...)
+	reg := &redis.MACSettingsProfileRegistry{
+		Redis:   cl,
+		LockTTL: test.Delay << 10,
+	}
+	if err := reg.Init(ctx); err != nil {
+		tb.Fatalf("Failed to initialize Redis MAC Settings Profile Registry: %s", test.FormatError(err))
+	}
+	return reg,
+		func() {
+			flush()
+			cl.Close()
+		}
+}

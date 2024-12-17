@@ -56,7 +56,7 @@ const ApplicationAdd = () => {
   return (
     <Require featureCheck={mayCreateApplications} otherwise={{ redirect: '/applications' }}>
       <RequireRequest requestAction={getOrganizationsList()}>
-        <div className="container container--xxl grid">
+        <div className="container container--xl grid">
           <PageTitle
             colProps={{ md: 10, lg: 9 }}
             className="mb-cs-s"
@@ -76,7 +76,7 @@ const ApplicationAdd = () => {
             />
             <hr className="mb-ls-s" />
           </PageTitle>
-          <div className="item-10 xl:item-9">
+          <div className="item-12">
             <ApplicationForm onSuccess={handleSuccess} />
           </div>
         </div>

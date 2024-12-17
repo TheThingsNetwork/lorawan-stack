@@ -26,6 +26,79 @@ import (
 	"google.golang.org/grpc"
 )
 
+func TestApplicationAPIKeysPermissions(t *testing.T) {
+	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	appKey, _ := p.NewAPIKey(app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_LINK,
+	)
+	appCreds := rpcCreds(appKey)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+		reg := ttnpb.NewApplicationAccessClient(cc)
+
+		t.Run("API Key CRUD with different invalid credentials", func(t *testing.T) { // nolint:paralleltest
+			for _, opts := range [][]grpc.CallOption{nil, {appCreds}, {readOnlyAdminKeyCreds}} {
+				created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
+					ApplicationIds: app1.GetIds(),
+					Name:           "api-key-name",
+					Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO},
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(created, should.BeNil)
+				}
+
+				list, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
+					ApplicationIds: app1.GetIds(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(list, should.BeNil)
+				}
+
+				got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
+					ApplicationIds: app1.GetIds(),
+					KeyId:          appKey.GetId(),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(got, should.BeNil)
+				}
+
+				updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
+					ApplicationIds: app1.GetIds(),
+					ApiKey: &ttnpb.APIKey{
+						Id:   appKey.GetId(),
+						Name: "api-key-name-updated",
+					},
+					FieldMask: ttnpb.FieldMask("name"),
+				}, opts...)
+				if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					a.So(updated, should.BeNil)
+				}
+
+				_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteApplicationAPIKeyRequest{
+					ApplicationIds: app1.GetIds(),
+					KeyId:          created.GetId(),
+				}, opts...)
+				if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.FailNow()
+				}
+			}
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestApplicationAPIKeys(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -50,7 +123,6 @@ func TestApplicationAPIKeys(t *testing.T) { // nolint:gocyclo
 		ttnpb.Right_RIGHT_APPLICATION_INFO,
 		ttnpb.Right_RIGHT_APPLICATION_LINK,
 	)
-	appCreds := rpcCreds(appKey)
 
 	t.Parallel()
 	a, ctx := test.New(t)
@@ -147,53 +219,6 @@ func TestApplicationAPIKeys(t *testing.T) { // nolint:gocyclo
 			})
 		}
 
-		// API Key CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {appCreds}} {
-			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
-				ApplicationIds: app1.GetIds(),
-				Name:           "api-key-name",
-				Rights:         []ttnpb.Right{ttnpb.Right_RIGHT_APPLICATION_INFO},
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(created, should.BeNil)
-			}
-
-			list, err := reg.ListAPIKeys(ctx, &ttnpb.ListApplicationAPIKeysRequest{
-				ApplicationIds: app1.GetIds(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(list, should.BeNil)
-			}
-
-			got, err := reg.GetAPIKey(ctx, &ttnpb.GetApplicationAPIKeyRequest{
-				ApplicationIds: app1.GetIds(),
-				KeyId:          appKey.GetId(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-
-			updated, err := reg.UpdateAPIKey(ctx, &ttnpb.UpdateApplicationAPIKeyRequest{
-				ApplicationIds: app1.GetIds(),
-				ApiKey: &ttnpb.APIKey{
-					Id:   appKey.GetId(),
-					Name: "api-key-name-updated",
-				},
-				FieldMask: ttnpb.FieldMask("name"),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(updated, should.BeNil)
-			}
-
-			_, err = reg.DeleteAPIKey(ctx, &ttnpb.DeleteApplicationAPIKeyRequest{
-				ApplicationIds: app1.GetIds(),
-				KeyId:          created.GetId(),
-			}, opts...)
-			if !a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				t.FailNow()
-			}
-		}
-
 		// API Key CRUD with different valid credentials.
 		for _, opts := range [][]grpc.CallOption{{adminCreds}, {usr1Creds}, {limitedCreds}} {
 			created, err := reg.CreateAPIKey(ctx, &ttnpb.CreateApplicationAPIKeyRequest{
@@ -287,6 +312,72 @@ func TestApplicationAPIKeys(t *testing.T) { // nolint:gocyclo
 	}, withPrivateTestDatabase(p))
 }
 
+func TestApplicationCollaboratorsPermissions(t *testing.T) { // nolint:gocyclo
+	p := &storetest.Population{}
+
+	readOnlyAdmin := p.NewUser()
+	readOnlyAdmin.Admin = true
+	readOnlyAdminKey, _ := p.NewAPIKey(readOnlyAdmin.GetEntityIdentifiers(), ttnpb.AllReadAdminRights.GetRights()...)
+	readOnlyAdminKeyCreds := rpcCreds(readOnlyAdminKey)
+
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	appKey, _ := p.NewAPIKey(app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_LINK,
+	)
+	appCreds := rpcCreds(appKey)
+
+	usr2 := p.NewUser()
+	p.NewMembership(
+		usr2.GetOrganizationOrUserIdentifiers(),
+		app1.GetEntityIdentifiers(),
+		ttnpb.Right_RIGHT_APPLICATION_INFO,
+		ttnpb.Right_RIGHT_APPLICATION_LINK,
+	)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		is.config.AdminRights.All = true
+
+		reg := ttnpb.NewApplicationAccessClient(cc)
+
+		// Collaborator CRUD with different invalid credentials.
+		for _, opts := range [][]grpc.CallOption{nil, {appCreds}, {readOnlyAdminKeyCreds}} {
+			_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator: &ttnpb.Collaborator{
+					Ids: usr2.GetOrganizationOrUserIdentifiers(),
+					Rights: []ttnpb.Right{
+						ttnpb.Right_RIGHT_APPLICATION_INFO,
+					},
+				},
+			}, opts...)
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+
+			got, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
+				ApplicationIds: app1.GetIds(),
+				Collaborator:   usr2.GetOrganizationOrUserIdentifiers(),
+			}, opts...)
+			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
+				a.So(got, should.BeNil)
+			}
+		}
+
+		// ListCollaborators without credentials.
+		list, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{
+			ApplicationIds: app1.GetIds(),
+		})
+		if a.So(err, should.NotBeNil) && a.So(errors.IsUnauthenticated(err), should.BeTrue) {
+			a.So(list, should.BeNil)
+		}
+	}, withPrivateTestDatabase(p))
+}
+
 func TestApplicationCollaborators(t *testing.T) { // nolint:gocyclo
 	p := &storetest.Population{}
 
@@ -307,12 +398,6 @@ func TestApplicationCollaborators(t *testing.T) { // nolint:gocyclo
 		ttnpb.Right_RIGHT_APPLICATION_SETTINGS_COLLABORATORS,
 	)
 	limitedCreds := rpcCreds(limitedKey)
-
-	appKey, _ := p.NewAPIKey(app1.GetEntityIdentifiers(),
-		ttnpb.Right_RIGHT_APPLICATION_INFO,
-		ttnpb.Right_RIGHT_APPLICATION_LINK,
-	)
-	appCreds := rpcCreds(appKey)
 
 	usr2 := p.NewUser()
 	p.NewMembership(
@@ -384,30 +469,6 @@ func TestApplicationCollaborators(t *testing.T) { // nolint:gocyclo
 			},
 		}, limitedCreds)
 		a.So(err, should.BeNil)
-
-		// Collaborator CRUD with different invalid credentials.
-		for _, opts := range [][]grpc.CallOption{nil, {appCreds}} {
-			_, err := reg.SetCollaborator(ctx, &ttnpb.SetApplicationCollaboratorRequest{
-				ApplicationIds: app1.GetIds(),
-				Collaborator: &ttnpb.Collaborator{
-					Ids: usr2.GetOrganizationOrUserIdentifiers(),
-					Rights: []ttnpb.Right{
-						ttnpb.Right_RIGHT_APPLICATION_INFO,
-					},
-				},
-			}, opts...)
-			if a.So(err, should.NotBeNil) {
-				a.So(errors.IsPermissionDenied(err), should.BeTrue)
-			}
-
-			got, err := reg.GetCollaborator(ctx, &ttnpb.GetApplicationCollaboratorRequest{
-				ApplicationIds: app1.GetIds(),
-				Collaborator:   usr2.GetOrganizationOrUserIdentifiers(),
-			}, opts...)
-			if a.So(err, should.NotBeNil) && a.So(errors.IsPermissionDenied(err), should.BeTrue) {
-				a.So(got, should.BeNil)
-			}
-		}
 
 		// ListCollaborators without credentials.
 		list, err := reg.ListCollaborators(ctx, &ttnpb.ListApplicationCollaboratorsRequest{

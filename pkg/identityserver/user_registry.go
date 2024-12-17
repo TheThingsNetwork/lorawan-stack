@@ -179,6 +179,20 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	createdByAdmin := is.IsAdmin(ctx)
 	config := is.configFromContext(ctx)
 
+	if createdByAdmin {
+		authInfo, err := is.authInfo(ctx)
+		if err != nil {
+			return nil, err
+		}
+		if !ttnpb.RightsFrom(authInfo.GetRights()...).IncludesAll(ttnpb.Right_RIGHT_USER_CREATE) {
+			return nil, rights.ErrInsufficientRights.WithAttributes(
+				"uid", req.IDString(),
+				"entity_type", "user",
+				"missing", ttnpb.Right_RIGHT_ALL.String(),
+			)
+		}
+	}
+
 	if err = blocklist.Check(ctx, req.User.GetIds().GetUserId()); err != nil {
 		return nil, err
 	}
@@ -259,12 +273,11 @@ func (is *IdentityServer) createUser(ctx context.Context, req *ttnpb.CreateUserR
 	if usr.State == ttnpb.State_STATE_REQUESTED {
 		go is.notifyAdminsInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        req.GetUser().GetIds().GetEntityIdentifiers(),
-			NotificationType: "user_requested",
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_USER_REQUESTED),
 			Data:             ttnpb.MustMarshalAny(req),
 			Receivers: []ttnpb.NotificationReceiver{
 				ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_ADMINISTRATIVE_CONTACT,
 			},
-			Email: true,
 		})
 	}
 
@@ -339,6 +352,18 @@ func (is *IdentityServer) listUsers(ctx context.Context, req *ttnpb.ListUsersReq
 	if err = is.RequireAdmin(ctx); err != nil {
 		return nil, err
 	}
+
+	authInfo, err := is.authInfo(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !ttnpb.RightsFrom(authInfo.GetRights()...).IncludesAll(ttnpb.Right_RIGHT_USER_LIST) {
+		return nil, rights.ErrInsufficientRights.WithAttributes(
+			"entity_type", "user",
+			"missing", ttnpb.Right_RIGHT_ALL.String(),
+		)
+	}
+
 	contactInfoInPath := ttnpb.HasAnyField(req.FieldMask.GetPaths(), "contact_info")
 	if contactInfoInPath {
 		req.FieldMask.Paths = ttnpb.ExcludeFields(req.FieldMask.Paths, "contact_info")
@@ -510,13 +535,12 @@ func (is *IdentityServer) updateUser(ctx context.Context, req *ttnpb.UpdateUserR
 	if ttnpb.HasAnyField(req.FieldMask.GetPaths(), "state") {
 		go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 			EntityIds:        usr.GetIds().GetEntityIdentifiers(),
-			NotificationType: "entity_state_changed",
+			NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_ENTITY_STATE_CHANGED),
 			Data: ttnpb.MustMarshalAny(&ttnpb.EntityStateChangedNotification{
 				State:            usr.State,
 				StateDescription: usr.StateDescription,
 			}),
 			Receivers: []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
-			Email:     true,
 		})
 	}
 
@@ -639,8 +663,7 @@ func (is *IdentityServer) updateUserPassword(ctx context.Context, req *ttnpb.Upd
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateMask))
 	go is.notifyInternal(ctx, &ttnpb.CreateNotificationRequest{
 		EntityIds:        req.GetUserIds().GetEntityIdentifiers(),
-		NotificationType: "password_changed",
-		Email:            true,
+		NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_PASSWORD_CHANGED),
 		Receivers:        []ttnpb.NotificationReceiver{ttnpb.NotificationReceiver_NOTIFICATION_RECEIVER_COLLABORATOR},
 	})
 	return ttnpb.Empty, nil
@@ -682,13 +705,15 @@ func (is *IdentityServer) createTemporaryPassword(ctx context.Context, req *ttnp
 		"temporary_password", temporaryPassword,
 	)).Info("Created temporary password")
 	events.Publish(evtUpdateUser.NewWithIdentifiersAndData(ctx, req.GetUserIds(), updateTemporaryPasswordFieldMask))
-	go is.SendTemplateEmailToUserIDs(is.FromRequestContext(ctx), "temporary_password", func(ctx context.Context, data email.TemplateData) (email.TemplateData, error) {
-		return &templates.TemporaryPasswordData{
-			TemplateData:      data,
-			TemporaryPassword: temporaryPassword,
-			TTL:               ttl,
-		}, nil
-	}, req.GetUserIds())
+	go is.SendTemplateEmailToUserIDs( // nolint:errcheck
+		is.FromRequestContext(ctx), ttnpb.GetNotificationTypeString(ttnpb.NotificationType_TEMPORARY_PASSWORD),
+		func(_ context.Context, data email.TemplateData) (email.TemplateData, error) {
+			return &templates.TemporaryPasswordData{
+				TemplateData:      data,
+				TemporaryPassword: temporaryPassword,
+				TTL:               ttl,
+			}, nil
+		}, req.GetUserIds())
 
 	return ttnpb.Empty, nil
 }
@@ -751,6 +776,11 @@ func (is *IdentityServer) restoreUser(ctx context.Context, ids *ttnpb.UserIdenti
 func (is *IdentityServer) purgeUser(ctx context.Context, ids *ttnpb.UserIdentifiers) (*emptypb.Empty, error) {
 	if !is.IsAdmin(ctx) {
 		return nil, errAdminsPurgeUsers.New()
+	}
+	if err := rights.RequireUser(
+		store.WithSoftDeleted(ctx, false), ids, ttnpb.Right_RIGHT_USER_PURGE,
+	); err != nil {
+		return nil, err
 	}
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) error {
 		// Delete related API keys before purging the user.

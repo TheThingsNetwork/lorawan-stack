@@ -18,11 +18,12 @@ import (
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/email"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 )
 
 func init() {
 	tmpl, err := email.NewTemplateFS(
-		fsys, "temporary_password",
+		fsys, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_TEMPORARY_PASSWORD),
 		email.FSTemplate{
 			SubjectTemplate:      "Your temporary password for {{ .Network.Name }}",
 			HTMLTemplateBaseFile: "base.html.tmpl",

@@ -30,4 +30,6 @@ type Registry interface {
 	List(ctx context.Context, ids *ttnpb.ApplicationIdentifiers, paths []string) ([]*ttnpb.ApplicationPubSub, error)
 	// Set creates, updates or deletes the pub/sub integration by its identifiers.
 	Set(ctx context.Context, ids *ttnpb.ApplicationPubSubIdentifiers, paths []string, f func(*ttnpb.ApplicationPubSub) (*ttnpb.ApplicationPubSub, []string, error)) (*ttnpb.ApplicationPubSub, error)
+	// WithPagination returns a new context with pagination parameters.
+	WithPagination(ctx context.Context, limit uint32, page uint32, total *int64) context.Context
 }
