@@ -119,7 +119,7 @@
     "react-focus-lock": "^2.13.5",
     "react-helmet": "^6.1.0",
     "react-intl": "^7.0.4",
-    "react-leaflet": "^4.2.1",
+    "react-leaflet": "^5.0.0",
     "react-paginate": "^8.2.0",
     "react-redux": "^8.1.2",
     "react-remove-scroll": "^2.6.2",
