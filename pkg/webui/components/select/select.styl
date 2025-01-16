@@ -17,6 +17,8 @@
   // Overwriting react-select styling in global scope.
 
   // stylelint-disable
+  :global(.select__single-value)
+    color: var(--c-text-neutral-heavy)
   :global(.select__option)
     padding: $cs.xs $cs.s
   :global(.select__option--is-selected)
@@ -33,6 +35,7 @@
     min-height: $default-input-height
     border-radius: $br.xs
   :global(.select__menu)
+    background: var(--c-bg-neutral-extralight)
     z-index: $zi.dropdown
   :global(.select__dropdown-indicator)
     padding: 4px
