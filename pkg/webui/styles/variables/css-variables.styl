@@ -19,11 +19,19 @@ make-variables($name, $theme)
   for $key, $value in $dict[$theme][shadow]
     {'--shadow-'}{$key}: $value
 
-// Generate CSS variables based on token definitions.
-
 :root, :before, :after
-  make-variables('tokens', 'theme-light')
+  color-scheme: light dark
 
   --grid-column-gap: $ls.s
   --grid-row-gap: $ls.s
   --container-vertical-padding: $ls.s
+
+// Define color theme and generate variables accordingly.
+:global
+  .dark
+    color-scheme: dark
+    make-variables('tokens', 'theme-dark')
+
+  .light
+    color-scheme: light
+    make-variables('tokens', 'theme-light')

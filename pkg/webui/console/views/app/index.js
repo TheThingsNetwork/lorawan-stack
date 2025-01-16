@@ -82,6 +82,7 @@ const Layout = () => {
   const { search } = useLocation()
   const page = new URLSearchParams(search).get('page')
   const user = useSelector(selectUser)
+  const darkTheme = user?.console_preferences?.console_theme === 'CONSOLE_THEME_DARK'
   const fetching = useSelector(selectUserFetching)
   const error = useSelector(selectUserError)
   const rights = useSelector(selectUserRights)
@@ -92,11 +93,24 @@ const Layout = () => {
 
   const { height: splitFrameHeight } = useContext(EventSplitFrameContext)
 
+  const toggleTheme = theme => {
+    const htmlElement = document.documentElement // Get the root element
+
+    if (theme === 'dark') {
+      htmlElement.classList.add('dark')
+      htmlElement.classList.remove('light')
+    } else {
+      htmlElement.classList.add('light')
+      htmlElement.classList.remove('dark')
+    }
+  }
+
   useEffect(() => {
+    toggleTheme(darkTheme ? 'dark' : 'light')
     if (main.current) {
       main.current.scrollTop = 0
     }
-  }, [page])
+  }, [page, darkTheme])
 
   return (
     <SidebarContextProvider>
