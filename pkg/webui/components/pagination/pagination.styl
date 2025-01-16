@@ -40,16 +40,17 @@
     cursor: pointer
     height: 100%
     width: 100%
+    border-radius: $br.m
 
   .link:hover
-    background-color: hoverize(var(--c-bg-neutral-extralight-hover))
+    background-color: var(--c-bg-neutral-extralight-hover)
 
   .link
     +focus-visible()
-      background-color: hoverize(var(--c-bg-neutral-min))
+      background-color: var(--c-bg-neutral-min)
 
   .link:active
-    background-color: activize(var(--c-bg-neutral-min))
+    background-color: var(--c-bg-neutral-min)
 
 
   &-disabled
