@@ -32,6 +32,7 @@ import { isFrontend } from '@ttn-lw/lib/errors/utils'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 import m from './messages'
 
@@ -60,6 +61,8 @@ const Processor = ({
   handleReset,
   editorRef,
 }) => {
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const darkTheme = consolePreferences.console_theme === 'CONSOLE_THEME_DARK'
   const appId = useSelector(selectSelectedApplicationId)
   const hasErrored = status === 'error'
   const operationMessage = step === 'conversion' ? m.converting : m.creating
@@ -181,6 +184,7 @@ const Processor = ({
         showGutter={false}
         scrollToBottom
         editorRef={editorRef}
+        darkTheme={darkTheme}
       />
       <SubmitBar align="start">
         <ButtonGroup>

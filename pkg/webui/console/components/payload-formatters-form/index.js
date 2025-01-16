@@ -110,6 +110,7 @@ const Formatter = ({
   type,
   pasteAppPayloadFormatter,
   pasteRepoPayloadFormatters,
+  darkTheme,
 }) => {
   const hasRepoFormatter = repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
   const repositoryPayloadFormatters = repoFormatters?.formatter_parameter
@@ -130,6 +131,7 @@ const Formatter = ({
           height="10rem"
           minLines={25}
           maxLines={25}
+          darkTheme={darkTheme}
         />
         {type === TYPES.JAVASCRIPT && (
           <ButtonGroup>
@@ -188,6 +190,7 @@ const Formatter = ({
           minLines={25}
           maxLines={25}
           value={repositoryPayloadFormatters}
+          darkTheme={darkTheme}
         />
         <Link.DocLink path="/integrations/payload-formatters/device-repo/" secondary>
           <Message content={m.learnMoreAboutDeviceRepo} />
@@ -200,6 +203,7 @@ const Formatter = ({
 }
 
 Formatter.propTypes = {
+  darkTheme: PropTypes.bool,
   defaultType: PropTypes.string,
   pasteAppPayloadFormatter: PropTypes.func.isRequired,
   pasteRepoPayloadFormatters: PropTypes.func.isRequired,
@@ -210,6 +214,7 @@ Formatter.propTypes = {
 }
 
 Formatter.defaultProps = {
+  darkTheme: false,
   defaultType: undefined,
   repoFormatters: undefined,
 }
@@ -230,6 +235,7 @@ const PayloadFormattersForm = ({
   onSubmitFailure,
   onTestSubmit,
   defaultParameter,
+  darkTheme,
 }) => {
   const [type, setType] = useState(initialType)
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -451,6 +457,7 @@ const PayloadFormattersForm = ({
                 type={type}
                 pasteAppPayloadFormatter={pasteAppPayloadFormatter}
                 pasteRepoPayloadFormatters={pasteRepoPayloadFormatters}
+                darkTheme={darkTheme}
               />
               <MoveAwayModal blocker={blocker} />
             </>
@@ -465,6 +472,7 @@ const PayloadFormattersForm = ({
               onSubmit={handleTestSubmit}
               uplink={uplink}
               testResult={testResult}
+              darkTheme={darkTheme}
             />
             <Link.DocLink path="/integrations/payload-formatters" secondary>
               <Message content={m.learnMoreAboutPayloadFormatters} />
@@ -490,6 +498,7 @@ PayloadFormattersForm.propTypes = {
   allowReset: PropTypes.bool,
   allowTest: PropTypes.bool,
   appId: PropTypes.string,
+  darkTheme: PropTypes.bool,
   defaultParameter: PropTypes.string,
   defaultType: PropTypes.string,
   initialParameter: PropTypes.string,
@@ -522,6 +531,7 @@ PayloadFormattersForm.defaultProps = {
   appId: undefined,
   isDefaultType: undefined,
   repoFormatters: undefined,
+  darkTheme: false,
 }
 
 export default injectIntl(PayloadFormattersForm)

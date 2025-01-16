@@ -96,6 +96,7 @@ const TestForm = props => {
       normalized_payload_warnings: normalizedPayloadWarnings,
       frm_payload: framePayload,
     },
+    darkTheme,
   } = props
 
   const { formatMessage } = useIntl()
@@ -215,6 +216,7 @@ const TestForm = props => {
                   maxLines={12}
                   readOnly
                   showGutter={false}
+                  darkTheme={darkTheme}
                 />
               </Form.InfoField>
             )}
@@ -227,6 +229,7 @@ const TestForm = props => {
                 maxLines={11}
                 readOnly
                 showGutter={false}
+                darkTheme={darkTheme}
               />
             </Form.InfoField>
           </>
@@ -248,6 +251,7 @@ const TestForm = props => {
               maxLines={showTestError ? 9 : 6}
               readOnly
               showGutter={false}
+              darkTheme={darkTheme}
             />
           </Form.InfoField>
         )}
@@ -278,6 +282,7 @@ const TestForm = props => {
 
 TestForm.propTypes = {
   className: PropTypes.string,
+  darkTheme: PropTypes.bool,
   onSubmit: PropTypes.func.isRequired,
   testResult: PropTypes.shape({
     decoded_payload: PropTypes.PropTypes.shape({}),
@@ -290,6 +295,7 @@ TestForm.propTypes = {
 }
 TestForm.defaultProps = {
   className: undefined,
+  darkTheme: false,
 }
 
 export default TestForm

@@ -40,6 +40,7 @@ import {
   selectApplicationLinkError,
   selectApplicationLinkFormatters,
 } from '@console/store/selectors/applications'
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 const m = defineMessages({
   title: 'Default downlink payload formatter',
@@ -50,6 +51,8 @@ const m = defineMessages({
 })
 
 const ApplicationPayloadFormatters = () => {
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const darkTheme = consolePreferences.console_theme === 'CONSOLE_THEME_DARK'
   const { appId } = useParams()
   const formatters = useSelector(selectApplicationLinkFormatters) || {}
   const linkError = useSelector(selectApplicationLinkError)
@@ -116,6 +119,7 @@ const ApplicationPayloadFormatters = () => {
           initialType={formatters.down_formatter || PAYLOAD_FORMATTER_TYPES.NONE}
           initialParameter={formatters.down_formatter_parameter || ''}
           onTypeChange={onTypeChange}
+          darkTheme={darkTheme}
         />
       </div>
     </div>
