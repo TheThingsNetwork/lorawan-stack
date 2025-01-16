@@ -18,7 +18,8 @@ import { useSelector } from 'react-redux'
 
 import LORA_CLOUD_MS from '@console/constants/lora-cloud-ms'
 import LORA_CLOUD_GLS from '@console/constants/lora-cloud-gls'
-import LoRaCloudImage from '@assets/misc/lora-cloud.png'
+import LoRaCloudImage from '@assets/misc/logo-LoRa-cloud-default.svg'
+import LoRaCloudWhiteImage from '@assets/misc/logo-LoRa-cloud-white.svg'
 
 import PageTitle from '@ttn-lw/components/page-title'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -46,6 +47,7 @@ import { getAppPkgDefaultAssoc } from '@console/store/actions/application-packag
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import style from './application-integrations-lora-cloud.styl'
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 const m = defineMessages({
   loraCloudInfoText:
@@ -59,6 +61,8 @@ const m = defineMessages({
 
 const LoRaCloud = () => {
   const appId = useSelector(selectSelectedApplicationId)
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const darkTheme = consolePreferences.console_theme === 'CONSOLE_THEME_DARK'
   const selector = ['data']
 
   useBreadcrumbs(
@@ -84,7 +88,11 @@ const LoRaCloud = () => {
           <div className="container container--xl grid">
             <PageTitle title="LoRa Cloud Modem and Geolocation Services" />
             <div className="item-12">
-              <img className={style.logo} src={LoRaCloudImage} alt="LoRa Cloud" />
+              <img
+                className={style.logo}
+                src={darkTheme ? LoRaCloudWhiteImage : LoRaCloudImage}
+                alt="LoRa Cloud"
+              />
               <Message content={m.loraCloudInfoText} className="mt-0" />
               <div>
                 <Message
