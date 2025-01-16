@@ -15,6 +15,7 @@
 import React, { useContext } from 'react'
 import classnames from 'classnames'
 import { Link } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
 import { IconLayoutSidebarLeftCollapse, IconX } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -24,15 +25,19 @@ import SidebarContext from '@console/containers/sidebar/context'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
+
 import style from './side-header.styl'
 
 const SideHeader = ({ Logo }) => {
   const { onMinimizeToggle, isMinimized, closeDrawer } = useContext(SidebarContext)
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const darkTheme = consolePreferences.console_theme === 'CONSOLE_THEME_DARK'
 
   return (
     <div className={classnames(style.headerContainer)}>
       <Link to="/">
-        <Logo className={classnames(style.logo)} />
+        <Logo className={classnames(style.logo)} dark={darkTheme} />
       </Link>
       {!isMinimized && (
         <Button

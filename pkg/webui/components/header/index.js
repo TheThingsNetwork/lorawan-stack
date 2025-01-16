@@ -14,6 +14,7 @@
 
 import React from 'react'
 import classnames from 'classnames'
+import { useSelector } from 'react-redux'
 
 import { IconStar, IconPlus, IconInbox, IconLayoutSidebarLeftExpand } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
@@ -23,6 +24,8 @@ import AppStatusBadge from '@console/containers/app-status-badge'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 import Link from '../link'
 
@@ -48,6 +51,8 @@ const Header = ({
   ...rest
 }) => {
   const LinkComponent = safe ? 'a' : Link
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const darkTheme = consolePreferences.console_theme === 'CONSOLE_THEME_DARK'
   return (
     <header
       {...rest}
@@ -59,7 +64,7 @@ const Header = ({
       {alwaysShowLogo ? (
         <div className="d-flex al-center gap-cs-xs">
           <LinkComponent to="/" href="/">
-            <Logo className={style.logo} />
+            <Logo className={style.logo} dark={darkTheme} />
           </LinkComponent>
         </div>
       ) : (
@@ -85,7 +90,7 @@ const Header = ({
           <div className="d-none lg-xl:d-flex al-center gap-cs-xs">
             <Button secondary icon={IconLayoutSidebarLeftExpand} onClick={onMenuClick} />
             <LinkComponent to="/" href="/">
-              <Logo className={style.logo} />
+              <Logo className={style.logo} dark={darkTheme} />
             </LinkComponent>
           </div>
         </>
