@@ -11,23 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Add recvTime field to the decodeUplink input in payload formatters
-- Add the latest battery percentage of the end device in the `ApplicationUplink` message.
-- Add live data split view tutorial to the Console.
-- Add end device attributes to ApplicationUp messages.
-  - Add the locations, version_ids, network_ids fields to the following ApplicationUp messages:
-    - ApplicationJoinAccept
-    - ApplicationDownlink
-    - ApplicationDownlinkFailed
-    - ApplicationInvalidatedDownlinks
-    - ApplicationServiceData
-  - Add Timeout and Cache fields in the EndDeviceMetadataStorageConfig of the AS.
-
 ### Changed
 
 ### Deprecated
-
-- Deprecate the Location field (and its subfields) in the EndDeviceMetadataStorageConfig of AS.
 
 ### Removed
 
