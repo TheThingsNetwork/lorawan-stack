@@ -2764,7 +2764,7 @@
   },
   "error:pkg/applicationserver/io/web/sink:webhook_disabled": {
     "translations": {
-      "en": "webhook disabled"
+      "en": "webhook {webhook_id} of application {application_id} is disabled"
     },
     "description": {
       "package": "pkg/applicationserver/io/web/sink",

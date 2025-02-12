@@ -19,6 +19,7 @@ import (
 	"net/http"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/applicationserver/io/web/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -60,7 +61,9 @@ const (
 	healthStateUnhealthy
 )
 
-var errWebhookDisabled = errors.DefineAborted("webhook_disabled", "webhook disabled")
+var errWebhookDisabled = errors.DefineAborted(
+	"webhook_disabled", "webhook {webhook_id} of application {application_id} is disabled",
+)
 
 // preRunCheck verifies if the webhook should be executed.
 func (hcs *healthCheckSink) preRunCheck(ctx context.Context) (healthState, error) {
@@ -102,7 +105,10 @@ func (hcs *healthCheckSink) preRunCheck(ctx context.Context) (healthState, error
 
 		default:
 			// The webhook is above the threshold, and the cooldown period has not passed yet.
-			return healthStateUnhealthy, errWebhookDisabled.New()
+			return healthStateUnhealthy, errWebhookDisabled.WithAttributes(
+				"application_id", internal.WebhookIDFromContext(ctx).ApplicationIds.ApplicationId,
+				"webhook_id", internal.WebhookIDFromContext(ctx).WebhookId,
+			)
 		}
 
 	default:
