@@ -140,22 +140,23 @@ func (c Config) WithNamespace(namespace ...string) *Config {
 // IsZero returns whether the Redis configuration is empty.
 func (c Config) IsZero() bool {
 	if c.Failover.Enable {
-		return c.Failover.MasterName == "" && len(c.Failover.Addresses) == 0
+		return c.Failover.MasterName == "" && len(c.Failover.SentinelAddresses) == 0
 	}
 	return c.Address == ""
 }
 
 // FailoverConfig represents Redis failover configuration.
 type FailoverConfig struct {
-	Enable     bool     `name:"enable" description:"Enable failover using Redis Sentinel"`
-	Addresses  []string `name:"addresses" description:"Redis Sentinel server addresses"`
-	MasterName string   `name:"master-name" description:"Redis Sentinel master name"`
+	Enable            bool     `name:"enable" description:"Enable failover using Redis Sentinel"`
+	SentinelAddresses []string `name:"addresses" description:"Redis Sentinel server addresses"`
+	SentinelPassword  string   `name:"password" description:"Redis Sentinel password"`
+	MasterName        string   `name:"master-name" description:"Redis Sentinel master name"`
 }
 
 // Equals checks if the other configuration is equivalent to this.
 func (c FailoverConfig) Equals(other FailoverConfig) bool {
 	return c.Enable == other.Enable &&
-		equalsStringSlice(c.Addresses, other.Addresses) &&
+		equalsStringSlice(c.SentinelAddresses, other.SentinelAddresses) &&
 		c.MasterName == other.MasterName
 }
 
@@ -200,14 +201,15 @@ func debugLogFunc(ctx context.Context, format string, v ...any) {
 func newRedisClient(conf *Config) *redis.Client {
 	if conf.Failover.Enable {
 		return redis.NewFailoverClient(&redis.FailoverOptions{
-			Dialer:          conf.makeDialer(),
-			MasterName:      conf.Failover.MasterName,
-			SentinelAddrs:   conf.Failover.Addresses,
-			Password:        conf.Password,
-			DB:              conf.Database,
-			PoolSize:        conf.PoolSize,
-			ConnMaxIdleTime: conf.IdleTimeout,
-			ConnMaxLifetime: conf.ConnMaxLifetime,
+			Dialer:           conf.makeDialer(),
+			MasterName:       conf.Failover.MasterName,
+			SentinelAddrs:    conf.Failover.SentinelAddresses,
+			SentinelPassword: conf.Failover.SentinelPassword,
+			Password:         conf.Password,
+			DB:               conf.Database,
+			PoolSize:         conf.PoolSize,
+			ConnMaxIdleTime:  conf.IdleTimeout,
+			ConnMaxLifetime:  conf.ConnMaxLifetime,
 		})
 	}
 	return redis.NewClient(&redis.Options{
