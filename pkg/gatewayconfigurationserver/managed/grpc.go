@@ -217,8 +217,8 @@ func (s *managedGCSServer) Update(
 		return nil, err
 	}
 	ret := &ttnpb.ManagedGateway{}
-	if ret.SetFields(reqGtw, req.FieldMask.GetPaths()...) != nil {
-		return nil, err
+	if errS := ret.SetFields(reqGtw, req.FieldMask.GetPaths()...); errS != nil {
+		return nil, errS
 	}
 	return ret, nil
 }
