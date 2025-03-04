@@ -68,6 +68,7 @@ func NewClient(
 	}
 
 	acmeConfig := c.GetTLSConfig(ctx).ACME
+	acmeConfig.DefaultHost = config.Domain
 	clientAuthConfig := config.TLS
 	clientAuthConfig.ACME = &acmeConfig
 
