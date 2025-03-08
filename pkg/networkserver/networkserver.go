@@ -66,7 +66,7 @@ const (
 // windowDurationFunc is a function, which is used by Network Server to determine the duration of deduplication and cooldown windows.
 type windowDurationFunc func(ctx context.Context) time.Duration
 
-// makeWindowEndAfterFunc returns a windowDurationFunc, which always returns d.
+// makeWindowDurationFunc returns a windowDurationFunc, which always returns d.
 func makeWindowDurationFunc(d time.Duration) windowDurationFunc {
 	return func(ctx context.Context) time.Duration { return d }
 }
