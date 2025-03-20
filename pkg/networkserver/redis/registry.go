@@ -1150,3 +1150,84 @@ func (r *DeviceRegistry) BatchDelete(
 	}
 	return ret, nil
 }
+
+// BatchSetByID implements DeviceRegistry.
+// This function sets all the devices in a single transaction.
+func (r *DeviceRegistry) BatchSetByID(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+	callback func(dev *ttnpb.EndDevice) error,
+) ([]*ttnpb.EndDevice, error) {
+	defer trace.StartRegion(ctx, "batch set end device by id").End()
+
+	// Generate keys and prepare UID keys
+	uidKeys := make([]string, len(deviceIDs))
+	for i, devID := range deviceIDs {
+		ids := &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: appIDs,
+			DeviceId:       devID,
+		}
+		if err := ids.ValidateContext(ctx); err != nil {
+			return nil, err
+		}
+		uidKeys[i] = r.uidKey(unique.ID(ctx, ids))
+	}
+
+	var modifiedDevices []*ttnpb.EndDevice
+
+	transaction := func(tx *redis.Tx) error {
+		// Fetch current devices
+		raw, err := tx.MGet(ctx, uidKeys...).Result()
+		if err != nil {
+			return err
+		}
+
+		devices := make([]*ttnpb.EndDevice, len(raw))
+		for i, val := range raw {
+			if val == nil {
+				continue
+			}
+			str, ok := val.(string)
+			if !ok {
+				continue
+			}
+			dev := &ttnpb.EndDevice{}
+			if err := ttnredis.UnmarshalProto(str, dev); err != nil {
+				log.FromContext(ctx).WithError(err).Warn("Failed to decode stored end device")
+				continue
+			}
+			// Call the user-defined callback to mutate the device
+			if callback != nil {
+				if err := callback(dev); err != nil {
+					return err
+				}
+			}
+			devices[i] = dev
+		}
+
+		// Write all modified devices back to Redis
+		_, err = tx.TxPipelined(ctx, func(p redis.Pipeliner) error {
+			for i, dev := range devices {
+				if dev == nil {
+					continue
+				}
+				value, err := ttnredis.MarshalProto(dev)
+				if err != nil {
+					return err
+				}
+				p.Set(ctx, uidKeys[i], value, 0)
+				modifiedDevices = append(modifiedDevices, dev)
+			}
+			return nil
+		})
+		return err
+	}
+
+	// Use WATCH with UID keys to ensure that no other transaction modifies the devices
+	err := r.Redis.Watch(ctx, transaction, uidKeys...)
+	if err != nil {
+		return nil, ttnredis.ConvertError(err)
+	}
+	return modifiedDevices, nil
+}

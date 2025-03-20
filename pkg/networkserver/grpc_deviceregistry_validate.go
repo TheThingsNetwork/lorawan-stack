@@ -1058,10 +1058,10 @@ func validateZeroFields(st *setDeviceState) error { // nolint: gocyclo
 
 func validateProfile( // nolint: gocyclo
 	profile *ttnpb.MACSettings,
-	st *setDeviceState,
+	dev *ttnpb.EndDevice,
 	fps *frequencyplans.Store,
 ) error {
-	fp, phy, err := DeviceFrequencyPlanAndBand(st.Device, fps)
+	fp, phy, err := DeviceFrequencyPlanAndBand(dev, fps)
 	if err != nil {
 		return err
 	}
@@ -1220,7 +1220,7 @@ func validateProfile( // nolint: gocyclo
 			panic("unreachable")
 		}
 	}
-	if st.Device.GetSupportsClassB() {
+	if dev.GetSupportsClassB() {
 		if profile.GetPingSlotFrequency().GetValue() == 0 {
 			if len(phy.PingSlotFrequencies) == 0 {
 				return newInvalidFieldValueError("mac_settings_profile.mac_settings.ping_slot_frequency.value")
