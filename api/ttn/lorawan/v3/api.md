@@ -244,6 +244,7 @@
   - [Message `ADRSettings.StaticMode`](#ttn.lorawan.v3.ADRSettings.StaticMode)
   - [Message `BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest)
   - [Message `BatchGetEndDevicesRequest`](#ttn.lorawan.v3.BatchGetEndDevicesRequest)
+  - [Message `BatchSetMACSettingsProfileRequest`](#ttn.lorawan.v3.BatchSetMACSettingsProfileRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest)
   - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
@@ -3921,6 +3922,21 @@ Configuration options for static ADR.
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
 | `device_ids` | [`string`](#string) | repeated |  |
 | `field_mask` | [`google.protobuf.FieldMask`](#google.protobuf.FieldMask) |  | The names of the end device fields that should be returned. This mask is applied on all the end devices in the result. See the API reference for which fields can be returned by the different services. |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+| `device_ids` | <p>`repeated.min_items`: `1`</p><p>`repeated.max_items`: `20`</p><p>`repeated.items.string.max_len`: `36`</p><p>`repeated.items.string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
+
+### <a name="ttn.lorawan.v3.BatchSetMACSettingsProfileRequest">Message `BatchSetMACSettingsProfileRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `mac_settings_profile_ids` | [`MACSettingsProfileIdentifiers`](#ttn.lorawan.v3.MACSettingsProfileIdentifiers) |  |  |
+| `device_ids` | [`string`](#string) | repeated |  |
 
 #### Field Rules
 
@@ -9433,12 +9449,14 @@ The NsEndDeviceBatchRegistry service allows clients to manage batches of end dev
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | `Delete` | [`BatchDeleteEndDevicesRequest`](#ttn.lorawan.v3.BatchDeleteEndDevicesRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete a list of devices within the same application. This operation is atomic; either all devices are deleted or none. Devices not found are skipped and no error is returned. |
+| `SetMACSettingsProfile` | [`BatchSetMACSettingsProfileRequest`](#ttn.lorawan.v3.BatchSetMACSettingsProfileRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | Set the MAC settings profile for a batch of end devices. |
 
 #### HTTP bindings
 
 | Method Name | Method | Pattern | Body |
 | ----------- | ------ | ------- | ---- |
 | `Delete` | `DELETE` | `/api/v3/ns/applications/{application_ids.application_id}/devices/batch` |  |
+| `SetMACSettingsProfile` | `POST` | `/api/v3/ns/applications/{application_ids.application_id}/devices/mac_settings_profile/batch` | `*` |
 
 ### <a name="ttn.lorawan.v3.NsEndDeviceRegistry">Service `NsEndDeviceRegistry`</a>
 

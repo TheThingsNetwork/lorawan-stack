@@ -5562,6 +5562,21 @@ var BatchGetEndDevicesRequestFieldPathsTopLevel = []string{
 	"device_ids",
 	"field_mask",
 }
+var BatchSetMACSettingsProfileRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"device_ids",
+	"mac_settings_profile_ids",
+	"mac_settings_profile_ids.application_ids",
+	"mac_settings_profile_ids.application_ids.application_id",
+	"mac_settings_profile_ids.profile_id",
+}
+
+var BatchSetMACSettingsProfileRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"device_ids",
+	"mac_settings_profile_ids",
+}
 var MACParameters_ChannelFieldPathsNested = []string{
 	"downlink_frequency",
 	"enable_uplink",

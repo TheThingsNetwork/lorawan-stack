@@ -4361,6 +4361,76 @@ func (dst *BatchGetEndDevicesRequest) SetFields(src *BatchGetEndDevicesRequest, 
 	return nil
 }
 
+func (dst *BatchSetMACSettingsProfileRequest) SetFields(src *BatchSetMACSettingsProfileRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+		case "mac_settings_profile_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *MACSettingsProfileIdentifiers
+				if (src == nil || src.MacSettingsProfileIds == nil) && dst.MacSettingsProfileIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.MacSettingsProfileIds
+				}
+				if dst.MacSettingsProfileIds != nil {
+					newDst = dst.MacSettingsProfileIds
+				} else {
+					newDst = &MACSettingsProfileIdentifiers{}
+					dst.MacSettingsProfileIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.MacSettingsProfileIds = src.MacSettingsProfileIds
+				} else {
+					dst.MacSettingsProfileIds = nil
+				}
+			}
+		case "device_ids":
+			if len(subs) > 0 {
+				return fmt.Errorf("'device_ids' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.DeviceIds = src.DeviceIds
+			} else {
+				dst.DeviceIds = nil
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *MACParameters_Channel) SetFields(src *MACParameters_Channel, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {

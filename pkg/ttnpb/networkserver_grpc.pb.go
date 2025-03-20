@@ -759,7 +759,8 @@ var NsEndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	NsEndDeviceBatchRegistry_Delete_FullMethodName = "/ttn.lorawan.v3.NsEndDeviceBatchRegistry/Delete"
+	NsEndDeviceBatchRegistry_Delete_FullMethodName                = "/ttn.lorawan.v3.NsEndDeviceBatchRegistry/Delete"
+	NsEndDeviceBatchRegistry_SetMACSettingsProfile_FullMethodName = "/ttn.lorawan.v3.NsEndDeviceBatchRegistry/SetMACSettingsProfile"
 )
 
 // NsEndDeviceBatchRegistryClient is the client API for NsEndDeviceBatchRegistry service.
@@ -770,6 +771,8 @@ type NsEndDeviceBatchRegistryClient interface {
 	// This operation is atomic; either all devices are deleted or none.
 	// Devices not found are skipped and no error is returned.
 	Delete(ctx context.Context, in *BatchDeleteEndDevicesRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	// Set the MAC settings profile for a batch of end devices.
+	SetMACSettingsProfile(ctx context.Context, in *BatchSetMACSettingsProfileRequest, opts ...grpc.CallOption) (*EndDevices, error)
 }
 
 type nsEndDeviceBatchRegistryClient struct {
@@ -789,6 +792,15 @@ func (c *nsEndDeviceBatchRegistryClient) Delete(ctx context.Context, in *BatchDe
 	return out, nil
 }
 
+func (c *nsEndDeviceBatchRegistryClient) SetMACSettingsProfile(ctx context.Context, in *BatchSetMACSettingsProfileRequest, opts ...grpc.CallOption) (*EndDevices, error) {
+	out := new(EndDevices)
+	err := c.cc.Invoke(ctx, NsEndDeviceBatchRegistry_SetMACSettingsProfile_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NsEndDeviceBatchRegistryServer is the server API for NsEndDeviceBatchRegistry service.
 // All implementations must embed UnimplementedNsEndDeviceBatchRegistryServer
 // for forward compatibility
@@ -797,6 +809,8 @@ type NsEndDeviceBatchRegistryServer interface {
 	// This operation is atomic; either all devices are deleted or none.
 	// Devices not found are skipped and no error is returned.
 	Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error)
+	// Set the MAC settings profile for a batch of end devices.
+	SetMACSettingsProfile(context.Context, *BatchSetMACSettingsProfileRequest) (*EndDevices, error)
 	mustEmbedUnimplementedNsEndDeviceBatchRegistryServer()
 }
 
@@ -806,6 +820,9 @@ type UnimplementedNsEndDeviceBatchRegistryServer struct {
 
 func (UnimplementedNsEndDeviceBatchRegistryServer) Delete(context.Context, *BatchDeleteEndDevicesRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+}
+func (UnimplementedNsEndDeviceBatchRegistryServer) SetMACSettingsProfile(context.Context, *BatchSetMACSettingsProfileRequest) (*EndDevices, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetMACSettingsProfile not implemented")
 }
 func (UnimplementedNsEndDeviceBatchRegistryServer) mustEmbedUnimplementedNsEndDeviceBatchRegistryServer() {
 }
@@ -839,6 +856,24 @@ func _NsEndDeviceBatchRegistry_Delete_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NsEndDeviceBatchRegistry_SetMACSettingsProfile_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(BatchSetMACSettingsProfileRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NsEndDeviceBatchRegistryServer).SetMACSettingsProfile(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NsEndDeviceBatchRegistry_SetMACSettingsProfile_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NsEndDeviceBatchRegistryServer).SetMACSettingsProfile(ctx, req.(*BatchSetMACSettingsProfileRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NsEndDeviceBatchRegistry_ServiceDesc is the grpc.ServiceDesc for NsEndDeviceBatchRegistry service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -849,6 +884,10 @@ var NsEndDeviceBatchRegistry_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Delete",
 			Handler:    _NsEndDeviceBatchRegistry_Delete_Handler,
+		},
+		{
+			MethodName: "SetMACSettingsProfile",
+			Handler:    _NsEndDeviceBatchRegistry_SetMACSettingsProfile_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

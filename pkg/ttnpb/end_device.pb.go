@@ -3845,6 +3845,69 @@ func (x *BatchGetEndDevicesRequest) GetFieldMask() *fieldmaskpb.FieldMask {
 	return nil
 }
 
+type BatchSetMACSettingsProfileRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	ApplicationIds        *ApplicationIdentifiers        `protobuf:"bytes,1,opt,name=application_ids,json=applicationIds,proto3" json:"application_ids,omitempty"`
+	MacSettingsProfileIds *MACSettingsProfileIdentifiers `protobuf:"bytes,2,opt,name=mac_settings_profile_ids,json=macSettingsProfileIds,proto3" json:"mac_settings_profile_ids,omitempty"`
+	DeviceIds             []string                       `protobuf:"bytes,3,rep,name=device_ids,json=deviceIds,proto3" json:"device_ids,omitempty"`
+}
+
+func (x *BatchSetMACSettingsProfileRequest) Reset() {
+	*x = BatchSetMACSettingsProfileRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[34]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *BatchSetMACSettingsProfileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*BatchSetMACSettingsProfileRequest) ProtoMessage() {}
+
+func (x *BatchSetMACSettingsProfileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[34]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use BatchSetMACSettingsProfileRequest.ProtoReflect.Descriptor instead.
+func (*BatchSetMACSettingsProfileRequest) Descriptor() ([]byte, []int) {
+	return file_ttn_lorawan_v3_end_device_proto_rawDescGZIP(), []int{34}
+}
+
+func (x *BatchSetMACSettingsProfileRequest) GetApplicationIds() *ApplicationIdentifiers {
+	if x != nil {
+		return x.ApplicationIds
+	}
+	return nil
+}
+
+func (x *BatchSetMACSettingsProfileRequest) GetMacSettingsProfileIds() *MACSettingsProfileIdentifiers {
+	if x != nil {
+		return x.MacSettingsProfileIds
+	}
+	return nil
+}
+
+func (x *BatchSetMACSettingsProfileRequest) GetDeviceIds() []string {
+	if x != nil {
+		return x.DeviceIds
+	}
+	return nil
+}
+
 type MACParameters_Channel struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -3865,7 +3928,7 @@ type MACParameters_Channel struct {
 func (x *MACParameters_Channel) Reset() {
 	*x = MACParameters_Channel{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[34]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[35]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3878,7 +3941,7 @@ func (x *MACParameters_Channel) String() string {
 func (*MACParameters_Channel) ProtoMessage() {}
 
 func (x *MACParameters_Channel) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[34]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[35]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3946,7 +4009,7 @@ type ADRSettings_StaticMode struct {
 func (x *ADRSettings_StaticMode) Reset() {
 	*x = ADRSettings_StaticMode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[35]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[36]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -3959,7 +4022,7 @@ func (x *ADRSettings_StaticMode) String() string {
 func (*ADRSettings_StaticMode) ProtoMessage() {}
 
 func (x *ADRSettings_StaticMode) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[35]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[36]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4031,7 +4094,7 @@ type ADRSettings_DynamicMode struct {
 func (x *ADRSettings_DynamicMode) Reset() {
 	*x = ADRSettings_DynamicMode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[36]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[37]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4044,7 +4107,7 @@ func (x *ADRSettings_DynamicMode) String() string {
 func (*ADRSettings_DynamicMode) ProtoMessage() {}
 
 func (x *ADRSettings_DynamicMode) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[36]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[37]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4134,7 +4197,7 @@ type ADRSettings_DisabledMode struct {
 func (x *ADRSettings_DisabledMode) Reset() {
 	*x = ADRSettings_DisabledMode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[37]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[38]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4147,7 +4210,7 @@ func (x *ADRSettings_DisabledMode) String() string {
 func (*ADRSettings_DisabledMode) ProtoMessage() {}
 
 func (x *ADRSettings_DisabledMode) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[37]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[38]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4178,7 +4241,7 @@ type ADRSettings_DynamicMode_ChannelSteeringSettings struct {
 func (x *ADRSettings_DynamicMode_ChannelSteeringSettings) Reset() {
 	*x = ADRSettings_DynamicMode_ChannelSteeringSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[38]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[39]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4191,7 +4254,7 @@ func (x *ADRSettings_DynamicMode_ChannelSteeringSettings) String() string {
 func (*ADRSettings_DynamicMode_ChannelSteeringSettings) ProtoMessage() {}
 
 func (x *ADRSettings_DynamicMode_ChannelSteeringSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[38]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[39]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4263,7 +4326,7 @@ type ADRSettings_DynamicMode_PerDataRateIndexOverride struct {
 func (x *ADRSettings_DynamicMode_PerDataRateIndexOverride) Reset() {
 	*x = ADRSettings_DynamicMode_PerDataRateIndexOverride{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[39]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[40]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4276,7 +4339,7 @@ func (x *ADRSettings_DynamicMode_PerDataRateIndexOverride) String() string {
 func (*ADRSettings_DynamicMode_PerDataRateIndexOverride) ProtoMessage() {}
 
 func (x *ADRSettings_DynamicMode_PerDataRateIndexOverride) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[39]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[40]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4333,7 +4396,7 @@ type ADRSettings_DynamicMode_Overrides struct {
 func (x *ADRSettings_DynamicMode_Overrides) Reset() {
 	*x = ADRSettings_DynamicMode_Overrides{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[40]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[41]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4346,7 +4409,7 @@ func (x *ADRSettings_DynamicMode_Overrides) String() string {
 func (*ADRSettings_DynamicMode_Overrides) ProtoMessage() {}
 
 func (x *ADRSettings_DynamicMode_Overrides) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[40]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[41]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4486,7 +4549,7 @@ type ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode struct {
 func (x *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) Reset() {
 	*x = ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[41]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[42]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4499,7 +4562,7 @@ func (x *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) String(
 func (*ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) ProtoMessage() {}
 
 func (x *ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[41]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[42]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4526,7 +4589,7 @@ type ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode struct {
 func (x *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) Reset() {
 	*x = ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[42]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[43]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4539,7 +4602,7 @@ func (x *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) String() 
 func (*ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) ProtoMessage() {}
 
 func (x *ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[42]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[43]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4568,7 +4631,7 @@ type MACState_JoinRequest struct {
 func (x *MACState_JoinRequest) Reset() {
 	*x = MACState_JoinRequest{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[43]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[44]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4581,7 +4644,7 @@ func (x *MACState_JoinRequest) String() string {
 func (*MACState_JoinRequest) ProtoMessage() {}
 
 func (x *MACState_JoinRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[43]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[44]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4636,7 +4699,7 @@ type MACState_JoinAccept struct {
 func (x *MACState_JoinAccept) Reset() {
 	*x = MACState_JoinAccept{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[44]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[45]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4649,7 +4712,7 @@ func (x *MACState_JoinAccept) String() string {
 func (*MACState_JoinAccept) ProtoMessage() {}
 
 func (x *MACState_JoinAccept) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[44]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[45]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4725,7 +4788,7 @@ type MACState_UplinkMessage struct {
 func (x *MACState_UplinkMessage) Reset() {
 	*x = MACState_UplinkMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[45]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[46]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4738,7 +4801,7 @@ func (x *MACState_UplinkMessage) String() string {
 func (*MACState_UplinkMessage) ProtoMessage() {}
 
 func (x *MACState_UplinkMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[45]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[46]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4810,7 +4873,7 @@ type MACState_DownlinkMessage struct {
 func (x *MACState_DownlinkMessage) Reset() {
 	*x = MACState_DownlinkMessage{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[46]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[47]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4823,7 +4886,7 @@ func (x *MACState_DownlinkMessage) String() string {
 func (*MACState_DownlinkMessage) ProtoMessage() {}
 
 func (x *MACState_DownlinkMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[46]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[47]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4865,7 +4928,7 @@ type MACState_DataRateRange struct {
 func (x *MACState_DataRateRange) Reset() {
 	*x = MACState_DataRateRange{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[47]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[48]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4878,7 +4941,7 @@ func (x *MACState_DataRateRange) String() string {
 func (*MACState_DataRateRange) ProtoMessage() {}
 
 func (x *MACState_DataRateRange) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[47]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[48]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4919,7 +4982,7 @@ type MACState_DataRateRanges struct {
 func (x *MACState_DataRateRanges) Reset() {
 	*x = MACState_DataRateRanges{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[48]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[49]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4932,7 +4995,7 @@ func (x *MACState_DataRateRanges) String() string {
 func (*MACState_DataRateRanges) ProtoMessage() {}
 
 func (x *MACState_DataRateRanges) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[48]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[49]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4966,7 +5029,7 @@ type MACState_UplinkMessage_TxSettings struct {
 func (x *MACState_UplinkMessage_TxSettings) Reset() {
 	*x = MACState_UplinkMessage_TxSettings{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[50]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[51]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -4979,7 +5042,7 @@ func (x *MACState_UplinkMessage_TxSettings) String() string {
 func (*MACState_UplinkMessage_TxSettings) ProtoMessage() {}
 
 func (x *MACState_UplinkMessage_TxSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[50]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[51]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5019,7 +5082,7 @@ type MACState_UplinkMessage_RxMetadata struct {
 func (x *MACState_UplinkMessage_RxMetadata) Reset() {
 	*x = MACState_UplinkMessage_RxMetadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[51]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[52]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5032,7 +5095,7 @@ func (x *MACState_UplinkMessage_RxMetadata) String() string {
 func (*MACState_UplinkMessage_RxMetadata) ProtoMessage() {}
 
 func (x *MACState_UplinkMessage_RxMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[51]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[52]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5106,7 +5169,7 @@ type MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata struct {
 func (x *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) Reset() {
 	*x = MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[52]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[53]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5119,7 +5182,7 @@ func (x *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) String() string
 func (*MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) ProtoMessage() {}
 
 func (x *MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[52]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[53]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5144,7 +5207,7 @@ type MACState_UplinkMessage_RxMetadata_RelayMetadata struct {
 func (x *MACState_UplinkMessage_RxMetadata_RelayMetadata) Reset() {
 	*x = MACState_UplinkMessage_RxMetadata_RelayMetadata{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[53]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[54]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5157,7 +5220,7 @@ func (x *MACState_UplinkMessage_RxMetadata_RelayMetadata) String() string {
 func (*MACState_UplinkMessage_RxMetadata_RelayMetadata) ProtoMessage() {}
 
 func (x *MACState_UplinkMessage_RxMetadata_RelayMetadata) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[53]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[54]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5185,7 +5248,7 @@ type MACState_DownlinkMessage_Message struct {
 func (x *MACState_DownlinkMessage_Message) Reset() {
 	*x = MACState_DownlinkMessage_Message{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[54]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[55]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5198,7 +5261,7 @@ func (x *MACState_DownlinkMessage_Message) String() string {
 func (*MACState_DownlinkMessage_Message) ProtoMessage() {}
 
 func (x *MACState_DownlinkMessage_Message) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[54]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[55]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5239,7 +5302,7 @@ type MACState_DownlinkMessage_Message_MHDR struct {
 func (x *MACState_DownlinkMessage_Message_MHDR) Reset() {
 	*x = MACState_DownlinkMessage_Message_MHDR{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[55]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[56]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5252,7 +5315,7 @@ func (x *MACState_DownlinkMessage_Message_MHDR) String() string {
 func (*MACState_DownlinkMessage_Message_MHDR) ProtoMessage() {}
 
 func (x *MACState_DownlinkMessage_Message_MHDR) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[55]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[56]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5287,7 +5350,7 @@ type MACState_DownlinkMessage_Message_MACPayload struct {
 func (x *MACState_DownlinkMessage_Message_MACPayload) Reset() {
 	*x = MACState_DownlinkMessage_Message_MACPayload{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[56]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[57]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5300,7 +5363,7 @@ func (x *MACState_DownlinkMessage_Message_MACPayload) String() string {
 func (*MACState_DownlinkMessage_Message_MACPayload) ProtoMessage() {}
 
 func (x *MACState_DownlinkMessage_Message_MACPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[56]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[57]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5342,7 +5405,7 @@ type BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate struct {
 func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) Reset() {
 	*x = BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[59]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[60]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5355,7 +5418,7 @@ func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) String() s
 func (*BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) ProtoMessage() {}
 
 func (x *BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[59]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[60]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5399,7 +5462,7 @@ type ListEndDevicesRequest_Filter struct {
 func (x *ListEndDevicesRequest_Filter) Reset() {
 	*x = ListEndDevicesRequest_Filter{}
 	if protoimpl.UnsafeEnabled {
-		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[60]
+		mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[61]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		ms.StoreMessageInfo(mi)
 	}
@@ -5412,7 +5475,7 @@ func (x *ListEndDevicesRequest_Filter) String() string {
 func (*ListEndDevicesRequest_Filter) ProtoMessage() {}
 
 func (x *ListEndDevicesRequest_Filter) ProtoReflect() protoreflect.Message {
-	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[60]
+	mi := &file_ttn_lorawan_v3_end_device_proto_msgTypes[61]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -7170,16 +7233,36 @@ var file_ttn_lorawan_v3_end_device_proto_rawDesc = []byte{
 	0x2e, 0x46, 0x69, 0x65, 0x6c, 0x64, 0x4d, 0x61, 0x73, 0x6b, 0x52, 0x09, 0x66, 0x69, 0x65, 0x6c,
 	0x64, 0x4d, 0x61, 0x73, 0x6b, 0x4a, 0x04, 0x08, 0x04, 0x10, 0x05, 0x4a, 0x04, 0x08, 0x05, 0x10,
 	0x06, 0x4a, 0x04, 0x08, 0x06, 0x10, 0x07, 0x52, 0x05, 0x6f, 0x72, 0x64, 0x65, 0x72, 0x52, 0x05,
-	0x6c, 0x69, 0x6d, 0x69, 0x74, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x2a, 0x55, 0x0a, 0x0a, 0x50,
-	0x6f, 0x77, 0x65, 0x72, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x11, 0x0a, 0x0d, 0x50, 0x4f, 0x57,
-	0x45, 0x52, 0x5f, 0x55, 0x4e, 0x4b, 0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d,
-	0x50, 0x4f, 0x57, 0x45, 0x52, 0x5f, 0x42, 0x41, 0x54, 0x54, 0x45, 0x52, 0x59, 0x10, 0x01, 0x12,
-	0x12, 0x0a, 0x0e, 0x50, 0x4f, 0x57, 0x45, 0x52, 0x5f, 0x45, 0x58, 0x54, 0x45, 0x52, 0x4e, 0x41,
-	0x4c, 0x10, 0x02, 0x1a, 0x0d, 0xea, 0xaa, 0x19, 0x09, 0x18, 0x01, 0x2a, 0x05, 0x50, 0x4f, 0x57,
-	0x45, 0x52, 0x42, 0x31, 0x5a, 0x2f, 0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e,
-	0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74, 0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77,
-	0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61, 0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f,
-	0x74, 0x74, 0x6e, 0x70, 0x62, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x6c, 0x69, 0x6d, 0x69, 0x74, 0x52, 0x04, 0x70, 0x61, 0x67, 0x65, 0x22, 0xb7, 0x02, 0x0a, 0x21,
+	0x42, 0x61, 0x74, 0x63, 0x68, 0x53, 0x65, 0x74, 0x4d, 0x41, 0x43, 0x53, 0x65, 0x74, 0x74, 0x69,
+	0x6e, 0x67, 0x73, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x59, 0x0a, 0x0f, 0x61, 0x70, 0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e,
+	0x5f, 0x69, 0x64, 0x73, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x26, 0x2e, 0x74, 0x74, 0x6e,
+	0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e, 0x41, 0x70, 0x70, 0x6c,
+	0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65,
+	0x72, 0x73, 0x42, 0x08, 0xfa, 0x42, 0x05, 0x8a, 0x01, 0x02, 0x10, 0x01, 0x52, 0x0e, 0x61, 0x70,
+	0x70, 0x6c, 0x69, 0x63, 0x61, 0x74, 0x69, 0x6f, 0x6e, 0x49, 0x64, 0x73, 0x12, 0x66, 0x0a, 0x18,
+	0x6d, 0x61, 0x63, 0x5f, 0x73, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x5f, 0x70, 0x72, 0x6f,
+	0x66, 0x69, 0x6c, 0x65, 0x5f, 0x69, 0x64, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x2d,
+	0x2e, 0x74, 0x74, 0x6e, 0x2e, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2e, 0x76, 0x33, 0x2e,
+	0x4d, 0x41, 0x43, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x50, 0x72, 0x6f, 0x66, 0x69,
+	0x6c, 0x65, 0x49, 0x64, 0x65, 0x6e, 0x74, 0x69, 0x66, 0x69, 0x65, 0x72, 0x73, 0x52, 0x15, 0x6d,
+	0x61, 0x63, 0x53, 0x65, 0x74, 0x74, 0x69, 0x6e, 0x67, 0x73, 0x50, 0x72, 0x6f, 0x66, 0x69, 0x6c,
+	0x65, 0x49, 0x64, 0x73, 0x12, 0x4f, 0x0a, 0x0a, 0x64, 0x65, 0x76, 0x69, 0x63, 0x65, 0x5f, 0x69,
+	0x64, 0x73, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x42, 0x30, 0xfa, 0x42, 0x2d, 0x92, 0x01, 0x2a,
+	0x08, 0x01, 0x10, 0x14, 0x22, 0x24, 0x72, 0x22, 0x18, 0x24, 0x32, 0x1e, 0x5e, 0x5b, 0x61, 0x2d,
+	0x7a, 0x30, 0x2d, 0x39, 0x5d, 0x28, 0x3f, 0x3a, 0x5b, 0x2d, 0x5d, 0x3f, 0x5b, 0x61, 0x2d, 0x7a,
+	0x30, 0x2d, 0x39, 0x5d, 0x29, 0x7b, 0x32, 0x2c, 0x7d, 0x24, 0x52, 0x09, 0x64, 0x65, 0x76, 0x69,
+	0x63, 0x65, 0x49, 0x64, 0x73, 0x2a, 0x55, 0x0a, 0x0a, 0x50, 0x6f, 0x77, 0x65, 0x72, 0x53, 0x74,
+	0x61, 0x74, 0x65, 0x12, 0x11, 0x0a, 0x0d, 0x50, 0x4f, 0x57, 0x45, 0x52, 0x5f, 0x55, 0x4e, 0x4b,
+	0x4e, 0x4f, 0x57, 0x4e, 0x10, 0x00, 0x12, 0x11, 0x0a, 0x0d, 0x50, 0x4f, 0x57, 0x45, 0x52, 0x5f,
+	0x42, 0x41, 0x54, 0x54, 0x45, 0x52, 0x59, 0x10, 0x01, 0x12, 0x12, 0x0a, 0x0e, 0x50, 0x4f, 0x57,
+	0x45, 0x52, 0x5f, 0x45, 0x58, 0x54, 0x45, 0x52, 0x4e, 0x41, 0x4c, 0x10, 0x02, 0x1a, 0x0d, 0xea,
+	0xaa, 0x19, 0x09, 0x18, 0x01, 0x2a, 0x05, 0x50, 0x4f, 0x57, 0x45, 0x52, 0x42, 0x31, 0x5a, 0x2f,
+	0x67, 0x6f, 0x2e, 0x74, 0x68, 0x65, 0x74, 0x68, 0x69, 0x6e, 0x67, 0x73, 0x2e, 0x6e, 0x65, 0x74,
+	0x77, 0x6f, 0x72, 0x6b, 0x2f, 0x6c, 0x6f, 0x72, 0x61, 0x77, 0x61, 0x6e, 0x2d, 0x73, 0x74, 0x61,
+	0x63, 0x6b, 0x2f, 0x76, 0x33, 0x2f, 0x70, 0x6b, 0x67, 0x2f, 0x74, 0x74, 0x6e, 0x70, 0x62, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -7195,7 +7278,7 @@ func file_ttn_lorawan_v3_end_device_proto_rawDescGZIP() []byte {
 }
 
 var file_ttn_lorawan_v3_end_device_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_ttn_lorawan_v3_end_device_proto_msgTypes = make([]protoimpl.MessageInfo, 62)
+var file_ttn_lorawan_v3_end_device_proto_msgTypes = make([]protoimpl.MessageInfo, 63)
 var file_ttn_lorawan_v3_end_device_proto_goTypes = []interface{}{
 	(PowerState)(0),                                          // 0: ttn.lorawan.v3.PowerState
 	(*Session)(nil),                                          // 1: ttn.lorawan.v3.Session
@@ -7232,315 +7315,318 @@ var file_ttn_lorawan_v3_end_device_proto_goTypes = []interface{}{
 	(*ConvertEndDeviceTemplateRequest)(nil),                  // 32: ttn.lorawan.v3.ConvertEndDeviceTemplateRequest
 	(*BatchDeleteEndDevicesRequest)(nil),                     // 33: ttn.lorawan.v3.BatchDeleteEndDevicesRequest
 	(*BatchGetEndDevicesRequest)(nil),                        // 34: ttn.lorawan.v3.BatchGetEndDevicesRequest
-	(*MACParameters_Channel)(nil),                            // 35: ttn.lorawan.v3.MACParameters.Channel
-	(*ADRSettings_StaticMode)(nil),                           // 36: ttn.lorawan.v3.ADRSettings.StaticMode
-	(*ADRSettings_DynamicMode)(nil),                          // 37: ttn.lorawan.v3.ADRSettings.DynamicMode
-	(*ADRSettings_DisabledMode)(nil),                         // 38: ttn.lorawan.v3.ADRSettings.DisabledMode
-	(*ADRSettings_DynamicMode_ChannelSteeringSettings)(nil),  // 39: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings
-	(*ADRSettings_DynamicMode_PerDataRateIndexOverride)(nil), // 40: ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	(*ADRSettings_DynamicMode_Overrides)(nil),                // 41: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides
-	(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode)(nil), // 42: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode
-	(*ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode)(nil),   // 43: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode
-	(*MACState_JoinRequest)(nil),                                           // 44: ttn.lorawan.v3.MACState.JoinRequest
-	(*MACState_JoinAccept)(nil),                                            // 45: ttn.lorawan.v3.MACState.JoinAccept
-	(*MACState_UplinkMessage)(nil),                                         // 46: ttn.lorawan.v3.MACState.UplinkMessage
-	(*MACState_DownlinkMessage)(nil),                                       // 47: ttn.lorawan.v3.MACState.DownlinkMessage
-	(*MACState_DataRateRange)(nil),                                         // 48: ttn.lorawan.v3.MACState.DataRateRange
-	(*MACState_DataRateRanges)(nil),                                        // 49: ttn.lorawan.v3.MACState.DataRateRanges
-	nil,                                                                    // 50: ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry
-	(*MACState_UplinkMessage_TxSettings)(nil),                              // 51: ttn.lorawan.v3.MACState.UplinkMessage.TxSettings
-	(*MACState_UplinkMessage_RxMetadata)(nil),                              // 52: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata
-	(*MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata)(nil),         // 53: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata
-	(*MACState_UplinkMessage_RxMetadata_RelayMetadata)(nil),                // 54: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata
-	(*MACState_DownlinkMessage_Message)(nil),                               // 55: ttn.lorawan.v3.MACState.DownlinkMessage.Message
-	(*MACState_DownlinkMessage_Message_MHDR)(nil),                          // 56: ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR
-	(*MACState_DownlinkMessage_Message_MACPayload)(nil),                    // 57: ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload
-	nil, // 58: ttn.lorawan.v3.EndDevice.AttributesEntry
-	nil, // 59: ttn.lorawan.v3.EndDevice.LocationsEntry
-	(*BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate)(nil), // 60: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate
-	(*ListEndDevicesRequest_Filter)(nil),                                // 61: ttn.lorawan.v3.ListEndDevicesRequest.Filter
-	nil,                                                                 // 62: ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry
-	(*SessionKeys)(nil),                                                 // 63: ttn.lorawan.v3.SessionKeys
-	(*timestamppb.Timestamp)(nil),                                       // 64: google.protobuf.Timestamp
-	(*ApplicationDownlink)(nil),                                         // 65: ttn.lorawan.v3.ApplicationDownlink
-	(RelayResetLimitCounter)(0),                                         // 66: ttn.lorawan.v3.RelayResetLimitCounter
-	(*RelayForwardLimits)(nil),                                          // 67: ttn.lorawan.v3.RelayForwardLimits
-	(*RelayUplinkForwardLimits)(nil),                                    // 68: ttn.lorawan.v3.RelayUplinkForwardLimits
-	(*RelaySecondChannel)(nil),                                          // 69: ttn.lorawan.v3.RelaySecondChannel
-	(RelayCADPeriodicity)(0),                                            // 70: ttn.lorawan.v3.RelayCADPeriodicity
-	(*RelayEndDeviceAlwaysMode)(nil),                                    // 71: ttn.lorawan.v3.RelayEndDeviceAlwaysMode
-	(*RelayEndDeviceDynamicMode)(nil),                                   // 72: ttn.lorawan.v3.RelayEndDeviceDynamicMode
-	(*RelayEndDeviceControlledMode)(nil),                                // 73: ttn.lorawan.v3.RelayEndDeviceControlledMode
-	(*wrapperspb.UInt32Value)(nil),                                      // 74: google.protobuf.UInt32Value
-	(DataRateIndex)(0),                                                  // 75: ttn.lorawan.v3.DataRateIndex
-	(RxDelay)(0),                                                        // 76: ttn.lorawan.v3.RxDelay
-	(DataRateOffset)(0),                                                 // 77: ttn.lorawan.v3.DataRateOffset
-	(AggregatedDutyCycle)(0),                                            // 78: ttn.lorawan.v3.AggregatedDutyCycle
-	(RejoinTimeExponent)(0),                                             // 79: ttn.lorawan.v3.RejoinTimeExponent
-	(RejoinCountExponent)(0),                                            // 80: ttn.lorawan.v3.RejoinCountExponent
-	(*ADRAckLimitExponentValue)(nil),                                    // 81: ttn.lorawan.v3.ADRAckLimitExponentValue
-	(*ADRAckDelayExponentValue)(nil),                                    // 82: ttn.lorawan.v3.ADRAckDelayExponentValue
-	(*DataRateIndexValue)(nil),                                          // 83: ttn.lorawan.v3.DataRateIndexValue
-	(*EndDeviceVersionIdentifiers)(nil),                                 // 84: ttn.lorawan.v3.EndDeviceVersionIdentifiers
-	(MACVersion)(0),                                                     // 85: ttn.lorawan.v3.MACVersion
-	(PHYVersion)(0),                                                     // 86: ttn.lorawan.v3.PHYVersion
-	(*MessagePayloadFormatters)(nil),                                    // 87: ttn.lorawan.v3.MessagePayloadFormatters
-	(*durationpb.Duration)(nil),                                         // 88: google.protobuf.Duration
-	(*PingSlotPeriodValue)(nil),                                         // 89: ttn.lorawan.v3.PingSlotPeriodValue
-	(*ZeroableFrequencyValue)(nil),                                      // 90: ttn.lorawan.v3.ZeroableFrequencyValue
-	(*RxDelayValue)(nil),                                                // 91: ttn.lorawan.v3.RxDelayValue
-	(*DataRateOffsetValue)(nil),                                         // 92: ttn.lorawan.v3.DataRateOffsetValue
-	(*FrequencyValue)(nil),                                              // 93: ttn.lorawan.v3.FrequencyValue
-	(*AggregatedDutyCycleValue)(nil),                                    // 94: ttn.lorawan.v3.AggregatedDutyCycleValue
-	(*wrapperspb.FloatValue)(nil),                                       // 95: google.protobuf.FloatValue
-	(*DeviceEIRPValue)(nil),                                             // 96: ttn.lorawan.v3.DeviceEIRPValue
-	(*MACSettingsProfileIdentifiers)(nil),                               // 97: ttn.lorawan.v3.MACSettingsProfileIdentifiers
-	(Class)(0),                                                          // 98: ttn.lorawan.v3.Class
-	(*MACCommand)(nil),                                                  // 99: ttn.lorawan.v3.MACCommand
-	(MACCommandIdentifier)(0),                                           // 100: ttn.lorawan.v3.MACCommandIdentifier
-	(*RelayForwardDownlinkReq)(nil),                                     // 101: ttn.lorawan.v3.RelayForwardDownlinkReq
-	(*EndDeviceIdentifiers)(nil),                                        // 102: ttn.lorawan.v3.EndDeviceIdentifiers
-	(*Picture)(nil),                                                     // 103: ttn.lorawan.v3.Picture
-	(*RootKeys)(nil),                                                    // 104: ttn.lorawan.v3.RootKeys
-	(*structpb.Struct)(nil),                                             // 105: google.protobuf.Struct
-	(*wrapperspb.BoolValue)(nil),                                        // 106: google.protobuf.BoolValue
-	(*LoRaAllianceProfileIdentifiers)(nil),                              // 107: ttn.lorawan.v3.LoRaAllianceProfileIdentifiers
-	(*fieldmaskpb.FieldMask)(nil),                                       // 108: google.protobuf.FieldMask
-	(*ApplicationIdentifiers)(nil),                                      // 109: ttn.lorawan.v3.ApplicationIdentifiers
-	(*DLSettings)(nil),                                                  // 110: ttn.lorawan.v3.DLSettings
-	(*CFList)(nil),                                                      // 111: ttn.lorawan.v3.CFList
-	(*Message)(nil),                                                     // 112: ttn.lorawan.v3.Message
-	(*DataRate)(nil),                                                    // 113: ttn.lorawan.v3.DataRate
-	(*GatewayIdentifiers)(nil),                                          // 114: ttn.lorawan.v3.GatewayIdentifiers
-	(DownlinkPathConstraint)(0),                                         // 115: ttn.lorawan.v3.DownlinkPathConstraint
-	(MType)(0),                                                          // 116: ttn.lorawan.v3.MType
-	(*Location)(nil),                                                    // 117: ttn.lorawan.v3.Location
+	(*BatchSetMACSettingsProfileRequest)(nil),                // 35: ttn.lorawan.v3.BatchSetMACSettingsProfileRequest
+	(*MACParameters_Channel)(nil),                            // 36: ttn.lorawan.v3.MACParameters.Channel
+	(*ADRSettings_StaticMode)(nil),                           // 37: ttn.lorawan.v3.ADRSettings.StaticMode
+	(*ADRSettings_DynamicMode)(nil),                          // 38: ttn.lorawan.v3.ADRSettings.DynamicMode
+	(*ADRSettings_DisabledMode)(nil),                         // 39: ttn.lorawan.v3.ADRSettings.DisabledMode
+	(*ADRSettings_DynamicMode_ChannelSteeringSettings)(nil),  // 40: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings
+	(*ADRSettings_DynamicMode_PerDataRateIndexOverride)(nil), // 41: ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	(*ADRSettings_DynamicMode_Overrides)(nil),                // 42: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides
+	(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode)(nil), // 43: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode
+	(*ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode)(nil),   // 44: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode
+	(*MACState_JoinRequest)(nil),                                           // 45: ttn.lorawan.v3.MACState.JoinRequest
+	(*MACState_JoinAccept)(nil),                                            // 46: ttn.lorawan.v3.MACState.JoinAccept
+	(*MACState_UplinkMessage)(nil),                                         // 47: ttn.lorawan.v3.MACState.UplinkMessage
+	(*MACState_DownlinkMessage)(nil),                                       // 48: ttn.lorawan.v3.MACState.DownlinkMessage
+	(*MACState_DataRateRange)(nil),                                         // 49: ttn.lorawan.v3.MACState.DataRateRange
+	(*MACState_DataRateRanges)(nil),                                        // 50: ttn.lorawan.v3.MACState.DataRateRanges
+	nil,                                                                    // 51: ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry
+	(*MACState_UplinkMessage_TxSettings)(nil),                              // 52: ttn.lorawan.v3.MACState.UplinkMessage.TxSettings
+	(*MACState_UplinkMessage_RxMetadata)(nil),                              // 53: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata
+	(*MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata)(nil),         // 54: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata
+	(*MACState_UplinkMessage_RxMetadata_RelayMetadata)(nil),                // 55: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata
+	(*MACState_DownlinkMessage_Message)(nil),                               // 56: ttn.lorawan.v3.MACState.DownlinkMessage.Message
+	(*MACState_DownlinkMessage_Message_MHDR)(nil),                          // 57: ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR
+	(*MACState_DownlinkMessage_Message_MACPayload)(nil),                    // 58: ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload
+	nil, // 59: ttn.lorawan.v3.EndDevice.AttributesEntry
+	nil, // 60: ttn.lorawan.v3.EndDevice.LocationsEntry
+	(*BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate)(nil), // 61: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate
+	(*ListEndDevicesRequest_Filter)(nil),                                // 62: ttn.lorawan.v3.ListEndDevicesRequest.Filter
+	nil,                                                                 // 63: ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry
+	(*SessionKeys)(nil),                                                 // 64: ttn.lorawan.v3.SessionKeys
+	(*timestamppb.Timestamp)(nil),                                       // 65: google.protobuf.Timestamp
+	(*ApplicationDownlink)(nil),                                         // 66: ttn.lorawan.v3.ApplicationDownlink
+	(RelayResetLimitCounter)(0),                                         // 67: ttn.lorawan.v3.RelayResetLimitCounter
+	(*RelayForwardLimits)(nil),                                          // 68: ttn.lorawan.v3.RelayForwardLimits
+	(*RelayUplinkForwardLimits)(nil),                                    // 69: ttn.lorawan.v3.RelayUplinkForwardLimits
+	(*RelaySecondChannel)(nil),                                          // 70: ttn.lorawan.v3.RelaySecondChannel
+	(RelayCADPeriodicity)(0),                                            // 71: ttn.lorawan.v3.RelayCADPeriodicity
+	(*RelayEndDeviceAlwaysMode)(nil),                                    // 72: ttn.lorawan.v3.RelayEndDeviceAlwaysMode
+	(*RelayEndDeviceDynamicMode)(nil),                                   // 73: ttn.lorawan.v3.RelayEndDeviceDynamicMode
+	(*RelayEndDeviceControlledMode)(nil),                                // 74: ttn.lorawan.v3.RelayEndDeviceControlledMode
+	(*wrapperspb.UInt32Value)(nil),                                      // 75: google.protobuf.UInt32Value
+	(DataRateIndex)(0),                                                  // 76: ttn.lorawan.v3.DataRateIndex
+	(RxDelay)(0),                                                        // 77: ttn.lorawan.v3.RxDelay
+	(DataRateOffset)(0),                                                 // 78: ttn.lorawan.v3.DataRateOffset
+	(AggregatedDutyCycle)(0),                                            // 79: ttn.lorawan.v3.AggregatedDutyCycle
+	(RejoinTimeExponent)(0),                                             // 80: ttn.lorawan.v3.RejoinTimeExponent
+	(RejoinCountExponent)(0),                                            // 81: ttn.lorawan.v3.RejoinCountExponent
+	(*ADRAckLimitExponentValue)(nil),                                    // 82: ttn.lorawan.v3.ADRAckLimitExponentValue
+	(*ADRAckDelayExponentValue)(nil),                                    // 83: ttn.lorawan.v3.ADRAckDelayExponentValue
+	(*DataRateIndexValue)(nil),                                          // 84: ttn.lorawan.v3.DataRateIndexValue
+	(*EndDeviceVersionIdentifiers)(nil),                                 // 85: ttn.lorawan.v3.EndDeviceVersionIdentifiers
+	(MACVersion)(0),                                                     // 86: ttn.lorawan.v3.MACVersion
+	(PHYVersion)(0),                                                     // 87: ttn.lorawan.v3.PHYVersion
+	(*MessagePayloadFormatters)(nil),                                    // 88: ttn.lorawan.v3.MessagePayloadFormatters
+	(*durationpb.Duration)(nil),                                         // 89: google.protobuf.Duration
+	(*PingSlotPeriodValue)(nil),                                         // 90: ttn.lorawan.v3.PingSlotPeriodValue
+	(*ZeroableFrequencyValue)(nil),                                      // 91: ttn.lorawan.v3.ZeroableFrequencyValue
+	(*RxDelayValue)(nil),                                                // 92: ttn.lorawan.v3.RxDelayValue
+	(*DataRateOffsetValue)(nil),                                         // 93: ttn.lorawan.v3.DataRateOffsetValue
+	(*FrequencyValue)(nil),                                              // 94: ttn.lorawan.v3.FrequencyValue
+	(*AggregatedDutyCycleValue)(nil),                                    // 95: ttn.lorawan.v3.AggregatedDutyCycleValue
+	(*wrapperspb.FloatValue)(nil),                                       // 96: google.protobuf.FloatValue
+	(*DeviceEIRPValue)(nil),                                             // 97: ttn.lorawan.v3.DeviceEIRPValue
+	(*MACSettingsProfileIdentifiers)(nil),                               // 98: ttn.lorawan.v3.MACSettingsProfileIdentifiers
+	(Class)(0),                                                          // 99: ttn.lorawan.v3.Class
+	(*MACCommand)(nil),                                                  // 100: ttn.lorawan.v3.MACCommand
+	(MACCommandIdentifier)(0),                                           // 101: ttn.lorawan.v3.MACCommandIdentifier
+	(*RelayForwardDownlinkReq)(nil),                                     // 102: ttn.lorawan.v3.RelayForwardDownlinkReq
+	(*EndDeviceIdentifiers)(nil),                                        // 103: ttn.lorawan.v3.EndDeviceIdentifiers
+	(*Picture)(nil),                                                     // 104: ttn.lorawan.v3.Picture
+	(*RootKeys)(nil),                                                    // 105: ttn.lorawan.v3.RootKeys
+	(*structpb.Struct)(nil),                                             // 106: google.protobuf.Struct
+	(*wrapperspb.BoolValue)(nil),                                        // 107: google.protobuf.BoolValue
+	(*LoRaAllianceProfileIdentifiers)(nil),                              // 108: ttn.lorawan.v3.LoRaAllianceProfileIdentifiers
+	(*fieldmaskpb.FieldMask)(nil),                                       // 109: google.protobuf.FieldMask
+	(*ApplicationIdentifiers)(nil),                                      // 110: ttn.lorawan.v3.ApplicationIdentifiers
+	(*DLSettings)(nil),                                                  // 111: ttn.lorawan.v3.DLSettings
+	(*CFList)(nil),                                                      // 112: ttn.lorawan.v3.CFList
+	(*Message)(nil),                                                     // 113: ttn.lorawan.v3.Message
+	(*DataRate)(nil),                                                    // 114: ttn.lorawan.v3.DataRate
+	(*GatewayIdentifiers)(nil),                                          // 115: ttn.lorawan.v3.GatewayIdentifiers
+	(DownlinkPathConstraint)(0),                                         // 116: ttn.lorawan.v3.DownlinkPathConstraint
+	(MType)(0),                                                          // 117: ttn.lorawan.v3.MType
+	(*Location)(nil),                                                    // 118: ttn.lorawan.v3.Location
 }
 var file_ttn_lorawan_v3_end_device_proto_depIdxs = []int32{
-	63,  // 0: ttn.lorawan.v3.Session.keys:type_name -> ttn.lorawan.v3.SessionKeys
-	64,  // 1: ttn.lorawan.v3.Session.started_at:type_name -> google.protobuf.Timestamp
-	65,  // 2: ttn.lorawan.v3.Session.queued_application_downlinks:type_name -> ttn.lorawan.v3.ApplicationDownlink
-	66,  // 3: ttn.lorawan.v3.ServingRelayForwardingLimits.reset_behavior:type_name -> ttn.lorawan.v3.RelayResetLimitCounter
-	67,  // 4: ttn.lorawan.v3.ServingRelayForwardingLimits.join_requests:type_name -> ttn.lorawan.v3.RelayForwardLimits
-	67,  // 5: ttn.lorawan.v3.ServingRelayForwardingLimits.notifications:type_name -> ttn.lorawan.v3.RelayForwardLimits
-	67,  // 6: ttn.lorawan.v3.ServingRelayForwardingLimits.uplink_messages:type_name -> ttn.lorawan.v3.RelayForwardLimits
-	67,  // 7: ttn.lorawan.v3.ServingRelayForwardingLimits.overall:type_name -> ttn.lorawan.v3.RelayForwardLimits
-	68,  // 8: ttn.lorawan.v3.RelayUplinkForwardingRule.limits:type_name -> ttn.lorawan.v3.RelayUplinkForwardLimits
-	69,  // 9: ttn.lorawan.v3.ServingRelayParameters.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
-	70,  // 10: ttn.lorawan.v3.ServingRelayParameters.cad_periodicity:type_name -> ttn.lorawan.v3.RelayCADPeriodicity
+	64,  // 0: ttn.lorawan.v3.Session.keys:type_name -> ttn.lorawan.v3.SessionKeys
+	65,  // 1: ttn.lorawan.v3.Session.started_at:type_name -> google.protobuf.Timestamp
+	66,  // 2: ttn.lorawan.v3.Session.queued_application_downlinks:type_name -> ttn.lorawan.v3.ApplicationDownlink
+	67,  // 3: ttn.lorawan.v3.ServingRelayForwardingLimits.reset_behavior:type_name -> ttn.lorawan.v3.RelayResetLimitCounter
+	68,  // 4: ttn.lorawan.v3.ServingRelayForwardingLimits.join_requests:type_name -> ttn.lorawan.v3.RelayForwardLimits
+	68,  // 5: ttn.lorawan.v3.ServingRelayForwardingLimits.notifications:type_name -> ttn.lorawan.v3.RelayForwardLimits
+	68,  // 6: ttn.lorawan.v3.ServingRelayForwardingLimits.uplink_messages:type_name -> ttn.lorawan.v3.RelayForwardLimits
+	68,  // 7: ttn.lorawan.v3.ServingRelayForwardingLimits.overall:type_name -> ttn.lorawan.v3.RelayForwardLimits
+	69,  // 8: ttn.lorawan.v3.RelayUplinkForwardingRule.limits:type_name -> ttn.lorawan.v3.RelayUplinkForwardLimits
+	70,  // 9: ttn.lorawan.v3.ServingRelayParameters.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
+	71,  // 10: ttn.lorawan.v3.ServingRelayParameters.cad_periodicity:type_name -> ttn.lorawan.v3.RelayCADPeriodicity
 	4,   // 11: ttn.lorawan.v3.ServingRelayParameters.uplink_forwarding_rules:type_name -> ttn.lorawan.v3.RelayUplinkForwardingRule
 	3,   // 12: ttn.lorawan.v3.ServingRelayParameters.limits:type_name -> ttn.lorawan.v3.ServingRelayForwardingLimits
-	71,  // 13: ttn.lorawan.v3.ServedRelayParameters.always:type_name -> ttn.lorawan.v3.RelayEndDeviceAlwaysMode
-	72,  // 14: ttn.lorawan.v3.ServedRelayParameters.dynamic:type_name -> ttn.lorawan.v3.RelayEndDeviceDynamicMode
-	73,  // 15: ttn.lorawan.v3.ServedRelayParameters.end_device_controlled:type_name -> ttn.lorawan.v3.RelayEndDeviceControlledMode
-	69,  // 16: ttn.lorawan.v3.ServedRelayParameters.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
+	72,  // 13: ttn.lorawan.v3.ServedRelayParameters.always:type_name -> ttn.lorawan.v3.RelayEndDeviceAlwaysMode
+	73,  // 14: ttn.lorawan.v3.ServedRelayParameters.dynamic:type_name -> ttn.lorawan.v3.RelayEndDeviceDynamicMode
+	74,  // 15: ttn.lorawan.v3.ServedRelayParameters.end_device_controlled:type_name -> ttn.lorawan.v3.RelayEndDeviceControlledMode
+	70,  // 16: ttn.lorawan.v3.ServedRelayParameters.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
 	5,   // 17: ttn.lorawan.v3.RelayParameters.serving:type_name -> ttn.lorawan.v3.ServingRelayParameters
 	6,   // 18: ttn.lorawan.v3.RelayParameters.served:type_name -> ttn.lorawan.v3.ServedRelayParameters
-	69,  // 19: ttn.lorawan.v3.ServingRelaySettings.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
-	74,  // 20: ttn.lorawan.v3.ServingRelaySettings.default_channel_index:type_name -> google.protobuf.UInt32Value
-	70,  // 21: ttn.lorawan.v3.ServingRelaySettings.cad_periodicity:type_name -> ttn.lorawan.v3.RelayCADPeriodicity
+	70,  // 19: ttn.lorawan.v3.ServingRelaySettings.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
+	75,  // 20: ttn.lorawan.v3.ServingRelaySettings.default_channel_index:type_name -> google.protobuf.UInt32Value
+	71,  // 21: ttn.lorawan.v3.ServingRelaySettings.cad_periodicity:type_name -> ttn.lorawan.v3.RelayCADPeriodicity
 	4,   // 22: ttn.lorawan.v3.ServingRelaySettings.uplink_forwarding_rules:type_name -> ttn.lorawan.v3.RelayUplinkForwardingRule
 	3,   // 23: ttn.lorawan.v3.ServingRelaySettings.limits:type_name -> ttn.lorawan.v3.ServingRelayForwardingLimits
-	71,  // 24: ttn.lorawan.v3.ServedRelaySettings.always:type_name -> ttn.lorawan.v3.RelayEndDeviceAlwaysMode
-	72,  // 25: ttn.lorawan.v3.ServedRelaySettings.dynamic:type_name -> ttn.lorawan.v3.RelayEndDeviceDynamicMode
-	73,  // 26: ttn.lorawan.v3.ServedRelaySettings.end_device_controlled:type_name -> ttn.lorawan.v3.RelayEndDeviceControlledMode
-	74,  // 27: ttn.lorawan.v3.ServedRelaySettings.backoff:type_name -> google.protobuf.UInt32Value
-	69,  // 28: ttn.lorawan.v3.ServedRelaySettings.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
+	72,  // 24: ttn.lorawan.v3.ServedRelaySettings.always:type_name -> ttn.lorawan.v3.RelayEndDeviceAlwaysMode
+	73,  // 25: ttn.lorawan.v3.ServedRelaySettings.dynamic:type_name -> ttn.lorawan.v3.RelayEndDeviceDynamicMode
+	74,  // 26: ttn.lorawan.v3.ServedRelaySettings.end_device_controlled:type_name -> ttn.lorawan.v3.RelayEndDeviceControlledMode
+	75,  // 27: ttn.lorawan.v3.ServedRelaySettings.backoff:type_name -> google.protobuf.UInt32Value
+	70,  // 28: ttn.lorawan.v3.ServedRelaySettings.second_channel:type_name -> ttn.lorawan.v3.RelaySecondChannel
 	8,   // 29: ttn.lorawan.v3.RelaySettings.serving:type_name -> ttn.lorawan.v3.ServingRelaySettings
 	9,   // 30: ttn.lorawan.v3.RelaySettings.served:type_name -> ttn.lorawan.v3.ServedRelaySettings
-	75,  // 31: ttn.lorawan.v3.MACParameters.adr_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	76,  // 32: ttn.lorawan.v3.MACParameters.rx1_delay:type_name -> ttn.lorawan.v3.RxDelay
-	77,  // 33: ttn.lorawan.v3.MACParameters.rx1_data_rate_offset:type_name -> ttn.lorawan.v3.DataRateOffset
-	75,  // 34: ttn.lorawan.v3.MACParameters.rx2_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	78,  // 35: ttn.lorawan.v3.MACParameters.max_duty_cycle:type_name -> ttn.lorawan.v3.AggregatedDutyCycle
-	79,  // 36: ttn.lorawan.v3.MACParameters.rejoin_time_periodicity:type_name -> ttn.lorawan.v3.RejoinTimeExponent
-	80,  // 37: ttn.lorawan.v3.MACParameters.rejoin_count_periodicity:type_name -> ttn.lorawan.v3.RejoinCountExponent
-	75,  // 38: ttn.lorawan.v3.MACParameters.ping_slot_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	35,  // 39: ttn.lorawan.v3.MACParameters.channels:type_name -> ttn.lorawan.v3.MACParameters.Channel
+	76,  // 31: ttn.lorawan.v3.MACParameters.adr_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	77,  // 32: ttn.lorawan.v3.MACParameters.rx1_delay:type_name -> ttn.lorawan.v3.RxDelay
+	78,  // 33: ttn.lorawan.v3.MACParameters.rx1_data_rate_offset:type_name -> ttn.lorawan.v3.DataRateOffset
+	76,  // 34: ttn.lorawan.v3.MACParameters.rx2_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	79,  // 35: ttn.lorawan.v3.MACParameters.max_duty_cycle:type_name -> ttn.lorawan.v3.AggregatedDutyCycle
+	80,  // 36: ttn.lorawan.v3.MACParameters.rejoin_time_periodicity:type_name -> ttn.lorawan.v3.RejoinTimeExponent
+	81,  // 37: ttn.lorawan.v3.MACParameters.rejoin_count_periodicity:type_name -> ttn.lorawan.v3.RejoinCountExponent
+	76,  // 38: ttn.lorawan.v3.MACParameters.ping_slot_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	36,  // 39: ttn.lorawan.v3.MACParameters.channels:type_name -> ttn.lorawan.v3.MACParameters.Channel
 	2,   // 40: ttn.lorawan.v3.MACParameters.uplink_dwell_time:type_name -> ttn.lorawan.v3.BoolValue
 	2,   // 41: ttn.lorawan.v3.MACParameters.downlink_dwell_time:type_name -> ttn.lorawan.v3.BoolValue
-	81,  // 42: ttn.lorawan.v3.MACParameters.adr_ack_limit_exponent:type_name -> ttn.lorawan.v3.ADRAckLimitExponentValue
-	82,  // 43: ttn.lorawan.v3.MACParameters.adr_ack_delay_exponent:type_name -> ttn.lorawan.v3.ADRAckDelayExponentValue
-	83,  // 44: ttn.lorawan.v3.MACParameters.ping_slot_data_rate_index_value:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	82,  // 42: ttn.lorawan.v3.MACParameters.adr_ack_limit_exponent:type_name -> ttn.lorawan.v3.ADRAckLimitExponentValue
+	83,  // 43: ttn.lorawan.v3.MACParameters.adr_ack_delay_exponent:type_name -> ttn.lorawan.v3.ADRAckDelayExponentValue
+	84,  // 44: ttn.lorawan.v3.MACParameters.ping_slot_data_rate_index_value:type_name -> ttn.lorawan.v3.DataRateIndexValue
 	7,   // 45: ttn.lorawan.v3.MACParameters.relay:type_name -> ttn.lorawan.v3.RelayParameters
-	84,  // 46: ttn.lorawan.v3.EndDeviceVersion.ids:type_name -> ttn.lorawan.v3.EndDeviceVersionIdentifiers
-	85,  // 47: ttn.lorawan.v3.EndDeviceVersion.lorawan_version:type_name -> ttn.lorawan.v3.MACVersion
-	86,  // 48: ttn.lorawan.v3.EndDeviceVersion.lorawan_phy_version:type_name -> ttn.lorawan.v3.PHYVersion
+	85,  // 46: ttn.lorawan.v3.EndDeviceVersion.ids:type_name -> ttn.lorawan.v3.EndDeviceVersionIdentifiers
+	86,  // 47: ttn.lorawan.v3.EndDeviceVersion.lorawan_version:type_name -> ttn.lorawan.v3.MACVersion
+	87,  // 48: ttn.lorawan.v3.EndDeviceVersion.lorawan_phy_version:type_name -> ttn.lorawan.v3.PHYVersion
 	14,  // 49: ttn.lorawan.v3.EndDeviceVersion.default_mac_settings:type_name -> ttn.lorawan.v3.MACSettings
-	87,  // 50: ttn.lorawan.v3.EndDeviceVersion.default_formatters:type_name -> ttn.lorawan.v3.MessagePayloadFormatters
-	36,  // 51: ttn.lorawan.v3.ADRSettings.static:type_name -> ttn.lorawan.v3.ADRSettings.StaticMode
-	37,  // 52: ttn.lorawan.v3.ADRSettings.dynamic:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode
-	38,  // 53: ttn.lorawan.v3.ADRSettings.disabled:type_name -> ttn.lorawan.v3.ADRSettings.DisabledMode
-	88,  // 54: ttn.lorawan.v3.MACSettings.class_b_timeout:type_name -> google.protobuf.Duration
-	89,  // 55: ttn.lorawan.v3.MACSettings.ping_slot_periodicity:type_name -> ttn.lorawan.v3.PingSlotPeriodValue
-	83,  // 56: ttn.lorawan.v3.MACSettings.ping_slot_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
-	90,  // 57: ttn.lorawan.v3.MACSettings.ping_slot_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
-	90,  // 58: ttn.lorawan.v3.MACSettings.beacon_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
-	88,  // 59: ttn.lorawan.v3.MACSettings.class_c_timeout:type_name -> google.protobuf.Duration
-	91,  // 60: ttn.lorawan.v3.MACSettings.rx1_delay:type_name -> ttn.lorawan.v3.RxDelayValue
-	92,  // 61: ttn.lorawan.v3.MACSettings.rx1_data_rate_offset:type_name -> ttn.lorawan.v3.DataRateOffsetValue
-	83,  // 62: ttn.lorawan.v3.MACSettings.rx2_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
-	93,  // 63: ttn.lorawan.v3.MACSettings.rx2_frequency:type_name -> ttn.lorawan.v3.FrequencyValue
-	94,  // 64: ttn.lorawan.v3.MACSettings.max_duty_cycle:type_name -> ttn.lorawan.v3.AggregatedDutyCycleValue
+	88,  // 50: ttn.lorawan.v3.EndDeviceVersion.default_formatters:type_name -> ttn.lorawan.v3.MessagePayloadFormatters
+	37,  // 51: ttn.lorawan.v3.ADRSettings.static:type_name -> ttn.lorawan.v3.ADRSettings.StaticMode
+	38,  // 52: ttn.lorawan.v3.ADRSettings.dynamic:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode
+	39,  // 53: ttn.lorawan.v3.ADRSettings.disabled:type_name -> ttn.lorawan.v3.ADRSettings.DisabledMode
+	89,  // 54: ttn.lorawan.v3.MACSettings.class_b_timeout:type_name -> google.protobuf.Duration
+	90,  // 55: ttn.lorawan.v3.MACSettings.ping_slot_periodicity:type_name -> ttn.lorawan.v3.PingSlotPeriodValue
+	84,  // 56: ttn.lorawan.v3.MACSettings.ping_slot_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	91,  // 57: ttn.lorawan.v3.MACSettings.ping_slot_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
+	91,  // 58: ttn.lorawan.v3.MACSettings.beacon_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
+	89,  // 59: ttn.lorawan.v3.MACSettings.class_c_timeout:type_name -> google.protobuf.Duration
+	92,  // 60: ttn.lorawan.v3.MACSettings.rx1_delay:type_name -> ttn.lorawan.v3.RxDelayValue
+	93,  // 61: ttn.lorawan.v3.MACSettings.rx1_data_rate_offset:type_name -> ttn.lorawan.v3.DataRateOffsetValue
+	84,  // 62: ttn.lorawan.v3.MACSettings.rx2_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	94,  // 63: ttn.lorawan.v3.MACSettings.rx2_frequency:type_name -> ttn.lorawan.v3.FrequencyValue
+	95,  // 64: ttn.lorawan.v3.MACSettings.max_duty_cycle:type_name -> ttn.lorawan.v3.AggregatedDutyCycleValue
 	2,   // 65: ttn.lorawan.v3.MACSettings.supports_32_bit_f_cnt:type_name -> ttn.lorawan.v3.BoolValue
 	2,   // 66: ttn.lorawan.v3.MACSettings.use_adr:type_name -> ttn.lorawan.v3.BoolValue
-	95,  // 67: ttn.lorawan.v3.MACSettings.adr_margin:type_name -> google.protobuf.FloatValue
+	96,  // 67: ttn.lorawan.v3.MACSettings.adr_margin:type_name -> google.protobuf.FloatValue
 	2,   // 68: ttn.lorawan.v3.MACSettings.resets_f_cnt:type_name -> ttn.lorawan.v3.BoolValue
-	88,  // 69: ttn.lorawan.v3.MACSettings.status_time_periodicity:type_name -> google.protobuf.Duration
-	74,  // 70: ttn.lorawan.v3.MACSettings.status_count_periodicity:type_name -> google.protobuf.UInt32Value
-	91,  // 71: ttn.lorawan.v3.MACSettings.desired_rx1_delay:type_name -> ttn.lorawan.v3.RxDelayValue
-	92,  // 72: ttn.lorawan.v3.MACSettings.desired_rx1_data_rate_offset:type_name -> ttn.lorawan.v3.DataRateOffsetValue
-	83,  // 73: ttn.lorawan.v3.MACSettings.desired_rx2_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
-	93,  // 74: ttn.lorawan.v3.MACSettings.desired_rx2_frequency:type_name -> ttn.lorawan.v3.FrequencyValue
-	94,  // 75: ttn.lorawan.v3.MACSettings.desired_max_duty_cycle:type_name -> ttn.lorawan.v3.AggregatedDutyCycleValue
-	81,  // 76: ttn.lorawan.v3.MACSettings.desired_adr_ack_limit_exponent:type_name -> ttn.lorawan.v3.ADRAckLimitExponentValue
-	82,  // 77: ttn.lorawan.v3.MACSettings.desired_adr_ack_delay_exponent:type_name -> ttn.lorawan.v3.ADRAckDelayExponentValue
-	83,  // 78: ttn.lorawan.v3.MACSettings.desired_ping_slot_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
-	90,  // 79: ttn.lorawan.v3.MACSettings.desired_ping_slot_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
-	90,  // 80: ttn.lorawan.v3.MACSettings.desired_beacon_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
-	96,  // 81: ttn.lorawan.v3.MACSettings.desired_max_eirp:type_name -> ttn.lorawan.v3.DeviceEIRPValue
-	88,  // 82: ttn.lorawan.v3.MACSettings.class_b_c_downlink_interval:type_name -> google.protobuf.Duration
+	89,  // 69: ttn.lorawan.v3.MACSettings.status_time_periodicity:type_name -> google.protobuf.Duration
+	75,  // 70: ttn.lorawan.v3.MACSettings.status_count_periodicity:type_name -> google.protobuf.UInt32Value
+	92,  // 71: ttn.lorawan.v3.MACSettings.desired_rx1_delay:type_name -> ttn.lorawan.v3.RxDelayValue
+	93,  // 72: ttn.lorawan.v3.MACSettings.desired_rx1_data_rate_offset:type_name -> ttn.lorawan.v3.DataRateOffsetValue
+	84,  // 73: ttn.lorawan.v3.MACSettings.desired_rx2_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	94,  // 74: ttn.lorawan.v3.MACSettings.desired_rx2_frequency:type_name -> ttn.lorawan.v3.FrequencyValue
+	95,  // 75: ttn.lorawan.v3.MACSettings.desired_max_duty_cycle:type_name -> ttn.lorawan.v3.AggregatedDutyCycleValue
+	82,  // 76: ttn.lorawan.v3.MACSettings.desired_adr_ack_limit_exponent:type_name -> ttn.lorawan.v3.ADRAckLimitExponentValue
+	83,  // 77: ttn.lorawan.v3.MACSettings.desired_adr_ack_delay_exponent:type_name -> ttn.lorawan.v3.ADRAckDelayExponentValue
+	84,  // 78: ttn.lorawan.v3.MACSettings.desired_ping_slot_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	91,  // 79: ttn.lorawan.v3.MACSettings.desired_ping_slot_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
+	91,  // 80: ttn.lorawan.v3.MACSettings.desired_beacon_frequency:type_name -> ttn.lorawan.v3.ZeroableFrequencyValue
+	97,  // 81: ttn.lorawan.v3.MACSettings.desired_max_eirp:type_name -> ttn.lorawan.v3.DeviceEIRPValue
+	89,  // 82: ttn.lorawan.v3.MACSettings.class_b_c_downlink_interval:type_name -> google.protobuf.Duration
 	2,   // 83: ttn.lorawan.v3.MACSettings.uplink_dwell_time:type_name -> ttn.lorawan.v3.BoolValue
 	2,   // 84: ttn.lorawan.v3.MACSettings.downlink_dwell_time:type_name -> ttn.lorawan.v3.BoolValue
 	13,  // 85: ttn.lorawan.v3.MACSettings.adr:type_name -> ttn.lorawan.v3.ADRSettings
 	2,   // 86: ttn.lorawan.v3.MACSettings.schedule_downlinks:type_name -> ttn.lorawan.v3.BoolValue
 	10,  // 87: ttn.lorawan.v3.MACSettings.relay:type_name -> ttn.lorawan.v3.RelaySettings
 	10,  // 88: ttn.lorawan.v3.MACSettings.desired_relay:type_name -> ttn.lorawan.v3.RelaySettings
-	97,  // 89: ttn.lorawan.v3.MACSettingsProfile.ids:type_name -> ttn.lorawan.v3.MACSettingsProfileIdentifiers
+	98,  // 89: ttn.lorawan.v3.MACSettingsProfile.ids:type_name -> ttn.lorawan.v3.MACSettingsProfileIdentifiers
 	14,  // 90: ttn.lorawan.v3.MACSettingsProfile.mac_settings:type_name -> ttn.lorawan.v3.MACSettings
 	11,  // 91: ttn.lorawan.v3.MACState.current_parameters:type_name -> ttn.lorawan.v3.MACParameters
 	11,  // 92: ttn.lorawan.v3.MACState.desired_parameters:type_name -> ttn.lorawan.v3.MACParameters
-	98,  // 93: ttn.lorawan.v3.MACState.device_class:type_name -> ttn.lorawan.v3.Class
-	85,  // 94: ttn.lorawan.v3.MACState.lorawan_version:type_name -> ttn.lorawan.v3.MACVersion
-	64,  // 95: ttn.lorawan.v3.MACState.last_confirmed_downlink_at:type_name -> google.protobuf.Timestamp
-	89,  // 96: ttn.lorawan.v3.MACState.ping_slot_periodicity:type_name -> ttn.lorawan.v3.PingSlotPeriodValue
-	65,  // 97: ttn.lorawan.v3.MACState.pending_application_downlink:type_name -> ttn.lorawan.v3.ApplicationDownlink
-	99,  // 98: ttn.lorawan.v3.MACState.queued_responses:type_name -> ttn.lorawan.v3.MACCommand
-	99,  // 99: ttn.lorawan.v3.MACState.pending_requests:type_name -> ttn.lorawan.v3.MACCommand
-	45,  // 100: ttn.lorawan.v3.MACState.queued_join_accept:type_name -> ttn.lorawan.v3.MACState.JoinAccept
-	44,  // 101: ttn.lorawan.v3.MACState.pending_join_request:type_name -> ttn.lorawan.v3.MACState.JoinRequest
-	46,  // 102: ttn.lorawan.v3.MACState.recent_uplinks:type_name -> ttn.lorawan.v3.MACState.UplinkMessage
-	47,  // 103: ttn.lorawan.v3.MACState.recent_downlinks:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage
-	64,  // 104: ttn.lorawan.v3.MACState.last_network_initiated_downlink_at:type_name -> google.protobuf.Timestamp
-	75,  // 105: ttn.lorawan.v3.MACState.rejected_adr_data_rate_indexes:type_name -> ttn.lorawan.v3.DataRateIndex
-	64,  // 106: ttn.lorawan.v3.MACState.last_downlink_at:type_name -> google.protobuf.Timestamp
-	50,  // 107: ttn.lorawan.v3.MACState.rejected_data_rate_ranges:type_name -> ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry
-	100, // 108: ttn.lorawan.v3.MACState.recent_mac_command_identifiers:type_name -> ttn.lorawan.v3.MACCommandIdentifier
-	101, // 109: ttn.lorawan.v3.MACState.pending_relay_downlink:type_name -> ttn.lorawan.v3.RelayForwardDownlinkReq
-	64,  // 110: ttn.lorawan.v3.EndDeviceAuthenticationCode.valid_from:type_name -> google.protobuf.Timestamp
-	64,  // 111: ttn.lorawan.v3.EndDeviceAuthenticationCode.valid_to:type_name -> google.protobuf.Timestamp
-	102, // 112: ttn.lorawan.v3.EndDevice.ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
-	64,  // 113: ttn.lorawan.v3.EndDevice.created_at:type_name -> google.protobuf.Timestamp
-	64,  // 114: ttn.lorawan.v3.EndDevice.updated_at:type_name -> google.protobuf.Timestamp
-	58,  // 115: ttn.lorawan.v3.EndDevice.attributes:type_name -> ttn.lorawan.v3.EndDevice.AttributesEntry
-	84,  // 116: ttn.lorawan.v3.EndDevice.version_ids:type_name -> ttn.lorawan.v3.EndDeviceVersionIdentifiers
-	59,  // 117: ttn.lorawan.v3.EndDevice.locations:type_name -> ttn.lorawan.v3.EndDevice.LocationsEntry
-	103, // 118: ttn.lorawan.v3.EndDevice.picture:type_name -> ttn.lorawan.v3.Picture
-	85,  // 119: ttn.lorawan.v3.EndDevice.lorawan_version:type_name -> ttn.lorawan.v3.MACVersion
-	86,  // 120: ttn.lorawan.v3.EndDevice.lorawan_phy_version:type_name -> ttn.lorawan.v3.PHYVersion
-	104, // 121: ttn.lorawan.v3.EndDevice.root_keys:type_name -> ttn.lorawan.v3.RootKeys
+	99,  // 93: ttn.lorawan.v3.MACState.device_class:type_name -> ttn.lorawan.v3.Class
+	86,  // 94: ttn.lorawan.v3.MACState.lorawan_version:type_name -> ttn.lorawan.v3.MACVersion
+	65,  // 95: ttn.lorawan.v3.MACState.last_confirmed_downlink_at:type_name -> google.protobuf.Timestamp
+	90,  // 96: ttn.lorawan.v3.MACState.ping_slot_periodicity:type_name -> ttn.lorawan.v3.PingSlotPeriodValue
+	66,  // 97: ttn.lorawan.v3.MACState.pending_application_downlink:type_name -> ttn.lorawan.v3.ApplicationDownlink
+	100, // 98: ttn.lorawan.v3.MACState.queued_responses:type_name -> ttn.lorawan.v3.MACCommand
+	100, // 99: ttn.lorawan.v3.MACState.pending_requests:type_name -> ttn.lorawan.v3.MACCommand
+	46,  // 100: ttn.lorawan.v3.MACState.queued_join_accept:type_name -> ttn.lorawan.v3.MACState.JoinAccept
+	45,  // 101: ttn.lorawan.v3.MACState.pending_join_request:type_name -> ttn.lorawan.v3.MACState.JoinRequest
+	47,  // 102: ttn.lorawan.v3.MACState.recent_uplinks:type_name -> ttn.lorawan.v3.MACState.UplinkMessage
+	48,  // 103: ttn.lorawan.v3.MACState.recent_downlinks:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage
+	65,  // 104: ttn.lorawan.v3.MACState.last_network_initiated_downlink_at:type_name -> google.protobuf.Timestamp
+	76,  // 105: ttn.lorawan.v3.MACState.rejected_adr_data_rate_indexes:type_name -> ttn.lorawan.v3.DataRateIndex
+	65,  // 106: ttn.lorawan.v3.MACState.last_downlink_at:type_name -> google.protobuf.Timestamp
+	51,  // 107: ttn.lorawan.v3.MACState.rejected_data_rate_ranges:type_name -> ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry
+	101, // 108: ttn.lorawan.v3.MACState.recent_mac_command_identifiers:type_name -> ttn.lorawan.v3.MACCommandIdentifier
+	102, // 109: ttn.lorawan.v3.MACState.pending_relay_downlink:type_name -> ttn.lorawan.v3.RelayForwardDownlinkReq
+	65,  // 110: ttn.lorawan.v3.EndDeviceAuthenticationCode.valid_from:type_name -> google.protobuf.Timestamp
+	65,  // 111: ttn.lorawan.v3.EndDeviceAuthenticationCode.valid_to:type_name -> google.protobuf.Timestamp
+	103, // 112: ttn.lorawan.v3.EndDevice.ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
+	65,  // 113: ttn.lorawan.v3.EndDevice.created_at:type_name -> google.protobuf.Timestamp
+	65,  // 114: ttn.lorawan.v3.EndDevice.updated_at:type_name -> google.protobuf.Timestamp
+	59,  // 115: ttn.lorawan.v3.EndDevice.attributes:type_name -> ttn.lorawan.v3.EndDevice.AttributesEntry
+	85,  // 116: ttn.lorawan.v3.EndDevice.version_ids:type_name -> ttn.lorawan.v3.EndDeviceVersionIdentifiers
+	60,  // 117: ttn.lorawan.v3.EndDevice.locations:type_name -> ttn.lorawan.v3.EndDevice.LocationsEntry
+	104, // 118: ttn.lorawan.v3.EndDevice.picture:type_name -> ttn.lorawan.v3.Picture
+	86,  // 119: ttn.lorawan.v3.EndDevice.lorawan_version:type_name -> ttn.lorawan.v3.MACVersion
+	87,  // 120: ttn.lorawan.v3.EndDevice.lorawan_phy_version:type_name -> ttn.lorawan.v3.PHYVersion
+	105, // 121: ttn.lorawan.v3.EndDevice.root_keys:type_name -> ttn.lorawan.v3.RootKeys
 	14,  // 122: ttn.lorawan.v3.EndDevice.mac_settings:type_name -> ttn.lorawan.v3.MACSettings
 	16,  // 123: ttn.lorawan.v3.EndDevice.mac_state:type_name -> ttn.lorawan.v3.MACState
 	16,  // 124: ttn.lorawan.v3.EndDevice.pending_mac_state:type_name -> ttn.lorawan.v3.MACState
 	1,   // 125: ttn.lorawan.v3.EndDevice.session:type_name -> ttn.lorawan.v3.Session
 	1,   // 126: ttn.lorawan.v3.EndDevice.pending_session:type_name -> ttn.lorawan.v3.Session
-	64,  // 127: ttn.lorawan.v3.EndDevice.last_dev_status_received_at:type_name -> google.protobuf.Timestamp
+	65,  // 127: ttn.lorawan.v3.EndDevice.last_dev_status_received_at:type_name -> google.protobuf.Timestamp
 	0,   // 128: ttn.lorawan.v3.EndDevice.power_state:type_name -> ttn.lorawan.v3.PowerState
-	95,  // 129: ttn.lorawan.v3.EndDevice.battery_percentage:type_name -> google.protobuf.FloatValue
-	65,  // 130: ttn.lorawan.v3.EndDevice.queued_application_downlinks:type_name -> ttn.lorawan.v3.ApplicationDownlink
-	87,  // 131: ttn.lorawan.v3.EndDevice.formatters:type_name -> ttn.lorawan.v3.MessagePayloadFormatters
-	105, // 132: ttn.lorawan.v3.EndDevice.provisioning_data:type_name -> google.protobuf.Struct
+	96,  // 129: ttn.lorawan.v3.EndDevice.battery_percentage:type_name -> google.protobuf.FloatValue
+	66,  // 130: ttn.lorawan.v3.EndDevice.queued_application_downlinks:type_name -> ttn.lorawan.v3.ApplicationDownlink
+	88,  // 131: ttn.lorawan.v3.EndDevice.formatters:type_name -> ttn.lorawan.v3.MessagePayloadFormatters
+	106, // 132: ttn.lorawan.v3.EndDevice.provisioning_data:type_name -> google.protobuf.Struct
 	17,  // 133: ttn.lorawan.v3.EndDevice.claim_authentication_code:type_name -> ttn.lorawan.v3.EndDeviceAuthenticationCode
-	106, // 134: ttn.lorawan.v3.EndDevice.skip_payload_crypto_override:type_name -> google.protobuf.BoolValue
-	64,  // 135: ttn.lorawan.v3.EndDevice.activated_at:type_name -> google.protobuf.Timestamp
-	64,  // 136: ttn.lorawan.v3.EndDevice.last_seen_at:type_name -> google.protobuf.Timestamp
-	107, // 137: ttn.lorawan.v3.EndDevice.lora_alliance_profile_ids:type_name -> ttn.lorawan.v3.LoRaAllianceProfileIdentifiers
-	97,  // 138: ttn.lorawan.v3.EndDevice.mac_settings_profile_ids:type_name -> ttn.lorawan.v3.MACSettingsProfileIdentifiers
+	107, // 134: ttn.lorawan.v3.EndDevice.skip_payload_crypto_override:type_name -> google.protobuf.BoolValue
+	65,  // 135: ttn.lorawan.v3.EndDevice.activated_at:type_name -> google.protobuf.Timestamp
+	65,  // 136: ttn.lorawan.v3.EndDevice.last_seen_at:type_name -> google.protobuf.Timestamp
+	108, // 137: ttn.lorawan.v3.EndDevice.lora_alliance_profile_ids:type_name -> ttn.lorawan.v3.LoRaAllianceProfileIdentifiers
+	98,  // 138: ttn.lorawan.v3.EndDevice.mac_settings_profile_ids:type_name -> ttn.lorawan.v3.MACSettingsProfileIdentifiers
 	18,  // 139: ttn.lorawan.v3.EndDevices.end_devices:type_name -> ttn.lorawan.v3.EndDevice
 	18,  // 140: ttn.lorawan.v3.CreateEndDeviceRequest.end_device:type_name -> ttn.lorawan.v3.EndDevice
 	18,  // 141: ttn.lorawan.v3.UpdateEndDeviceRequest.end_device:type_name -> ttn.lorawan.v3.EndDevice
-	108, // 142: ttn.lorawan.v3.UpdateEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
-	60,  // 143: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.updates:type_name -> ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate
-	102, // 144: ttn.lorawan.v3.GetEndDeviceRequest.end_device_ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
-	108, // 145: ttn.lorawan.v3.GetEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
-	109, // 146: ttn.lorawan.v3.ListEndDevicesRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
-	108, // 147: ttn.lorawan.v3.ListEndDevicesRequest.field_mask:type_name -> google.protobuf.FieldMask
-	61,  // 148: ttn.lorawan.v3.ListEndDevicesRequest.filters:type_name -> ttn.lorawan.v3.ListEndDevicesRequest.Filter
+	109, // 142: ttn.lorawan.v3.UpdateEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
+	61,  // 143: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.updates:type_name -> ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate
+	103, // 144: ttn.lorawan.v3.GetEndDeviceRequest.end_device_ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
+	109, // 145: ttn.lorawan.v3.GetEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
+	110, // 146: ttn.lorawan.v3.ListEndDevicesRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
+	109, // 147: ttn.lorawan.v3.ListEndDevicesRequest.field_mask:type_name -> google.protobuf.FieldMask
+	62,  // 148: ttn.lorawan.v3.ListEndDevicesRequest.filters:type_name -> ttn.lorawan.v3.ListEndDevicesRequest.Filter
 	18,  // 149: ttn.lorawan.v3.SetEndDeviceRequest.end_device:type_name -> ttn.lorawan.v3.EndDevice
-	108, // 150: ttn.lorawan.v3.SetEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
-	102, // 151: ttn.lorawan.v3.ResetAndGetEndDeviceRequest.end_device_ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
-	108, // 152: ttn.lorawan.v3.ResetAndGetEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
+	109, // 150: ttn.lorawan.v3.SetEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
+	103, // 151: ttn.lorawan.v3.ResetAndGetEndDeviceRequest.end_device_ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
+	109, // 152: ttn.lorawan.v3.ResetAndGetEndDeviceRequest.field_mask:type_name -> google.protobuf.FieldMask
 	18,  // 153: ttn.lorawan.v3.EndDeviceTemplate.end_device:type_name -> ttn.lorawan.v3.EndDevice
-	108, // 154: ttn.lorawan.v3.EndDeviceTemplate.field_mask:type_name -> google.protobuf.FieldMask
-	62,  // 155: ttn.lorawan.v3.EndDeviceTemplateFormats.formats:type_name -> ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry
-	84,  // 156: ttn.lorawan.v3.ConvertEndDeviceTemplateRequest.end_device_version_ids:type_name -> ttn.lorawan.v3.EndDeviceVersionIdentifiers
-	109, // 157: ttn.lorawan.v3.BatchDeleteEndDevicesRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
-	109, // 158: ttn.lorawan.v3.BatchGetEndDevicesRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
-	108, // 159: ttn.lorawan.v3.BatchGetEndDevicesRequest.field_mask:type_name -> google.protobuf.FieldMask
-	75,  // 160: ttn.lorawan.v3.MACParameters.Channel.min_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	75,  // 161: ttn.lorawan.v3.MACParameters.Channel.max_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	75,  // 162: ttn.lorawan.v3.ADRSettings.StaticMode.data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	95,  // 163: ttn.lorawan.v3.ADRSettings.DynamicMode.margin:type_name -> google.protobuf.FloatValue
-	83,  // 164: ttn.lorawan.v3.ADRSettings.DynamicMode.min_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
-	83,  // 165: ttn.lorawan.v3.ADRSettings.DynamicMode.max_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
-	74,  // 166: ttn.lorawan.v3.ADRSettings.DynamicMode.min_tx_power_index:type_name -> google.protobuf.UInt32Value
-	74,  // 167: ttn.lorawan.v3.ADRSettings.DynamicMode.max_tx_power_index:type_name -> google.protobuf.UInt32Value
-	74,  // 168: ttn.lorawan.v3.ADRSettings.DynamicMode.min_nb_trans:type_name -> google.protobuf.UInt32Value
-	74,  // 169: ttn.lorawan.v3.ADRSettings.DynamicMode.max_nb_trans:type_name -> google.protobuf.UInt32Value
-	39,  // 170: ttn.lorawan.v3.ADRSettings.DynamicMode.channel_steering:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings
-	41,  // 171: ttn.lorawan.v3.ADRSettings.DynamicMode.overrides:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides
-	42,  // 172: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.lora_narrow:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode
-	43,  // 173: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.disabled:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode
-	74,  // 174: ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride.min_nb_trans:type_name -> google.protobuf.UInt32Value
-	74,  // 175: ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride.max_nb_trans:type_name -> google.protobuf.UInt32Value
-	40,  // 176: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_0:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 177: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_1:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 178: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_2:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 179: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_3:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 180: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_4:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 181: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_5:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 182: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_6:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 183: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_7:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 184: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_8:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 185: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_9:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 186: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_10:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 187: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_11:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 188: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_12:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 189: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_13:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 190: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_14:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	40,  // 191: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_15:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
-	110, // 192: ttn.lorawan.v3.MACState.JoinRequest.downlink_settings:type_name -> ttn.lorawan.v3.DLSettings
-	76,  // 193: ttn.lorawan.v3.MACState.JoinRequest.rx_delay:type_name -> ttn.lorawan.v3.RxDelay
-	111, // 194: ttn.lorawan.v3.MACState.JoinRequest.cf_list:type_name -> ttn.lorawan.v3.CFList
-	44,  // 195: ttn.lorawan.v3.MACState.JoinAccept.request:type_name -> ttn.lorawan.v3.MACState.JoinRequest
-	63,  // 196: ttn.lorawan.v3.MACState.JoinAccept.keys:type_name -> ttn.lorawan.v3.SessionKeys
-	112, // 197: ttn.lorawan.v3.MACState.UplinkMessage.payload:type_name -> ttn.lorawan.v3.Message
-	51,  // 198: ttn.lorawan.v3.MACState.UplinkMessage.settings:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.TxSettings
-	52,  // 199: ttn.lorawan.v3.MACState.UplinkMessage.rx_metadata:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata
-	64,  // 200: ttn.lorawan.v3.MACState.UplinkMessage.received_at:type_name -> google.protobuf.Timestamp
-	55,  // 201: ttn.lorawan.v3.MACState.DownlinkMessage.payload:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage.Message
-	75,  // 202: ttn.lorawan.v3.MACState.DataRateRange.min_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	75,  // 203: ttn.lorawan.v3.MACState.DataRateRange.max_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
-	48,  // 204: ttn.lorawan.v3.MACState.DataRateRanges.ranges:type_name -> ttn.lorawan.v3.MACState.DataRateRange
-	49,  // 205: ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry.value:type_name -> ttn.lorawan.v3.MACState.DataRateRanges
-	113, // 206: ttn.lorawan.v3.MACState.UplinkMessage.TxSettings.data_rate:type_name -> ttn.lorawan.v3.DataRate
-	114, // 207: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.gateway_ids:type_name -> ttn.lorawan.v3.GatewayIdentifiers
-	115, // 208: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.downlink_path_constraint:type_name -> ttn.lorawan.v3.DownlinkPathConstraint
-	53,  // 209: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.packet_broker:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata
-	54,  // 210: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.relay:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata
-	56,  // 211: ttn.lorawan.v3.MACState.DownlinkMessage.Message.m_hdr:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR
-	57,  // 212: ttn.lorawan.v3.MACState.DownlinkMessage.Message.mac_payload:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload
-	116, // 213: ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR.m_type:type_name -> ttn.lorawan.v3.MType
-	117, // 214: ttn.lorawan.v3.EndDevice.LocationsEntry.value:type_name -> ttn.lorawan.v3.Location
-	102, // 215: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate.ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
-	64,  // 216: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate.last_seen_at:type_name -> google.protobuf.Timestamp
-	64,  // 217: ttn.lorawan.v3.ListEndDevicesRequest.Filter.updated_since:type_name -> google.protobuf.Timestamp
-	30,  // 218: ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry.value:type_name -> ttn.lorawan.v3.EndDeviceTemplateFormat
-	219, // [219:219] is the sub-list for method output_type
-	219, // [219:219] is the sub-list for method input_type
-	219, // [219:219] is the sub-list for extension type_name
-	219, // [219:219] is the sub-list for extension extendee
-	0,   // [0:219] is the sub-list for field type_name
+	109, // 154: ttn.lorawan.v3.EndDeviceTemplate.field_mask:type_name -> google.protobuf.FieldMask
+	63,  // 155: ttn.lorawan.v3.EndDeviceTemplateFormats.formats:type_name -> ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry
+	85,  // 156: ttn.lorawan.v3.ConvertEndDeviceTemplateRequest.end_device_version_ids:type_name -> ttn.lorawan.v3.EndDeviceVersionIdentifiers
+	110, // 157: ttn.lorawan.v3.BatchDeleteEndDevicesRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
+	110, // 158: ttn.lorawan.v3.BatchGetEndDevicesRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
+	109, // 159: ttn.lorawan.v3.BatchGetEndDevicesRequest.field_mask:type_name -> google.protobuf.FieldMask
+	110, // 160: ttn.lorawan.v3.BatchSetMACSettingsProfileRequest.application_ids:type_name -> ttn.lorawan.v3.ApplicationIdentifiers
+	98,  // 161: ttn.lorawan.v3.BatchSetMACSettingsProfileRequest.mac_settings_profile_ids:type_name -> ttn.lorawan.v3.MACSettingsProfileIdentifiers
+	76,  // 162: ttn.lorawan.v3.MACParameters.Channel.min_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	76,  // 163: ttn.lorawan.v3.MACParameters.Channel.max_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	76,  // 164: ttn.lorawan.v3.ADRSettings.StaticMode.data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	96,  // 165: ttn.lorawan.v3.ADRSettings.DynamicMode.margin:type_name -> google.protobuf.FloatValue
+	84,  // 166: ttn.lorawan.v3.ADRSettings.DynamicMode.min_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	84,  // 167: ttn.lorawan.v3.ADRSettings.DynamicMode.max_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndexValue
+	75,  // 168: ttn.lorawan.v3.ADRSettings.DynamicMode.min_tx_power_index:type_name -> google.protobuf.UInt32Value
+	75,  // 169: ttn.lorawan.v3.ADRSettings.DynamicMode.max_tx_power_index:type_name -> google.protobuf.UInt32Value
+	75,  // 170: ttn.lorawan.v3.ADRSettings.DynamicMode.min_nb_trans:type_name -> google.protobuf.UInt32Value
+	75,  // 171: ttn.lorawan.v3.ADRSettings.DynamicMode.max_nb_trans:type_name -> google.protobuf.UInt32Value
+	40,  // 172: ttn.lorawan.v3.ADRSettings.DynamicMode.channel_steering:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings
+	42,  // 173: ttn.lorawan.v3.ADRSettings.DynamicMode.overrides:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides
+	43,  // 174: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.lora_narrow:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.LoRaNarrowMode
+	44,  // 175: ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.disabled:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.ChannelSteeringSettings.DisabledMode
+	75,  // 176: ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride.min_nb_trans:type_name -> google.protobuf.UInt32Value
+	75,  // 177: ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride.max_nb_trans:type_name -> google.protobuf.UInt32Value
+	41,  // 178: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_0:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 179: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_1:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 180: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_2:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 181: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_3:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 182: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_4:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 183: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_5:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 184: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_6:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 185: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_7:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 186: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_8:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 187: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_9:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 188: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_10:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 189: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_11:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 190: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_12:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 191: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_13:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 192: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_14:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	41,  // 193: ttn.lorawan.v3.ADRSettings.DynamicMode.Overrides.data_rate_15:type_name -> ttn.lorawan.v3.ADRSettings.DynamicMode.PerDataRateIndexOverride
+	111, // 194: ttn.lorawan.v3.MACState.JoinRequest.downlink_settings:type_name -> ttn.lorawan.v3.DLSettings
+	77,  // 195: ttn.lorawan.v3.MACState.JoinRequest.rx_delay:type_name -> ttn.lorawan.v3.RxDelay
+	112, // 196: ttn.lorawan.v3.MACState.JoinRequest.cf_list:type_name -> ttn.lorawan.v3.CFList
+	45,  // 197: ttn.lorawan.v3.MACState.JoinAccept.request:type_name -> ttn.lorawan.v3.MACState.JoinRequest
+	64,  // 198: ttn.lorawan.v3.MACState.JoinAccept.keys:type_name -> ttn.lorawan.v3.SessionKeys
+	113, // 199: ttn.lorawan.v3.MACState.UplinkMessage.payload:type_name -> ttn.lorawan.v3.Message
+	52,  // 200: ttn.lorawan.v3.MACState.UplinkMessage.settings:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.TxSettings
+	53,  // 201: ttn.lorawan.v3.MACState.UplinkMessage.rx_metadata:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata
+	65,  // 202: ttn.lorawan.v3.MACState.UplinkMessage.received_at:type_name -> google.protobuf.Timestamp
+	56,  // 203: ttn.lorawan.v3.MACState.DownlinkMessage.payload:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage.Message
+	76,  // 204: ttn.lorawan.v3.MACState.DataRateRange.min_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	76,  // 205: ttn.lorawan.v3.MACState.DataRateRange.max_data_rate_index:type_name -> ttn.lorawan.v3.DataRateIndex
+	49,  // 206: ttn.lorawan.v3.MACState.DataRateRanges.ranges:type_name -> ttn.lorawan.v3.MACState.DataRateRange
+	50,  // 207: ttn.lorawan.v3.MACState.RejectedDataRateRangesEntry.value:type_name -> ttn.lorawan.v3.MACState.DataRateRanges
+	114, // 208: ttn.lorawan.v3.MACState.UplinkMessage.TxSettings.data_rate:type_name -> ttn.lorawan.v3.DataRate
+	115, // 209: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.gateway_ids:type_name -> ttn.lorawan.v3.GatewayIdentifiers
+	116, // 210: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.downlink_path_constraint:type_name -> ttn.lorawan.v3.DownlinkPathConstraint
+	54,  // 211: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.packet_broker:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.PacketBrokerMetadata
+	55,  // 212: ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.relay:type_name -> ttn.lorawan.v3.MACState.UplinkMessage.RxMetadata.RelayMetadata
+	57,  // 213: ttn.lorawan.v3.MACState.DownlinkMessage.Message.m_hdr:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR
+	58,  // 214: ttn.lorawan.v3.MACState.DownlinkMessage.Message.mac_payload:type_name -> ttn.lorawan.v3.MACState.DownlinkMessage.Message.MACPayload
+	117, // 215: ttn.lorawan.v3.MACState.DownlinkMessage.Message.MHDR.m_type:type_name -> ttn.lorawan.v3.MType
+	118, // 216: ttn.lorawan.v3.EndDevice.LocationsEntry.value:type_name -> ttn.lorawan.v3.Location
+	103, // 217: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate.ids:type_name -> ttn.lorawan.v3.EndDeviceIdentifiers
+	65,  // 218: ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate.last_seen_at:type_name -> google.protobuf.Timestamp
+	65,  // 219: ttn.lorawan.v3.ListEndDevicesRequest.Filter.updated_since:type_name -> google.protobuf.Timestamp
+	30,  // 220: ttn.lorawan.v3.EndDeviceTemplateFormats.FormatsEntry.value:type_name -> ttn.lorawan.v3.EndDeviceTemplateFormat
+	221, // [221:221] is the sub-list for method output_type
+	221, // [221:221] is the sub-list for method input_type
+	221, // [221:221] is the sub-list for extension type_name
+	221, // [221:221] is the sub-list for extension extendee
+	0,   // [0:221] is the sub-list for field type_name
 }
 
 func init() { file_ttn_lorawan_v3_end_device_proto_init() }
@@ -7965,7 +8051,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[34].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MACParameters_Channel); i {
+			switch v := v.(*BatchSetMACSettingsProfileRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7977,7 +8063,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[35].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_StaticMode); i {
+			switch v := v.(*MACParameters_Channel); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -7989,7 +8075,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[36].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DynamicMode); i {
+			switch v := v.(*ADRSettings_StaticMode); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8001,7 +8087,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[37].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DisabledMode); i {
+			switch v := v.(*ADRSettings_DynamicMode); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8013,7 +8099,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[38].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DynamicMode_ChannelSteeringSettings); i {
+			switch v := v.(*ADRSettings_DisabledMode); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8025,7 +8111,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[39].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DynamicMode_PerDataRateIndexOverride); i {
+			switch v := v.(*ADRSettings_DynamicMode_ChannelSteeringSettings); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8037,7 +8123,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[40].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DynamicMode_Overrides); i {
+			switch v := v.(*ADRSettings_DynamicMode_PerDataRateIndexOverride); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8049,7 +8135,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[41].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode); i {
+			switch v := v.(*ADRSettings_DynamicMode_Overrides); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8061,7 +8147,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[42].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode); i {
+			switch v := v.(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoRaNarrowMode); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8073,7 +8159,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[43].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MACState_JoinRequest); i {
+			switch v := v.(*ADRSettings_DynamicMode_ChannelSteeringSettings_DisabledMode); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8085,7 +8171,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[44].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MACState_JoinAccept); i {
+			switch v := v.(*MACState_JoinRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8097,7 +8183,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[45].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MACState_UplinkMessage); i {
+			switch v := v.(*MACState_JoinAccept); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8109,7 +8195,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[46].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MACState_DownlinkMessage); i {
+			switch v := v.(*MACState_UplinkMessage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8121,7 +8207,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[47].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*MACState_DataRateRange); i {
+			switch v := v.(*MACState_DownlinkMessage); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -8133,6 +8219,18 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			}
 		}
 		file_ttn_lorawan_v3_end_device_proto_msgTypes[48].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*MACState_DataRateRange); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[49].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_DataRateRanges); i {
 			case 0:
 				return &v.state
@@ -8144,7 +8242,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[50].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_UplinkMessage_TxSettings); i {
 			case 0:
 				return &v.state
@@ -8156,7 +8254,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[51].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_UplinkMessage_RxMetadata); i {
 			case 0:
 				return &v.state
@@ -8168,7 +8266,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[52].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_UplinkMessage_RxMetadata_PacketBrokerMetadata); i {
 			case 0:
 				return &v.state
@@ -8180,7 +8278,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[53].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_UplinkMessage_RxMetadata_RelayMetadata); i {
 			case 0:
 				return &v.state
@@ -8192,7 +8290,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[54].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[55].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_DownlinkMessage_Message); i {
 			case 0:
 				return &v.state
@@ -8204,7 +8302,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[55].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[56].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_DownlinkMessage_Message_MHDR); i {
 			case 0:
 				return &v.state
@@ -8216,7 +8314,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[56].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[57].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*MACState_DownlinkMessage_Message_MACPayload); i {
 			case 0:
 				return &v.state
@@ -8228,7 +8326,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[59].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[60].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*BatchUpdateEndDeviceLastSeenRequest_EndDeviceLastSeenUpdate); i {
 			case 0:
 				return &v.state
@@ -8240,7 +8338,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 				return nil
 			}
 		}
-		file_ttn_lorawan_v3_end_device_proto_msgTypes[60].Exporter = func(v interface{}, i int) interface{} {
+		file_ttn_lorawan_v3_end_device_proto_msgTypes[61].Exporter = func(v interface{}, i int) interface{} {
 			switch v := v.(*ListEndDevicesRequest_Filter); i {
 			case 0:
 				return &v.state
@@ -8276,11 +8374,11 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 		(*ADRSettings_Dynamic)(nil),
 		(*ADRSettings_Disabled)(nil),
 	}
-	file_ttn_lorawan_v3_end_device_proto_msgTypes[38].OneofWrappers = []interface{}{
+	file_ttn_lorawan_v3_end_device_proto_msgTypes[39].OneofWrappers = []interface{}{
 		(*ADRSettings_DynamicMode_ChannelSteeringSettings_LoraNarrow)(nil),
 		(*ADRSettings_DynamicMode_ChannelSteeringSettings_Disabled)(nil),
 	}
-	file_ttn_lorawan_v3_end_device_proto_msgTypes[60].OneofWrappers = []interface{}{
+	file_ttn_lorawan_v3_end_device_proto_msgTypes[61].OneofWrappers = []interface{}{
 		(*ListEndDevicesRequest_Filter_UpdatedSince)(nil),
 	}
 	type x struct{}
@@ -8289,7 +8387,7 @@ func file_ttn_lorawan_v3_end_device_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_ttn_lorawan_v3_end_device_proto_rawDesc,
 			NumEnums:      1,
-			NumMessages:   62,
+			NumMessages:   63,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
