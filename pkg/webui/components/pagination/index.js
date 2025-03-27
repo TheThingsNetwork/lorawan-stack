@@ -100,7 +100,7 @@ const Pagination = ({
 
   // Don't show page size select if there are less than 20 items.
   // 20 is the smallest amount of items that can be displayed per page.
-  if (totalCount < 20) {
+  if (totalCount < propPageSize) {
     return null
   }
 

@@ -13,6 +13,10 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import {
+  createPaginationBaseActionType,
+  createPaginationByIdRequestActions,
+} from '@ttn-lw/lib/store/actions/pagination'
 
 export const GET_WEBHOOK_BASE = 'GET_WEBHOOK'
 export const [
@@ -24,7 +28,7 @@ export const [
   (appId, webhookId, selector) => ({ selector }),
 )
 
-export const GET_WEBHOOKS_LIST_BASE = 'GET_WEBHOOKS_LIST'
+export const GET_WEBHOOKS_LIST_BASE = createPaginationBaseActionType('WEBHOOKS')
 export const [
   {
     request: GET_WEBHOOKS_LIST,
@@ -32,11 +36,7 @@ export const [
     failure: GET_WEBHOOKS_LIST_FAILURE,
   },
   { request: getWebhooksList, success: getWebhooksListSuccess, failure: getWebhooksListFailure },
-] = createRequestActions(
-  GET_WEBHOOKS_LIST_BASE,
-  appId => ({ appId }),
-  (appId, selector) => ({ selector }),
-)
+] = createPaginationByIdRequestActions('WEBHOOKS')
 
 export const UPDATE_WEBHOOK_BASE = 'UPDATE_WEBHOOK'
 export const [

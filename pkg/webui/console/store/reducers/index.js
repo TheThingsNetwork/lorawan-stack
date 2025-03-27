@@ -133,6 +133,8 @@ export default combineReducers({
       getPacketBrokerNetworkId,
     ),
     clients: createNamedPaginationReducer('CLIENTS', getClientId),
+    pubsubs: createNamedPaginationReducer('PUBSUB', getApplicationId),
+    webhooks: createNamedPaginationReducer('WEBHOOKS', getApplicationId),
   }),
   js,
   gatewayStatus,
