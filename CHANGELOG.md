@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.34.1] - unreleased
+
+### Added
+
 - Support to associate/disassociate MAC settings profiles to end devices
   - This feature is experimental and subject to change.
 
@@ -19,17 +33,11 @@ For details about compatibility between different releases, see the **Commitment
 - Support wildcards in the supported hosts for TLS certificates obtained via ACME (`tls.acme.hosts`).
 - Increase downlink capacity by raising duty-cycle budgets per priority.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Downlink scheduling conflicts by gateways that require up to 32.5 ms margin between downlink transmissions (this includes the UDP Packet Forwarder and other packet forwarders that behave similarly).
 - Live data button covers content on the page.
 - Overflow device info in device overview -> General information panel.
-
-### Security
 
 ## [3.34.0] - 2025-03-18
 
@@ -2970,7 +2978,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.0...v3.34
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.1...v3.34
+[3.34.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.0...v3.34.1
 [3.34.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.33.1...v3.34.0
 [3.33.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.33.0...v3.33.1
 [3.33.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.3...v3.33.0
