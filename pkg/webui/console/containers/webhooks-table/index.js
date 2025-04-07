@@ -45,7 +45,7 @@ const WebhooksTable = () => {
   const { appId } = useParams()
   const healthStatusEnabled = useSelector(selectWebhooksHealthStatusEnabled)
   const getWebhooksListCallback = useCallback(
-    () => getWebhooksList(appId, ['template_ids', 'health_status', 'paused']),
+    filters => getWebhooksList(appId, ...filters, ['template_ids', 'health_status', 'paused']),
     [appId],
   )
 
@@ -131,7 +131,6 @@ const WebhooksTable = () => {
       getItemsAction={getWebhooksListCallback}
       baseDataSelector={baseDataSelector}
       tableTitle={<Message content={sharedMessages.webhooks} />}
-      paginated={false}
       handlesSorting
     />
   )

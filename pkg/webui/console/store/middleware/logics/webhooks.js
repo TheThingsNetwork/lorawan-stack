@@ -36,10 +36,12 @@ const getWebhooksLogic = createRequestLogic({
   type: webhooks.GET_WEBHOOKS_LIST,
   process: async ({ action }) => {
     const {
-      payload: { appId },
-      meta: { selector },
-    } = action
-    const res = await tts.Applications.Webhooks.getAll(appId, selector)
+      id: appId,
+      params: { page, limit },
+    } = action.payload
+    const { selectors } = action.meta
+
+    const res = await tts.Applications.Webhooks.getAll(appId, { page, limit }, selectors)
 
     return { entities: res.webhooks, totalCount: res.totalCount }
   },

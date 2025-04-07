@@ -22,13 +22,16 @@ class Webhooks {
     autoBind(this)
   }
 
-  async getAll(appId, selector) {
+  async getAll(appId, params, selector) {
     const fieldMask = Marshaler.selectorToFieldMask(selector)
     const result = await this._api.List(
       {
         routeParams: { 'application_ids.application_id': appId },
       },
-      fieldMask,
+      {
+        ...params,
+        ...fieldMask,
+      },
     )
 
     return Marshaler.payloadListResponse('webhooks', result)

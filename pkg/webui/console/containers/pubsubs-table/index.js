@@ -84,7 +84,7 @@ const getItemPathPrefix = item => `${item.ids.pub_sub_id}`
 const PubsubsTable = () => {
   const { appId } = useParams()
 
-  const getItemsAction = useCallback(() => getPubsubsList(appId), [appId])
+  const getItemsAction = useCallback(filters => getPubsubsList(appId, { ...filters }), [appId])
 
   const baseDataSelector = createSelector(
     [selectPubsubs, selectPubsubsTotalCount],
@@ -104,7 +104,6 @@ const PubsubsTable = () => {
       baseDataSelector={baseDataSelector}
       tableTitle={<Message content={sharedMessages.pubsubs} />}
       getItemPathPrefix={getItemPathPrefix}
-      paginated={false}
       handlesSorting
     />
   )

@@ -54,12 +54,13 @@ class PubSub {
     }
   }
 
-  async getAll(appId, selector) {
+  async getAll(appId, params, selector) {
     const result = await this._api.List(
       {
         routeParams: { 'application_ids.application_id': appId },
       },
       {
+        ...params,
         ...Marshaler.selectorToFieldMask(selector),
       },
     )

@@ -13,6 +13,10 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
+import {
+  createPaginationBaseActionType,
+  createPaginationByIdRequestActions,
+} from '@ttn-lw/lib/store/actions/pagination'
 
 export const CREATE_PUBSUB_BASE = 'CREATE_PUBSUB'
 export const [
@@ -30,7 +34,7 @@ export const [
   (appId, pubsubId, selector) => ({ selector }),
 )
 
-export const GET_PUBSUBS_LIST_BASE = 'GET_PUBSUBS_LIST'
+export const GET_PUBSUBS_LIST_BASE = createPaginationBaseActionType('PUBSUB')
 export const [
   {
     request: GET_PUBSUBS_LIST,
@@ -38,7 +42,7 @@ export const [
     failure: GET_PUBSUBS_LIST_FAILURE,
   },
   { request: getPubsubsList, success: getPubsubsListSuccess, failure: getPubsubsListFailure },
-] = createRequestActions(GET_PUBSUBS_LIST_BASE, appId => ({ appId }))
+] = createPaginationByIdRequestActions('PUBSUB')
 
 export const UPDATE_PUBSUB_BASE = 'UPDATE_PUBSUB'
 export const [
