@@ -37,6 +37,7 @@ const whiteMiniLogo = {
 }
 const Logo = props => {
   const { dark } = props
+
   return (
     <LogoComponent
       logo={dark ? whiteLogo : logo}

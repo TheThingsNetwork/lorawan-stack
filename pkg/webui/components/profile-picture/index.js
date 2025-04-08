@@ -14,8 +14,10 @@
 
 import React, { useRef, useCallback } from 'react'
 import classnames from 'classnames'
+import { useSelector } from 'react-redux'
 
 import missingProfilePicture from '@assets/img/placeholder/missing-profile-picture.svg'
+import missingProfilePictureWhite from '@assets/img/placeholder/missing-profile-picture-white.svg'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import {
@@ -23,13 +25,25 @@ import {
   isValidProfilePictureObject,
 } from '@ttn-lw/lib/selectors/profile-picture'
 
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
+
 import styles from './profile-picture.styl'
 
 const ProfilePicture = ({ profilePicture, className, size }) => {
   const imageRef = useRef()
-  const handleImageError = useCallback(error => {
-    error.target.src = missingProfilePicture
-  }, [])
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const darkTheme =
+    consolePreferences.console_theme === 'CONSOLE_THEME_DARK' ||
+    (consolePreferences.console_theme === 'CONSOLE_THEME_SYSTEM' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches)
+
+  const handleImageError = useCallback(
+    error => {
+      error.target.src = darkTheme ? missingProfilePictureWhite : missingProfilePicture
+    },
+    [darkTheme],
+  )
+
   return (
     <div className={classnames(className, styles.container)}>
       <img
@@ -37,7 +51,9 @@ const ProfilePicture = ({ profilePicture, className, size }) => {
         src={
           isValidProfilePictureObject(profilePicture)
             ? getClosestProfilePictureBySize(profilePicture, size)
-            : missingProfilePicture
+            : darkTheme
+              ? missingProfilePictureWhite
+              : missingProfilePicture
         }
         alt="Profile picture"
         ref={imageRef}
