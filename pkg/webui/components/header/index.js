@@ -50,6 +50,7 @@ const Header = ({
 }) => {
   const LinkComponent = safe ? 'a' : Link
   const darkTheme = window.matchMedia('(prefers-color-scheme: dark)').matches
+
   return (
     <header
       {...rest}

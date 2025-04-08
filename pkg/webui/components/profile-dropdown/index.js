@@ -23,7 +23,7 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import styles from './profile-dropdown.styl'
 
 const ProfileDropdown = props => {
-  const { brandLogo, className, children, profilePicture, ...rest } = props
+  const { brandLogo, className, children, profilePicture, darkTheme, ...rest } = props
 
   return (
     <div className={styles.container}>
@@ -36,7 +36,11 @@ const ProfileDropdown = props => {
       >
         <div className="d-flex gap-cs-xs al-center">
           {brandLogo && <img {...brandLogo} className={styles.brandLogo} />}
-          <ProfilePicture className={styles.profilePicture} profilePicture={profilePicture} />
+          <ProfilePicture
+            className={styles.profilePicture}
+            darkTheme={darkTheme}
+            profilePicture={profilePicture}
+          />
         </div>
       </Button>
     </div>
@@ -54,6 +58,8 @@ ProfileDropdown.propTypes = {
    */
   children: PropTypes.node.isRequired,
   className: PropTypes.string,
+  /** The dark theme. */
+  darkTheme: PropTypes.bool,
   /** The profile picture of the current user. */
   profilePicture: PropTypes.profilePicture,
 }
@@ -62,6 +68,7 @@ ProfileDropdown.defaultProps = {
   brandLogo: undefined,
   className: undefined,
   profilePicture: undefined,
+  darkTheme: false,
 }
 
 export default ProfileDropdown
