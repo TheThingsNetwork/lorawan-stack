@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useRef, useCallback } from 'react'
+import React, { useRef, useCallback, useEffect } from 'react'
 import classnames from 'classnames'
 import { useSelector } from 'react-redux'
 
@@ -43,6 +43,12 @@ const ProfilePicture = ({ profilePicture, className, size }) => {
     },
     [darkTheme],
   )
+
+  useEffect(() => {
+    if (imageRef.current) {
+      imageRef.current.src = darkTheme ? missingProfilePictureWhite : missingProfilePicture
+    }
+  }, [darkTheme])
 
   return (
     <div className={classnames(className, styles.container)}>
