@@ -38,6 +38,7 @@ import {
   selectApplicationEventsFilter,
   selectApplicationById,
 } from '@console/store/selectors/applications'
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 const m = defineMessages({
   applicationEventsOf: 'Application events of <strong>{entityName}</strong>',
@@ -52,6 +53,11 @@ const ApplicationEvents = props => {
   const paused = useSelector(state => selectApplicationEventsPaused(state, appId))
   const truncated = useSelector(state => selectApplicationEventsTruncated(state, appId))
   const filter = useSelector(state => selectApplicationEventsFilter(state, appId))
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const dark =
+    consolePreferences.console_theme === 'CONSOLE_THEME_DARK' ||
+    (consolePreferences.console_theme === 'CONSOLE_THEME_SYSTEM' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   const dispatch = useDispatch()
 
@@ -94,7 +100,7 @@ const ApplicationEvents = props => {
         filter={filter}
         onPauseToggle={onPauseToggle}
         onFilterChange={onFilterChange}
-        darkTheme={darkTheme}
+        darkTheme={dark ?? darkTheme}
         framed={framed}
         titleMessage={m.applicationEventsOf}
         entityName={applicationName}
@@ -104,6 +110,7 @@ const ApplicationEvents = props => {
     appId,
     applicationName,
     darkTheme,
+    dark,
     events,
     filter,
     framed,

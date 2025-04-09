@@ -35,6 +35,7 @@ import {
   selectDeviceEventsFilter,
   selectDeviceById,
 } from '@console/store/selectors/devices'
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 const m = defineMessages({
   deviceEventsOf: 'End device events of <strong>{entityName}</strong>',
@@ -52,6 +53,11 @@ const DeviceEvents = props => {
   const paused = useSelector(state => selectDeviceEventsPaused(state, combinedId))
   const truncated = useSelector(state => selectDeviceEventsTruncated(state, combinedId))
   const filter = useSelector(state => selectDeviceEventsFilter(state, combinedId))
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const dark =
+    consolePreferences.console_theme === 'CONSOLE_THEME_DARK' ||
+    (consolePreferences.console_theme === 'CONSOLE_THEME_SYSTEM' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   const dispatch = useDispatch()
 
@@ -98,7 +104,7 @@ const DeviceEvents = props => {
       onPauseToggle={onPauseToggle}
       onFilterChange={onFilterChange}
       truncated={truncated}
-      darkTheme={darkTheme}
+      darkTheme={dark ?? darkTheme}
       framed={framed}
       titleMessage={m.deviceEventsOf}
       entityName={deviceName}

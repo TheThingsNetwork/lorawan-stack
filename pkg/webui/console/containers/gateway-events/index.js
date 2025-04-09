@@ -38,6 +38,7 @@ import {
   selectGatewayEventsFilter,
   selectGatewayById,
 } from '@console/store/selectors/gateways'
+import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
 const m = defineMessages({
   gatewayEventsOf: 'Gateway events of <strong>{entityName}</strong>',
@@ -52,6 +53,11 @@ const GatewayEvents = props => {
   const paused = useSelector(state => selectGatewayEventsPaused(state, gtwId))
   const truncated = useSelector(state => selectGatewayEventsTruncated(state, gtwId))
   const filter = useSelector(state => selectGatewayEventsFilter(state, gtwId))
+  const consolePreferences = useSelector(selectConsolePreferences)
+  const dark =
+    consolePreferences.console_theme === 'CONSOLE_THEME_DARK' ||
+    (consolePreferences.console_theme === 'CONSOLE_THEME_SYSTEM' &&
+      window.matchMedia('(prefers-color-scheme: dark)').matches)
 
   const dispatch = useDispatch()
 
@@ -101,7 +107,7 @@ const GatewayEvents = props => {
         onFilterChange={onFilterChange}
         truncated={truncated}
         filter={filter}
-        darkTheme={darkTheme}
+        darkTheme={dark ?? darkTheme}
         framed={framed}
         titleMessage={m.gatewayEventsOf}
         entityName={gatewayName}
@@ -110,6 +116,7 @@ const GatewayEvents = props => {
     )
   }, [
     darkTheme,
+    dark,
     filter,
     framed,
     gatewayName,
