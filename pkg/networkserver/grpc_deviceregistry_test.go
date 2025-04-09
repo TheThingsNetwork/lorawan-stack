@@ -1828,3 +1828,422 @@ func TestDeviceRegistryBatchDelete(t *testing.T) { // nolint:paralleltest
 		})
 	}
 }
+
+func TestDeviceRegistrySetMACSettingsProfile(t *testing.T) {
+	t.Parallel()
+	registeredApplicationID := "test-app"
+	registeredApplicationIDs := &ttnpb.ApplicationIdentifiers{
+		ApplicationId: registeredApplicationID,
+	}
+	devIDs1 := &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: registeredApplicationID,
+		},
+		DeviceId: "test-device-1",
+		JoinEui:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+		DevEui:   types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+	}
+	devIDs2 := &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: registeredApplicationID,
+		},
+		DeviceId: "test-device-2",
+		JoinEui:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+		DevEui:   types.EUI64{0x42, 0x43, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+	}
+	devIDs3 := &ttnpb.EndDeviceIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: registeredApplicationID,
+		},
+		DeviceId: "test-device-3",
+		JoinEui:  types.EUI64{0x42, 0x42, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+		DevEui:   types.EUI64{0x42, 0x44, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes(),
+	}
+	unknownMACSettingsProfileID := &ttnpb.MACSettingsProfileIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: "test-unknown-app-id",
+		},
+		ProfileId: "test-unknown-profile-id",
+	}
+	macSettingsProfileID1 := &ttnpb.MACSettingsProfileIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: "test-app-id",
+		},
+		ProfileId: "test-mac-settings-profile-id-1",
+	}
+	macSettingsProfileID2 := &ttnpb.MACSettingsProfileIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: "test-app-id",
+		},
+		ProfileId: "test-mac-settings-profile-id-2",
+	}
+
+	customMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
+	customMACSettings.Rx1Delay = &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2}
+	customMACSettings.Rx1DataRateOffset = nil
+
+	for _, tc := range []struct {
+		Name               string
+		Devices            []*ttnpb.EndDevice
+		Request            *ttnpb.BatchSetMACSettingsProfileRequest
+		ContextFunc        func(context.Context) context.Context
+		AssertionFunc      func(*testing.T, *ttnpb.EndDevice) bool
+		ErrorAssertionFunc func(*testing.T, error) bool
+	}{
+		{
+			Name: "No device write rights",
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        registeredApplicationIDs,
+				MacSettingsProfileIds: macSettingsProfileID1,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
+							},
+						},
+					}),
+				})
+			},
+			ErrorAssertionFunc: func(t *testing.T, err error) bool {
+				t.Helper()
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+		},
+		{
+			Name: "Wrong application ID",
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        &ttnpb.ApplicationIdentifiers{ApplicationId: "test-unknown-app-id"},
+				MacSettingsProfileIds: macSettingsProfileID1,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			ErrorAssertionFunc: func(t *testing.T, err error) bool {
+				t.Helper()
+				if !assertions.New(t).So(errors.IsPermissionDenied(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+		},
+		{
+			Name: "Wrong MAC settings profile ID",
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        registeredApplicationIDs,
+				MacSettingsProfileIds: unknownMACSettingsProfileID,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			ErrorAssertionFunc: func(t *testing.T, err error) bool {
+				t.Helper()
+				if !assertions.New(t).So(errors.IsNotFound(err), should.BeTrue) {
+					t.Errorf("Received error: %s", err)
+					return false
+				}
+				return true
+			},
+		},
+		{
+			Name: "Set MAC settings profile",
+			Devices: []*ttnpb.EndDevice{
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs1),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(nil),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs2),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(nil),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs3),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(nil),
+				),
+			},
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        registeredApplicationIDs,
+				MacSettingsProfileIds: macSettingsProfileID1,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			AssertionFunc: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				t.Helper()
+				a := assertions.New(t)
+				a.So(dev, should.NotBeNil)
+				a.So(dev.MacSettings, should.BeNil)
+				a.So(dev.MacSettingsProfileIds, should.Resemble, macSettingsProfileID1)
+				return true
+			},
+		},
+		{
+			Name: "Set MAC settings profile with existing MAC settings profile",
+			Devices: []*ttnpb.EndDevice{
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs1),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(nil),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs2),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID1),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs3),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID2),
+				),
+			},
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        registeredApplicationIDs,
+				MacSettingsProfileIds: macSettingsProfileID1,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			AssertionFunc: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				t.Helper()
+				a := assertions.New(t)
+				a.So(dev, should.NotBeNil)
+				a.So(dev.MacSettings, should.BeNil)
+				a.So(dev.MacSettingsProfileIds, should.Resemble, macSettingsProfileID1)
+				return true
+			},
+		},
+		{
+			Name: "Unset MAC settings profile",
+			Devices: []*ttnpb.EndDevice{
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs1),
+					EndDeviceOptions.WithMacSettings(nil),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID1),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs2),
+					EndDeviceOptions.WithMacSettings(nil),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID1),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs3),
+					EndDeviceOptions.WithMacSettings(nil),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID1),
+				),
+			},
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        registeredApplicationIDs,
+				MacSettingsProfileIds: nil,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			AssertionFunc: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				t.Helper()
+				a := assertions.New(t)
+				a.So(dev, should.NotBeNil)
+				a.So(dev.MacSettings, should.Resemble, customMACSettings)
+				a.So(dev.MacSettingsProfileIds, should.BeNil)
+				return true
+			},
+		},
+		{
+			Name: "Unset MAC settings profile with mixed MAC settings profiles",
+			Devices: []*ttnpb.EndDevice{
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs1),
+					EndDeviceOptions.WithMacSettings(customMACSettings),
+					EndDeviceOptions.WithMacSettingsProfileIds(nil),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs2),
+					EndDeviceOptions.WithMacSettings(nil),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID1),
+				),
+				MakeEndDevice(
+					EndDeviceOptions.WithIds(devIDs3),
+					EndDeviceOptions.WithMacSettings(nil),
+					EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID2),
+				),
+			},
+			Request: &ttnpb.BatchSetMACSettingsProfileRequest{
+				ApplicationIds:        registeredApplicationIDs,
+				MacSettingsProfileIds: nil,
+				DeviceIds: []string{
+					devIDs1.DeviceId,
+					devIDs2.DeviceId,
+					devIDs3.DeviceId,
+				},
+			},
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), registeredApplicationIDs): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			AssertionFunc: func(t *testing.T, dev *ttnpb.EndDevice) bool {
+				t.Helper()
+				a := assertions.New(t)
+				a.So(dev, should.NotBeNil)
+				a.So(dev.MacSettings, should.Resemble, customMACSettings)
+				a.So(dev.MacSettingsProfileIds, should.BeNil)
+				return true
+			},
+		},
+	} {
+		test.RunSubtest(t, test.SubtestConfig{
+			Name:     tc.Name,
+			Parallel: true,
+			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
+				t.Helper()
+				nsConf := DefaultConfig
+				nsConf.DeviceKEKLabel = test.DefaultKEKLabel
+
+				ns, ctx, env, stop := StartTest(ctx, TestConfig{
+					Component: component.Config{
+						ServiceBase: config.ServiceBase{
+							GRPC: config.GRPC{
+								LogIgnoreMethods: []string{
+									"/ttn.lorawan.v3.ApplicationAccess/ListRights",
+									"/ttn.lorawan.v3.NsEndDeviceRegistry/Set",
+								},
+							},
+							KeyVault: test.DefaultKeyVault,
+							FrequencyPlans: config.FrequencyPlansConfig{
+								ConfigSource: "static",
+								Static:       test.StaticFrequencyPlans,
+							},
+						},
+					},
+					NetworkServer: nsConf,
+					TaskStarter: StartTaskExclude(
+						DownlinkProcessTaskName,
+						DownlinkDispatchTaskName,
+					),
+				})
+				defer stop()
+
+				for _, createDevice := range tc.Devices {
+					_, ctx = MustCreateDevice(ctx, env.Devices, createDevice)
+				}
+
+				for _, id := range []*ttnpb.MACSettingsProfileIdentifiers{macSettingsProfileID1, macSettingsProfileID2} {
+					macSettingsProfile := &ttnpb.MACSettingsProfile{
+						Ids:         id,
+						MacSettings: customMACSettings,
+					}
+					profile, err := env.MACSettingsProfileRegistry.Set(ctx, id, []string{"ids", "mac_settings"},
+						func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
+							return macSettingsProfile, []string{"ids", "mac_settings"}, nil
+						})
+					a.So(err, should.BeNil)
+					a.So(profile, should.Resemble, macSettingsProfile)
+				}
+
+				ns.AddContextFiller(tc.ContextFunc)
+				ns.AddContextFiller(func(ctx context.Context) context.Context {
+					return test.ContextWithTB(ctx, t)
+				})
+				req := ttnpb.Clone(tc.Request)
+				a.So(req, should.Resemble, tc.Request)
+
+				res, err := ttnpb.NewNsEndDeviceBatchRegistryClient(ns.LoopbackConn()).SetMACSettingsProfile(ctx, req)
+				if tc.ErrorAssertionFunc != nil {
+					a.So(tc.ErrorAssertionFunc(t, err), should.BeTrue)
+				} else {
+					a.So(err, should.BeNil)
+				}
+				if tc.AssertionFunc != nil {
+					for _, dev := range res.EndDevices {
+						a.So(tc.AssertionFunc(t, dev), should.BeTrue)
+					}
+				}
+			},
+		})
+	}
+}
