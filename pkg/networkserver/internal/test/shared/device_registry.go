@@ -446,9 +446,44 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 	pb3.Ids.DevEui = types.EUI64{0x42, 0x45, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}.Bytes()
 	pb3.PendingSession = nil
 
+	macSettingsProfileID := &ttnpb.MACSettingsProfileIdentifiers{
+		ApplicationIds: pb.Ids.ApplicationIds,
+		ProfileId:      "test-mac-settings-profile-id",
+	}
+
 	// Create the devices
 	for _, pb := range []*ttnpb.EndDevice{pb1, pb2, pb3} {
 		assertCreateDevice(ctx, pb, pbFields...)
+	}
+
+	// Modify the devices in batch
+	modified, err := reg.BatchSetByID(
+		ctx,
+		pb.Ids.ApplicationIds,
+		[]string{
+			pb1.Ids.DeviceId,
+			pb2.Ids.DeviceId,
+			pb3.Ids.DeviceId,
+			// This unknown device will be ignored.
+			"test-dev-4",
+		},
+		func(stored *ttnpb.EndDevice) error {
+			a.So(stored, should.NotBeNil)
+			stored.MacSettingsProfileIds = macSettingsProfileID
+
+			return nil
+		},
+	)
+	if !a.So(err, should.BeNil) {
+		t.Fatalf("BatchSetByID failed with: %s", errors.Stack(err))
+	}
+	if !a.So(modified, should.HaveLength, 3) {
+		t.Fatalf("BatchSetByID returned wrong number of devices: %d", len(modified))
+	}
+	for _, dev := range modified {
+		if !a.So(dev.MacSettingsProfileIds, should.Resemble, macSettingsProfileID) {
+			t.Fatalf("Unexpected macSettingsProfileId in device: %s", dev.MacSettingsProfileIds)
+		}
 	}
 
 	// Batch Delete
