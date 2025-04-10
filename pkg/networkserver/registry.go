@@ -55,6 +55,7 @@ type DeviceRegistry interface {
 		ctx context.Context,
 		appIDs *ttnpb.ApplicationIdentifiers,
 		deviceIDs []string,
+		paths []string,
 		callback func(dev *ttnpb.EndDevice) error,
 	) ([]*ttnpb.EndDevice, error)
 }

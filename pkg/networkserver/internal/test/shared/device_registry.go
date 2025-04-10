@@ -467,6 +467,9 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			// This unknown device will be ignored.
 			"test-dev-4",
 		},
+		[]string{
+			"mac_settings_profile_ids",
+		},
 		func(stored *ttnpb.EndDevice) error {
 			a.So(stored, should.NotBeNil)
 			stored.MacSettingsProfileIds = macSettingsProfileID

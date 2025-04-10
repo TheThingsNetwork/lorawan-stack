@@ -2552,6 +2552,7 @@ type MockDeviceRegistry struct {
 		ctx context.Context,
 		appIDs *ttnpb.ApplicationIdentifiers,
 		deviceIDs []string,
+		paths []string,
 		callback func(dev *ttnpb.EndDevice) error,
 	) ([]*ttnpb.EndDevice, error)
 }
@@ -2614,12 +2615,13 @@ func (m MockDeviceRegistry) BatchSetByID(
 	ctx context.Context,
 	appIDs *ttnpb.ApplicationIdentifiers,
 	deviceIDs []string,
+	paths []string,
 	callback func(dev *ttnpb.EndDevice) error,
 ) ([]*ttnpb.EndDevice, error) {
 	if m.BatchSetByIDFunc == nil {
 		panic("BatchSetByIDFunc called, but not set")
 	}
-	return m.BatchSetByIDFunc(ctx, appIDs, deviceIDs, callback)
+	return m.BatchSetByIDFunc(ctx, appIDs, deviceIDs, paths, callback)
 }
 
 type MockMACSettingsProfileRegistry struct {

@@ -1157,6 +1157,7 @@ func (r *DeviceRegistry) BatchSetByID(
 	ctx context.Context,
 	appIDs *ttnpb.ApplicationIdentifiers,
 	deviceIDs []string,
+	paths []string,
 	callback func(dev *ttnpb.EndDevice) error,
 ) ([]*ttnpb.EndDevice, error) {
 	defer trace.StartRegion(ctx, "batch set end device by id").End()
@@ -1202,6 +1203,7 @@ func (r *DeviceRegistry) BatchSetByID(
 				if err := callback(dev); err != nil {
 					return err
 				}
+				dev.UpdatedAt = timestamppb.New(time.Now())
 			}
 			devices[i] = dev
 		}
@@ -1217,6 +1219,10 @@ func (r *DeviceRegistry) BatchSetByID(
 					return err
 				}
 				p.Set(ctx, uidKeys[i], value, 0)
+				dev, err = ttnpb.FilterGetEndDevice(dev, paths...)
+				if err != nil {
+					return err
+				}
 				modifiedDevices = append(modifiedDevices, dev)
 			}
 			return nil

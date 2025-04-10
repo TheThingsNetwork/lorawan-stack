@@ -1734,6 +1734,7 @@ func (srv *nsEndDeviceBatchRegistry) SetMACSettingsProfile( // nolint: gocyclo
 		ctx,
 		req.ApplicationIds,
 		req.DeviceIds,
+		[]string{"ids", "mac_settings_profile_ids", "mac_settings"},
 		func(stored *ttnpb.EndDevice) error {
 			if req.MacSettingsProfileIds != nil && stored.MacSettingsProfileIds == nil {
 				if c, ok := changes[req.MacSettingsProfileIds]; !ok {
