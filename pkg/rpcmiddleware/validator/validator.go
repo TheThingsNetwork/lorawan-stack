@@ -89,7 +89,7 @@ func convertError(err error) error {
 	if ttnErr, ok := errors.From(err); ok {
 		return ttnErr
 	}
-	return status.Errorf(codes.InvalidArgument, err.Error())
+	return status.Error(codes.InvalidArgument, err.Error())
 }
 
 var (
