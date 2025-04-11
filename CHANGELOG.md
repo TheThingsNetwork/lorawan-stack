@@ -11,6 +11,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Support to associate/disassociate MAC settings profiles to batch of end devices
+  - This feature is experimental and subject to change.
+
 ### Changed
 
 ### Deprecated
