@@ -12,77 +12,88 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-const options = {
-  chart: {
-    type: 'heatmap',
-    toolbar: {
-      show: false,
-    },
-    animations: {
-      enabled: false,
-    },
-    zoom: {
-      enabled: false,
-    },
-    events: {
-      mounted: chart => {
-        chart.windowResizeHandler()
+import style from './heatmap-chart.styl'
+
+const getOptions = () => {
+  const labelColor = getComputedStyle(document.documentElement).getPropertyValue(
+    '--c-text-neutral-light',
+  )
+
+  return {
+    chart: {
+      type: 'heatmap',
+      toolbar: {
+        show: false,
+      },
+      animations: {
+        enabled: false,
+      },
+      zoom: {
+        enabled: false,
+      },
+      events: {
+        mounted: chart => {
+          chart.windowResizeHandler()
+        },
       },
     },
-  },
-  dataLabels: {
-    enabled: false,
-  },
-  colors: ['#152F66'],
-  grid: {
-    show: false,
-    strokeDashArray: 0,
-    padding: {
-      left: 0,
-      right: 0,
-      bottom: -13,
-      top: -30,
-    },
-  },
-  yaxis: {
-    labels: {
-      align: 'left',
-      offsetX: 10,
-    },
-  },
-  xaxis: {
-    labels: {
-      show: false,
-    },
-    axisBorder: {
-      show: false,
-    },
-    tooltip: {
+    dataLabels: {
       enabled: false,
     },
-  },
-  tooltip: {
-    x: {
+    colors: ['#152F66'],
+    grid: {
       show: false,
+      strokeDashArray: 0,
+      padding: {
+        left: 0,
+        right: 0,
+        bottom: -15,
+        top: -28,
+      },
     },
-    marker: {
-      show: false,
+    yaxis: {
+      labels: {
+        align: 'left',
+        offsetX: 10,
+        style: {
+          colors: labelColor,
+        },
+      },
     },
-    custom: ({ series, seriesIndex, dataPointIndex, w }) => {
-      const val = series[seriesIndex][dataPointIndex]
-      const date = new Date(w.globals.seriesX[seriesIndex][dataPointIndex])
-      const formattedDate = date.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-      })
-      const formattedTime = date.toLocaleTimeString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: false,
-      })
-      return `<div class="pl-cs-s pr-cs-s pt-cs-xs pb-cs-xs"><strong>${formattedDate} ${formattedTime}</strong>: ${val}</div>`
+    xaxis: {
+      labels: {
+        show: false,
+      },
+      axisBorder: {
+        show: false,
+      },
+      tooltip: {
+        enabled: false,
+      },
     },
-  },
+    tooltip: {
+      x: {
+        show: false,
+      },
+      marker: {
+        show: false,
+      },
+      custom: ({ series, seriesIndex, dataPointIndex, w }) => {
+        const val = series[seriesIndex][dataPointIndex]
+        const date = new Date(w.globals.seriesX[seriesIndex][dataPointIndex])
+        const formattedDate = date.toLocaleDateString('en-US', {
+          month: '2-digit',
+          day: '2-digit',
+        })
+        const formattedTime = date.toLocaleTimeString('en-US', {
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false,
+        })
+        return `<div class="${style.tooltip} pl-cs-s pr-cs-s pt-cs-xs pb-cs-xs"><strong>${formattedDate} ${formattedTime}</strong>: ${val}</div>`
+      },
+    },
+  }
 }
 
-export default options
+export default getOptions
