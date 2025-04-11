@@ -10194,6 +10194,45 @@
         ]
       }
     },
+    "/ns/applications/{application_ids.application_id}/devices/mac_settings_profile/batch": {
+      "post": {
+        "summary": "Set the MAC settings profile for a batch of end devices.",
+        "operationId": "NsEndDeviceBatchRegistry_SetMACSettingsProfile",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v3EndDevices"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/googlerpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "application_ids.application_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/NsEndDeviceBatchRegistrySetMACSettingsProfileBody"
+            }
+          }
+        ],
+        "tags": [
+          "NsEndDeviceBatchRegistry"
+        ]
+      }
+    },
     "/ns/applications/{application_ids.application_id}/devices/{device_id}": {
       "delete": {
         "summary": "Delete deletes the device that matches the given identifiers.\nIf there are multiple matches, an error will be returned.",
@@ -18864,6 +18903,23 @@
         "status": {
           "$ref": "#/definitions/v3NotificationStatus",
           "description": "The status to set on the notifications."
+        }
+      }
+    },
+    "NsEndDeviceBatchRegistrySetMACSettingsProfileBody": {
+      "type": "object",
+      "properties": {
+        "application_ids": {
+          "type": "object"
+        },
+        "mac_settings_profile_ids": {
+          "$ref": "#/definitions/v3MACSettingsProfileIdentifiers"
+        },
+        "device_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

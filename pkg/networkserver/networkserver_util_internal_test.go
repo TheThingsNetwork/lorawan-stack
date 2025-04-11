@@ -2548,6 +2548,13 @@ type MockDeviceRegistry struct {
 		appIDs *ttnpb.ApplicationIdentifiers,
 		deviceIDs []string,
 	) ([]*ttnpb.EndDeviceIdentifiers, error)
+	BatchSetByIDFunc func(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		deviceIDs []string,
+		paths []string,
+		callback func(dev *ttnpb.EndDevice) error,
+	) ([]*ttnpb.EndDevice, error)
 }
 
 // GetByEUI panics.
@@ -2581,7 +2588,7 @@ func (m MockDeviceRegistry) Range(ctx context.Context, paths []string, f func(co
 	panic("Range must not be called")
 }
 
-// BatchGetByID panics.
+// BatchGetByID calls BatchGetByIDFunc if set and panics otherwise.
 func (m MockDeviceRegistry) BatchGetByID(
 	ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devIDs []string, paths []string,
 ) ([]*ttnpb.EndDevice, error) {
@@ -2591,7 +2598,7 @@ func (m MockDeviceRegistry) BatchGetByID(
 	return m.BatchGetByIDFunc(ctx, appID, devIDs, paths)
 }
 
-// GetByID calls GetByIDFunc if set and panics otherwise.
+// BatchDelete calls BatchDeleteFunc if set and panics otherwise.
 func (m MockDeviceRegistry) BatchDelete(
 	ctx context.Context,
 	appIDs *ttnpb.ApplicationIdentifiers,
@@ -2601,6 +2608,20 @@ func (m MockDeviceRegistry) BatchDelete(
 		panic("BatchDeleteFunc called, but not set")
 	}
 	return m.BatchDeleteFunc(ctx, appIDs, deviceIDs)
+}
+
+// BatchSetByID calls BatchSetByIDFunc if set and panics otherwise.
+func (m MockDeviceRegistry) BatchSetByID(
+	ctx context.Context,
+	appIDs *ttnpb.ApplicationIdentifiers,
+	deviceIDs []string,
+	paths []string,
+	callback func(dev *ttnpb.EndDevice) error,
+) ([]*ttnpb.EndDevice, error) {
+	if m.BatchSetByIDFunc == nil {
+		panic("BatchSetByIDFunc called, but not set")
+	}
+	return m.BatchSetByIDFunc(ctx, appIDs, deviceIDs, paths, callback)
 }
 
 type MockMACSettingsProfileRegistry struct {

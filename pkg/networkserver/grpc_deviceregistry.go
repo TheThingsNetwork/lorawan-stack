@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto/cryptoutil"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
+	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	. "go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal"
 	"go.thethings.network/lorawan-stack/v3/pkg/networkserver/internal/time"
@@ -410,10 +411,7 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 		return nil, err
 	}
 
-	var (
-		profile                   *ttnpb.MACSettingsProfile
-		macSettingsProfileChanged bool
-	)
+	var profile *ttnpb.MACSettingsProfile
 
 	if st.HasSetField(
 		"mac_settings_profile_ids",
@@ -435,15 +433,10 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return nil, err
 			}
 
-			if err = validateProfile(profile.GetMacSettings(), st, fps); err != nil {
+			if err = validateProfile(profile.GetMacSettings(), st.Device, fps); err != nil {
 				return nil, err
 			}
-
-			// If mac_settings_profile_ids is set, mac_settings must not be set.
-			st.Device.MacSettings = nil
-			st.AddSetFields(macSettingsFields...)
 		}
-		macSettingsProfileChanged = true
 	}
 
 	if err := validateADR(st); err != nil {
@@ -1445,43 +1438,40 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				)
 			}
 		}
-		if macSettingsProfileChanged &&
-			!(stored.GetMacSettingsProfileIds() == nil &&
-				st.Device.MacSettingsProfileIds == nil) {
-			id := st.Device.MacSettingsProfileIds
-			if id == nil {
-				id = stored.GetMacSettingsProfileIds()
-			}
 
-			profile, err = ns.macSettingsProfiles.Get(
+		changes := make(map[*ttnpb.MACSettingsProfileIdentifiers]string, 2)
+
+		if st.Device.MacSettingsProfileIds != nil && stored.GetMacSettingsProfileIds() == nil {
+			changes[st.Device.MacSettingsProfileIds] = "inc"
+			st.Device.MacSettings = nil
+			st.AddSetFields(macSettingsFields...)
+		}
+		if st.Device.MacSettingsProfileIds != nil && stored.GetMacSettingsProfileIds() != nil &&
+			st.Device.MacSettingsProfileIds != stored.GetMacSettingsProfileIds() {
+			changes[st.Device.MacSettingsProfileIds] = "inc"
+			changes[stored.MacSettingsProfileIds] = "dec"
+		}
+		if st.Device.MacSettingsProfileIds == nil && stored.GetMacSettingsProfileIds() != nil {
+			profile, err := ns.macSettingsProfiles.Get(
 				ctx,
-				id,
+				stored.MacSettingsProfileIds,
 				[]string{"ids", "mac_settings", "end_devices_count"},
 			)
 			if err != nil {
 				return err
 			}
+			changes[stored.MacSettingsProfileIds] = "dec"
+			st.Device.MacSettings = profile.MacSettings
+			st.AddSetFields(macSettingsFields...)
+		}
 
-			var changed string
-			// Mac Settings profile is added
-			if stored.GetMacSettingsProfileIds() == nil && st.Device.MacSettingsProfileIds != nil {
-				changed = "inc"
-			}
-
-			// Mac Settings profile is deleted
-			if stored.GetMacSettingsProfileIds() != nil && st.Device.MacSettingsProfileIds == nil {
-				changed = "dec"
-
-				st.Device.MacSettings = profile.MacSettings
-				st.AddSetFields(macSettingsFields...)
-			}
-
-			_, err := ns.macSettingsProfiles.Set(
+		for id, change := range changes {
+			_, err = ns.macSettingsProfiles.Set(
 				ctx,
 				id,
 				[]string{"ids", "mac_settings", "end_devices_count"},
 				func(_ context.Context, existing *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
-					switch changed {
+					switch change {
 					case "inc":
 						existing.EndDevicesCount++
 					case "dec":
@@ -1643,7 +1633,9 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 type nsEndDeviceBatchRegistry struct {
 	ttnpb.UnimplementedNsEndDeviceBatchRegistryServer
 
-	devices DeviceRegistry
+	devices             DeviceRegistry
+	macSettingsProfiles MACSettingsProfileRegistry
+	frequencyPlans      func(context.Context) (*frequencyplans.Store, error)
 }
 
 // Delete implements ttipb.NsEndDeviceBatchRegistryServer.
@@ -1676,6 +1668,140 @@ func (srv *nsEndDeviceBatchRegistry) Delete(
 	}
 
 	return ttnpb.Empty, nil
+}
+
+func (srv *nsEndDeviceBatchRegistry) SetMACSettingsProfile( // nolint: gocyclo
+	ctx context.Context,
+	req *ttnpb.BatchSetMACSettingsProfileRequest,
+) (*ttnpb.EndDevices, error) {
+	// Check if the user has rights on the application.
+	if err := rights.RequireApplication(
+		ctx,
+		req.ApplicationIds,
+		ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+	); err != nil {
+		return nil, err
+	}
+
+	if req.MacSettingsProfileIds != nil {
+		devices, err := srv.devices.BatchGetByID(ctx, req.ApplicationIds, req.DeviceIds, ttnpb.EndDeviceFieldPathsTopLevel)
+		if err != nil {
+			logRegistryRPCError(ctx, err, "Failed to get devices from registry")
+			return nil, err
+		}
+
+		fps, err := srv.frequencyPlans(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		profile, err := srv.macSettingsProfiles.Get(
+			ctx,
+			req.MacSettingsProfileIds,
+			[]string{"ids", "mac_settings", "end_devices_count"},
+		)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, dev := range devices {
+			err = validateProfile(profile.GetMacSettings(), dev, fps)
+			if err != nil {
+				logRegistryRPCError(ctx, err, "Failed to validate mac settings profile")
+				return nil, err
+			}
+		}
+	}
+
+	type change struct {
+		changed string
+		count   uint32
+	}
+	changes := make(map[*ttnpb.MACSettingsProfileIdentifiers]change, len(req.DeviceIds)*2)
+
+	storedDevices, err := srv.devices.BatchSetByID(
+		ctx,
+		req.ApplicationIds,
+		req.DeviceIds,
+		[]string{"ids", "mac_settings_profile_ids", "mac_settings"},
+		func(stored *ttnpb.EndDevice) error {
+			if req.MacSettingsProfileIds != nil && stored.MacSettingsProfileIds == nil {
+				if c, ok := changes[req.MacSettingsProfileIds]; !ok {
+					changes[req.MacSettingsProfileIds] = change{"inc", 1}
+				} else {
+					c.count++
+					changes[req.MacSettingsProfileIds] = c
+				}
+				stored.MacSettingsProfileIds = req.MacSettingsProfileIds
+				stored.MacSettings = nil
+			}
+			if req.MacSettingsProfileIds != nil && stored.MacSettingsProfileIds != nil &&
+				req.MacSettingsProfileIds != stored.MacSettingsProfileIds {
+				if c, ok := changes[req.MacSettingsProfileIds]; !ok {
+					changes[req.MacSettingsProfileIds] = change{"inc", 1}
+				} else {
+					c.count++
+					changes[req.MacSettingsProfileIds] = c
+				}
+				if c, ok := changes[stored.MacSettingsProfileIds]; !ok {
+					changes[stored.MacSettingsProfileIds] = change{"dec", 1}
+				} else {
+					c.count++
+					changes[stored.MacSettingsProfileIds] = c
+				}
+				stored.MacSettingsProfileIds = req.MacSettingsProfileIds
+				stored.MacSettings = nil
+			}
+			if req.MacSettingsProfileIds == nil && stored.MacSettingsProfileIds != nil {
+				profile, err := srv.macSettingsProfiles.Get(
+					ctx,
+					stored.MacSettingsProfileIds,
+					[]string{"ids", "mac_settings", "end_devices_count"},
+				)
+				if err != nil {
+					return err
+				}
+				if c, ok := changes[stored.MacSettingsProfileIds]; !ok {
+					changes[stored.MacSettingsProfileIds] = change{"dec", 1}
+				} else {
+					c.count++
+					changes[stored.MacSettingsProfileIds] = c
+				}
+				stored.MacSettings = profile.MacSettings
+				stored.MacSettingsProfileIds = nil
+			}
+			return nil
+		})
+	if err != nil {
+		logRegistryRPCError(ctx, err, "Failed to set devices in registry")
+		return nil, err
+	}
+
+	for id, change := range changes {
+		_, err = srv.macSettingsProfiles.Set(
+			ctx,
+			id,
+			[]string{"ids", "mac_settings", "end_devices_count"},
+			func(_ context.Context, existing *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
+				switch change.changed {
+				case "inc":
+					existing.EndDevicesCount += change.count
+				case "dec":
+					if existing.EndDevicesCount > 0 {
+						existing.EndDevicesCount -= change.count
+					}
+				}
+				return existing, []string{"ids", "mac_settings", "end_devices_count"}, nil
+			})
+		if err != nil {
+			logRegistryRPCError(ctx, err, "Failed to set mac settings profile in registry")
+			return nil, err
+		}
+	}
+
+	return &ttnpb.EndDevices{
+		EndDevices: storedDevices,
+	}, nil
 }
 
 func init() {

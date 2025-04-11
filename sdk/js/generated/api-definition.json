@@ -4528,6 +4528,19 @@
           ]
         }
       ]
+    },
+    "SetMACSettingsProfile": {
+      "file": "ttn/lorawan/v3/networkserver.proto",
+      "http": [
+        {
+          "method": "post",
+          "pattern": "/ns/applications/{application_ids.application_id}/devices/mac_settings_profile/batch",
+          "body": "*",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
     }
   },
   "NsEndDeviceRegistry": {

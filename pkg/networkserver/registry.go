@@ -51,6 +51,13 @@ type DeviceRegistry interface {
 		appIDs *ttnpb.ApplicationIdentifiers,
 		deviceIDs []string,
 	) ([]*ttnpb.EndDeviceIdentifiers, error)
+	BatchSetByID(
+		ctx context.Context,
+		appIDs *ttnpb.ApplicationIdentifiers,
+		deviceIDs []string,
+		paths []string,
+		callback func(dev *ttnpb.EndDevice) error,
+	) ([]*ttnpb.EndDevice, error)
 }
 
 var errDeviceExists = errors.DefineAlreadyExists("device_exists", "device already exists")

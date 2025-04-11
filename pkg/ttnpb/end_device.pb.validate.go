@@ -5668,6 +5668,149 @@ var _ interface {
 
 var _BatchGetEndDevicesRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
 
+// ValidateFields checks the field values on BatchSetMACSettingsProfileRequest
+// with the rules defined in the proto definition for this message. If any
+// rules are violated, an error is returned.
+func (m *BatchSetMACSettingsProfileRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = BatchSetMACSettingsProfileRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return BatchSetMACSettingsProfileRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchSetMACSettingsProfileRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "mac_settings_profile_ids":
+
+			if v, ok := interface{}(m.GetMacSettingsProfileIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return BatchSetMACSettingsProfileRequestValidationError{
+						field:  "mac_settings_profile_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "device_ids":
+
+			if l := len(m.GetDeviceIds()); l < 1 || l > 20 {
+				return BatchSetMACSettingsProfileRequestValidationError{
+					field:  "device_ids",
+					reason: "value must contain between 1 and 20 items, inclusive",
+				}
+			}
+
+			for idx, item := range m.GetDeviceIds() {
+				_, _ = idx, item
+
+				if utf8.RuneCountInString(item) > 36 {
+					return BatchSetMACSettingsProfileRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value length must be at most 36 runes",
+					}
+				}
+
+				if !_BatchSetMACSettingsProfileRequest_DeviceIds_Pattern.MatchString(item) {
+					return BatchSetMACSettingsProfileRequestValidationError{
+						field:  fmt.Sprintf("device_ids[%v]", idx),
+						reason: "value does not match regex pattern \"^[a-z0-9](?:[-]?[a-z0-9]){2,}$\"",
+					}
+				}
+
+			}
+
+		default:
+			return BatchSetMACSettingsProfileRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// BatchSetMACSettingsProfileRequestValidationError is the validation error
+// returned by BatchSetMACSettingsProfileRequest.ValidateFields if the
+// designated constraints aren't met.
+type BatchSetMACSettingsProfileRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e BatchSetMACSettingsProfileRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e BatchSetMACSettingsProfileRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e BatchSetMACSettingsProfileRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e BatchSetMACSettingsProfileRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e BatchSetMACSettingsProfileRequestValidationError) ErrorName() string {
+	return "BatchSetMACSettingsProfileRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e BatchSetMACSettingsProfileRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sBatchSetMACSettingsProfileRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = BatchSetMACSettingsProfileRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = BatchSetMACSettingsProfileRequestValidationError{}
+
+var _BatchSetMACSettingsProfileRequest_DeviceIds_Pattern = regexp.MustCompile("^[a-z0-9](?:[-]?[a-z0-9]){2,}$")
+
 // ValidateFields checks the field values on MACParameters_Channel with the
 // rules defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

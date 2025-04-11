@@ -182,4 +182,12 @@ service NsEndDeviceBatchRegistry {
   rpc Delete(BatchDeleteEndDevicesRequest) returns (google.protobuf.Empty) {
     option (google.api.http) = {delete: "/ns/applications/{application_ids.application_id}/devices/batch"};
   }
+
+  // Set the MAC settings profile for a batch of end devices.
+  rpc SetMACSettingsProfile(BatchSetMACSettingsProfileRequest) returns (EndDevices) {
+    option (google.api.http) = {
+      post: "/ns/applications/{application_ids.application_id}/devices/mac_settings_profile/batch"
+      body: "*"
+    };
+  }
 }
