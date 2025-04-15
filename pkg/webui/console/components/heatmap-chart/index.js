@@ -13,32 +13,69 @@
 // limitations under the License.
 
 import ReactApexChart from 'react-apexcharts'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { random } from 'lodash'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-import options from './chart-utils'
+import getOptions from './chart-utils'
 
 const HeatmapChart = ({ showRandomValues, data, height }) => {
-  const series = showRandomValues
-    ? new Array(random(4, 18)).fill(1).map(() => ({
+  const series = useMemo(() => {
+    if (showRandomValues) {
+      const now = new Date()
+      now.setMinutes(0, 0, 0)
+      const baseTimestamp = now.getTime()
+
+      return Array.from({ length: random(10, 18) }, () => ({
         name: `${random(800, 999)}.${random(100, 999)}`,
-        data: Array.from({ length: 50 }, () => ({
-          x: Date.now() + random(0, 1000) * 1000,
-          y: random(0, 100),
+        data: Array.from({ length: 24 }, (_, i) => ({
+          x: baseTimestamp - (24 - i - 1) * 60 * 60 * 1000,
+          y: random(1, 100),
         })),
       }))
-    : data
+    }
+    return data
+  }, [data, showRandomValues])
 
-  return <ReactApexChart options={options} series={series} type="heatmap" height={height} />
+  const calculateHeight = () => {
+    const baseRowHeight = 30
+    const rowCount = series.length
+
+    // Ideal full height
+    const fullHeight = rowCount * baseRowHeight
+
+    if (fullHeight <= height) {
+      return fullHeight
+    }
+
+    // Shrink row height to fit within maxHeight
+    const scaledRowHeight = height / rowCount
+    return rowCount * scaledRowHeight
+  }
+
+  return (
+    <div className="w-full">
+      <ReactApexChart
+        options={getOptions()}
+        series={series}
+        type="heatmap"
+        height={calculateHeight()}
+      />
+    </div>
+  )
 }
 
 HeatmapChart.propTypes = {
   data: PropTypes.arrayOf(
     PropTypes.shape({
       name: PropTypes.string,
-      data: PropTypes.arrayOf(PropTypes.number),
+      data: PropTypes.arrayOf(
+        PropTypes.shape({
+          x: PropTypes.number,
+          y: PropTypes.number,
+        }),
+      ),
     }),
   ).isRequired,
   height: PropTypes.number,
@@ -46,7 +83,7 @@ HeatmapChart.propTypes = {
 }
 
 HeatmapChart.defaultProps = {
-  height: 250,
+  height: 350,
 }
 
 export default HeatmapChart
