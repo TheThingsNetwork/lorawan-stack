@@ -274,9 +274,10 @@ const WebhookForm = props => {
   const [existingId, setExistingId] = useState(undefined)
   const [error, setError] = useState(undefined)
 
-  const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)[0]
-  const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)[1]
+  const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)?.[0]
+  const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)?.[1]
   const retryIntervalIntlUnit = units[retryIntervalUnit]
+  const hasValidRetryValue = retryIntervalValue && Number.isFinite(Number(retryIntervalValue))
 
   let initialValues = blankValues
   if (update && initialWebhookValue) {
@@ -409,7 +410,7 @@ const WebhookForm = props => {
                 webhookRetryInterval: (
                   <FormattedRelativeTime
                     style="long"
-                    value={retryIntervalValue}
+                    value={hasValidRetryValue}
                     unit={retryIntervalIntlUnit}
                   />
                 ),
