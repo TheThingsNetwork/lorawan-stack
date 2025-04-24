@@ -1290,10 +1290,12 @@ func TestDeviceRegistryDelete(t *testing.T) {
 	for _, tc := range []struct {
 		Name           string
 		ContextFunc    func(context.Context) context.Context
-		SetByIDFunc    func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)
+		SetByIDFunc    func(context.Context, *ttnpb.ApplicationIdentifiers, string, []string, func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error)          // nolint: lll
+		SetFunc        func(context.Context, *ttnpb.MACSettingsProfileIdentifiers, []string, func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error)) (*ttnpb.MACSettingsProfile, error) // nolint: lll
 		Request        *ttnpb.EndDeviceIdentifiers
 		ErrorAssertion func(*testing.T, error) bool
 		SetByIDCalls   uint64
+		SetCalls       uint64
 	}{
 		{
 			Name: "No device write rights",
@@ -1308,7 +1310,13 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					}),
 				})
 			},
-			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(
+				ctx context.Context,
+				_ *ttnpb.ApplicationIdentifiers,
+				_ string,
+				_ []string,
+				_ func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+			) (*ttnpb.EndDevice, context.Context, error) {
 				err := errors.New("SetByIDFunc must not be called")
 				test.MustTFromContext(ctx).Error(err)
 				return nil, ctx, err
@@ -1339,12 +1347,18 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					}),
 				})
 			},
-			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(
+				ctx context.Context,
+				appID *ttnpb.ApplicationIdentifiers,
+				devID string,
+				gets []string,
+				f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+			) (*ttnpb.EndDevice, context.Context, error) {
 				t := test.MustTFromContext(ctx)
 				a := assertions.New(t)
 				a.So(appID, should.Resemble, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.BeNil)
+				a.So(gets, should.Equal, []string{"mac_settings_profile_ids"})
 
 				dev, sets, err := f(ctx, nil)
 				if !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -1374,11 +1388,17 @@ func TestDeviceRegistryDelete(t *testing.T) {
 					}),
 				})
 			},
-			SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+			SetByIDFunc: func(
+				ctx context.Context,
+				appID *ttnpb.ApplicationIdentifiers,
+				devID string,
+				gets []string,
+				f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+			) (*ttnpb.EndDevice, context.Context, error) {
 				a := assertions.New(test.MustTFromContext(ctx))
 				a.So(appID, should.Resemble, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
 				a.So(devID, should.Equal, "test-dev-id")
-				a.So(gets, should.BeNil)
+				a.So(gets, should.Equal, []string{"mac_settings_profile_ids"})
 
 				dev, sets, err := f(ctx, &ttnpb.EndDevice{
 					Ids: &ttnpb.EndDeviceIdentifiers{
@@ -1399,22 +1419,121 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			},
 			SetByIDCalls: 1,
 		},
+
+		{
+			Name: "Existing device with MAC settings profile",
+			ContextFunc: func(ctx context.Context) context.Context {
+				return rights.NewContext(ctx, &rights.Rights{
+					ApplicationRights: *rights.NewMap(map[string]*ttnpb.Rights{
+						unique.ID(test.Context(), &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"}): {
+							Rights: []ttnpb.Right{
+								ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
+							},
+						},
+					}),
+				})
+			},
+			SetByIDFunc: func(
+				ctx context.Context,
+				appID *ttnpb.ApplicationIdentifiers,
+				devID string,
+				gets []string,
+				f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+			) (*ttnpb.EndDevice, context.Context, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(appID, should.Resemble, &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"})
+				a.So(devID, should.Equal, "test-dev-id")
+				a.So(gets, should.Equal, []string{"mac_settings_profile_ids"})
+
+				dev, sets, err := f(ctx, &ttnpb.EndDevice{
+					Ids: &ttnpb.EndDeviceIdentifiers{
+						DeviceId:       "test-dev-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					},
+					MacSettingsProfileIds: &ttnpb.MACSettingsProfileIdentifiers{
+						ProfileId:      "test-mac-settings-profile-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					},
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, ctx, err
+				}
+				a.So(sets, should.BeNil)
+				a.So(dev, should.BeNil)
+				return nil, ctx, nil
+			},
+			SetFunc: func(
+				ctx context.Context,
+				ids *ttnpb.MACSettingsProfileIdentifiers,
+				paths []string,
+				f func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error),
+			) (*ttnpb.MACSettingsProfile, error) {
+				a := assertions.New(test.MustTFromContext(ctx))
+				a.So(ids, should.Resemble, &ttnpb.MACSettingsProfileIdentifiers{
+					ProfileId:      "test-mac-settings-profile-id",
+					ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+				})
+				a.So(paths, should.Equal, []string{"ids", "mac_settings", "end_devices_count"})
+				profile, sets, err := f(ctx, &ttnpb.MACSettingsProfile{
+					Ids: &ttnpb.MACSettingsProfileIdentifiers{
+						ProfileId:      "test-mac-settings-profile-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					},
+					EndDevicesCount: 1,
+				})
+				if !a.So(err, should.BeNil) {
+					return nil, err
+				}
+				a.So(sets, should.Equal, []string{"ids", "mac_settings", "end_devices_count"})
+				a.So(profile, should.Resemble, &ttnpb.MACSettingsProfile{
+					Ids: &ttnpb.MACSettingsProfileIdentifiers{
+						ProfileId:      "test-mac-settings-profile-id",
+						ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+					},
+					EndDevicesCount: 0,
+				})
+				return profile, nil
+			},
+			Request: &ttnpb.EndDeviceIdentifiers{
+				DeviceId:       "test-dev-id",
+				ApplicationIds: &ttnpb.ApplicationIdentifiers{ApplicationId: "test-app-id"},
+			},
+			SetByIDCalls: 1,
+			SetCalls:     1,
+		},
 	} {
 		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
-				var setByIDCalls uint64
+				var setByIDCalls, setCalls uint64
 
 				ns, ctx, env, stop := StartTest(
 					ctx,
 					TestConfig{
 						NetworkServer: Config{
 							Devices: &MockDeviceRegistry{
-								SetByIDFunc: func(ctx context.Context, appID *ttnpb.ApplicationIdentifiers, devID string, gets []string, f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error)) (*ttnpb.EndDevice, context.Context, error) {
+								SetByIDFunc: func(
+									ctx context.Context,
+									appID *ttnpb.ApplicationIdentifiers,
+									devID string,
+									gets []string,
+									f func(context.Context, *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error),
+								) (*ttnpb.EndDevice, context.Context, error) {
 									atomic.AddUint64(&setByIDCalls, 1)
 									return tc.SetByIDFunc(ctx, appID, devID, gets, f)
+								},
+							},
+							MACSettingsProfileRegistry: &MockMACSettingsProfileRegistry{
+								SetFunc: func(
+									ctx context.Context,
+									ids *ttnpb.MACSettingsProfileIdentifiers,
+									paths []string,
+									f func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error),
+								) (*ttnpb.MACSettingsProfile, error) {
+									atomic.AddUint64(&setCalls, 1)
+									return tc.SetFunc(ctx, ids, paths, f)
 								},
 							},
 						},
@@ -1436,6 +1555,7 @@ func TestDeviceRegistryDelete(t *testing.T) {
 				req := ttnpb.Clone(tc.Request)
 				res, err := ttnpb.NewNsEndDeviceRegistryClient(ns.LoopbackConn()).Delete(ctx, req)
 				a.So(setByIDCalls, should.Equal, tc.SetByIDCalls)
+				a.So(setCalls, should.Equal, tc.SetCalls)
 				if tc.ErrorAssertion != nil && a.So(tc.ErrorAssertion(t, err), should.BeTrue) {
 					a.So(res, should.BeNil)
 				} else if a.So(err, should.BeNil) {
