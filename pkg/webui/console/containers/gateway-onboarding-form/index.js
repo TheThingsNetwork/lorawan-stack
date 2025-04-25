@@ -15,6 +15,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { merge } from 'lodash'
+import { defineMessages } from 'react-intl'
 
 import Form from '@ttn-lw/components/form'
 
@@ -23,6 +24,7 @@ import GatewayApiKeysModal from '@console/components/gateway-api-keys-modal'
 import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import { getBackendErrorRootCause } from '@ttn-lw/lib/errors/utils'
 
 import { createGateway, claimGateway, updateGateway } from '@console/store/actions/gateways'
 import { createGatewayApiKey } from '@console/store/actions/api-keys'
@@ -34,6 +36,14 @@ import validationSchema from './gateway-provisioning-form/validation-schema'
 import { initialValues as registerInitialValues } from './gateway-provisioning-form/gateway-registration-form-section'
 import { initialValues as claimingInitialValues } from './gateway-provisioning-form/gateway-claim-form-section'
 import GatewayQRScanSection from './qr-scan-section'
+
+const m = defineMessages({
+  claimGatewayNotFound:
+    "`NotFound`: the gateway doesn't exist. This is most likely a typo in the EUI. An edge case is that The Things Stack is configured for the staging environment.",
+  claimGatewayFailedPrecondition:
+    "`FailedPrecondition`: the owner token is correct, but either there's no gateway subscription attached and active, or it is a correct gateway activation code and it has expired.",
+  claimGatewayPermissionDenied: '`PermissionDenied`: the owner token is invalid.',
+})
 
 const GatewayOnboardingForm = props => {
   const { onSuccess } = props
@@ -141,7 +151,21 @@ const GatewayOnboardingForm = props => {
 
         onSuccess(cleanValues.target_gateway_id, inputMethod === 'managed')
       } catch (error) {
-        setError(error)
+        const rootCause = getBackendErrorRootCause(error)
+        const errorCode = rootCause?.code ?? -1
+
+        const errorMessages = {
+          5: m.claimGatewayNotFound, // NOT_FOUND
+          9: m.claimGatewayFailedPrecondition, // FAILED_PRECONDITION
+          7: m.claimGatewayPermissionDenied, // PERMISSION_DENIED
+        }
+
+        if (errorMessages[errorCode]) {
+          setError(errorMessages[errorCode])
+        } else {
+          // Fallback for unexpected/unhandled errors
+          setError(error)
+        }
       }
     },
     [dispatch, onSuccess, userId],
