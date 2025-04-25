@@ -415,6 +415,8 @@
   "console.containers.applications-table.index.otherClusterTooltip": "This application is registered on a different cluster (`{host}`). To access this application, use the Console of the cluster that this application was registered on.",
   "console.containers.applications-table.index.myApplications": "My applications",
   "console.containers.applications-table.index.myApplicationsTooltip": "Applications that you are a collaborator to",
+  "console.containers.create-api-key-modal-button.index.modalTitle": "Create a new API key for {entityName}",
+  "console.containers.create-api-key-modal.index.modalTitle": "Create a new API key for {entityName}",
   "console.containers.deployment-component-status.index.availableComponents": "Available components",
   "console.containers.deployment-component-status.index.versionInfo": "Deployment",
   "console.containers.deployment-component-status.index.statusPage": "Go to status page",

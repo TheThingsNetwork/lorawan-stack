@@ -235,6 +235,7 @@ const FormField = props => {
     onChange: handleChange,
     onBlur: handleBlur,
     readOnly,
+    inputWidth: fieldWidth,
   }
 
   const cls = classnames(

@@ -415,6 +415,8 @@
   "console.containers.applications-table.index.otherClusterTooltip": "",
   "console.containers.applications-table.index.myApplications": "",
   "console.containers.applications-table.index.myApplicationsTooltip": "",
+  "console.containers.create-api-key-modal-button.index.modalTitle": "",
+  "console.containers.create-api-key-modal.index.modalTitle": "",
   "console.containers.deployment-component-status.index.availableComponents": "",
   "console.containers.deployment-component-status.index.versionInfo": "",
   "console.containers.deployment-component-status.index.statusPage": "",

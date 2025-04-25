@@ -59,7 +59,7 @@ const Modal = props => {
 
   const approvalAllowed = !Boolean(approveButtonProps.disabled)
 
-  const modalClassNames = classnames(style.modal, style.modal, {
+  const modalClassNames = classnames(style.modal, {
     [style.modalInline]: inline,
     [style.modalAbsolute]: !Boolean(inline),
   })
@@ -167,7 +167,7 @@ const Modal = props => {
   return (
     <FocusLock autoFocus returnFocus onActivation={handleModalActivate}>
       <RemoveScroll>
-        {!inline && <div key="shadow" className={style.shadow} />}
+        {!inline && <div key="shadow" className={style.shadow} onClick={handleCancel} />}
         <RootComponent
           ref={modalReference}
           data-test-id="modal-window"

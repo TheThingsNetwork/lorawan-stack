@@ -23,7 +23,7 @@ const SubmitButton = ({ disabled, icon, isSubmitting, isValidating, message, ...
 
   return (
     <Button
-      primary
+      {...(!rest.secondary ? { primary: true } : {})}
       {...rest}
       type="submit"
       icon={icon}
