@@ -50,6 +50,7 @@ type DeviceRegistry interface {
 		ctx context.Context,
 		appIDs *ttnpb.ApplicationIdentifiers,
 		deviceIDs []string,
+		callback func(dev *ttnpb.EndDevice) error,
 	) ([]*ttnpb.EndDeviceIdentifiers, error)
 	BatchSetByID(
 		ctx context.Context,
@@ -154,8 +155,9 @@ func (w replacedEndDeviceFieldRegistryWrapper) BatchDelete(
 	ctx context.Context,
 	appIDs *ttnpb.ApplicationIdentifiers,
 	deviceIDs []string,
+	callback func(dev *ttnpb.EndDevice) error,
 ) ([]*ttnpb.EndDeviceIdentifiers, error) {
-	return w.DeviceRegistry.BatchDelete(ctx, appIDs, deviceIDs)
+	return w.DeviceRegistry.BatchDelete(ctx, appIDs, deviceIDs, callback)
 }
 
 func (w replacedEndDeviceFieldRegistryWrapper) Range(ctx context.Context, paths []string, f func(context.Context, *ttnpb.EndDeviceIdentifiers, *ttnpb.EndDevice) bool) error {
