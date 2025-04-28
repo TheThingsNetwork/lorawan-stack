@@ -56,7 +56,33 @@ const m = defineMessages({
   addBookmarkFail: 'There was an error and the gateway could not be bookmarked',
   duplicateGateway: 'Duplicate gateway',
   removeBookmarkFail: 'There was an error and the gateway could not be removed from bookmarks',
+  gatewayConnection: 'Gateway connection (also LNS Key)',
+  linkToGatewayServer: 'Link as Gateway to a Gateway Server for traffic exchange',
+  cupsKey: 'CUPS Key',
+  viewGatewayInformation: 'View Gateway Information',
+  retrieveSecrets: 'Retrieve Secrets Associated with the gateway',
+  editBasicSettings: 'Edit basic gateway settings',
+  getGatewayStatistics: 'Get gateway statistics',
+  viewGatewayStatus: 'View gateway status',
 })
+
+const apiKeyRights = [
+  {
+    title: m.gatewayConnection,
+    grants: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_LINK'],
+    descriptionItems: [m.viewGatewayInformation, m.linkToGatewayServer],
+  },
+  {
+    title: m.cupsKey,
+    grants: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_SETTINGS_BASIC', 'RIGHT_GATEWAY_READ_SECRETS'],
+    descriptionItems: [m.viewGatewayInformation, m.retrieveSecrets, m.editBasicSettings],
+  },
+  {
+    title: m.getGatewayStatistics,
+    grants: ['RIGHT_GATEWAY_STATUS_READ'],
+    descriptionItems: [m.viewGatewayStatus],
+  },
+]
 
 const GatewayOverviewHeader = ({ gateway }) => {
   const [deleteGatewayVisible, setDeleteGatewayVisible] = useState(false)
@@ -192,6 +218,7 @@ const GatewayOverviewHeader = ({ gateway }) => {
           entityId={gateway_id}
           modalVisible={createApiKeyModalVisible}
           setModalVisible={setCreateApiKeyModalVisible}
+          rights={apiKeyRights}
         />
       </div>
     </div>

@@ -14,7 +14,6 @@
 
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { defineMessages } from 'react-intl'
-import PropTypes from 'prop-types'
 
 import { GATEWAY } from '@console/constants/entities'
 
@@ -35,40 +34,15 @@ import Message from '@ttn-lw/lib/components/message'
 import { ApiKeyModalCreateForm } from '@console/containers/api-key-modal-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import PropTypes from '@ttn-lw/lib/prop-types'
 
 const m = defineMessages({
   firstStepTitle: 'Create a new API key for {entityName}',
-  gatewayConnection: 'Gateway connection (also LNS Key)',
-  linkToGatewayServer: 'Link as Gateway to a Gateway Server for traffic exchange',
-  cupsKey: 'CUPS Key',
-  viewGatewayInformation: 'View Gateway Information',
-  retrieveSecrets: 'Retrieve Secrets Associated with the gateway',
-  editBasicSettings: 'Edit basic gateway settings',
-  getGatewayStatistics: 'Get gateway statistics',
-  viewGatewayStatus: 'View gateway status',
   secondStepTitle: 'Your API key has been created successfully',
   secondStepNotification:
     'After closing this window, the value of the key secret will not be accessible anymore. Make sure to copy and store it in a safe place now.',
   download: 'Download',
 })
-
-const rights = [
-  {
-    title: m.gatewayConnection,
-    grants: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_LINK'],
-    descriptionItems: [m.viewGatewayInformation, m.linkToGatewayServer],
-  },
-  {
-    title: m.cupsKey,
-    grants: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_SETTINGS_BASIC', 'RIGHT_GATEWAY_READ_SECRETS'],
-    descriptionItems: [m.viewGatewayInformation, m.retrieveSecrets, m.editBasicSettings],
-  },
-  {
-    title: m.getGatewayStatistics,
-    grants: ['RIGHT_GATEWAY_STATUS_READ'],
-    descriptionItems: [m.viewGatewayStatus],
-  },
-]
 
 const CreateApiKeyModal = props => {
   const [apiKey, setApiKey] = useState(null)
@@ -123,7 +97,7 @@ const CreateApiKeyModal = props => {
         entityId={props.entityId}
         entity={GATEWAY}
         handleCancel={handleCloseModal}
-        rights={rights}
+        rights={props.rights}
         setApiKey={setApiKey}
       />
     </div>
@@ -183,6 +157,7 @@ CreateApiKeyModal.propTypes = {
   entityId: PropTypes.string.isRequired,
   entityName: PropTypes.string,
   modalVisible: PropTypes.bool.isRequired,
+  rights: PropTypes.rightsRadioItems.isRequired,
   setModalVisible: PropTypes.func.isRequired,
 }
 
