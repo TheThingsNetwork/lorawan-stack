@@ -156,6 +156,7 @@ export default defineMessages({
   contactFieldPlaceholder: 'Type or choose a collaborator',
   contactInformation: 'Contact information',
   convertMacToEui: 'Convert MAC to EUI',
+  copiedTheKey: 'I have copied the key',
   copiedToClipboard: 'Copied to clipboard!',
   copy: 'Copy',
   copyToClipboard: 'Copy to clipboard',

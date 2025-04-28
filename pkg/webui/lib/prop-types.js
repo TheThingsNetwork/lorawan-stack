@@ -443,4 +443,12 @@ PropTypes.notificationData = PropTypes.shape({
   entity_ids: PropTypes.shape({}).isRequired,
 })
 
+PropTypes.rightsRadioItems = PropTypes.arrayOf(
+  PropTypes.shape({
+    grants: PropTypes.arrayOf(PropTypes.string).isRequired,
+    title: PropTypes.message.isRequired,
+    descriptionItems: PropTypes.arrayOf(PropTypes.message).isRequired,
+  }),
+)
+
 export default PropTypes

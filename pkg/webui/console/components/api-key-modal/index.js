@@ -29,7 +29,6 @@ import style from './api-key-modal.styl'
 const m = defineMessages({
   title: 'Please copy newly created API key',
   subtitle: "You won't be able to view the key afterward",
-  buttonMessage: 'I have copied the key',
   grantedRights: 'Granted rights',
   description: `Your API key has been created successfully.
 Note: After closing this window, the value of the key secret will not be accessible anymore.
@@ -50,7 +49,7 @@ const ApiKeyModal = props => {
       title={m.title}
       subtitle={m.subtitle}
       approval={false}
-      buttonMessage={m.buttonMessage}
+      buttonMessage={sharedMessages.copiedTheKey}
       approveButtonProps={{ primary: true }}
     >
       <div className={style.left}>

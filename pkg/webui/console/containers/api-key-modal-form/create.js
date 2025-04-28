@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
+import { defineMessages } from 'react-intl'
 
 import tts from '@console/api/tts'
 import { APPLICATION, GATEWAY, ORGANIZATION, USER } from '@console/constants/entities'
@@ -23,6 +24,8 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import Input from '@ttn-lw/components/input'
 import Button from '@ttn-lw/components/button'
 import { useFormContext } from '@ttn-lw/components/form'
+import RightsGroupModal from '@ttn-lw/components/rights-group-modal'
+import toast from '@ttn-lw/components/toast'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
@@ -38,6 +41,10 @@ const sdkServices = {
   [USER]: 'Users',
 }
 
+const m = defineMessages({
+  createApiKeyError: 'Failed to create API key',
+})
+
 const FormButtons = ({ handleCancel }) => {
   const { isValid } = useFormContext()
   return (
@@ -45,7 +52,6 @@ const FormButtons = ({ handleCancel }) => {
       <Button message={sharedMessages.cancel} secondary onClick={handleCancel} />
       <FormSubmit
         component={SubmitButton}
-        secondary
         message={sharedMessages.createApiKey}
         disabled={!isValid}
       />
@@ -57,7 +63,7 @@ FormButtons.propTypes = {
   handleCancel: PropTypes.func.isRequired,
 }
 
-const CreateForm = ({ entity, entityId, handleCancel }) => {
+const CreateForm = ({ entity, entityId, handleCancel, rights, setApiKey }) => {
   const handleCreate = useCallback(
     async values => {
       const castedValues = validationSchema.cast(values)
@@ -67,9 +73,19 @@ const CreateForm = ({ entity, entityId, handleCancel }) => {
     [entity, entityId],
   )
 
-  const handleCreateSuccess = useCallback(() => null, [])
+  const handleCreateSuccess = useCallback(
+    key => {
+      setApiKey(key.key)
+    },
+    [setApiKey],
+  )
 
-  const handleCreateFailure = useCallback(() => null, [])
+  const handleCreateFailure = useCallback(() => {
+    toast({
+      type: toast.types.ERROR,
+      message: m.createApiKeyError,
+    })
+  }, [])
 
   const initialValues = {
     name: '',
@@ -103,6 +119,14 @@ const CreateForm = ({ entity, entityId, handleCancel }) => {
           component={Input}
           fieldWidth="full"
         />
+        <FormField
+          name="rights"
+          title={sharedMessages.rights}
+          required
+          component={RightsGroupModal}
+          rights={rights}
+          fieldWidth="full"
+        />
         <FormButtons handleCancel={handleCancel} />
       </ApiKeyForm>
     </>
@@ -113,6 +137,8 @@ CreateForm.propTypes = {
   entity: PropTypes.entity.isRequired,
   entityId: PropTypes.string.isRequired,
   handleCancel: PropTypes.func.isRequired,
+  rights: PropTypes.rightsRadioItems.isRequired,
+  setApiKey: PropTypes.func.isRequired,
 }
 
 export default CreateForm
