@@ -30,6 +30,7 @@
 .source
   font-size: $fs.xs
   font-weight: $fw.bold
+  text-transform: uppercase
 
 .received
   color: var(--c-text-neutral-light)
@@ -106,3 +107,19 @@
   width: 100%
   height: 100%
   object-fit: cover
+
+.normalized-payload
+  &-scroll
+    max-height: 210px
+    overflow-y: auto
+    border: 1px solid var(--c-border-neutral-normal)
+    border-bottom-left-radius: $br.l
+    border-bottom-right-radius: $br.l
+    margin-bottom: $cs.l
+
+  &-property-section
+    width: 48%
+
+    &-border
+      border-top: 1px solid var(--c-border-neutral-normal)
+      margin-top: $cs.xs

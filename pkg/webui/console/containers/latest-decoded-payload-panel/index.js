@@ -55,6 +55,8 @@ import {
 import { selectDeviceByIds, selectDeviceFetching } from '@console/store/selectors/devices'
 import { selectConsolePreferences } from '@console/store/selectors/user-preferences'
 
+import NormalizedPayload from './normalized-payload'
+
 import style from './latest-decoded-payload-panel.styl'
 
 const deviceNameAndImageSelector = createSelector(
@@ -79,6 +81,8 @@ const m = defineMessages({
   rssi: `{rssi}dBm RSSI`,
   snr: `{snr}dBm SNR`,
   noRecentActivityDescription: "There haven't been any uplinks recently in this application",
+  default: 'Default',
+  normalized: 'Normalized',
 })
 
 const hasDecodedPayload = data => {
@@ -91,11 +95,24 @@ const hasDecodedPayload = data => {
   )
 }
 
+const toggleOptions = [
+  { label: m.default, value: 'default' },
+  { label: m.normalized, value: 'normalized' },
+]
+
 const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className, isDevice }) => {
   const [modalVisible, setModalVisible] = useState(null)
   const [copied, setCopied] = useState(false)
   const [isHovered, setIsHovered] = useState(false)
   const [latestEvent, setLatestEvent] = useState(null)
+  const [active, setActive] = useState('default')
+  const handleChange = useCallback(
+    (_, value) => {
+      setActive(value)
+    },
+    [setActive],
+  )
+
   const consolePreferences = useSelector(selectConsolePreferences)
   const darkTheme =
     consolePreferences.console_theme === 'CONSOLE_THEME_DARK' ||
@@ -133,6 +150,7 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
   const imageFetching = useSelector(
     state => selectDeviceModelFetching(state) || selectDeviceFetching(state),
   )
+  const normalizedPayload = latestEvent?.data?.uplink_message?.normalized_payload
 
   // Fetch device data when payload event is received.
   useEffect(() => {
@@ -329,6 +347,48 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
     ],
   )
 
+  const getNormalized = useCallback(
+    latestEvent => (
+      <>
+        <div>
+          <div
+            className={classnames(
+              style.header,
+              'd-flex j-between p-sides-cs-s c-text-neutral-light',
+              {
+                'p-vert-cs-xxs': !modalVisible,
+                'p-vert-cs-s': modalVisible,
+              },
+            )}
+          >
+            <div className="d-flex gap-cs-xxs">
+              <Message
+                uppercase
+                content={m.source}
+                values={{ source: sharedMessages.liveData.defaultMessage }}
+                className={style.source}
+              />
+              <LastSeen statusClassName={style.source} lastSeen={latestEvent?.time} short />
+            </div>
+            {!modalVisible && (
+              <Button
+                naked
+                icon={IconArrowsMaximize}
+                small
+                className={style.maximize}
+                onClick={handleOpenMaximizeCodeModal}
+                tooltip={sharedMessages.expand}
+                tooltipPlacement="top"
+              />
+            )}
+          </div>
+          <NormalizedPayload payload={normalizedPayload[0]} />
+        </div>
+      </>
+    ),
+    [normalizedPayload, handleOpenMaximizeCodeModal, modalVisible],
+  )
+
   return (
     <Panel
       title={m.latestDecodedPayload}
@@ -336,12 +396,17 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
       shortCutLinkTitle={m.seeInLiveData}
       shortCutLinkPath={`${shortCutLinkPath}${latestEvent ? `?eventId=${latestEvent?.unique_id}` : ''}`}
       className={classnames(style.panel, className)}
+      toggleOptions={normalizedPayload ? toggleOptions : undefined}
+      activeToggle={active}
+      onToggleClick={handleChange}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
       {latestEvent ? (
         <div className="pos-relative">
-          {getContent(latestEvent)}
+          {active === 'default' || !normalizedPayload
+            ? getContent(latestEvent)
+            : getNormalized(latestEvent)}
           <PortalledModal
             visible={modalVisible}
             noTitleLine
@@ -357,7 +422,9 @@ const LatestDecodedPayloadPanel = ({ appId, events, shortCutLinkPath, className,
                 <Button naked icon={IconX} onClick={handleCloseMaximizeCodeModal} />
               </div>
 
-              {getContent(latestEvent)}
+              {active === 'default' || !normalizedPayload
+                ? getContent(latestEvent)
+                : getNormalized(latestEvent)}
               <div className="d-flex j-center al-center gap-cs-m pt-cs-xl">
                 <Button
                   secondary
