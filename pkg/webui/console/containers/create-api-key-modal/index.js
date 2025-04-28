@@ -78,12 +78,15 @@ const CreateApiKeyModal = props => {
 
   const _timer = useRef(null)
 
-  useEffect(
-    () => () => {
+  useEffect(() => {
+    if (!props.modalVisible) {
+      setApiKey(null)
       clearTimeout(_timer.current)
-    },
-    [],
-  )
+    }
+    return () => {
+      clearTimeout(_timer.current)
+    }
+  }, [props.modalVisible])
 
   const handleCloseModal = useCallback(() => {
     props.setModalVisible(false)
