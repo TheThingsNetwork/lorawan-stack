@@ -25,7 +25,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.34.1] - unreleased
+## [3.34.1] - 2025-04-28
 
 ### Added
 
