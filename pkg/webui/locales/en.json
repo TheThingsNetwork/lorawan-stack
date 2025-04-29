@@ -952,7 +952,7 @@
   "console.views.application-integrations-lora-cloud.index.dasDescription": "With the LoRa Cloud Modem and Geolocation Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.",
   "console.views.application-integrations-lora-cloud.index.glsDescription": "LoRa Cloud Geolocation is a simple cloud API that can be easily integrated with The Things Stack to enable estimating the location of any LoRa-based device.",
   "console.views.application-integrations-lora-cloud.index.loraSupportTitle": "LoRa Cloud support",
-  "console.views.application-integrations-lora-cloud.index.loraSupport": "The support for this integration will be dropped after July.",
+  "console.views.application-integrations-lora-cloud.index.loraSupport": "Effective July 31, 2025, all LoRa Cloud™ services will transition to Semtech's partner network. This integration will no longer be supported after this date.",
   "console.views.application-integrations-mqtt.index.publicAddress": "Public address",
   "console.views.application-integrations-mqtt.index.publicTlsAddress": "Public TLS address",
   "console.views.application-integrations-mqtt.index.generateApiKey": "Generate new API key",
