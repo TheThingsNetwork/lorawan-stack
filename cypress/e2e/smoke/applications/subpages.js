@@ -84,8 +84,8 @@ const applicationSubpages = defineSmokeTest('check all application sub-pages', (
     .closest('[data-test-id="collapsible-section"]')
     .within(() => {
       cy.findByRole('button', { name: 'Expand' }).click()
-      cy.findByLabelText('Token').should('be.visible')
       cy.get('button[type="submit"]').scrollIntoView()
+      cy.findByLabelText('Token').should('be.visible')
       cy.findByRole('button', { name: 'Set token' }).should('be.visible')
       cy.findByRole('button', { name: 'Collapse' }).click()
       cy.findByTestId('error-notification').should('not.exist')
