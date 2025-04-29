@@ -23,7 +23,7 @@ jobs:
 
       - name: Add TheThingsIndustries remote
         run: |
-          git remote add tti "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/merge/os-to-enterprise.git"
+          git remote add tti "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TheThingsIndustries/lorawan-stack.git"
           git fetch tti
 
       - name: Create merge branch
