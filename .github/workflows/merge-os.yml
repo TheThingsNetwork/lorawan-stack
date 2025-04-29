@@ -1,9 +1,9 @@
 name: Merge OS to Enterprise
 
 on:
-  push:
+  pull_request_target:
     branches:
-      - '*'
+      - 'v3.*'
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
