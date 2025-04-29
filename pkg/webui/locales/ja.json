@@ -959,6 +959,8 @@
   "console.views.application-integrations-lora-cloud.index.officialLoRaCloudDocumentation": "",
   "console.views.application-integrations-lora-cloud.index.dasDescription": "",
   "console.views.application-integrations-lora-cloud.index.glsDescription": "",
+  "console.views.application-integrations-lora-cloud.index.loraSupportTitle": "",
+  "console.views.application-integrations-lora-cloud.index.loraSupport": "",
   "console.views.application-integrations-mqtt.index.publicAddress": "",
   "console.views.application-integrations-mqtt.index.publicTlsAddress": "",
   "console.views.application-integrations-mqtt.index.generateApiKey": "",

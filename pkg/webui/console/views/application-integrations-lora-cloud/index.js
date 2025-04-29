@@ -26,6 +26,7 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Link from '@ttn-lw/components/link'
 import Collapse from '@ttn-lw/components/collapse'
+import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorView from '@ttn-lw/lib/components/error-view'
@@ -57,6 +58,8 @@ const m = defineMessages({
     'With the LoRa Cloud Modem and Geolocation Services protocol, you can manage common device functionality at the application layer for LoRaWAN-enabled devices.',
   glsDescription:
     'LoRa Cloud Geolocation is a simple cloud API that can be easily integrated with The Things Stack to enable estimating the location of any LoRa-based device.',
+  loraSupportTitle: 'LoRa Cloud support',
+  loraSupport: `Effective July 31, 2025, all LoRa Cloud™ services will transition to Semtech's partner network. This integration will no longer be supported after this date.`,
 })
 
 const LoRaCloud = () => {
@@ -89,6 +92,13 @@ const LoRaCloud = () => {
       >
         <ErrorView errorRender={SubViewError}>
           <div className="container container--xl grid">
+            <Notification
+              warning
+              content={m.loraSupport}
+              title={m.loraSupportTitle}
+              small
+              className="item-12"
+            />
             <PageTitle title="LoRa Cloud Modem and Geolocation Services" />
             <div className="item-12">
               <img
