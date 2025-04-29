@@ -23,14 +23,9 @@ jobs:
 
       - name: Add TheThingsIndustries remote
         run: |
-          git fetch https://github.com/TheThingsIndustries/lorawan-stack ${{ github.ref_name }}
-          git remote add tti "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TheThingsIndustries/lorawan-stack.git"
-          git fetch tti
-
-      - name: Create merge branch
-        run: |
+          git fetch https://github.com/TheThingsIndustries/lorawan-stack ${{ github.event.pull_request.base.ref }}
+          git merge FETCH_HEAD -m "Merge remote/${{ github.event.pull_request.base.ref }} into #${{ github.event.inputs.pull_request_number }}"
           git checkout -b merge/os-to-enterprise
-          git push tti merge/os-to-enterprise
 
       - name: Create Pull Request using gh
         run: |
@@ -39,7 +34,7 @@ jobs:
           else
            gh pr create \
              --repo TheThingsIndustries/lorawan-stack \
-             --base {{ github.ref_name }} \
+             --base v3.34 \
              --head merge/os-to-enterprise \
              --title "Merge changes from TheThingsNetwork/lorawan-stack" \
              --body "This PR automatically syncs changes from the open source repository to the enterprise repository." \
