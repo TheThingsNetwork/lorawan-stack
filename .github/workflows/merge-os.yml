@@ -1,0 +1,47 @@
+name: Merge OS to Enterprise
+
+on:
+  push:
+    branches:
+      - 'v3.*'
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  merge-os:
+    name: Merge OS to Enterprise
+    if: ${{ github.repository == 'TheThingsNetwork/lorawan-stack' }}
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # Fetch full history to enable full diff
+
+      - name: Configure Git
+        run: |
+          git config user.name "The Things Bot"
+          git config user.email "github@thethingsindustries.com"
+
+      - name: Add TheThingsIndustries remote
+        run: |
+          git remote add tti git@github.com/TheThingsIndustries/lorawan-stack.git
+          git fetch tti
+
+      - name: Create merge branch
+        run: |
+          git checkout -b merge/os-to-enterprise
+          git push tti merge/os-to-enterprise
+
+      - name: Create Pull Request using gh
+        run: |
+          if gh pr list --repo TheThingsIndustries/lorawan-stack --head merge/os-to-enterprise --state open | grep -q "merge/os-to-enterprise"; then
+            echo "A pull request already exists, skipping creation."
+          else
+           gh pr create \
+             --repo TheThingsIndustries/lorawan-stack \
+             --base {{ github.ref_name }} \
+             --head merge/os-to-enterprise \
+             --title "Merge changes from TheThingsNetwork/lorawan-stack" \
+             --body "This PR automatically syncs changes from the open source repository to the enterprise repository." \
