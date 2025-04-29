@@ -23,6 +23,7 @@ jobs:
           token: ${{ secrets.BOT_TOKEN }}
 
       - name: Add TheThingsIndustries remote
+        continue-on-error: true
         run: |
           git fetch https://github.com/TheThingsIndustries/lorawan-stack ${{ github.event.pull_request.base.ref }}
           git merge FETCH_HEAD -m "Merge remote/${{ github.event.pull_request.base.ref }} into #${{ github.event.inputs.pull_request_number }}"
