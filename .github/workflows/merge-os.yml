@@ -39,4 +39,5 @@ jobs:
              --base v3.34 \
              --head merge/os-to-enterprise \
              --title "Merge changes from TheThingsNetwork/lorawan-stack" \
-             --body "This PR automatically syncs changes from the open source repository to the enterprise repository." \
+             --body "This PR automatically syncs changes from the open source repository to the enterprise repository."
+          fi
