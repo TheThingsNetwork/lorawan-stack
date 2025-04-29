@@ -23,6 +23,7 @@ jobs:
 
       - name: Add TheThingsIndustries remote
         run: |
+          git fetch https://github.com/TheThingsIndustries/lorawan-stack ${{ github.ref_name }}
           git remote add tti "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/TheThingsIndustries/lorawan-stack.git"
           git fetch tti
 
