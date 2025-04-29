@@ -59,7 +59,7 @@ const m = defineMessages({
   glsDescription:
     'LoRa Cloud Geolocation is a simple cloud API that can be easily integrated with The Things Stack to enable estimating the location of any LoRa-based device.',
   loraSupportTitle: 'LoRa Cloud support',
-  loraSupport: 'The support for this integration will be dropped after July.',
+  loraSupport: `Effective July 31, 2025, all LoRa Cloud™ services will transition to Semtech's partner network. This integration will no longer be supported after this date.`,
 })
 
 const LoRaCloud = () => {
