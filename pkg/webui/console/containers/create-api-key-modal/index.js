@@ -88,7 +88,6 @@ const CreateApiKeyModal = ({ entityId, entityName, modalVisible, setModalVisible
     try {
       const apiKeyDataUri = composeDataUri(apiKey, 'data:text/plain;charset=utf-8')
       downloadDataUriAsFile(apiKeyDataUri, `${entityId}_api_key_${Date.now()}.txt`)
-      handleCloseModal()
     } catch (err) {
       toast({
         title: m.apiKeyFileFailed,
@@ -96,7 +95,7 @@ const CreateApiKeyModal = ({ entityId, entityName, modalVisible, setModalVisible
         type: toast.types.ERROR,
       })
     }
-  }, [apiKey, entityId, handleCloseModal])
+  }, [apiKey, entityId])
 
   const firstStep = (
     <div className="flex-column gap-cs-xl w-full">

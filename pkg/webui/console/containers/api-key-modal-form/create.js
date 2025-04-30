@@ -102,23 +102,28 @@ const CreateForm = ({ entity, entityId, handleCancel, rights, setApiKey }) => {
         validationSchema={validationSchema}
         initialValues={initialValues}
       >
-        <FormField
-          title={sharedMessages.name}
-          placeholder={sharedMessages.apiKeyNamePlaceholder}
-          name="name"
-          autoFocus
-          component={Input}
-          fieldWidth="full"
-        />
-        <FormField
-          title={'Expiry date'}
-          name="expires_at"
-          type="date"
-          encode={encodeExpiryDate}
-          decode={decodeExpiryDate}
-          component={Input}
-          fieldWidth="full"
-        />
+        <div className="grid gap-cs-m md-lg:gap-0">
+          <FormField
+            title={sharedMessages.name}
+            placeholder={sharedMessages.apiKeyNamePlaceholder}
+            name="name"
+            className="item-12 md-lg:item-6"
+            autoFocus
+            component={Input}
+            fieldWidth="full"
+          />
+          <FormField
+            title={'Expiry date'}
+            name="expires_at"
+            type="date"
+            className="item-12 md-lg:item-6"
+            encode={encodeExpiryDate}
+            decode={decodeExpiryDate}
+            component={Input}
+            fieldWidth="full"
+          />
+        </div>
+
         <FormField
           name="rights"
           title={sharedMessages.rights}
