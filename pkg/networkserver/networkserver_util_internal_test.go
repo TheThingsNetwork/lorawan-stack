@@ -2547,6 +2547,7 @@ type MockDeviceRegistry struct {
 		ctx context.Context,
 		appIDs *ttnpb.ApplicationIdentifiers,
 		deviceIDs []string,
+		callback func(dev *ttnpb.EndDevice) error,
 	) ([]*ttnpb.EndDeviceIdentifiers, error)
 	BatchSetByIDFunc func(
 		ctx context.Context,
@@ -2603,11 +2604,12 @@ func (m MockDeviceRegistry) BatchDelete(
 	ctx context.Context,
 	appIDs *ttnpb.ApplicationIdentifiers,
 	deviceIDs []string,
+	callback func(dev *ttnpb.EndDevice) error,
 ) ([]*ttnpb.EndDeviceIdentifiers, error) {
 	if m.BatchDeleteFunc == nil {
 		panic("BatchDeleteFunc called, but not set")
 	}
-	return m.BatchDeleteFunc(ctx, appIDs, deviceIDs)
+	return m.BatchDeleteFunc(ctx, appIDs, deviceIDs, callback)
 }
 
 // BatchSetByID calls BatchSetByIDFunc if set and panics otherwise.

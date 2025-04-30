@@ -500,6 +500,11 @@ func handleDeviceRegistryTest(ctx context.Context, reg DeviceRegistry) {
 			// This unknown device will be ignored.
 			"test-dev-4",
 		},
+		func(stored *ttnpb.EndDevice) error {
+			a.So(stored, should.NotBeNil)
+			a.So(stored.MacSettingsProfileIds, should.Resemble, macSettingsProfileID)
+			return nil
+		},
 	)
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("BatchDelete failed with: %s", errors.Stack(err))

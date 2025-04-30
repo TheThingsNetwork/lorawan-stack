@@ -1050,6 +1050,7 @@ func (r *DeviceRegistry) BatchDelete(
 	ctx context.Context,
 	appIDs *ttnpb.ApplicationIdentifiers,
 	deviceIDs []string,
+	callback func(dev *ttnpb.EndDevice) error,
 ) ([]*ttnpb.EndDeviceIdentifiers, error) {
 	var (
 		uidKeys = make([]string, 0, len(deviceIDs))
@@ -1088,6 +1089,11 @@ func (r *DeviceRegistry) BatchDelete(
 				if err := ttnredis.UnmarshalProto(val, dev); err != nil {
 					log.FromContext(ctx).WithError(err).Warn("Failed to decode stored end device")
 					continue
+				}
+				if callback != nil {
+					if err := callback(dev); err != nil {
+						return err
+					}
 				}
 				ret = append(ret, dev.Ids)
 				uid := unique.ID(ctx, dev.GetIds())

@@ -1613,9 +1613,24 @@ func (ns *NetworkServer) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentif
 		return nil, err
 	}
 	var evt events.Event
-	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIds, req.DeviceId, nil, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+	_, _, err := ns.devices.SetByID(ctx, req.ApplicationIds, req.DeviceId, []string{"mac_settings_profile_ids"}, func(ctx context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) { // nolint: lll
 		if dev == nil {
 			return nil, nil, errDeviceNotFound.New()
+		}
+		if dev.MacSettingsProfileIds != nil {
+			_, err := ns.macSettingsProfiles.Set(
+				ctx,
+				dev.MacSettingsProfileIds,
+				[]string{"ids", "mac_settings", "end_devices_count"},
+				func(_ context.Context, existing *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
+					if existing.EndDevicesCount > 0 {
+						existing.EndDevicesCount--
+					}
+					return existing, []string{"ids", "mac_settings", "end_devices_count"}, nil
+				})
+			if err != nil {
+				return nil, nil, err
+			}
 		}
 		evt = evtDeleteEndDevice.NewWithIdentifiersAndData(ctx, req, nil)
 		return nil, nil, nil
@@ -1651,7 +1666,27 @@ func (srv *nsEndDeviceBatchRegistry) Delete(
 	); err != nil {
 		return nil, err
 	}
-	deleted, err := srv.devices.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds)
+	deleted, err := srv.devices.BatchDelete(ctx, req.ApplicationIds, req.DeviceIds, func(dev *ttnpb.EndDevice) error {
+		if dev == nil {
+			return errDeviceNotFound.New()
+		}
+		if dev.MacSettingsProfileIds != nil {
+			_, err := srv.macSettingsProfiles.Set(
+				ctx,
+				dev.MacSettingsProfileIds,
+				[]string{"ids", "mac_settings", "end_devices_count"},
+				func(_ context.Context, existing *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
+					if existing.EndDevicesCount > 0 {
+						existing.EndDevicesCount--
+					}
+					return existing, []string{"ids", "mac_settings", "end_devices_count"}, nil
+				})
+			if err != nil {
+				return err
+			}
+		}
+		return nil
+	})
 	if err != nil {
 		logRegistryRPCError(ctx, err, "Failed to delete device from registry")
 		return nil, err
