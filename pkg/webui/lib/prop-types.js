@@ -30,7 +30,7 @@ PropTypes.formatters = PropTypes.shape({
 PropTypes.message = PropTypes.oneOfType([
   PropTypes.shape({
     id: PropTypes.string.isRequired,
-    value: PropTypes.shape({}),
+    values: PropTypes.shape({}),
     defaultMessage: PropTypes.string,
   }),
   PropTypes.string,

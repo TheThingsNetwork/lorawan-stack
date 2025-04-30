@@ -17,6 +17,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { merge } from 'lodash'
 
 import Form from '@ttn-lw/components/form'
+import Link from '@ttn-lw/components/link'
 
 import GatewayApiKeysModal from '@console/components/gateway-api-keys-modal'
 
@@ -142,8 +143,22 @@ const GatewayOnboardingForm = props => {
 
         onSuccess(cleanValues.target_gateway_id, inputMethod === 'managed')
       } catch (error) {
-        const message = getClaimGatewayErrorMessage(error)
+        let message = getClaimGatewayErrorMessage(error)
+
         if (message) {
+          message = {
+            ...message,
+            values: {
+              link: content => (
+                <Link.DocLink
+                  secondary
+                  path="/hardware/gateways/models/thethingsindoorgatewaypro/#subscription"
+                >
+                  {content}
+                </Link.DocLink>
+              ),
+            },
+          }
           setError(message)
         } else {
           // Fallback for unexpected/unhandled errors

@@ -600,8 +600,9 @@ export const getClaimGatewayErrorMessage = error => {
   const m = defineMessages({
     notFound: "Gateway doesn't exist. Please confirm that the gateway EUI is correct.",
     subscriptionNotActive:
-      'No gateway subscription attached and active. Please subscribe to the gateway or activate your subscription.',
-    activationCodeExpired: 'Activation code expired. Please extend your subscription.',
+      'There is no gateway subscription attached or active. Please get a <link>Gateway Subscription</link> or activate your subscription following the steps in the documentation and try again.',
+    activationCodeExpired:
+      'The activation code has expired. To reactivate it, extend your <link>Gateway Subscription</link>.',
     permissionDenied: 'The owner token is invalid.',
   })
 
