@@ -16,7 +16,7 @@ import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 
 import tts from '@console/api/tts'
-import { APPLICATION, GATEWAY, ORGANIZATION, USER } from '@console/constants/entities'
+import { sdkServices } from '@console/constants/entities'
 
 import FormField from '@ttn-lw/components/form/field'
 import FormSubmit from '@ttn-lw/components/form/submit'
@@ -33,13 +33,6 @@ import PropTypes from '@ttn-lw/lib/prop-types'
 import ApiKeyForm from './form'
 import validationSchema from './validation-schema'
 import { encodeExpiryDate, decodeExpiryDate } from './utils'
-
-const sdkServices = {
-  [APPLICATION]: 'Applications',
-  [GATEWAY]: 'Gateways',
-  [ORGANIZATION]: 'Organizations',
-  [USER]: 'Users',
-}
 
 const m = defineMessages({
   createApiKeyError: 'Failed to create API key',
@@ -113,7 +106,7 @@ const CreateForm = ({ entity, entityId, handleCancel, rights, setApiKey }) => {
             fieldWidth="full"
           />
           <FormField
-            title={'Expiry date'}
+            title={sharedMessages.expiryDate}
             name="expires_at"
             type="date"
             className="item-12 md-lg:item-6"

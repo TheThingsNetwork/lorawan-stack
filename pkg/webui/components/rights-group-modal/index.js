@@ -31,7 +31,7 @@ const RightsGroupModal = ({ className, rights, value, onChange, name }) => (
         {rights.map((r, idx) => (
           <div
             key={idx}
-            className="p-vert-cs-xl p-sides-cs-l c-bg-neutral-min br-xl border-regular cursor-pointer max-"
+            className="p-vert-cs-xl p-sides-cs-l c-bg-neutral-min br-xl border-regular cursor-pointer"
             onClick={() => onChange(r.grants)}
           >
             <Radio

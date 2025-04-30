@@ -267,6 +267,7 @@ export default defineMessages({
   eventsCannotShow: 'Cannot show events',
   expand: 'Expand',
   expiry: 'Expiry',
+  expiryDate: 'Expiry date',
   exportJson: 'Export as JSON',
   external: 'External',
   externalJoinServer: 'External Join Server',

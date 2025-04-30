@@ -94,7 +94,7 @@ const CreateForm = ({ entity, entityId }) => {
           component={Input}
         />
         <FormField
-          title={'Expiry date'}
+          title={sharedMessages.expiryDate}
           name="expires_at"
           type="date"
           encode={encodeExpiryDate}

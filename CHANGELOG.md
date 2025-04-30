@@ -14,6 +14,7 @@ For details about compatibility between different releases, see the **Commitment
 - Support to associate/disassociate MAC settings profiles to batch of end devices
   - This feature is experimental and subject to change.
 - Show normalized payload in the Console.
+- New modal in the gateway overview page for simplifying creation of API keys in the Console.
 
 ### Changed
 

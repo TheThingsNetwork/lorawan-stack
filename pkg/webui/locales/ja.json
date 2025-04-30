@@ -1449,6 +1449,7 @@
   "lib.shared-messages.eventsCannotShow": "イベントを表示できません",
   "lib.shared-messages.expand": "",
   "lib.shared-messages.expiry": "期限切れ",
+  "lib.shared-messages.expiryDate": "",
   "lib.shared-messages.exportJson": "JSONとしてエクスポート",
   "lib.shared-messages.external": "外部",
   "lib.shared-messages.externalJoinServer": "外部Joinサーバー",

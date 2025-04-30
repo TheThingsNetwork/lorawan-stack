@@ -1449,6 +1449,7 @@
   "lib.shared-messages.eventsCannotShow": "Cannot show events",
   "lib.shared-messages.expand": "Expand",
   "lib.shared-messages.expiry": "Expiry",
+  "lib.shared-messages.expiryDate": "Expiry date",
   "lib.shared-messages.exportJson": "Export as JSON",
   "lib.shared-messages.external": "External",
   "lib.shared-messages.externalJoinServer": "External Join Server",
