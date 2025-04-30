@@ -419,6 +419,8 @@
   "console.containers.create-api-key-modal.index.secondStepTitle": "",
   "console.containers.create-api-key-modal.index.secondStepNotification": "",
   "console.containers.create-api-key-modal.index.download": "",
+  "console.containers.create-api-key-modal.index.apiKeyFileFailed": "",
+  "console.containers.create-api-key-modal.index.apiKeyFileFailedMessage": "",
   "console.containers.deployment-component-status.index.availableComponents": "",
   "console.containers.deployment-component-status.index.versionInfo": "",
   "console.containers.deployment-component-status.index.statusPage": "",

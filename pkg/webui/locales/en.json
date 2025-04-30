@@ -419,6 +419,8 @@
   "console.containers.create-api-key-modal.index.secondStepTitle": "Your API key has been created successfully",
   "console.containers.create-api-key-modal.index.secondStepNotification": "After closing this window, the value of the key secret will not be accessible anymore. Make sure to copy and store it in a safe place now.",
   "console.containers.create-api-key-modal.index.download": "Download",
+  "console.containers.create-api-key-modal.index.apiKeyFileFailed": "Failed to download file",
+  "console.containers.create-api-key-modal.index.apiKeyFileFailedMessage": "An unknown error occurred and the file could not be downloaded",
   "console.containers.deployment-component-status.index.availableComponents": "Available components",
   "console.containers.deployment-component-status.index.versionInfo": "Deployment",
   "console.containers.deployment-component-status.index.statusPage": "Go to status page",

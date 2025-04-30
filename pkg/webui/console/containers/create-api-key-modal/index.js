@@ -28,6 +28,7 @@ import PortalledModal from '@ttn-lw/components/modal/portalled'
 import Notification from '@ttn-lw/components/notification'
 import SafeInspector from '@ttn-lw/components/safe-inspector'
 import Button from '@ttn-lw/components/button'
+import toast from '@ttn-lw/components/toast'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -35,6 +36,7 @@ import { ApiKeyModalCreateForm } from '@console/containers/api-key-modal-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import PropTypes from '@ttn-lw/lib/prop-types'
+import { composeDataUri, downloadDataUriAsFile } from '@ttn-lw/lib/data-uri'
 
 const m = defineMessages({
   firstStepTitle: 'Create a new API key for {entityName}',
@@ -42,9 +44,11 @@ const m = defineMessages({
   secondStepNotification:
     'After closing this window, the value of the key secret will not be accessible anymore. Make sure to copy and store it in a safe place now.',
   download: 'Download',
+  apiKeyFileFailed: 'Failed to download file',
+  apiKeyFileFailedMessage: 'An unknown error occurred and the file could not be downloaded',
 })
 
-const CreateApiKeyModal = props => {
+const CreateApiKeyModal = ({ entityId, entityName, modalVisible, setModalVisible, rights }) => {
   const [apiKey, setApiKey] = useState(null)
   const [copied, setCopied] = useState(false)
 
@@ -53,18 +57,18 @@ const CreateApiKeyModal = props => {
   const _timer = useRef(null)
 
   useEffect(() => {
-    if (!props.modalVisible) {
+    if (!modalVisible) {
       setApiKey(null)
       clearTimeout(_timer.current)
     }
     return () => {
       clearTimeout(_timer.current)
     }
-  }, [props.modalVisible])
+  }, [modalVisible])
 
   const handleCloseModal = useCallback(() => {
-    props.setModalVisible(false)
-  }, [props])
+    setModalVisible(false)
+  }, [setModalVisible])
 
   const handleCopyClick = useCallback(() => {
     if (copied) {
@@ -80,6 +84,20 @@ const CreateApiKeyModal = props => {
     }
   }, [copied, canCopy, apiKey])
 
+  const handleDownloadApiKey = useCallback(() => {
+    try {
+      const apiKeyDataUri = composeDataUri(apiKey, 'data:text/plain;charset=utf-8')
+      downloadDataUriAsFile(apiKeyDataUri, `${entityId}_api_key_${Date.now()}.txt`)
+      handleCloseModal()
+    } catch (err) {
+      toast({
+        title: m.apiKeyFileFailed,
+        message: m.apiKeyFileFailedMessage,
+        type: toast.types.ERROR,
+      })
+    }
+  }, [apiKey, entityId, handleCloseModal])
+
   const firstStep = (
     <div className="flex-column gap-cs-xl w-full">
       <div className="d-flex al-center gap-cs-m">
@@ -87,17 +105,17 @@ const CreateApiKeyModal = props => {
         <Message
           content={m.firstStepTitle}
           values={{
-            entityName: props.entityName || props.entityId,
+            entityName: entityName || entityId,
           }}
           className="fs-l fw-bold"
         />
       </div>
       <hr className="w-full" />
       <ApiKeyModalCreateForm
-        entityId={props.entityId}
+        entityId={entityId}
         entity={GATEWAY}
         handleCancel={handleCloseModal}
-        rights={props.rights}
+        rights={rights}
         setApiKey={setApiKey}
       />
     </div>
@@ -111,13 +129,15 @@ const CreateApiKeyModal = props => {
       <div>
         <Message component="p" className="mt-0 mb-cs-xxs fw-bold" content={sharedMessages.apiKey} />
         <div className="d-flex gap-cs-xs w-full">
-          <SafeInspector
-            className="overflow-x-hidden w-full"
-            data={apiKey}
-            isBytes={false}
-            disableResize
-            noCopy={canCopy}
-          />
+          {apiKey && (
+            <SafeInspector
+              className="overflow-x-hidden w-full"
+              data={apiKey}
+              isBytes={false}
+              disableResize
+              noCopy={Boolean(canCopy)}
+            />
+          )}
           {canCopy && (
             <Button
               message={!copied ? sharedMessages.copy : sharedMessages.copiedToClipboard}
@@ -130,7 +150,7 @@ const CreateApiKeyModal = props => {
         </div>
       </div>
       <div className="d-flex gap-cs-xs j-end">
-        <Button message={m.download} secondary onClick={handleCloseModal} icon={IconDownload} />
+        <Button message={m.download} secondary onClick={handleDownloadApiKey} icon={IconDownload} />
         <Button
           message={sharedMessages.copiedTheKey}
           primary
@@ -143,7 +163,7 @@ const CreateApiKeyModal = props => {
 
   return (
     <PortalledModal
-      visible={props.modalVisible}
+      visible={modalVisible}
       className="p-cs-xl c-bg-neutral-extralight br-l"
       noControlBar
       noTitleLine
