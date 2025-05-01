@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Input from '@ttn-lw/components/input'
-import Form from '@ttn-lw/components/form'
+import Form, { useFormContext } from '@ttn-lw/components/form'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -44,6 +44,7 @@ const DevEUIComponent = props => {
   const { name, required, disabled, autoFocus } = props
 
   const dispatch = useDispatch()
+  const { values } = useFormContext()
   const appId = useSelector(selectSelectedApplicationId)
   const promisifiedIssueDevEUI = attachPromise(issueDevEUI)
   const fetchDevEUICounter = attachPromise(getApplicationDevEUICount)
@@ -87,7 +88,8 @@ const DevEUIComponent = props => {
   const devEUIGenerateDisabled =
     applicationDevEUICounter === env.devEUIConfig.applicationLimit ||
     !env.devEUIConfig.devEUIIssuingEnabled ||
-    devEUIGenerated
+    devEUIGenerated ||
+    values.ids.dev_eui !== ''
 
   return env.devEUIConfig.devEUIIssuingEnabled ? (
     <Form.Field
