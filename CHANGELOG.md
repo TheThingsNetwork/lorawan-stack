@@ -11,10 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Support to associate/disassociate MAC settings profiles to batch of end devices
-  - This feature is experimental and subject to change.
-- Show normalized payload in the Console.
-
 ### Changed
 
 ### Deprecated
@@ -24,6 +20,14 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 ### Security
+
+## [3.34.2] - unreleased
+
+### Added
+
+- Support to associate/disassociate MAC settings profiles to batch of end devices
+  - This feature is experimental and subject to change.
+- Show normalized payload in the Console.
 
 ## [3.34.1] - 2025-04-28
 
@@ -2982,7 +2986,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.1...v3.34
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.2...v3.34
+[3.34.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.1...v3.34.2
 [3.34.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.0...v3.34.1
 [3.34.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.33.1...v3.34.0
 [3.33.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.33.0...v3.33.1
