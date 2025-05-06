@@ -14,6 +14,7 @@
 
 import * as Sentry from '@sentry/react'
 import { isPlainObject, isObject } from 'lodash'
+import { defineMessages } from 'react-intl'
 
 import { error as errorLog, warn } from '@ttn-lw/lib/log'
 import interpolate from '@ttn-lw/lib/interpolate'
@@ -586,5 +587,42 @@ export const ingestError = (error, extras = {}, tags = {}) => {
       warn('The above error was considered Sentry-worthy.', 'It was captured as:', passedError)
       Sentry.captureException(passedError)
     })
+  }
+}
+
+/**
+ * Maps claim-related backend errors to appropriate user messages.
+ *
+ * @param {object} error - The error object.
+ * @returns {object|undefined} - The corresponding error message, or undefined if no match.
+ */
+export const getClaimGatewayErrorMessage = error => {
+  const m = defineMessages({
+    notFound: "Gateway doesn't exist. Please confirm that the gateway EUI is correct.",
+    subscriptionNotActive:
+      'There is no gateway subscription attached or active. Please get a <link>Gateway Subscription</link> or activate your subscription following the steps in the documentation and try again.',
+    activationCodeExpired:
+      'The activation code has expired. To reactivate it, extend your <link>Gateway Subscription</link>.',
+    permissionDenied: 'The owner token is invalid.',
+  })
+
+  const rootCause = getBackendErrorRootCause(error)
+  const errorCode = rootCause?.code
+  const backendErrorMessage = rootCause?.message_format
+  switch (errorCode) {
+    case 5: // NOT_FOUND
+      return m.notFound
+    case 9: // FAILED_PRECONDITION
+      if (backendErrorMessage.includes('gateway subscription not attached and active')) {
+        return m.subscriptionNotActive
+      }
+      if (backendErrorMessage.includes('activation code expired')) {
+        return m.activationCodeExpired
+      }
+      return undefined
+    case 7: // PERMISSION_DENIED
+      return m.permissionDenied
+    default:
+      return undefined
   }
 }
