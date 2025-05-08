@@ -103,7 +103,11 @@ RadioGroup.propTypes = {
   name: PropTypes.string.isRequired,
   onChange: PropTypes.func,
   spaceBetween: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool,
+    PropTypes.arrayOf(PropTypes.string),
+  ]),
 }
 
 RadioGroup.defaultProps = {

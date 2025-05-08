@@ -16,7 +16,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { useParams } from 'react-router-dom'
 import { useCallback } from 'react'
 
-import { APPLICATION, GATEWAY, ORGANIZATION, USER } from '@console/constants/entities'
+import { APPLICATION, GATEWAY, ORGANIZATION, sdkServices, USER } from '@console/constants/entities'
 import tts from '@console/api/tts'
 
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
@@ -34,13 +34,6 @@ import {
   selectOrganizationPseudoRights,
 } from '@console/store/selectors/organizations'
 import { selectUserRights, selectUserPseudoRights } from '@console/store/selectors/users'
-
-const sdkServices = {
-  [APPLICATION]: 'Applications',
-  [GATEWAY]: 'Gateways',
-  [ORGANIZATION]: 'Organizations',
-  [USER]: 'Users',
-}
 
 const useApiKeyData = (entity, entityId) => {
   const rightsSelector = {

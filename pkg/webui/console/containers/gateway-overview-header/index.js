@@ -20,7 +20,7 @@ import classnames from 'classnames'
 import { GATEWAY } from '@console/constants/entities'
 import tts from '@console/api/tts'
 
-import { IconMenu2, IconStar, IconStarFilled } from '@ttn-lw/components/icon'
+import { IconMenu2, IconStar, IconStarFilled, IconPlus } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import toast from '@ttn-lw/components/toast'
 import Dropdown from '@ttn-lw/components/dropdown'
@@ -29,6 +29,7 @@ import Message from '@ttn-lw/lib/components/message'
 
 import GatewayConnection from '@console/containers/gateway-connection'
 import DeleteEntityHeaderModal from '@console/containers/delete-entity-header-modal'
+import CreateApiKeyModal from '@console/containers/create-api-key-modal'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
@@ -55,10 +56,37 @@ const m = defineMessages({
   addBookmarkFail: 'There was an error and the gateway could not be bookmarked',
   duplicateGateway: 'Duplicate gateway',
   removeBookmarkFail: 'There was an error and the gateway could not be removed from bookmarks',
+  gatewayConnection: 'Gateway connection (also LNS Key)',
+  linkToGatewayServer: 'Link as Gateway to a Gateway Server for traffic exchange',
+  cupsKey: 'CUPS Key',
+  viewGatewayInformation: 'View Gateway Information',
+  retrieveSecrets: 'Retrieve Secrets Associated with the gateway',
+  editBasicSettings: 'Edit basic gateway settings',
+  getGatewayStatistics: 'Get gateway statistics',
+  viewGatewayStatus: 'View gateway status',
 })
+
+const apiKeyRights = [
+  {
+    title: m.gatewayConnection,
+    grants: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_LINK'],
+    descriptionItems: [m.viewGatewayInformation, m.linkToGatewayServer],
+  },
+  {
+    title: m.cupsKey,
+    grants: ['RIGHT_GATEWAY_INFO', 'RIGHT_GATEWAY_SETTINGS_BASIC', 'RIGHT_GATEWAY_READ_SECRETS'],
+    descriptionItems: [m.viewGatewayInformation, m.retrieveSecrets, m.editBasicSettings],
+  },
+  {
+    title: m.getGatewayStatistics,
+    grants: ['RIGHT_GATEWAY_STATUS_READ'],
+    descriptionItems: [m.viewGatewayStatus],
+  },
+]
 
 const GatewayOverviewHeader = ({ gateway }) => {
   const [deleteGatewayVisible, setDeleteGatewayVisible] = useState(false)
+  const [createApiKeyModalVisible, setCreateApiKeyModalVisible] = useState(false)
 
   const dispatch = useDispatch()
   const { ids, name } = gateway
@@ -76,6 +104,10 @@ const GatewayOverviewHeader = ({ gateway }) => {
     () => bookmarks.map(b => b.entity_ids?.gateway_ids?.gateway_id).some(b => b === gateway_id),
     [bookmarks, gateway_id],
   )
+
+  const handleOpenCreateApiKeyModal = useCallback(() => {
+    setCreateApiKeyModalVisible(true)
+  }, [])
 
   const handleAddToBookmark = useCallback(async () => {
     try {
@@ -149,6 +181,12 @@ const GatewayOverviewHeader = ({ gateway }) => {
         <div className="d-inline-flex al-center gap-cs-xxs">
           <Button
             secondary
+            icon={IconPlus}
+            message={sharedMessages.apiKey}
+            onClick={handleOpenCreateApiKeyModal}
+          />
+          <Button
+            secondary
             icon={!isBookmarked ? IconStar : IconStarFilled}
             onClick={handleAddToBookmark}
             disabled={
@@ -174,6 +212,13 @@ const GatewayOverviewHeader = ({ gateway }) => {
           setVisible={setDeleteGatewayVisible}
           visible={deleteGatewayVisible}
           supportsClaiming={supportsClaiming}
+        />
+        <CreateApiKeyModal
+          entityName={name}
+          entityId={gateway_id}
+          modalVisible={createApiKeyModalVisible}
+          setModalVisible={setCreateApiKeyModalVisible}
+          rights={apiKeyRights}
         />
       </div>
     </div>

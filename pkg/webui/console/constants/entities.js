@@ -29,3 +29,10 @@ export const entitySdkServiceMap = Object.freeze({
   users: 'Users',
   client: 'Clients',
 })
+
+export const sdkServices = {
+  [APPLICATION]: entitySdkServiceMap.application,
+  [GATEWAY]: entitySdkServiceMap.gateway,
+  [ORGANIZATION]: entitySdkServiceMap.organization,
+  [USER]: entitySdkServiceMap.users,
+}

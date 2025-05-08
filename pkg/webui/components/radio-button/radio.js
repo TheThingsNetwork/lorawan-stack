@@ -131,7 +131,11 @@ RadioButton.propTypes = {
   onChange: PropTypes.func,
   onFocus: PropTypes.func,
   readOnly: PropTypes.bool,
-  value: PropTypes.oneOfType([PropTypes.string, PropTypes.bool]),
+  value: PropTypes.oneOfType([
+    PropTypes.string,
+    PropTypes.bool,
+    PropTypes.arrayOf(PropTypes.string),
+  ]),
 }
 
 RadioButton.defaultProps = {
