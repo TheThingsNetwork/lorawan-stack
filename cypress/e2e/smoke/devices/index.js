@@ -28,7 +28,6 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
   const application = {
     ids: { application_id: applicationId },
   }
-  const deviceId = 'device-all-components'
   const ns = {
     end_device: {
       frequency_plan_id: 'EU_863_870_TTN',
@@ -36,10 +35,6 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
       multicast: false,
       supports_join: false,
       lorawan_version: 'MAC_V1_0_2',
-      ids: {
-        device_id: 'device-all-components',
-        dev_eui: '70B3D57ED8000019',
-      },
       session: {
         keys: {
           f_nwk_s_int_key: {
@@ -63,6 +58,8 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
   cy.createUser(user)
   cy.createApplication(application, user.ids.user_id)
   cy.createMockDeviceAllComponents(applicationId, undefined, { ns })
+    .its('end_device.ids.device_id')
+    .as('deviceId')
   cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
   cy.visit(Cypress.config('consoleRootPath'))
 
@@ -71,7 +68,9 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
   cy.get('#sidebar').within(() => {
     cy.findByRole('link', { name: /End devices/ }).click()
   })
-  cy.findByRole('cell', { name: `Test Device Name ${deviceId}` }).click()
+  cy.get('@deviceId').then(deviceId => {
+    cy.findByRole('cell', { name: `Test Device Name ${deviceId}` }).click()
+  })
 
   cy.get('#stage').within(() => {
     cy.findByRole('button', { name: 'Live data' }).click()

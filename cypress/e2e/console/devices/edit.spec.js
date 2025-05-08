@@ -31,10 +31,6 @@ describe('Device general settings', () => {
       multicast: false,
       supports_join: false,
       lorawan_version: 'MAC_V1_0_2',
-      ids: {
-        device_id: 'device-all-components',
-        dev_eui: '70B3D57ED8000019',
-      },
       session: {
         keys: {
           f_nwk_s_int_key: {
@@ -54,13 +50,17 @@ describe('Device general settings', () => {
       },
     },
   }
-  const endDeviceId = ns.end_device.ids.device_id
+  let endDeviceId
+  let endDeviceDevEui
 
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createMockDeviceAllComponents(appId, undefined, { ns })
+    cy.createMockDeviceAllComponents(appId, undefined, { ns }).then(body => {
+      endDeviceId = body.end_device.ids.device_id
+      endDeviceDevEui = body.end_device.ids.dev_eui
+    })
   })
 
   beforeEach(() => {
@@ -82,7 +82,7 @@ describe('Device general settings', () => {
     cy.findByLabelText('DevEUI')
       .should('be.disabled')
       .and('have.attr', 'value')
-      .and('eq', ns.end_device.ids.dev_eui)
+      .and('eq', endDeviceDevEui)
 
     cy.fixture('console/devices/device.is.json').then(endDevice => {
       cy.findByLabelText('End device name')

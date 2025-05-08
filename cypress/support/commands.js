@@ -18,6 +18,8 @@ import { noop, merge } from 'lodash'
 
 import stringToHash from '../../pkg/webui/lib/string-to-hash'
 
+import { generateHexValue } from './utils'
+
 before(() => {
   cy.readFile('.env/admin_api_key.txt').then(adminKey => {
     Cypress.config('adminApiKey', adminKey)
@@ -319,9 +321,17 @@ Cypress.Commands.add(
   (
     applicationId,
     fixture = 'console/devices/device.*.json',
-    overwrites = { ns: {}, as: {}, js: {}, is: {} },
+    overwrites = {},
     injectHost = true,
   ) => {
+    const randomSuffix = Cypress._.random(0, 1e6)
+    const deviceIds = {
+      device_id: `device-${Date.now()}-${randomSuffix}`,
+      dev_eui: generateHexValue(16).toUpperCase(),
+      join_eui: generateHexValue(16).toUpperCase(),
+    }
+    const mergedOverwrites = Cypress._.merge({ ns: {}, as: {}, js: {}, is: {} }, overwrites)
+    const { ns, as, js, is } = mergedOverwrites
     const baseUrl = Cypress.config('baseUrl')
     const adminApiKey = Cypress.config('adminApiKey')
     const interpolateFixture = (fixtureString, component) => fixtureString.replace('*', component)
@@ -329,6 +339,7 @@ Cypress.Commands.add(
       Authorization: `Bearer ${adminApiKey}`,
     }
     cy.fixture(interpolateFixture(fixture, 'is')).then(body => {
+      body.end_device.ids = deviceIds
       if (injectHost && body && 'end_device' in body) {
         if ('network_server_address' in body.end_device) {
           body.end_device.network_server_address = window.location.hostname
@@ -343,27 +354,30 @@ Cypress.Commands.add(
       cy.request({
         method: 'POST',
         url: `${baseUrl}/api/v3/applications/${applicationId}/devices`,
-        body: { ...body, ...overwrites.is },
+        body: Cypress._.merge({}, body, is),
         headers,
       })
     })
     cy.fixture(interpolateFixture(fixture, 'ns')).then(body => {
+      body.end_device.ids = deviceIds
       cy.request({
         method: 'PUT',
         url: `${baseUrl}/api/v3/ns/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
-        body: { ...body, ...overwrites.ns },
+        body: Cypress._.merge({}, body, ns),
         headers,
       })
     })
     cy.fixture(interpolateFixture(fixture, 'as')).then(body => {
+      body.end_device.ids = deviceIds
       cy.request({
         method: 'PUT',
         url: `${baseUrl}/api/v3/as/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
-        body: { ...body, ...overwrites.as },
+        body: Cypress._.merge({}, body, as),
         headers,
       })
     })
     cy.fixture(interpolateFixture(fixture, 'js')).then(body => {
+      body.end_device.ids = deviceIds
       if (injectHost && body && 'end_device' in body) {
         if ('network_server_address' in body.end_device) {
           body.end_device.network_server_address = window.location.hostname
@@ -375,11 +389,14 @@ Cypress.Commands.add(
       cy.request({
         method: 'PUT',
         url: `${baseUrl}/api/v3/js/applications/${applicationId}/devices/${body.end_device.ids.device_id}`,
-        body: { ...body, ...overwrites.js },
+        body: Cypress._.merge({}, body, js),
         headers,
       })
     })
-    return cy.fixture(interpolateFixture(fixture, 'is'))
+    return cy.fixture(interpolateFixture(fixture, 'is')).then(body => {
+      body.end_device.ids = deviceIds
+      return body
+    })
   },
 )
 

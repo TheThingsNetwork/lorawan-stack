@@ -37,11 +37,6 @@ describe('Payload formatters', () => {
         fw_version: 'quickstart',
         band_id: 'EU_863_870',
       },
-      ids: {
-        device_id: 'device-all-components',
-        dev_eui: '70B3D57ED8000013',
-        join_eui: '0000000000000006',
-      },
       supports_class_c: false,
       supports_class_b: false,
       mac_settings: {
@@ -75,11 +70,6 @@ describe('Payload formatters', () => {
 
   const is = {
     end_device: {
-      ids: {
-        dev_eui: '70B3D57ED8000013',
-        join_eui: '0000000000000006',
-        device_id: 'device-all-components',
-      },
       network_server_address: window.location.hostname,
       application_server_address: window.location.hostname,
       join_server_address: window.location.hostname,

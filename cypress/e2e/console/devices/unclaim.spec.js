@@ -29,10 +29,6 @@ describe('Device un-claiming', () => {
       multicast: false,
       supports_join: false,
       lorawan_version: 'MAC_V1_0_2',
-      ids: {
-        device_id: 'device-all-components',
-        dev_eui: '70B3D57ED8000019',
-      },
       session: {
         keys: {
           f_nwk_s_int_key: {
@@ -52,13 +48,19 @@ describe('Device un-claiming', () => {
       },
     },
   }
-  const endDeviceId = ns.end_device.ids.device_id
+  let endDeviceId
+  let endDeviceDevEui
+  let endDeviceJoinEui
 
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, userId)
-    cy.createMockDeviceAllComponents(appId, undefined, { ns })
+    cy.createMockDeviceAllComponents(appId, undefined, { ns }).then(body => {
+      endDeviceId = body.end_device.ids.device_id
+      endDeviceDevEui = body.end_device.ids.dev_eui
+      endDeviceJoinEui = body.end_device.ids.join_eui
+    })
   })
 
   beforeEach(() => {
@@ -92,9 +94,8 @@ describe('Device un-claiming', () => {
         const params = new URLSearchParams(new URL(url).search)
         const hexToBase64 = hex =>
           btoa(String.fromCharCode(...hex.match(/.{1,2}/g).map(byte => parseInt(byte, 16))))
-
-        expect(params.get('dev_eui')).to.equal(hexToBase64(ns.end_device.ids.dev_eui))
-        expect(params.get('join_eui')).to.equal(hexToBase64('0000000000000000'))
+        expect(params.get('dev_eui')).to.equal(hexToBase64(endDeviceDevEui))
+        expect(params.get('join_eui')).to.equal(hexToBase64(endDeviceJoinEui))
       })
 
     cy.findByTestId('error-notification').should('not.exist')
