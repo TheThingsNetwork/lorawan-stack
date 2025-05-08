@@ -66,12 +66,12 @@ const DocumentationDashboardPanel = () => (
       icon={IconRocket}
     />
     <DocsPanelLink
-      path={`${docBaseUrl}/devices/`}
+      path={`${docBaseUrl}/hardware/devices/`}
       title={sharedMessages.devices}
       icon={IconDevice}
     />
     <DocsPanelLink
-      path={`${docBaseUrl}/gateways/`}
+      path={`${docBaseUrl}/hardware/gateways/`}
       title={sharedMessages.gateways}
       icon={IconGateway}
     />
@@ -80,8 +80,8 @@ const DocumentationDashboardPanel = () => (
       title={sharedMessages.integrations}
       icon={IconArrowMerge}
     />
-    <DocsPanelLink path={`${docBaseUrl}/the-things-stack/`} title={m.tts} icon={IconTts} />
-    <DocsPanelLink path={`${docBaseUrl}/reference/`} title={m.reference} icon={IconBook} />
+    <DocsPanelLink path={`${docBaseUrl}/concepts/`} title={m.tts} icon={IconTts} />
+    <DocsPanelLink path={`${docBaseUrl}/api/reference/`} title={m.reference} icon={IconBook} />
   </Panel>
 )
 
