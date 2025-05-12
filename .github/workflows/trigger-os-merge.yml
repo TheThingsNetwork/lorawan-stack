@@ -1,0 +1,29 @@
+name: Trigger OS merge action in TTI repo
+
+on:
+  pull_request:
+    branches:
+      - 'v3.*'
+    types:
+      - closed
+
+jobs:
+  trigger_merge:
+    name: Trigger OS merge action in TTI repo
+    if: ${{ github.repository == 'TheThingsNetwork/lorawan-stack' && github.event.pull_request.merged == true }}
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Trigger OS merge action in TTI repo
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.BOT_TOKEN }}
+          script: |
+            const resp = await github.rest.repos.createDispatchEvent({
+              owner: 'TheThingsIndustries',
+              repo: 'lorawan-stack',
+              event_type: 'merge-os-to-enterprise'
+            });
+            if (resp.status !== 204) {
+              throw new Error(`Failed to trigger OS merge action: ${resp.status} ${resp.statusText}`);
+            }
+            console.log('Triggered OS merge action in TTI repo');
