@@ -178,27 +178,7 @@ func New(ctx context.Context, name, description string, opts ...Option) Event {
 	return (&definition{name: name, description: description}).New(ctx, opts...)
 }
 
-var errMarshalData = errors.Define("marshal_data", "marshal data")
-
 func marshalData(data any) (anyPB *anypb.Any, err error) {
-	// TODO: https://github.com/TheThingsIndustries/lorawan-stack-support/issues/1163.
-	// Remove this after the issue is fixed.
-	defer func() {
-		if p := recover(); p != nil {
-			if pErr, ok := p.(error); ok {
-				err = errMarshalData.WithCause(pErr)
-			} else {
-				err = errMarshalData.WithAttributes("panic", p)
-			}
-			event := sentryerrors.NewEvent(err)
-			sentry.CaptureEvent(event)
-		}
-	}()
-
-	return mustMarshalData(data)
-}
-
-func mustMarshalData(data any) (anyPB *anypb.Any, err error) {
 	if protoMessage, ok := data.(proto.Message); ok {
 		anyPB, err = anypb.New(protoMessage)
 		if err != nil {
@@ -242,12 +222,45 @@ func Proto(e Event) (*ttnpb.Event, error) {
 	pb.Context = ctx
 	if evt.data != nil {
 		var err error
-		pb.Data, err = marshalData(e.Data())
+		// TODO: uncomment masrshalData and remove mustMarshalEventData after the issue mentioned
+		// below (7632) is fixed.
+		// pb.Data, err = marshalData(e.Data())
+		pb.Data, err = mustMarshalEventData(e)
 		if err != nil {
 			return nil, err
 		}
 	}
 	return pb, nil
+}
+
+// TODO: remove after issue is resolved
+// https://github.com/TheThingsNetwork/lorawan-stack/issues/7623
+var errMarshalData = errors.Define("marshal_data", "marshal data")
+
+func mustMarshalEventData(e Event) (*anypb.Any, error) {
+	defer func() {
+		if p := recover(); p != nil {
+			var err error
+			if pErr, ok := p.(error); ok {
+				err = errMarshalData.WithCause(pErr).WithAttributes(
+					"event_name", e.Name(),
+					"event_correlation_ids", e.CorrelationIds(),
+					"event_identifiers", e.Identifiers(),
+				)
+			} else {
+				err = errMarshalData.WithAttributes(
+					"panic", p,
+					"event_name", e.Name(),
+					"event_correlation_ids", e.CorrelationIds(),
+					"event_identifiers", e.Identifiers(),
+				)
+			}
+			event := sentryerrors.NewEvent(err)
+			sentry.CaptureEvent(event)
+		}
+	}()
+
+	return marshalData(e.Data())
 }
 
 // FromProto returns the event from its protobuf representation.
