@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
@@ -30,7 +30,6 @@ import Message from '@ttn-lw/lib/components/message'
 import DateTime from '@ttn-lw/lib/components/date-time'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import PropTypes from '@ttn-lw/lib/prop-types'
 import { getUserId } from '@ttn-lw/lib/selectors/id'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 
@@ -111,21 +110,20 @@ const state = {
   },
 }
 
-const UsersTable = props => {
-  const { pageSize } = props
+const UsersTable = () => {
   const dispatch = useDispatch()
   const currentUserId = useSelector(selectUserId)
   const mayInvite = useSelector(state => checkFromState(maySendInvites, state))
   const mayPerformAllActions = useSelector(state => checkFromState(mayPerformAllUserActions, state))
   const mayCreate = useSelector(state => checkFromState(mayCreateUsers, state))
-
-  const tabsWithInvitations = [
-    ...tabs,
-    { title: sharedMessages.userInvitations, name: INVITATIONS_TAB },
-  ]
   const [tab, setTab] = React.useState(USERS_TAB)
-  const isInvitationsTab = tab === INVITATIONS_TAB
-  const isDeletedTab = tab === DELETED_TAB
+  const isInvitationsTab = useMemo(() => tab === INVITATIONS_TAB, [tab])
+  const isDeletedTab = useMemo(() => tab === DELETED_TAB, [tab])
+
+  const tabsWithInvitations = useMemo(
+    () => [...tabs, { title: sharedMessages.userInvitations, name: INVITATIONS_TAB }],
+    [],
+  )
 
   const handleRestore = React.useCallback(
     async id => {
@@ -187,7 +185,7 @@ const UsersTable = props => {
     [dispatch],
   )
 
-  const headers = React.useMemo(() => {
+  const headers = useMemo(() => {
     const baseHeaders = []
 
     if (tab === INVITATIONS_TAB) {
@@ -354,22 +352,12 @@ const UsersTable = props => {
       getItemPathPrefix={isInvitationsTab ? getItemPathPrefix : undefined}
       tableTitle={<Message content={sharedMessages.users} />}
       getItemsAction={getItems}
-      searchItemsAction={getItems}
       baseDataSelector={isInvitationsTab ? invitationsBaseDataSelector : usersBaseDataSelector}
-      pageSize={pageSize}
       clickable={!isDeletedTab}
       tabs={mayInvite ? tabsWithInvitations : tabs}
       searchable={!isInvitationsTab}
     />
   )
-}
-
-UsersTable.propTypes = {
-  pageSize: PropTypes.number,
-}
-
-UsersTable.defaultProps = {
-  pageSize: undefined,
 }
 
 export default UsersTable

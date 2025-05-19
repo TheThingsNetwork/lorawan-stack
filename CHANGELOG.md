@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fixed searching users in User management in the Console.
+
 ### Security
 
 ## [3.34.1] - 2025-04-28
