@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Fixed searching users in User management in the Console.
+- CLI no longer causes a panic when running from a docker container in a Linux machine.
 
 ### Security
 
