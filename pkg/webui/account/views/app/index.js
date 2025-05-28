@@ -96,7 +96,7 @@ const Layout = () => {
           <div className={style.container}>
             <section className={style.content}>
               <div className={style.main}>
-                <Logo className={style.loginLogo} unlockSize />
+                <Logo className={style.loginLogo} dark={darkTheme} unlockSize />
                 <Outlet />
               </div>
             </section>
