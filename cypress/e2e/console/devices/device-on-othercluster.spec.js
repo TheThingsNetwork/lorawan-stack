@@ -27,8 +27,6 @@ describe('End device on other cluster', () => {
     ids: { application_id: applicationId },
   }
 
-  const deviceId = 'device-all-components'
-
   const ns = {
     end_device: {
       frequency_plan_id: 'EU_863_870_TTN',
@@ -36,11 +34,6 @@ describe('End device on other cluster', () => {
       multicast: false,
       supports_join: true,
       lorawan_version: 'MAC_V1_0_2',
-      ids: {
-        device_id: deviceId,
-        dev_eui: '70B3D57ED8000019',
-        join_eui: '0000000000000000',
-      },
       supports_class_c: false,
       supports_class_b: false,
       mac_settings: {
@@ -69,11 +62,6 @@ describe('End device on other cluster', () => {
 
   const is = {
     end_device: {
-      ids: {
-        dev_eui: '9000BEEF9000BEEF',
-        join_eui: '0000000000000000',
-        device_id: 'device-all-components',
-      },
       network_server_address: 'tti.staging1.cloud.thethings.industries',
       application_server_address: 'tti.staging1.cloud.thethings.industries',
       join_server_address: 'tti.staging1.cloud.thethings.industries',
@@ -83,11 +71,15 @@ describe('End device on other cluster', () => {
     },
   }
 
+  let deviceId
+
   before(() => {
     cy.dropAndSeedDatabase()
     cy.createUser(user)
     cy.createApplication(application, user.ids.user_id)
-    cy.createMockDeviceAllComponents(applicationId, undefined, { ns, is })
+    cy.createMockDeviceAllComponents(applicationId, undefined, { ns, is }).then(body => {
+      deviceId = body.end_device.ids.device_id
+    })
   })
 
   beforeEach(() => {
