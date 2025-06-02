@@ -78,7 +78,7 @@ const m = defineMessages({
   createErrorTitle: 'Could not create webhook',
   reactivateButtonMessage: 'Reactivate',
   suspendedWebhookMessage:
-    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated after {webhookRetryInterval}. If you wish to reactivate right away, you can use the button below.',
+    'This webhook has been deactivated due to several unsuccessful forwarding attempts. It will be automatically reactivated {webhookRetryInterval}. If you wish to reactivate right away, you can use the button below.',
   pendingInfo:
     'This webhook is currently pending until attempting its first regular request attempt. Note that webhooks can be restricted if they encounter too many request failures.',
   pausedInfo:
@@ -274,8 +274,8 @@ const WebhookForm = props => {
   const [existingId, setExistingId] = useState(undefined)
   const [error, setError] = useState(undefined)
 
-  const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)?.[0]
-  const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)?.[1]
+  const retryIntervalValue = webhookRetryInterval?.match(durationRegExp)?.[1]
+  const retryIntervalUnit = webhookRetryInterval?.match(durationRegExp)?.[2]
   const retryIntervalIntlUnit = units[retryIntervalUnit]
   const hasValidRetryValue = retryIntervalValue && Number.isFinite(Number(retryIntervalValue))
 
@@ -407,12 +407,14 @@ const WebhookForm = props => {
               warning
               content={m.suspendedWebhookMessage}
               messageValues={{
-                webhookRetryInterval: (
+                webhookRetryInterval: hasValidRetryValue ? (
                   <FormattedRelativeTime
                     style="long"
-                    value={hasValidRetryValue}
+                    value={retryIntervalValue}
                     unit={retryIntervalIntlUnit}
                   />
+                ) : (
+                  ''
                 ),
               }}
               children={
