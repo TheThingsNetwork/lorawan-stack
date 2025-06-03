@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2025 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -584,14 +584,18 @@ var (
 				return err
 			}
 
-			application, err := ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
-				ApplicationIds: devID.ApplicationIds,
-				FieldMask: ttnpb.FieldMask(
-					"network_server_address",
-					"application_server_address",
-					"join_server_address",
-				),
-			})
+			application, err := api.CallWithBackoff(
+				func() (*ttnpb.Application, error) {
+					return ttnpb.NewApplicationRegistryClient(is).Get(ctx, &ttnpb.GetApplicationRequest{
+						ApplicationIds: devID.ApplicationIds,
+						FieldMask: ttnpb.FieldMask(
+							"network_server_address",
+							"application_server_address",
+							"join_server_address",
+						),
+					})
+				},
+			)
 			if err != nil {
 				return err
 			}
@@ -604,7 +608,11 @@ var (
 					return errEndDeviceClaimGeneratedEUI.New()
 				}
 				logger.Debug("request-dev-eui flag set, requesting a DevEUI")
-				devEUIResponse, err := ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, devID.ApplicationIds)
+				devEUIResponse, err := api.CallWithBackoff(
+					func() (*ttnpb.IssueDevEUIResponse, error) {
+						return ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, devID.ApplicationIds)
+					},
+				)
 				if err != nil {
 					return err
 				}
@@ -634,26 +642,34 @@ var (
 				if err != nil {
 					return err
 				}
-				claimInfoResp, err := ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
-					JoinEui: device.Ids.JoinEui,
-				})
+				claimInfoResp, err := api.CallWithBackoff(
+					func() (*ttnpb.GetInfoByJoinEUIResponse, error) {
+						return ttnpb.NewEndDeviceClaimingServerClient(dcs).GetInfoByJoinEUI(ctx, &ttnpb.GetInfoByJoinEUIRequest{
+							JoinEui: device.Ids.JoinEui,
+						})
+					},
+				)
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)
 				}
 				if !claimInfoResp.SupportsClaiming {
 					return errClaimingNotSupported.WithAttributes("join_eui", types.MustEUI64(device.Ids.JoinEui).String())
 				}
-				_, err = ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
-					TargetApplicationIds: device.Ids.ApplicationIds,
-					TargetDeviceId:       device.Ids.DeviceId,
-					SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
-						AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
-							JoinEui:            device.Ids.JoinEui,
-							DevEui:             device.Ids.DevEui,
-							AuthenticationCode: device.ClaimAuthenticationCode.Value,
-						},
+				_, err = api.CallWithBackoff(
+					func() (*ttnpb.EndDeviceIdentifiers, error) {
+						return ttnpb.NewEndDeviceClaimingServerClient(dcs).Claim(ctx, &ttnpb.ClaimEndDeviceRequest{
+							TargetApplicationIds: device.Ids.ApplicationIds,
+							TargetDeviceId:       device.Ids.DeviceId,
+							SourceDevice: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers_{
+								AuthenticatedIdentifiers: &ttnpb.ClaimEndDeviceRequest_AuthenticatedIdentifiers{
+									JoinEui:            device.Ids.JoinEui,
+									DevEui:             device.Ids.DevEui,
+									AuthenticationCode: device.ClaimAuthenticationCode.Value,
+								},
+							},
+						})
 					},
-				})
+				)
 				if err != nil {
 					return errEndDeviceClaim.WithCause(err)
 				}
@@ -672,9 +688,13 @@ var (
 			if err := isDevice.SetFields(device, append(isPaths, "ids")...); err != nil {
 				return err
 			}
-			isRes, err := ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
-				EndDevice: isDevice,
-			})
+			isRes, err := api.CallWithBackoff(
+				func() (*ttnpb.EndDevice, error) {
+					return ttnpb.NewEndDeviceRegistryClient(is).Create(ctx, &ttnpb.CreateEndDeviceRequest{
+						EndDevice: isDevice,
+					})
+				},
+			)
 			if err != nil {
 				return err
 			}
