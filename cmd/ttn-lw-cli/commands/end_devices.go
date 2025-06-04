@@ -595,6 +595,7 @@ var (
 						),
 					})
 				},
+				api.WithLogger[*ttnpb.Application](log.FromContext(ctx)),
 			)
 			if err != nil {
 				return err
@@ -612,6 +613,7 @@ var (
 					func() (*ttnpb.IssueDevEUIResponse, error) {
 						return ttnpb.NewApplicationRegistryClient(is).IssueDevEUI(ctx, devID.ApplicationIds)
 					},
+					api.WithLogger[*ttnpb.IssueDevEUIResponse](log.FromContext(ctx)),
 				)
 				if err != nil {
 					return err
@@ -648,6 +650,7 @@ var (
 							JoinEui: device.Ids.JoinEui,
 						})
 					},
+					api.WithLogger[*ttnpb.GetInfoByJoinEUIResponse](log.FromContext(ctx)),
 				)
 				if err != nil {
 					return errEndDeviceClaimInfo.WithCause(err)
@@ -669,6 +672,7 @@ var (
 							},
 						})
 					},
+					api.WithLogger[*ttnpb.EndDeviceIdentifiers](log.FromContext(ctx)),
 				)
 				if err != nil {
 					return errEndDeviceClaim.WithCause(err)
@@ -694,6 +698,7 @@ var (
 						EndDevice: isDevice,
 					})
 				},
+				api.WithLogger[*ttnpb.EndDevice](log.FromContext(ctx)),
 			)
 			if err != nil {
 				return err

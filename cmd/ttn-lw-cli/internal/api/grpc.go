@@ -195,6 +195,7 @@ func CloseAll() {
 // Retry defines retry logic for gRPC calls.
 type Retry[T proto.Message] struct {
 	backoff    time.Duration
+	logger     log.Interface
 	maxRetries int
 }
 
@@ -205,6 +206,13 @@ type RetryOption[T proto.Message] func(*Retry[T])
 func WithBackoff[T proto.Message](d time.Duration) RetryOption[T] {
 	return func(r *Retry[T]) {
 		r.backoff = d
+	}
+}
+
+// WithLogger sets a custom logger for retry operations.
+func WithLogger[T proto.Message](l log.Interface) RetryOption[T] {
+	return func(r *Retry[T]) {
+		r.logger = l
 	}
 }
 
@@ -225,6 +233,7 @@ func WithMaxRetries[T proto.Message](n int) RetryOption[T] {
 func CallWithBackoff[T proto.Message](call func() (T, error), opts ...RetryOption[T]) (T, error) {
 	r := Retry[T]{
 		backoff:    600 * time.Millisecond,
+		logger:     log.Noop,
 		maxRetries: 5,
 	}
 	for _, opt := range opts {
@@ -245,6 +254,13 @@ func (r Retry[T]) callWithBackoff(call func() (T, error)) (T, error) {
 		if !ok || st.Code() != codes.ResourceExhausted {
 			return zero, err
 		}
+		r.logger.Infof(
+			"Retrying gRPC call due to %q (attempt %d/%d, waiting %s)...",
+			st.Code(),
+			attempt+1,
+			r.maxRetries,
+			backoff,
+		)
 		time.Sleep(backoff)
 		backoff *= 2
 	}
