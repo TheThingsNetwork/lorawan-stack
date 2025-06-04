@@ -5300,6 +5300,15 @@
       "file": "mapping.go"
     }
   },
+  "error:pkg/gatewayserver/io/ttigw:invalid_rf_chain": {
+    "translations": {
+      "en": "invalid RF chain `{rf_chain}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/ttigw",
+      "file": "mapping.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ttigw:no_client_hello": {
     "translations": {
       "en": "no client hello"

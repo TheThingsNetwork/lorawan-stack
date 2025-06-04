@@ -2452,6 +2452,7 @@
   "error:pkg/gatewayserver/io/ttigw:invalid_gateway_eui": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_if_chain": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_modulation": "",
+  "error:pkg/gatewayserver/io/ttigw:invalid_rf_chain": "",
   "error:pkg/gatewayserver/io/ttigw:no_client_hello": "",
   "error:pkg/gatewayserver/io/ttigw:not_scheduled": "",
   "error:pkg/gatewayserver/io/ttigw:unknown_message_type": "",
