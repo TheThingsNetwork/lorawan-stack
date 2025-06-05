@@ -1,4 +1,4 @@
-// Copyright © 2019 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2025 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -28,8 +28,11 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpclog"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmiddleware/rpcretry"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/proto"
 )
 
 var (
@@ -187,4 +190,79 @@ func CloseAll() {
 		}
 		conn.Close()
 	}
+}
+
+// Retry defines retry logic for gRPC calls.
+type Retry[T proto.Message] struct {
+	backoff    time.Duration
+	logger     log.Interface
+	maxRetries int
+}
+
+// RetryOption defines a functional option for configuring retry behavior.
+type RetryOption[T proto.Message] func(*Retry[T])
+
+// WithBackoff sets the initial backoff duration between retries.
+func WithBackoff[T proto.Message](d time.Duration) RetryOption[T] {
+	return func(r *Retry[T]) {
+		r.backoff = d
+	}
+}
+
+// WithLogger sets a custom logger for retry operations.
+func WithLogger[T proto.Message](l log.Interface) RetryOption[T] {
+	return func(r *Retry[T]) {
+		r.logger = l
+	}
+}
+
+// WithMaxRetries sets the maximum number of retry attempts.
+func WithMaxRetries[T proto.Message](n int) RetryOption[T] {
+	return func(r *Retry[T]) {
+		r.maxRetries = n
+	}
+}
+
+// CallWithBackoff executes a gRPC call with retry logic and exponential backoff.
+//
+// It takes a function `call` that performs the actual gRPC request and retries it
+// if the error returned is a gRPC `codes.ResourceExhausted` error. The retry behavior
+// (initial backoff duration and maximum number of retries) can be customized by
+// providing functional options (e.g., WithBackoff, WithMaxRetries). If no options are
+// provided, it defaults to a 600ms backoff and 5 maximum retries.
+func CallWithBackoff[T proto.Message](call func() (T, error), opts ...RetryOption[T]) (T, error) {
+	r := Retry[T]{
+		backoff:    600 * time.Millisecond,
+		logger:     log.Noop,
+		maxRetries: 5,
+	}
+	for _, opt := range opts {
+		opt(&r)
+	}
+	return r.callWithBackoff(call)
+}
+
+func (r Retry[T]) callWithBackoff(call func() (T, error)) (T, error) {
+	var zero T
+	backoff := r.backoff
+	for attempt := 0; attempt < r.maxRetries; attempt++ {
+		v, err := call()
+		if err == nil {
+			return v, nil
+		}
+		st, ok := status.FromError(err)
+		if !ok || st.Code() != codes.ResourceExhausted {
+			return zero, err
+		}
+		r.logger.Infof(
+			"Retrying gRPC call due to %q (attempt %d/%d, waiting %s)...",
+			st.Code(),
+			attempt+1,
+			r.maxRetries,
+			backoff,
+		)
+		time.Sleep(backoff)
+		backoff *= 2
+	}
+	return call()
 }
