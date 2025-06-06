@@ -2340,6 +2340,11 @@
     polished "^4.2.2"
     uuid "^9.0.0"
 
+"@storybook/addon-actions@9.0.5":
+  version "9.0.5"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-9.0.5.tgz#c1018df5d239b3e0958071c96f89d6d5501e2e37"
+  integrity sha512-JU0qMuFWw+eIprM7Oh50Ig16J01kDarMYD+xltf2/Sh4Nu0+GWaQfi3Qhq8cuPc/f4sHI6LmfEAO5JjY0icLOw==
+
 "@storybook/addon-backgrounds@8.6.14":
   version "8.6.14"
   resolved "https://registry.yarnpkg.com/@storybook/addon-backgrounds/-/addon-backgrounds-8.6.14.tgz#3840ce28339c3c16d001f751fd5f3125c0643ed7"
