@@ -1696,9 +1696,11 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 		}
 
 		gs.Close()
-		time.Sleep(2 * gsConfig.ConnectionStatsTTL)
 
-		_, err = statsRegistry.Get(ctx, ids)
-		a.So(errors.IsNotFound(err), should.BeTrue)
+		if statsRegistry != nil {
+			time.Sleep(2 * gsConfig.ConnectionStatsTTL)
+			_, err = statsRegistry.Get(ctx, ids)
+			a.So(errors.IsNotFound(err), should.BeTrue)
+		}
 	})
 }

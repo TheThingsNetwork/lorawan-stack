@@ -31,6 +31,7 @@ import (
 var (
 	errInvalidBoard                = errors.DefineInvalidArgument("invalid_board", "invalid board `{board}`")
 	errInvalidIFChain              = errors.DefineInvalidArgument("invalid_if_chain", "invalid IF chain `{if_chain}`")
+	errInvalidRFChain              = errors.DefineInvalidArgument("invalid_rf_chain", "invalid RF chain `{rf_chain}`")
 	errInvalidModulation           = errors.DefineInvalidArgument("invalid_modulation", "invalid modulation")
 	errUnsupportedDownlinkDataRate = errors.DefineInvalidArgument(
 		"unsupported_downlink_data_rate", "unsupported downlink data rate index `{data_rate_index}` in channel `{channel}`",
@@ -245,6 +246,9 @@ func toUplinkMessage(
 			board.Ifs.MultipleSf6,
 			board.Ifs.MultipleSf7,
 		}[msg.IfChain]
+		if multipleSF == nil {
+			return nil, errInvalidIFChain.WithAttributes("if_chain", msg.IfChain)
+		}
 		rfChain = multipleSF.RfChain
 		frequencyOffset = multipleSF.Frequency
 		modulation := msg.GetLora()
@@ -273,6 +277,9 @@ func toUplinkMessage(
 		}
 
 	case msg.IfChain == 8: // FSK
+		if board.Ifs.Fsk == nil {
+			return nil, errInvalidIFChain.WithAttributes("if_chain", msg.IfChain)
+		}
 		rfChain = board.Ifs.Fsk.RfChain
 		frequencyOffset = board.Ifs.Fsk.Frequency
 		dataRate.Modulation = &ttnpb.DataRate_Fsk{
@@ -282,6 +289,9 @@ func toUplinkMessage(
 		}
 
 	case msg.IfChain == 9: // LoRa standard channel
+		if board.Ifs.LoraServiceChannel == nil {
+			return nil, errInvalidIFChain.WithAttributes("if_chain", msg.IfChain)
+		}
 		rfChain = board.Ifs.LoraServiceChannel.RfChain
 		frequencyOffset = board.Ifs.LoraServiceChannel.Frequency
 		modulation := msg.GetLora()
@@ -313,7 +323,11 @@ func toUplinkMessage(
 		return nil, errInvalidIFChain.WithAttributes("if_chain", msg.IfChain)
 	}
 
-	centerFrequency := []*lorav1.Board_RFChain{board.RfChain0, board.RfChain1}[rfChain].Frequency
+	boardRFChain := []*lorav1.Board_RFChain{board.RfChain0, board.RfChain1}[rfChain]
+	if boardRFChain == nil {
+		return nil, errInvalidRFChain.WithAttributes("rf_chain", rfChain)
+	}
+	centerFrequency := boardRFChain.Frequency
 	frequency := uint64(int64(centerFrequency) + int64(frequencyOffset)) //nolint:gosec
 	return &ttnpb.UplinkMessage{
 		RawPayload: msg.Payload,
