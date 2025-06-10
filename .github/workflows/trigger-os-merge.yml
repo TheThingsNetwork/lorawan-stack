@@ -22,7 +22,7 @@ jobs:
               owner: 'TheThingsIndustries',
               repo: 'lorawan-stack',
               event_type: 'merge-os-to-enterprise',
-              ttn_pr_number: ${{ github.event.pull_request.number }}
+              client_payload: { ttn_pr_number: ${{ github.event.pull_request.number }} }
             });
             if (resp.status !== 204) {
               throw new Error(`Failed to trigger OS merge action: ${resp.status} ${resp.statusText}`);
