@@ -14,7 +14,10 @@ RUN rm -rf /srv/ttn-lorawan/lorawan-webhook-templates/.git
 
 FROM alpine:3.21
 
-RUN addgroup -g 886 thethings && adduser -u 886 -S -G thethings thethings
+RUN addgroup -g 886 thethings && \
+    adduser -u 886 -S -G thethings thethings && \
+    mkdir -p /home/thethings && \
+    chown thethings:thethings /home/thethings
 
 RUN apk --update --no-cache add ca-certificates curl
 
@@ -40,5 +43,8 @@ VOLUME ["/srv/ttn-lorawan/public/blob"]
 ENV TTN_LW_HEALTHCHECK_URL=http://localhost:1885/healthz
 
 HEALTHCHECK --interval=1m --timeout=5s CMD curl -f $TTN_LW_HEALTHCHECK_URL || exit 1
+
+RUN mkdir -p /home/thethings/.cache && chown -R thethings:thethings /home/thethings/.cache
+ENV XDG_CACHE_HOME=/home/thethings/.cache
 
 USER thethings:thethings

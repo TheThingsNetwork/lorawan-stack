@@ -79,50 +79,50 @@ func cliStatePath() (string, error) {
 }
 
 // getCLIState returns the telemetry state, if it doesn't exist it creates a file with default values for the state.
-func getCLIState() (*cliStateTelemetry, bool, error) {
+func getCLIState() (*cliStateTelemetry, error) {
 	folderPath, err := ttnPath()
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 	if _, err := os.Stat(folderPath); err != nil {
 		if !os.IsNotExist(err) {
-			return nil, false, err
+			return nil, err
 		}
 		// Creates the folder since it does not exist.
 		if err := os.Mkdir(folderPath, 0o755); err != nil {
-			return nil, false, err
+			return nil, err
 		}
 	}
 
 	statePath, err := cliStatePath()
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 
 	cliState := &cliStateTelemetry{}
 
 	if _, err := os.Stat(statePath); err != nil {
 		if !os.IsNotExist(err) {
-			return nil, false, err
+			return nil, err
 		}
 
 		cliState.UID = uuid.NewString()
 		cliState.LastSent = time.Now()
-		return cliState, true, nil
+		return cliState, nil
 	}
 
 	b, err := os.ReadFile(statePath)
 	if err != nil {
-		return nil, false, err
+		return nil, err
 	}
 	if err := yaml.Unmarshal(b, cliState); err != nil {
-		return nil, false, err
+		return nil, err
 	}
-	return cliState, false, nil
+	return cliState, nil
 }
 
-func shouldSendTelemetry(t time.Time) bool {
-	return time.Now().After(t.Add(defaultTimeout))
+func shouldSendTelemetry(st *cliStateTelemetry) bool {
+	return st != nil && time.Now().After(st.LastSent.Add(defaultTimeout))
 }
 
 type cliTask struct {
@@ -163,18 +163,23 @@ func NewCLITelemetry(opts ...Option) Task {
 // Run a small task that send telemetry data once a day.
 func (ct *cliTask) Run(ctx context.Context) {
 	logger := log.FromContext(ctx)
-	state, send, err := getCLIState()
+	state, err := getCLIState()
 	if err != nil {
 		logger.WithError(err).Debug("Failed to retrieve telemetry state")
+		return // Skip the telemetry procedure if an error is found creating or fetching the previous state.
 	}
 
-	if send || shouldSendTelemetry(state.LastSent) {
+	if shouldSendTelemetry(state) {
 		state.LastSent = time.Now()
-		if statePath, err := cliStatePath(); err != nil {
+
+		statePath, err := cliStatePath()
+		if err != nil {
 			logger.WithError(err).Debug("Failed to retrieve telemetry state file path")
-		} else {
-			// If no error fetching the state file path, update the last sent timestamp.
-			state.Write(statePath) //nolint:errcheck
+			return
+		}
+		if err := state.Write(statePath); err != nil {
+			logger.WithError(err).Debug("Failed to write new telemetry state")
+			return
 		}
 
 		b, err := json.Marshal(&models.TelemetryMessage{
@@ -186,6 +191,7 @@ func (ct *cliTask) Run(ctx context.Context) {
 			logger.WithError(err).Debug("Failed to marshal telemetry information")
 			return
 		}
+
 		resp, err := http.DefaultClient.Post(ct.target, "application/json", bytes.NewReader(b))
 		if err != nil {
 			logger.WithError(err).Debug("Failed to send telemetry information")
@@ -193,6 +199,7 @@ func (ct *cliTask) Run(ctx context.Context) {
 		}
 		defer resp.Body.Close()
 		io.Copy(io.Discard, resp.Body) // nolint:errcheck
+
 		logger.Info("Sent telemetry information")
 	}
 }
