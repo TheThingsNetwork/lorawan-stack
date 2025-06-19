@@ -58,7 +58,7 @@
     "html-webpack-plugin": "^5.6.3",
     "http-proxy-middleware": "^3.0.5",
     "jest": "^30.0.0",
-    "jest-environment-jsdom": "^29.7.0",
+    "jest-environment-jsdom": "^30.0.2",
     "js-yaml": "^4.0.0",
     "json": "^11.0.0",
     "messageformat-parser": "^4.1.3",
