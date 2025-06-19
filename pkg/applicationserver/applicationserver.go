@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"maps"
 	"net"
 	"runtime/trace"
 	"time"
@@ -1146,6 +1147,8 @@ func (as *ApplicationServer) setActivated(ctx context.Context, ids *ttnpb.EndDev
 }
 
 func (as *ApplicationServer) publishNormalizedUplink(ctx context.Context, info uplinkInfo) error {
+	loc := maps.Clone(info.uplink.Locations)
+
 	for _, measurement := range info.uplink.NormalizedPayload {
 		if err := as.Publish(ctx, &ttnpb.ApplicationUp{
 			EndDeviceIds:   info.ids,
@@ -1164,7 +1167,7 @@ func (as *ApplicationServer) publishNormalizedUplink(ctx context.Context, info u
 					ReceivedAt:                info.uplink.ReceivedAt,
 					Confirmed:                 info.uplink.Confirmed,
 					ConsumedAirtime:           info.uplink.ConsumedAirtime,
-					Locations:                 info.uplink.Locations,
+					Locations:                 loc,
 					VersionIds:                info.uplink.VersionIds,
 					NetworkIds:                info.uplink.NetworkIds,
 					Attributes:                info.uplink.Attributes,
