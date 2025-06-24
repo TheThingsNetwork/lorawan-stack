@@ -37,7 +37,7 @@ func init() {
 					Warn("Failed to enable pgcrypto extension, but trying to continue without it")
 			}
 
-			err = migrate.NewSQLMigrationFunc(sqlMigrations, "20220520000000_v3_20.init.sql")(ctx, db)
+			err = migrate.NewSQLMigrationFunc(sqlMigrations, "20220520000000_v3_20.init.sql")(ctx, db, nil)
 			if err != nil {
 				return fmt.Errorf("failed to run SQL migration: %w", err)
 			}
