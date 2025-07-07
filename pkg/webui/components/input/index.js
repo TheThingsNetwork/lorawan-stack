@@ -201,9 +201,6 @@ const Input = React.forwardRef((props, ref) => {
     ref: inputRef ? combineRefs([input, inputRef]) : input,
   }
 
-  const isPassword = type === 'password'
-  const inputType = isPassword && sensitive ? (hidden ? 'password' : 'text') : type
-
   return (
     <div className={classnames(className, style.container)}>
       <div className={inputCls} style={inputStyle}>
@@ -211,7 +208,7 @@ const Input = React.forwardRef((props, ref) => {
         <Component
           key="i"
           className={inputElemCls}
-          type={inputType}
+          type={type}
           value={value}
           onFocus={onFocusCallback}
           onBlur={onBlurCallback}
