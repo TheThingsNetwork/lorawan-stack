@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Parsers for newly added normalized payload fields.
+
 ### Changed
 
 ### Deprecated
@@ -18,9 +20,6 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
-
-- Subscription nudge not showing correct device count in the Console.
-- Parsers for newly added normalized payload fields.
 
 ### Security
 
