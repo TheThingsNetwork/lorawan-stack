@@ -76,6 +76,16 @@ type Water struct {
 	Temperature *float64
 }
 
+// WaterMetering is a water metering measurement.
+type WaterMetering struct {
+	Total *float64
+}
+
+// Metering is a metering measurement.
+type Metering struct {
+	Water WaterMetering
+}
+
 // Position is a position measurement.
 type Position struct {
 	Latitude  *float64
@@ -91,6 +101,7 @@ type Measurement struct {
 	Wind     Wind
 	Rain     Rain
 	Water    Water
+	Metering Metering
 	Action   Action
 	Position Position
 }
@@ -443,6 +454,22 @@ var fieldParsers = map[string]fieldParser{
 		func(dst *Measurement) **float64 {
 			return &dst.Water.Temperature
 		},
+	),
+	"metering": object(
+		func(dst *Measurement) *Metering {
+			return &dst.Metering
+		},
+	),
+	"metering.water": object(
+		func(dst *Measurement) *WaterMetering {
+			return &dst.Metering.Water
+		},
+	),
+	"metering.water.total": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Metering.Water.Total
+		},
+		minimum(0.0),
 	),
 	"action": object(
 		func(dst *Measurement) *Action {

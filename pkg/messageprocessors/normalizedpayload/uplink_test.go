@@ -688,6 +688,45 @@ func TestUplink(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "metering",
+			normalizedPayload: []*structpb.Struct{
+				{
+					Fields: map[string]*structpb.Value{
+						"metering": {
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"water": {
+											Kind: &structpb.Value_StructValue{
+												StructValue: &structpb.Struct{
+													Fields: map[string]*structpb.Value{
+														"total": {
+															Kind: &structpb.Value_NumberValue{
+																NumberValue: 100.5,
+															},
+														},
+													},
+												},
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []normalizedpayload.Measurement{
+				{
+					Metering: normalizedpayload.Metering{
+						Water: normalizedpayload.WaterMetering{
+							Total: float64Ptr(100.5),
+						},
+					},
+				},
+			},
+		},
 	} {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
