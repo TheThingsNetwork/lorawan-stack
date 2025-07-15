@@ -653,6 +653,41 @@ func TestUplink(t *testing.T) {
 			},
 			errorAssertion: errors.IsInvalidArgument,
 		},
+		{
+			name: "rain",
+			normalizedPayload: []*structpb.Struct{
+				{
+					Fields: map[string]*structpb.Value{
+						"rain": {
+							Kind: &structpb.Value_StructValue{
+								StructValue: &structpb.Struct{
+									Fields: map[string]*structpb.Value{
+										"intensity": {
+											Kind: &structpb.Value_NumberValue{
+												NumberValue: 5,
+											},
+										},
+										"cumulative": {
+											Kind: &structpb.Value_NumberValue{
+												NumberValue: 10,
+											},
+										},
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			expected: []normalizedpayload.Measurement{
+				{
+					Rain: normalizedpayload.Rain{
+						Intensity:  float64Ptr(5),
+						Cumulative: float64Ptr(10),
+					},
+				},
+			},
+		},
 	} {
 		tc := tc
 		t.Run(tc.name, func(t *testing.T) {

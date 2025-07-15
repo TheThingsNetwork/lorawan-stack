@@ -64,6 +64,12 @@ type Wind struct {
 	Direction *float64
 }
 
+// Rain is a rain measurement.
+type Rain struct {
+	Intensity  *float64
+	Cumulative *float64
+}
+
 // Water is a water measurement.
 type Water struct {
 	Leak        *bool
@@ -83,6 +89,7 @@ type Measurement struct {
 	Soil     Soil
 	Air      Air
 	Wind     Wind
+	Rain     Rain
 	Water    Water
 	Action   Action
 	Position Position
@@ -404,6 +411,23 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(0.0),
 		exclusiveMaximum(360.0),
+	),
+	"rain": object(
+		func(dst *Measurement) *Rain {
+			return &dst.Rain
+		},
+	),
+	"rain.intensity": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Rain.Intensity
+		},
+		minimum(0.0),
+	),
+	"rain.cumulative": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Rain.Cumulative
+		},
+		minimum(0.0),
 	),
 	"water": object(
 		func(dst *Measurement) *Water {
