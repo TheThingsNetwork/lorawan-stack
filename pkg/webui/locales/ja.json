@@ -2724,6 +2724,7 @@
   "error:pkg/messageprocessors/normalizedpayload:field_exclusive_minimum": "`{path}`は`{minimum}`より大きいべきです",
   "error:pkg/messageprocessors/normalizedpayload:field_maximum": "`{path}`は`{maximum}`以下であるべきです",
   "error:pkg/messageprocessors/normalizedpayload:field_minimum": "`{path}`は`{minimum}`以上であるべきです",
+  "error:pkg/messageprocessors/normalizedpayload:field_not_allowed": "",
   "error:pkg/messageprocessors/normalizedpayload:field_type": "`{path}`のフィールドタイプが無効です",
   "error:pkg/messageprocessors/normalizedpayload:unknown_field": "未知のフィールド`{path}`",
   "error:pkg/messageprocessors:formatter_not_configured": "フォーマッタ`{formatter}`が設定されていません",
