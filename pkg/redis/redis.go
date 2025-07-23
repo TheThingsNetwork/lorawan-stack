@@ -24,6 +24,7 @@ import (
 	"fmt"
 	"net"
 	"runtime/trace"
+	"slices"
 	"strconv"
 	"strings"
 	"sync"
@@ -105,24 +106,12 @@ type Config struct {
 	namespace []string
 }
 
-func equalsStringSlice(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
 // Equals checks if the other configuration is equivalent to this.
 func (c Config) Equals(other Config) bool {
 	return c.Address == other.Address &&
 		c.Password == other.Password &&
 		c.Database == other.Database &&
-		equalsStringSlice(c.RootNamespace, other.RootNamespace) &&
+		slices.Equal(c.RootNamespace, other.RootNamespace) &&
 		c.PoolSize == other.PoolSize &&
 		c.IdleTimeout == other.IdleTimeout &&
 		c.ConnMaxLifetime == other.ConnMaxLifetime &&
@@ -155,7 +144,7 @@ type FailoverConfig struct {
 // Equals checks if the other configuration is equivalent to this.
 func (c FailoverConfig) Equals(other FailoverConfig) bool {
 	return c.Enable == other.Enable &&
-		equalsStringSlice(c.Addresses, other.Addresses) &&
+		slices.Equal(c.Addresses, other.Addresses) &&
 		c.MasterName == other.MasterName
 }
 
