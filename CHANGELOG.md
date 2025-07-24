@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Parsers for newly added normalized payload fields.
+
 ### Changed
 
 ### Deprecated

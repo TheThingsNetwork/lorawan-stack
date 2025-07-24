@@ -141,7 +141,7 @@ const Login = () => {
           title={sharedMessages.password}
           component={Input}
           name="password"
-          type="password"
+          type="text"
           sensitive
           required
         />

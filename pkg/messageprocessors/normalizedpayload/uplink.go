@@ -43,6 +43,19 @@ type Air struct {
 	Pressure         *float64
 	CO2              *float64
 	LightIntensity   *float64
+	Location         *string
+}
+
+// Motion is a motion measurement.
+type Motion struct {
+	Detected *bool
+	Count    *float64
+}
+
+// Action is an action measurement.
+type Action struct {
+	Motion       Motion
+	ContactState *string
 }
 
 // Wind is a wind measurement.
@@ -51,12 +64,46 @@ type Wind struct {
 	Direction *float64
 }
 
+// Rain is a rain measurement.
+type Rain struct {
+	Intensity  *float64
+	Cumulative *float64
+}
+
+// Water is a water measurement.
+type Water struct {
+	Leak        *bool
+	Temperature *float64
+}
+
+// WaterMetering is a water metering measurement.
+type WaterMetering struct {
+	Total *float64
+}
+
+// Metering is a metering measurement.
+type Metering struct {
+	Water WaterMetering
+}
+
+// Position is a position measurement.
+type Position struct {
+	Latitude  *float64
+	Longitude *float64
+}
+
 // Measurement is a measurement.
 type Measurement struct {
-	Time *time.Time
-	Soil Soil
-	Air  Air
-	Wind Wind
+	Time     *time.Time
+	Battery  *float64
+	Soil     Soil
+	Air      Air
+	Wind     Wind
+	Rain     Rain
+	Water    Water
+	Metering Metering
+	Action   Action
+	Position Position
 }
 
 var (
@@ -64,6 +111,10 @@ var (
 	errFieldMinimum = errors.DefineDataLoss(
 		"field_minimum",
 		"`{path}` should be equal or greater than `{minimum}`",
+	)
+	errFieldNotAllowed = errors.DefineDataLoss(
+		"field_not_allowed",
+		"`{path}` should be one of `{allowed}`",
 	)
 	//nolint:unused
 	errFieldExclusiveMinimum = errors.DefineDataLoss(
@@ -141,6 +192,29 @@ func parseNumber(selector func(dst *Measurement) **float64, vals ...fieldValidat
 	}
 }
 
+// parseString parses and validates a string.
+func parseString(selector func(dst *Measurement) **string, allowed []string) fieldParser {
+	return func(dst *Measurement, src *structpb.Value, path string) []error {
+		val, ok := src.Kind.(*structpb.Value_StringValue)
+		if !ok {
+			return []error{errFieldType.WithAttributes("path", path)}
+		}
+		p := val.StringValue
+		for _, e := range allowed {
+			if p == e {
+				*selector(dst) = &p
+				return nil
+			}
+		}
+		return []error{
+			errFieldNotAllowed.WithAttributes(
+				"path", path,
+				"allowed", allowed,
+			),
+		}
+	}
+}
+
 // parsePercentage parses and validates a percentage.
 func parsePercentage(selector func(dst *Measurement) **float64) fieldParser {
 	return parseNumber(
@@ -157,6 +231,18 @@ func parseConcentration(selector func(dst *Measurement) **float64) fieldParser {
 		minimum(0.0),
 		maximum(1000000.0),
 	)
+}
+
+// parseBoolean parses a boolean.
+func parseBoolean(selector func(dst *Measurement) **bool) fieldParser {
+	return func(dst *Measurement, src *structpb.Value, path string) []error {
+		val, ok := src.Kind.(*structpb.Value_BoolValue)
+		if !ok {
+			return []error{errFieldType.WithAttributes("path", path)}
+		}
+		*selector(dst) = &val.BoolValue
+		return nil
+	}
 }
 
 // minimum returns a field validator that checks the inclusive minimum.
@@ -214,6 +300,12 @@ func exclusiveMaximum[T constraints.Ordered](max T) fieldValidator[T] {
 }
 
 var fieldParsers = map[string]fieldParser{
+	"battery": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Battery
+		},
+		minimum(0.0),
+	),
 	"time": parseTime(
 		func(dst *Measurement) **time.Time {
 			return &dst.Time
@@ -304,6 +396,15 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(0.0),
 	),
+	"air.location": parseString(
+		func(dst *Measurement) **string {
+			return &dst.Air.Location
+		},
+		[]string{
+			"indoor",
+			"outdoor",
+		},
+	),
 	"wind": object(
 		func(dst *Measurement) *Wind {
 			return &dst.Wind
@@ -321,6 +422,103 @@ var fieldParsers = map[string]fieldParser{
 		},
 		minimum(0.0),
 		exclusiveMaximum(360.0),
+	),
+	"rain": object(
+		func(dst *Measurement) *Rain {
+			return &dst.Rain
+		},
+	),
+	"rain.intensity": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Rain.Intensity
+		},
+		minimum(0.0),
+	),
+	"rain.cumulative": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Rain.Cumulative
+		},
+		minimum(0.0),
+	),
+	"water": object(
+		func(dst *Measurement) *Water {
+			return &dst.Water
+		},
+	),
+	"water.leak": parseBoolean(
+		func(dst *Measurement) **bool {
+			return &dst.Water.Leak
+		},
+	),
+	"water.temperature": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Water.Temperature
+		},
+	),
+	"metering": object(
+		func(dst *Measurement) *Metering {
+			return &dst.Metering
+		},
+	),
+	"metering.water": object(
+		func(dst *Measurement) *WaterMetering {
+			return &dst.Metering.Water
+		},
+	),
+	"metering.water.total": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Metering.Water.Total
+		},
+		minimum(0.0),
+	),
+	"action": object(
+		func(dst *Measurement) *Action {
+			return &dst.Action
+		},
+	),
+	"action.motion": object(
+		func(dst *Measurement) *Motion {
+			return &dst.Action.Motion
+		},
+	),
+	"action.motion.detected": parseBoolean(
+		func(dst *Measurement) **bool {
+			return &dst.Action.Motion.Detected
+		},
+	),
+	"action.motion.count": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Action.Motion.Count
+		},
+		minimum(0.0),
+	),
+	"action.contactState": parseString(
+		func(dst *Measurement) **string {
+			return &dst.Action.ContactState
+		},
+		[]string{
+			"open",
+			"closed",
+		},
+	),
+	"position": object(
+		func(dst *Measurement) *Position {
+			return &dst.Position
+		},
+	),
+	"position.latitude": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Position.Latitude
+		},
+		minimum(-90.0),
+		maximum(90.0),
+	),
+	"position.longitude": parseNumber(
+		func(dst *Measurement) **float64 {
+			return &dst.Position.Longitude
+		},
+		minimum(-180.0),
+		maximum(180.0),
 	),
 }
 
