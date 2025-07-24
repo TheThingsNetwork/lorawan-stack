@@ -260,3 +260,5 @@ require (
 	k8s.io/klog/v2 v2.100.1 // indirect
 	mellium.im/sasl v0.3.2 // indirect
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.71.0
