@@ -25,9 +25,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/getsentry/sentry-go"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	sentryerrors "go.thethings.network/lorawan-stack/v3/pkg/errors/sentry"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
 	"go.thethings.network/lorawan-stack/v3/pkg/jsonpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -222,45 +220,12 @@ func Proto(e Event) (*ttnpb.Event, error) {
 	pb.Context = ctx
 	if evt.data != nil {
 		var err error
-		// TODO: uncomment masrshalData and remove mustMarshalEventData after the issue mentioned
-		// below (7632) is fixed.
-		// pb.Data, err = marshalData(e.Data())
-		pb.Data, err = mustMarshalEventData(e)
+		pb.Data, err = marshalData(e.Data())
 		if err != nil {
 			return nil, err
 		}
 	}
 	return pb, nil
-}
-
-// TODO: remove after issue is resolved
-// https://github.com/TheThingsNetwork/lorawan-stack/issues/7623
-var errMarshalData = errors.Define("marshal_data", "marshal data")
-
-func mustMarshalEventData(e Event) (*anypb.Any, error) {
-	defer func() {
-		if p := recover(); p != nil {
-			var err error
-			if pErr, ok := p.(error); ok {
-				err = errMarshalData.WithCause(pErr).WithAttributes(
-					"event_name", e.Name(),
-					"event_correlation_ids", e.CorrelationIds(),
-					"event_identifiers", e.Identifiers(),
-				)
-			} else {
-				err = errMarshalData.WithAttributes(
-					"panic", p,
-					"event_name", e.Name(),
-					"event_correlation_ids", e.CorrelationIds(),
-					"event_identifiers", e.Identifiers(),
-				)
-			}
-			event := sentryerrors.NewEvent(err)
-			sentry.CaptureEvent(event)
-		}
-	}()
-
-	return marshalData(e.Data())
 }
 
 // FromProto returns the event from its protobuf representation.
