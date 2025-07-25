@@ -4841,15 +4841,6 @@
       "file": "pattern.go"
     }
   },
-  "error:pkg/events:marshal_data": {
-    "translations": {
-      "en": "marshal data"
-    },
-    "description": {
-      "package": "pkg/events",
-      "file": "events.go"
-    }
-  },
   "error:pkg/events:no_matching_events": {
     "translations": {
       "en": "no matching events for regexp `{regexp}`"
