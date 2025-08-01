@@ -17,6 +17,7 @@ package mac
 import (
 	"context"
 	"math"
+	"slices"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/band"
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
@@ -109,7 +110,7 @@ func generateLinkADRReq(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Ban
 		desiredChs[i] = isEnabled
 	}
 
-	equalMasks := band.EqualChMasks(currentChs, desiredChs)
+	equalMasks := slices.Equal(currentChs, desiredChs)
 	switch {
 	case !equalMasks:
 		// NOTE: LinkADRReq is scheduled regardless of ADR settings if channel mask is required,

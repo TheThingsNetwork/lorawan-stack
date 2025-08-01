@@ -201,20 +201,6 @@ func generateChMask16(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	}, nil
 }
 
-// EqualChMasks returns true if both channel masks are equal.
-func EqualChMasks(a, b []bool) bool {
-	if len(a) != len(b) {
-		return false
-	}
-
-	for i := range a {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
 func generateChMaskMatrix(pairs []ChMaskCntlPair, currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	n := len(currentChs)
 	if n%16 != 0 || len(desiredChs) != n {
@@ -356,7 +342,7 @@ func generateChMask72Generic(currentChs, desiredChs []bool, atomic bool) ([]ChMa
 	if len(currentChs) != 72 || len(desiredChs) != 72 {
 		return nil, errInvalidChannelCount.New()
 	}
-	if EqualChMasks(currentChs, desiredChs) {
+	if slices.Equal(currentChs, desiredChs) {
 		return []ChMaskCntlPair{
 			{
 				Mask: boolsTo16BoolArray(desiredChs[0:16]...),
@@ -520,7 +506,7 @@ func generateChMask96(currentChs, desiredChs []bool) ([]ChMaskCntlPair, error) {
 	if len(currentChs) != 96 || len(desiredChs) != 96 {
 		return nil, errInvalidChannelCount.New()
 	}
-	if EqualChMasks(currentChs, desiredChs) {
+	if slices.Equal(currentChs, desiredChs) {
 		return []ChMaskCntlPair{
 			{
 				Mask: boolsTo16BoolArray(desiredChs[0:16]...),
