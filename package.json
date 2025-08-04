@@ -92,7 +92,7 @@
     "@formatjs/intl-relativetimeformat": "^11.4.11",
     "@reduxjs/toolkit": "^2.8.2",
     "@sentry/integrations": "^7.114.0",
-    "@sentry/react": "^9.40.0",
+    "@sentry/react": "^10.1.0",
     "@tippyjs/react": "^4.2.6",
     "apexcharts": "^5.3.0",
     "autobind-decorator": "^2.4.0",
