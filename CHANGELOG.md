@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Parsers for newly added normalized payload fields.
+
 ### Changed
 
 ### Deprecated
@@ -21,7 +23,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.34.2] - unreleased
+## [3.34.2] - 2025-07-24
 
 ### Added
 

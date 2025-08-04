@@ -145,7 +145,7 @@ jobs:
         with:
           name: "build-files"
       - name: Download last failed spec
-        uses: dawidd6/action-download-artifact@v9
+        uses: dawidd6/action-download-artifact@v11
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

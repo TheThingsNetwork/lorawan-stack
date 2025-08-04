@@ -19,8 +19,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go/aws"
-	"github.com/aws/aws-sdk-go/aws/session"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"gocloud.dev/blob"
 	"gocloud.dev/blob/azureblob"
@@ -51,11 +52,12 @@ func Local(_ context.Context, bucket, path string) (*blob.Bucket, error) {
 }
 
 func AWS(ctx context.Context, bucket string, conf *aws.Config) (*blob.Bucket, error) {
-	s, err := session.NewSession(conf)
+	cfg, err := config.LoadDefaultConfig(ctx, config.WithRegion(*conf.Region))
 	if err != nil {
 		return nil, err
 	}
-	return s3blob.OpenBucket(ctx, s, bucket, nil)
+	s3Client := s3.NewFromConfig(cfg)
+	return s3blob.OpenBucketV2(ctx, s3Client, bucket, nil)
 }
 
 // Azure returns an open bucket that is connected to container containerName in storage account accountName.
