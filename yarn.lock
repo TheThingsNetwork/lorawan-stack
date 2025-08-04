@@ -6213,10 +6213,10 @@ eslint-plugin-jest@^28.13.0:
   dependencies:
     "@typescript-eslint/utils" "^6.0.0 || ^7.0.0 || ^8.0.0"
 
-eslint-plugin-jsdoc@^51.4.1:
-  version "51.4.1"
-  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-51.4.1.tgz#a512460da6ba328ac3be0c3e7b2aaa4633175625"
-  integrity sha512-y4CA9OkachG8v5nAtrwvcvjIbdcKgSyS6U//IfQr4FZFFyeBFwZFf/tfSsMr46mWDJgidZjBTqoCRlXywfFBMg==
+eslint-plugin-jsdoc@^52.0.2:
+  version "52.0.2"
+  resolved "https://registry.yarnpkg.com/eslint-plugin-jsdoc/-/eslint-plugin-jsdoc-52.0.2.tgz#90921df5bfd4a07c6cf4702d891f0e621d2bfffb"
+  integrity sha512-fYrnc7OpRifxxKjH78Y9/D/EouQDYD3G++bpR1Y+A+fy+CMzKZAdGIiHTIxCd2U10hb2y1NxN5TJt9aupq1vmw==
   dependencies:
     "@es-joy/jsdoccomment" "~0.52.0"
     are-docs-informative "^0.0.2"
@@ -13135,7 +13135,7 @@ tslib@^2.0.0, tslib@^2.0.1, tslib@^2.0.3, tslib@^2.1.0, tslib@^2.4.0, tslib@^2.8
   integrity sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==
 
 "ttn-lw@file:sdk/js":
-  version "3.34.1"
+  version "3.34.2"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     auto-bind "^5.0.1"
