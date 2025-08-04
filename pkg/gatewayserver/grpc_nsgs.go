@@ -83,7 +83,7 @@ func (gs *GatewayServer) ScheduleDownlink(ctx context.Context, down *ttnpb.Downl
 		connDown.GetRequest().DownlinkPaths = nil // And do not leak the downlink paths to the gateway.
 		connDown.CorrelationIds = events.CorrelationIDsFromContext(ctx)
 
-		registerScheduleDownlinkAttempt(ctx, conn.Gateway(), connDown, conn.Frontend().Protocol())
+		registerScheduleDownlinkAttempt(ctx, conn.Gateway(), ttnpb.Clone(connDown), conn.Frontend().Protocol())
 
 		rx1, rx2, delay, err := conn.ScheduleDown(path, connDown)
 		if err != nil {
