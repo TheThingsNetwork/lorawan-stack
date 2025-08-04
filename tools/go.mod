@@ -102,7 +102,6 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/getsentry/sentry-go v0.34.1 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.1 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-sourcemap/sourcemap v2.1.4+incompatible // indirect
@@ -193,7 +192,6 @@ require (
 	github.com/spf13/cobra v1.9.1 // indirect
 	github.com/spf13/pflag v1.0.6 // indirect
 	github.com/spf13/viper v1.20.1 // indirect
-	github.com/spiffe/go-spiffe/v2 v2.5.0 // indirect
 	github.com/ssor/bom v0.0.0-20170718123548-6386211fdfcf // indirect
 	github.com/steveyen/gtreap v0.1.0 // indirect
 	github.com/subosito/gotenv v1.6.0 // indirect
@@ -206,7 +204,6 @@ require (
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/weppos/publicsuffix-go v0.30.0 // indirect
 	github.com/willf/bitset v1.1.11 // indirect
-	github.com/zeebo/errs v1.4.0 // indirect
 	github.com/zmap/zcrypto v0.0.0-20230310154051-c8b263fd8300 // indirect
 	github.com/zmap/zlint/v3 v3.5.0 // indirect
 	go.etcd.io/bbolt v1.4.2 // indirect
@@ -265,3 +262,5 @@ require (
 	k8s.io/klog/v2 v2.100.1 // indirect
 	mellium.im/sasl v0.3.2 // indirect
 )
+
+replace google.golang.org/grpc => google.golang.org/grpc v1.71.0
