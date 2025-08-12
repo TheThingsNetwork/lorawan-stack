@@ -21,7 +21,7 @@ import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { getGatewayId } from '@ttn-lw/lib/selectors/id'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
-import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
+import { isNetworkError, isNotFoundError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 
 import * as gateways from '@console/store/actions/gateways'
 
@@ -61,13 +61,7 @@ const getGatewayLogic = createRequestLogic({
         'ethernet_mac_address',
       ])
     } catch (e) {
-      if (
-        e?.statusCode === 504 ||
-        e?.code === 'ERR_NETWORK' ||
-        e?.code === 'ECONNABORTED' ||
-        e?.code === 'ETIMEDOUT' ||
-        e?.message?.includes('timeout')
-      ) {
+      if (isNetworkError(e) || isTimeoutError(e)) {
         managed = 'unavailable'
         /* eslint-disable-next-line no-console */
         console.error('Gateway request timed out', e)
@@ -150,9 +144,11 @@ const getGatewaysLogic = createRequestLogic({
         try {
           gatewaysStats = await tts.Gateways.getBatchStatistics(gatewayIds)
         } catch (error) {
-          gatewaysStats = 'unknown'
-          /* eslint-disable-next-line no-console */
-          console.error(`Failed to fetch gateway statistics for ${gatewayIds.join(', ')}`, error)
+          if (isTimeoutError(error) || isNetworkError(error)) {
+            gatewaysStats = 'unknown'
+            /* eslint-disable-next-line no-console */
+            console.error(`Failed to fetch gateway statistics for ${gatewayIds.join(', ')}`, error)
+          }
         }
       }
 
@@ -312,13 +308,15 @@ const updateGatewayStatisticsLogic = createRequestLogic({
     try {
       stats = await tts.Gateways.getStatisticsById(id)
     } catch (error) {
-      dispatch(
-        gateways.updateGatewayStatisticsFailure({
-          message: 'Unavailable',
-        }),
-      )
-      /* eslint-disable-next-line no-console */
-      console.error(`Failed to fetch gateway statistics for ${id}`, error)
+      if (isTimeoutError(error) || isNetworkError(error)) {
+        dispatch(
+          gateways.updateGatewayStatisticsFailure({
+            message: 'Unavailable',
+          }),
+        )
+        /* eslint-disable-next-line no-console */
+        console.error(`Failed to fetch gateway statistics for ${id}`, error)
+      }
     }
 
     return { stats }
