@@ -66,6 +66,8 @@ const m = defineMessages({
   noConnection: 'This gateway has not made any connection attempts yet.',
   noConnectionDescription:
     'If you have recently registered this gateway, please wait for a few moments to allow the gateway to connect. Otherwise please refer to our <Link>gateway troubleshooting documentation</Link>.',
+  isUnavailable: 'Gateway status unavailable',
+  isUnavailableDesc: 'Gateway status is currently unavailable. Please try again later.',
 })
 
 const SectionTitle = ({ title, tooltip }) => (
@@ -172,11 +174,12 @@ const GatewayStatusPanel = () => {
         />
       }
     >
-      {isFetching ? (
+      {isFetching && (
         <Spinner center inline>
           <Message content={sharedMessages.fetching} />
         </Spinner>
-      ) : noConnectionYet ? (
+      )}
+      {noConnectionYet && (
         <div className="d-flex j-center al-center flex-grow">
           <div className="d-flex direction-column j-center al-center text-center w-60 gap-cs-m mb-ls-m">
             <Message content={m.noConnection} className="fw-bold fs-l lh-xs3" component="div" />
@@ -193,7 +196,16 @@ const GatewayStatusPanel = () => {
             />
           </div>
         </div>
-      ) : (
+      )}
+      {isUnavailable && (
+        <div className="d-flex j-center al-center flex-grow">
+          <div className="d-flex direction-column j-center al-center text-center w-60 gap-cs-m mb-ls-m">
+            <Message content={m.isUnavailable} className="fw-bold fs-l lh-xs3" component="div" />
+            <Message content={m.isUnavailableDesc} className="c-text-neutral-light lh-xxs" />
+          </div>
+        </div>
+      )}
+      {!isFetching && !noConnectionYet && !isUnavailable && (
         <>
           <div className={style.gtwStatusPanelUpperContainer}>
             <div className="d-flex direction-column j-between w-full sm-md:j-start">
