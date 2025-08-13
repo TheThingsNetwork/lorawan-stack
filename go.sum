@@ -1569,12 +1569,12 @@ github.com/tinylib/msgp v1.1.0/go.mod h1:+d+yLhGm8mzTaHzB+wgMYrodPfmZrzkirds8fDW
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc h1:9lRDQMhESg+zvGYmW5DyG0UqvY96Bu5QYsTLvCHdrgo=
 github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc/go.mod h1:bciPuU6GHm1iF1pBvUfxfsH0Wmnc2VbpgvbI9ZWuIRs=
 github.com/ugorji/go/codec v0.0.0-20181204163529-d75b2dcb6bc8/go.mod h1:VFNgLljTbGfSG7qAOspJ7OScBnGdDN/yBr0sguwnwf0=
-github.com/uptrace/bun v1.2.14 h1:5yFSfi/yVWEzQ2lAaHz+JfWN9AHmqYtNmlbaUbAp3rU=
-github.com/uptrace/bun v1.2.14/go.mod h1:ZS4nPaEv2Du3OFqAD/irk3WVP6xTB3/9TWqjJbgKYBU=
+github.com/uptrace/bun v1.2.15 h1:Ut68XRBLDgp9qG9QBMa9ELWaZOmzHNdczHQdrOZbEFE=
+github.com/uptrace/bun v1.2.15/go.mod h1:Eghz7NonZMiTX/Z6oKYytJ0oaMEJ/eq3kEV4vSqG038=
 github.com/uptrace/bun/dialect/pgdialect v1.2.14 h1:1jmCn7zcYIJDSk1pJO//b11k9NQP1rpWZoyxfoNdpzI=
 github.com/uptrace/bun/dialect/pgdialect v1.2.14/go.mod h1:MrRlsIpWIyOCNosWuG8bVtLb80JyIER5ci0VlTa38dU=
-github.com/uptrace/bun/driver/pgdriver v1.2.14 h1:luLg0draTX3p8uk6yXpGaliW1mNyHH6tmdvkYiVF+Ko=
-github.com/uptrace/bun/driver/pgdriver v1.2.14/go.mod h1:wK5o2IegmuGBRxM/23NZ51nFfWokCw/TMSsAlQUaa2o=
+github.com/uptrace/bun/driver/pgdriver v1.2.15 h1:eZZ60ZtUUE6jjv6VAI1pCMaTgtx3sxmChQzwbvchOOo=
+github.com/uptrace/bun/driver/pgdriver v1.2.15/go.mod h1:s2zz/BAeScal4KLFDI8PURwATN8s9RDBsElEbnPAjv4=
 github.com/vitorsalgado/mocha/v2 v2.0.2 h1:wb1QCRzVkp8uhRcUYmb9jJfbMj/qbiqcDyD8rD+Ldfw=
 github.com/vitorsalgado/mocha/v2 v2.0.2/go.mod h1:l7jRVm7KTL4VAxxazH99UVo+KzwztjrYpFTksTmL1DE=
 github.com/vmihailenco/msgpack/v5 v5.4.1 h1:cQriyiUvjTwOHg8QZaPihLWeRAAVoCpE00IUPn0Bjt8=

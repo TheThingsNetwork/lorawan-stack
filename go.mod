@@ -82,9 +82,9 @@ require (
 	github.com/spf13/pflag v1.0.6
 	github.com/spf13/viper v1.20.1
 	github.com/throttled/throttled/v2 v2.13.0
-	github.com/uptrace/bun v1.2.14
+	github.com/uptrace/bun v1.2.15
 	github.com/uptrace/bun/dialect/pgdialect v1.2.14
-	github.com/uptrace/bun/driver/pgdriver v1.2.14
+	github.com/uptrace/bun/driver/pgdriver v1.2.15
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.62.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.62.0
