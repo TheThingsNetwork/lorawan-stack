@@ -11,8 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Parsers for newly added normalized payload fields.
-
 ### Changed
 
 ### Deprecated
@@ -22,6 +20,12 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 ### Security
+
+## [3.34.3] - unreleased
+
+### Added
+
+- Parsers for newly added normalized payload fields.
 
 ## [3.34.2] - 2025-07-24
 
@@ -2999,7 +3003,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.2...v3.34
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.3...v3.34
+[3.34.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.2...v3.34.3
 [3.34.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.1...v3.34.2
 [3.34.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.0...v3.34.1
 [3.34.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.33.1...v3.34.0
