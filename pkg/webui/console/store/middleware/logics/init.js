@@ -25,8 +25,11 @@ import { getNetworkStatusSummary } from '@ttn-lw/lib/store/actions/status'
 
 import { getActiveUserSessionIdSuccess } from '@console/store/actions/sessions'
 import * as user from '@console/store/actions/user'
-import { getInboxNotifications } from '@console/store/actions/notifications'
-import { getAllBookmarks } from '@console/store/actions/user-preferences'
+import {
+  getInboxNotifications,
+  getInboxNotificationsSuccess,
+} from '@console/store/actions/notifications'
+import { getAllBookmarks, getAllBookmarksSuccess } from '@console/store/actions/user-preferences'
 
 const consoleAppLogic = createRequestLogic({
   type: init.INITIALIZE,
@@ -83,8 +86,20 @@ const consoleAppLogic = createRequestLogic({
         const initActions = []
 
         initActions.push(
-          await dispatch(attachPromise(getInboxNotifications({ page: 1, limit: 3 }))),
-          await dispatch(attachPromise(getAllBookmarks(userId))),
+          dispatch(attachPromise(getInboxNotifications({ page: 1, limit: 3 }))).catch(error => {
+            // Ignore error, as it is not critical for the app to work and log it in the browser console.
+            // The inbox notifications will be empty in this case.
+            getInboxNotificationsSuccess({})
+            // eslint-disable-next-line no-console
+            console.error('Failed to fetch inbox notifications', error)
+          }),
+          dispatch(attachPromise(getAllBookmarks(userId))).catch(error => {
+            // Ignore error, as it is not critical for the app to work and log it in the browser console.
+            // The bookmarks will be empty in this case.
+            getAllBookmarksSuccess([])
+            // eslint-disable-next-line no-console
+            console.error('Failed to fetch bookmarks', error)
+          }),
           statusPageUrl ? await dispatch(attachPromise(getNetworkStatusSummary())) : undefined,
         )
 

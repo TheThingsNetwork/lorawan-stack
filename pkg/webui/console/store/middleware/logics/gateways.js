@@ -21,7 +21,7 @@ import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import { getGatewayId } from '@ttn-lw/lib/selectors/id'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
-import { isNotFoundError } from '@ttn-lw/lib/errors/utils'
+import { isNetworkError, isNotFoundError, isTimeoutError } from '@ttn-lw/lib/errors/utils'
 
 import * as gateways from '@console/store/actions/gateways'
 
@@ -61,7 +61,11 @@ const getGatewayLogic = createRequestLogic({
         'ethernet_mac_address',
       ])
     } catch (e) {
-      if (!isNotFoundError(e)) {
+      if (isNetworkError(e) || isTimeoutError(e)) {
+        managed = 'unavailable'
+        /* eslint-disable-next-line no-console */
+        console.error('Gateway request timed out', e)
+      } else if (!isNotFoundError(e)) {
         throw e
       }
     }
@@ -137,11 +141,23 @@ const getGatewaysLogic = createRequestLogic({
       const gatewayIds = entities.map(e => e.ids)
       let gatewaysStats = null
       if (gatewayIds.length) {
-        gatewaysStats = await tts.Gateways.getBatchStatistics(gatewayIds)
+        try {
+          gatewaysStats = await tts.Gateways.getBatchStatistics(gatewayIds)
+        } catch (error) {
+          if (isTimeoutError(error) || isNetworkError(error)) {
+            gatewaysStats = 'unknown'
+            /* eslint-disable-next-line no-console */
+            console.error(`Failed to fetch gateway statistics for ${gatewayIds.join(', ')}`, error)
+          }
+        }
       }
 
       entities = data.gateways.map(gateway => {
         const gatewayServerAddress = getHostFromUrl(gateway.gateway_server_address)
+
+        if (gatewaysStats === 'unknown') {
+          return { ...gateway, status: 'unknown' }
+        }
 
         if (!Boolean(gatewayServerAddress)) {
           return { ...gateway, status: 'unknown' }
@@ -285,10 +301,23 @@ const startGatewayStatisticsLogic = createLogic({
 const updateGatewayStatisticsLogic = createRequestLogic({
   type: gateways.UPDATE_GTW_STATS,
   throttle: 1000,
-  process: async ({ action }) => {
+  process: async ({ action }, dispatch) => {
     const { id } = action.payload
 
-    const stats = await tts.Gateways.getStatisticsById(id)
+    let stats = null
+    try {
+      stats = await tts.Gateways.getStatisticsById(id)
+    } catch (error) {
+      if (isTimeoutError(error) || isNetworkError(error)) {
+        dispatch(
+          gateways.updateGatewayStatisticsFailure({
+            message: 'Unavailable',
+          }),
+        )
+        /* eslint-disable-next-line no-console */
+        console.error(`Failed to fetch gateway statistics for ${id}`, error)
+      }
+    }
 
     return { stats }
   },

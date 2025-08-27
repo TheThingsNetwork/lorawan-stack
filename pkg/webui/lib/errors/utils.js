@@ -239,7 +239,9 @@ export const isNetworkError = error =>
  * @returns {boolean} `true` if `error` is a timeout error, `false` otherwise.
  */
 export const isTimeoutError = error =>
-  Boolean(error) && typeof error === 'object' && error.code === 'ECONNABORTED'
+  Boolean(error) &&
+  typeof error === 'object' &&
+  (error.code === 'ECONNABORTED' || error?.message?.includes('timeout'))
 
 /**
  * Returns whether `error` is a connection failure error that happens on the

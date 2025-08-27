@@ -28,6 +28,7 @@ import SubmitButton from '@ttn-lw/components/submit-button'
 import toast from '@ttn-lw/components/toast'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
+import Message from '@ttn-lw/lib/components/message'
 
 import validationSchema from '@console/containers/gateway-managed-gateway/connection-settings/validation-schema'
 import {
@@ -71,6 +72,9 @@ const m = defineMessages({
     'You have just claimed a managed gateway. To connect it to WiFi or ethernet you can configure those connections here. The preprovisioned cellular backhaul typically connects automatically.',
   updateSuccess: 'Connection settings updated',
   updateFailure: 'There was an error updating these connection settings',
+  unavailable: 'Managed gateway connection settings unavailable',
+  unavailableDesc:
+    'The managed gateway connection settings are currently unavailable. Please try again later.',
 })
 
 const GatewayConnectionSettings = () => {
@@ -380,6 +384,17 @@ const GatewayConnectionSettings = () => {
       selectedGateway.name,
     ],
   )
+
+  if (selectedManagedGateway === 'unavailable') {
+    return (
+      <div className="item-12">
+        <div className="d-flex direction-column j-center al-center w-full text-center gap-cs-m mb-ls-m">
+          <Message content={m.unavailable} className="fw-bold fs-l lh-xs3" component="div" />
+          <Message content={m.unavailableDesc} className="c-text-neutral-light lh-xxs" />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <RequireRequest requestAction={loadData}>
