@@ -33,6 +33,7 @@ import {
   getCollaboratorId,
   getPacketBrokerNetworkId,
   getClientId,
+  getMacSettingsProfilesId,
 } from '@ttn-lw/lib/selectors/id'
 import { createNamedPaginationReducer } from '@ttn-lw/lib/store/reducers/pagination'
 import fetching from '@ttn-lw/lib/store/reducers/ui/fetching'
@@ -81,6 +82,7 @@ import sessions from './sessions'
 import authorizations from './authorizations'
 import clients from './clients'
 import connectionProfiles from './connection-profiles'
+import macSettingsProfiles from './mac-settings-profiles'
 
 export default combineReducers({
   user,
@@ -135,6 +137,10 @@ export default combineReducers({
     clients: createNamedPaginationReducer('CLIENTS', getClientId),
     pubsubs: createNamedPaginationReducer('PUBSUB', getApplicationId),
     webhooks: createNamedPaginationReducer('WEBHOOKS', getApplicationId),
+    macSettingsProfiles: createNamedPaginationReducer(
+      'MAC_SETTINGS_PROFILES',
+      getMacSettingsProfilesId,
+    ),
   }),
   js,
   gatewayStatus,
@@ -153,4 +159,5 @@ export default combineReducers({
   authorizations,
   clients,
   connectionProfiles,
+  macSettingsProfiles,
 })

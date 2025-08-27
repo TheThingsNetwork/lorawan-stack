@@ -45,6 +45,7 @@ import sessions from './sessions'
 import authorizations from './authorizations'
 import clients from './clients'
 import connectionProfiles from './connection-profiles'
+import macSettingsProfiles from './mac-settings-profiles'
 
 export default [
   ...status,
@@ -79,4 +80,5 @@ export default [
   ...authorizations,
   ...clients,
   ...connectionProfiles,
+  ...macSettingsProfiles,
 ]

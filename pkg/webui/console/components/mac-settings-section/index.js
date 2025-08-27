@@ -13,7 +13,6 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 import { useSelector } from 'react-redux'
 import { get, set } from 'lodash'
@@ -45,50 +44,6 @@ import getDataRate from '@console/lib/data-rate-utils'
 
 import { selectDataRates } from '@console/store/selectors/configuration'
 
-const m = defineMessages({
-  delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
-  factoryPresetFreqDescription: 'List of factory-preset frequencies. Note: order is respected.',
-  advancedMacSettings: 'Advanced MAC settings',
-  desiredPingSlotFrequencyTitle: 'Desired ping slot frequency',
-  pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
-  pingSlotDataRateTitle: 'Ping slot data rate index',
-  desiredPingSlotDataRateTitle: 'Desired ping slot data rate',
-  resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
-  desiredRx1DataRateOffsetTitle: 'Desired Rx1 data rate offset',
-  desiredRx1DelayTitle: 'Desired Rx1 delay',
-  rx2DataRateIndexTitle: 'Rx2 data rate index',
-  desiredRx2DataRateIndexTitle: 'Desired Rx2 data rate index',
-  desiredRx2FrequencyTitle: 'Desired Rx2 frequency',
-  updateSuccess: 'The MAC settings updated',
-  desiredBeaconFrequency: 'Desired beacon frequency',
-  maxDutyCycle: 'Maximum duty cycle',
-  desiredMaxDutyCycle: 'Desired maximum duty cycle',
-  adrMargin: 'ADR margin',
-  adrUplinks: 'ADR number of transmissions',
-  adrAdaptiveDataRate: 'Adaptive data rate (ADR)',
-  adrDataRate: 'ADR data rate index',
-  adrTransPower: 'ADR transmission power index',
-  adrDynamic: 'Dynamic mode',
-  adrStatic: 'Static mode',
-  desiredAdrAckLimit: 'Desired ADR ack limit',
-  desiredAdrAckDelay: 'Desired ADR ack delay',
-  adrAckValue: '{count, plural, one {every message} other {every {count} messages}}',
-  statusCountPeriodicity: 'Status count periodicity',
-  statusTimePeriodicity: 'Status time periodicity',
-  dataRate: 'Data Rate {n}',
-  dataRatePlaceholder: 'Data Rate',
-  minNbTrans: 'Min. NbTrans',
-  maxNbTrans: 'Max. NbTrans',
-  useDefaultNbTrans: 'Use default settings for number of retransmissions',
-  adrNbTrans: 'ADR number of retransmissions (NbTrans)',
-  overrideNbTrans: 'Override server defaults for NbTrans (all data rates)',
-  defaultForAllRates: '(Default for all data rates)',
-  defaultNbTransMessage:
-    'Overriding the default is not required for using data rate overrides (below)',
-  specificOverrides: 'Data rate specific overrides',
-  addSpecificOverride: 'Add data rate specific override',
-})
-
 // 0...7
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
   const value = Math.pow(2, index)
@@ -104,7 +59,7 @@ const adrAckLimitOptions = Array.from({ length: 16 }, (_, index) => {
 
   return {
     value: `ADR_ACK_LIMIT_${value}`,
-    label: <Message content={m.adrAckValue} values={{ count: value }} />,
+    label: <Message content={sharedMessages.adrAckValue} values={{ count: value }} />,
   }
 })
 // 0...15
@@ -113,7 +68,7 @@ const adrAckDelayOptions = Array.from({ length: 16 }, (_, index) => {
 
   return {
     value: `ADR_ACK_DELAY_${value}`,
-    label: <Message content={m.adrAckValue} values={{ count: value }} />,
+    label: <Message content={sharedMessages.adrAckValue} values={{ count: value }} />,
   }
 })
 const maxDutyCycleOptions = [
@@ -162,8 +117,8 @@ const MacSettingsSection = props => {
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
-  const isDynamicAdr = mac_settings.adr && 'dynamic' in mac_settings.adr
-  const isStaticAdr = mac_settings.adr && 'static' in mac_settings.adr
+  const isDynamicAdr = mac_settings?.adr && 'dynamic' in mac_settings?.adr
+  const isStaticAdr = mac_settings?.adr && 'static' in mac_settings?.adr
   const [resetsFCnt, setResetsFCnt] = React.useState(isABP && initialFCnt)
   const handleResetsFCntChange = React.useCallback(evt => {
     const { checked } = evt.target
@@ -190,9 +145,9 @@ const MacSettingsSection = props => {
     }
   }, [handleIsCollapsedChange, isABP, isClassB, isCollapsed, isMulticast, pingPeriodicityRequired])
 
-  const adrOverrides = mac_settings.adr.dynamic?.overrides
-  const showEditNbTrans = !values.mac_settings.adr.dynamic?._use_default_nb_trans
-  const defaultNbTransDisabled = !values.mac_settings.adr.dynamic?._override_nb_trans_defaults
+  const adrOverrides = mac_settings?.adr.dynamic?.overrides
+  const showEditNbTrans = !values.mac_settings?.adr.dynamic?._use_default_nb_trans
+  const defaultNbTransDisabled = !values.mac_settings?.adr.dynamic?._override_nb_trans_defaults
   const addOverride = React.useCallback(() => {
     const newOverride = { _data_rate_index: '', min_nb_trans: '', max_nb_trans: '' }
     setFieldValue(
@@ -252,7 +207,7 @@ const MacSettingsSection = props => {
   return (
     <Form.CollapseSection
       id="mac-settings"
-      title={m.advancedMacSettings}
+      title={sharedMessages.advancedMacSettings}
       initiallyCollapsed={initiallyCollapsed}
       onCollapse={handleIsCollapsedChange}
       isCollapsed={isCollapsed}
@@ -288,7 +243,7 @@ const MacSettingsSection = props => {
             )}
             {!isMulticast && (
               <Form.Field
-                title={m.desiredRx1DelayTitle}
+                title={sharedMessages.desiredRx1DelayTitle}
                 type="number"
                 name="mac_settings.desired_rx1_delay"
                 append={<Message content={sharedMessages.secondsAbbreviated} />}
@@ -317,7 +272,7 @@ const MacSettingsSection = props => {
             )}
             {!isMulticast && (
               <Form.Field
-                title={m.desiredRx1DataRateOffsetTitle}
+                title={sharedMessages.desiredRx1DataRateOffsetTitle}
                 type="number"
                 inputWidth="xxs"
                 fieldWidth="xs"
@@ -333,7 +288,7 @@ const MacSettingsSection = props => {
             <Form.Field
               label={sharedMessages.resetsFCnt}
               onChange={handleResetsFCntChange}
-              warning={resetsFCnt ? m.resetWarning : undefined}
+              warning={resetsFCnt ? sharedMessages.resetFCntWarning : undefined}
               name="mac_settings.resets_f_cnt"
               tooltipId={tooltipIds.RESETS_F_CNT}
               component={Checkbox}
@@ -344,7 +299,7 @@ const MacSettingsSection = props => {
       <Form.FieldContainer horizontal>
         {!isOTAA && (
           <Form.Field
-            title={m.rx2DataRateIndexTitle}
+            title={sharedMessages.rx2DataRateIndexTitle}
             type="number"
             name="mac_settings.rx2_data_rate_index"
             component={Input}
@@ -357,7 +312,7 @@ const MacSettingsSection = props => {
         )}
         {!isMulticast && (
           <Form.Field
-            title={m.desiredRx2DataRateIndexTitle}
+            title={sharedMessages.desiredRx2DataRateIndexTitle}
             type="number"
             name="mac_settings.desired_rx2_data_rate_index"
             component={Input}
@@ -387,7 +342,7 @@ const MacSettingsSection = props => {
             type="number"
             min={100000}
             step={100}
-            title={m.desiredRx2FrequencyTitle}
+            title={sharedMessages.desiredRx2FrequencyTitle}
             name="mac_settings.desired_rx2_frequency"
             component={UnitInput.Hertz}
             tooltipId={tooltipIds.RX2_FREQUENCY}
@@ -398,7 +353,7 @@ const MacSettingsSection = props => {
       <Form.FieldContainer horizontal>
         {!isOTAA && (
           <Form.Field
-            title={m.maxDutyCycle}
+            title={sharedMessages.maxDutyCycle}
             name="mac_settings.max_duty_cycle"
             component={Select}
             options={maxDutyCycleOptions}
@@ -408,7 +363,7 @@ const MacSettingsSection = props => {
         )}
         {!isMulticast && (
           <Form.Field
-            title={m.desiredMaxDutyCycle}
+            title={sharedMessages.desiredMaxDutyCycle}
             name="mac_settings.desired_max_duty_cycle"
             component={Select}
             options={maxDutyCycleOptions}
@@ -422,7 +377,7 @@ const MacSettingsSection = props => {
         name="mac_settings.factory_preset_frequencies"
         component={KeyValueMap}
         title={sharedMessages.factoryPresetFrequencies}
-        description={m.factoryPresetFreqDescription}
+        description={sharedMessages.factoryPresetFreqDescription}
         addMessage={sharedMessages.freqAdd}
         valuePlaceholder={sharedMessages.frequencyPlaceholder}
         tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
@@ -451,7 +406,7 @@ const MacSettingsSection = props => {
           />
           <Form.Field
             title={sharedMessages.pingSlotPeriodicity}
-            description={m.pingSlotPeriodicityDescription}
+            description={sharedMessages.pingSlotPeriodicityDescription}
             name="mac_settings.ping_slot_periodicity"
             component={Select}
             options={pingSlotPeriodicityOptions}
@@ -476,7 +431,7 @@ const MacSettingsSection = props => {
               <Form.Field
                 type="number"
                 min={100000}
-                title={m.desiredBeaconFrequency}
+                title={sharedMessages.desiredBeaconFrequency}
                 placeholder={sharedMessages.frequencyPlaceholder}
                 name="mac_settings.desired_beacon_frequency"
                 tooltipId={tooltipIds.BEACON_FREQUENCY}
@@ -504,7 +459,7 @@ const MacSettingsSection = props => {
                 type="number"
                 min={100000}
                 step={100}
-                title={m.desiredPingSlotFrequencyTitle}
+                title={sharedMessages.desiredPingSlotFrequencyTitle}
                 placeholder={sharedMessages.frequencyPlaceholder}
                 name="mac_settings.desired_ping_slot_frequency"
                 tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
@@ -516,7 +471,7 @@ const MacSettingsSection = props => {
           <Form.FieldContainer horizontal>
             {!isOTAA && (
               <Form.Field
-                title={m.pingSlotDataRateTitle}
+                title={sharedMessages.pingSlotDataRateTitle}
                 name="mac_settings.ping_slot_data_rate_index"
                 tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
                 component={Input}
@@ -529,7 +484,7 @@ const MacSettingsSection = props => {
             )}
             {!isMulticast && (
               <Form.Field
-                title={m.desiredPingSlotDataRateTitle}
+                title={sharedMessages.desiredPingSlotDataRateTitle}
                 name="mac_settings.desired_ping_slot_data_rate_index"
                 tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
                 component={Input}
@@ -545,7 +500,7 @@ const MacSettingsSection = props => {
       )}
       <Form.FieldContainer horizontal>
         <Form.Field
-          title={m.statusCountPeriodicity}
+          title={sharedMessages.statusCountPeriodicity}
           name="mac_settings.status_count_periodicity"
           component={Input}
           append={<Message content={sharedMessages.messages} />}
@@ -555,7 +510,7 @@ const MacSettingsSection = props => {
           tooltipId={tooltipIds.STATUS_COUNT_PERIODICITY}
         />
         <Form.Field
-          title={m.statusTimePeriodicity}
+          title={sharedMessages.statusTimePeriodicity}
           name="mac_settings.status_time_periodicity"
           component={UnitInput.Duration}
           unitSelector={['ms', 's']}
@@ -567,19 +522,19 @@ const MacSettingsSection = props => {
       <Form.Field
         name="mac_settings.adr"
         component={Radio.Group}
-        title={m.adrAdaptiveDataRate}
+        title={sharedMessages.adrAdaptiveDataRate}
         tooltipId={tooltipIds.ADR_USE}
         encode={encodeAdrMode}
         decode={decodeAdrMode}
       >
-        <Radio label={m.adrDynamic} value="dynamic" />
-        <Radio label={m.adrStatic} value="static" />
+        <Radio label={sharedMessages.adrDynamic} value="dynamic" />
+        <Radio label={sharedMessages.adrStatic} value="static" />
         <Radio label={sharedMessages.disabled} value="disabled" />
       </Form.Field>
       {isDynamicAdr && (
         <>
           <Form.Field
-            title={m.adrMargin}
+            title={sharedMessages.adrMargin}
             name="mac_settings.adr.dynamic.margin"
             component={Input}
             type="number"
@@ -590,7 +545,7 @@ const MacSettingsSection = props => {
             append="dB"
           />
           <Form.Field
-            label={m.useDefaultNbTrans}
+            label={sharedMessages.useDefaultNbTrans}
             name="mac_settings.adr.dynamic._use_default_nb_trans"
             component={Checkbox}
             tooltipId={tooltipIds.USE_DEFAULT_NB_TRANS}
@@ -598,14 +553,14 @@ const MacSettingsSection = props => {
           {showEditNbTrans && (
             <>
               <Form.Field
-                title={m.adrNbTrans}
+                title={sharedMessages.adrNbTrans}
                 name="mac_settings.adr.dynamic._override_nb_trans_defaults"
                 component={Checkbox}
-                label={m.overrideNbTrans}
+                label={sharedMessages.overrideNbTrans}
               />
               <Form.FieldContainer horizontal className="al-end mb-cs-xs">
                 <Form.Field
-                  title={m.minNbTrans}
+                  title={sharedMessages.minNbTrans}
                   name="mac_settings.adr.dynamic.min_nb_trans"
                   component={Input}
                   type="number"
@@ -616,7 +571,7 @@ const MacSettingsSection = props => {
                   className="d-flex direction-column"
                 />
                 <Form.Field
-                  title={m.maxNbTrans}
+                  title={sharedMessages.maxNbTrans}
                   name="mac_settings.adr.dynamic.max_nb_trans"
                   component={Input}
                   type="number"
@@ -626,16 +581,16 @@ const MacSettingsSection = props => {
                   inputWidth="xs"
                   className="d-flex direction-column"
                 />
-                <Message content={m.defaultForAllRates} className="mt-cs-xl" />
+                <Message content={sharedMessages.defaultForAllRates} className="mt-cs-xl" />
               </Form.FieldContainer>
               {!defaultNbTransDisabled && (
                 <div>
                   <Icon icon="info" nudgeUp className="mr-cs-xxs" />
-                  <Message content={m.defaultNbTransMessage} />
+                  <Message content={sharedMessages.defaultNbTransMessage} />
                 </div>
               )}
               <Form.InfoField
-                title={m.specificOverrides}
+                title={sharedMessages.specificOverrides}
                 tooltipId={tooltipIds.DATA_RATE_SPECIFIC_OVERRIDES}
                 className="mt-cs-m"
               >
@@ -643,7 +598,7 @@ const MacSettingsSection = props => {
                   Object.keys(adrOverrides).map(index => (
                     <Form.FieldContainer horizontal className="al-end" key={index}>
                       <Form.Field
-                        title={m.dataRatePlaceholder}
+                        title={sharedMessages.dataRatePlaceholder}
                         name={`mac_settings.adr.dynamic.overrides.${index}._data_rate_index`}
                         valueSetter={dataRateValueSetter}
                         component={Select}
@@ -654,7 +609,7 @@ const MacSettingsSection = props => {
                         className="d-flex direction-column"
                       />
                       <Form.Field
-                        title={m.minNbTrans}
+                        title={sharedMessages.minNbTrans}
                         name={`mac_settings.adr.dynamic.overrides.${index}.min_nb_trans`}
                         component={Input}
                         fieldWidth="xxs"
@@ -664,7 +619,7 @@ const MacSettingsSection = props => {
                         max={3}
                       />
                       <Form.Field
-                        title={m.maxNbTrans}
+                        title={sharedMessages.maxNbTrans}
                         name={`mac_settings.adr.dynamic.overrides.${index}.max_nb_trans`}
                         component={Input}
                         fieldWidth="xxs"
@@ -684,7 +639,7 @@ const MacSettingsSection = props => {
                   ))}
                 <Button
                   type="button"
-                  message={m.addSpecificOverride}
+                  message={sharedMessages.addSpecificOverride}
                   onClick={addOverride}
                   icon="add"
                 />
@@ -696,14 +651,14 @@ const MacSettingsSection = props => {
       {isStaticAdr && (
         <>
           <Form.Field
-            title={m.adrDataRate}
+            title={sharedMessages.adrDataRate}
             name="mac_settings.adr.static.data_rate_index"
             component={Input}
             type="number"
             inputWidth="xs"
           />
           <Form.Field
-            title={m.adrTransPower}
+            title={sharedMessages.adrTransPower}
             name="mac_settings.adr.static.tx_power_index"
             component={Input}
             type="number"
@@ -711,7 +666,7 @@ const MacSettingsSection = props => {
             max={15}
           />
           <Form.Field
-            title={m.adrUplinks}
+            title={sharedMessages.adrUplinks}
             name="mac_settings.adr.static.nb_trans"
             component={Input}
             type="number"
@@ -724,7 +679,7 @@ const MacSettingsSection = props => {
       {isNewLorawanVersion && !isMulticast && (
         <>
           <Form.Field
-            title={m.desiredAdrAckLimit}
+            title={sharedMessages.desiredAdrAckLimit}
             name="mac_settings.desired_adr_ack_limit_exponent"
             component={Select}
             options={adrAckLimitOptions}
@@ -732,7 +687,7 @@ const MacSettingsSection = props => {
             fieldWidth="xs"
           />
           <Form.Field
-            title={m.desiredAdrAckDelay}
+            title={sharedMessages.desiredAdrAckDelay}
             name="mac_settings.desired_adr_ack_delay_exponent"
             component={Select}
             options={adrAckDelayOptions}
