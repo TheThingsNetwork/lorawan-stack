@@ -583,6 +583,13 @@ func adrAdaptDataRate(
 ) float32 {
 	currentParameters, desiredParameters := macState.CurrentParameters, macState.DesiredParameters
 	currentDataRateIndex := currentParameters.AdrDataRateIndex
+	// Keep the data rate index between min and max
+	if currentDataRateIndex < minDataRateIndex {
+		currentDataRateIndex = minDataRateIndex
+	}
+	if currentDataRateIndex > maxDataRateIndex {
+		currentDataRateIndex = maxDataRateIndex
+	}
 	// NOTE: Network Server may only increase the data rate index of the device.
 	if currentDataRateIndex > minDataRateIndex {
 		minDataRateIndex = currentDataRateIndex
