@@ -27,6 +27,10 @@ For details about compatibility between different releases, see the **Commitment
 
 - Parsers for newly added normalized payload fields.
 
+### Fixed
+
+- ADR respects the MAC settings `adr.mode.dynamic.min-data-rate-index` and `adr.mode.dynamic.max-data-rate-index` values
+
 ## [3.34.2] - 2025-07-24
 
 ### Added
