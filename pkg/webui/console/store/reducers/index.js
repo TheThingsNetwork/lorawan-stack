@@ -137,7 +137,7 @@ export default combineReducers({
     clients: createNamedPaginationReducer('CLIENTS', getClientId),
     pubsubs: createNamedPaginationReducer('PUBSUB', getApplicationId),
     webhooks: createNamedPaginationReducer('WEBHOOKS', getApplicationId),
-    macSettingsProfiles: createNamedPaginationReducer(
+    mac_settings_profiles: createNamedPaginationReducer(
       'MAC_SETTINGS_PROFILES',
       getMacSettingsProfilesId,
     ),

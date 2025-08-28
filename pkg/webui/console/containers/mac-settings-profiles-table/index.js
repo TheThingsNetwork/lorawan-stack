@@ -12,22 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
+import { useDispatch } from 'react-redux'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import ButtonGroup from '@ttn-lw/components/button/group'
 import Button from '@ttn-lw/components/button'
 import PageTitle from '@ttn-lw/components/page-title'
 import { IconPencil } from '@ttn-lw/components/icon'
 import DeleteModalButton from '@ttn-lw/components/delete-modal-button'
+import toast from '@ttn-lw/components/toast'
 
 import FetchTable from '@ttn-lw/containers/fetch-table'
 
-import DateTime from '@ttn-lw/lib/components/date-time'
 import Message from '@ttn-lw/lib/components/message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+
+import { deleteMacSettingsProfile } from '@console/store/actions/mac-settings-profiles'
 
 const m = defineMessages({
   information:
@@ -38,7 +43,37 @@ const m = defineMessages({
 })
 
 const MacSettingsProfilesTable = props => {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const { appId } = useParams()
   const { baseDataSelector, getItemsAction } = props
+
+  const handleEdit = useCallback(
+    profileId => {
+      navigate(`/applications/${appId}/mac-settings-profiles/${profileId}`)
+    },
+    [navigate, appId],
+  )
+
+  const handleDelete = useCallback(
+    async id => {
+      try {
+        await dispatch(attachPromise(deleteMacSettingsProfile(appId, id)))
+        toast({
+          title: id,
+          message: m.deleteSuccess,
+          type: toast.types.SUCCESS,
+        })
+      } catch (err) {
+        toast({
+          title: id,
+          message: m.deleteFail,
+          type: toast.types.ERROR,
+        })
+      }
+    },
+    [appId, dispatch],
+  )
 
   const headers = [
     {
@@ -61,15 +96,15 @@ const MacSettingsProfilesTable = props => {
       sortKey: 'ids.profile_id',
     },
     {
-      name: 'created_at',
-      displayName: sharedMessages.createdAt,
-      width: 10,
-      render: date => <DateTime.Relative value={date} />,
-    },
-    {
       name: 'actions',
       displayName: sharedMessages.actions,
       width: 50,
+      getValue: row => ({
+        id: row.ids.profile_id,
+        name: row.name,
+        edit: handleEdit.bind(null, row.ids.profile_id),
+        delete: handleDelete.bind(null, row.ids.profile_id),
+      }),
       render: details => (
         <ButtonGroup align="end">
           <Button
@@ -103,6 +138,7 @@ const MacSettingsProfilesTable = props => {
         addMessage={'Create MAC settings profile'}
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
+        clickable={false}
       />
     </>
   )

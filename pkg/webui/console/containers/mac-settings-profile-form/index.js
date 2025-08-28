@@ -15,7 +15,7 @@
 import React, { useCallback, useState } from 'react'
 import { get, set } from 'lodash'
 import { useDispatch } from 'react-redux'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Radio from '@ttn-lw/components/radio-button'
@@ -600,6 +600,7 @@ const MACSettingsProfileInnerForm = () => {
 const MACSettingsProfileForm = () => {
   const dispatch = useDispatch()
   const { appId } = useParams()
+  const navigate = useNavigate()
   const [error, setError] = useState('')
 
   const handleSubmit = useCallback(
@@ -611,11 +612,12 @@ const MACSettingsProfileForm = () => {
           message: 'MAC settings profile created',
           type: toast.types.SUCCESS,
         })
+        navigate(`/applications/${appId}/mac-settings-profiles`)
       } catch (error) {
         setError(error)
       }
     },
-    [appId, dispatch],
+    [appId, dispatch, navigate],
   )
 
   return (

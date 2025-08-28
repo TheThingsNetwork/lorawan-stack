@@ -37,17 +37,12 @@ const ApplicationMacSettingsProfilesList = () => {
     [appId],
   )
 
-  const baseDataSelectors = createSelector(
+  const baseDataSelector = createSelector(
     [selectMacSettingsProfiles, selectMacSettingsProfilesTotalCount],
-    (keys, totalCount) => ({
-      keys,
+    (macSettingsProfiles, totalCount) => ({
+      mac_settings_profiles: macSettingsProfiles,
       totalCount,
     }),
-  )
-
-  const baseDataSelector = useCallback(
-    state => baseDataSelectors(state, appId),
-    [appId, baseDataSelectors],
   )
 
   return (

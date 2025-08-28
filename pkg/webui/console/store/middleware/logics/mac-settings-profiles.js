@@ -18,7 +18,9 @@ import createRequestLogic from '@ttn-lw/lib/store/logics/create-request-logic'
 
 import {
   CREATE_MAC_SETTINGS_PROFILE,
+  DELETE_MAC_SETTINGS_PROFILE,
   GET_MAC_SETTINGS_PROFILES_LIST,
+  UPDATE_MAC_SETTINGS_PROFILE,
 } from '@console/store/actions/mac-settings-profiles'
 
 const getMacSettingsProfiles = createRequestLogic({
@@ -45,4 +47,33 @@ const createMacSettingsProfile = createRequestLogic({
   },
 })
 
-export default [getMacSettingsProfiles, createMacSettingsProfile]
+const updateMacSettingsProfile = createRequestLogic({
+  type: UPDATE_MAC_SETTINGS_PROFILE,
+  process: async ({ action }) => {
+    const { appId, macSettingsProfileId, macSettingsProfile } = action.payload
+    const profile = await tts.NsMACSettingsProfiles.update(
+      appId,
+      macSettingsProfileId,
+      macSettingsProfile,
+    )
+
+    return profile
+  },
+})
+
+const deleteMacSettingsProfile = createRequestLogic({
+  type: DELETE_MAC_SETTINGS_PROFILE,
+  process: async ({ action }) => {
+    const { id, targetId } = action.payload
+    await tts.NsMACSettingsProfiles.delete(id, targetId)
+
+    return { id: targetId }
+  },
+})
+
+export default [
+  getMacSettingsProfiles,
+  createMacSettingsProfile,
+  updateMacSettingsProfile,
+  deleteMacSettingsProfile,
+]

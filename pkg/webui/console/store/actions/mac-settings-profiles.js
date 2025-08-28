@@ -13,7 +13,10 @@
 // limitations under the License.
 
 import createRequestActions from '@ttn-lw/lib/store/actions/create-request-actions'
-import { createPaginationByParentRequestActions } from '@ttn-lw/lib/store/actions/pagination'
+import {
+  createPaginationByIdDeleteActions,
+  createPaginationByParentRequestActions,
+} from '@ttn-lw/lib/store/actions/pagination'
 
 export const GET_MAC_SETTINGS_PROFILES_LIST_BASE = 'GET_MAC_SETTINGS_PROFILES_LIST'
 export const [
@@ -45,3 +48,34 @@ export const [
   appId,
   macSettingsProfile,
 }))
+
+export const UPDATE_MAC_SETTINGS_PROFILE_BASE = 'UPDATE_MAC_SETTINGS_PROFILE'
+export const [
+  {
+    request: UPDATE_MAC_SETTINGS_PROFILE,
+    success: UPDATE_MAC_SETTINGS_PROFILE_SUCCESS,
+    failure: UPDATE_MAC_SETTINGS_PROFILE_FAILURE,
+  },
+  {
+    request: updateMacSettingsProfile,
+    success: updateMacSettingsProfileSuccess,
+    failure: updateMacSettingsProfileFailure,
+  },
+] = createRequestActions(UPDATE_MAC_SETTINGS_PROFILE_BASE, (appId, macSettingsProfile) => ({
+  appId,
+  macSettingsProfile,
+}))
+
+export const DELETE_MAC_SETTINGS_PROFILE_BASE = 'DELETE_MAC_SETTINGS_PROFILE'
+export const [
+  {
+    request: DELETE_MAC_SETTINGS_PROFILE,
+    success: DELETE_MAC_SETTINGS_PROFILE_SUCCESS,
+    failure: DELETE_MAC_SETTINGS_PROFILE_FAILURE,
+  },
+  {
+    request: deleteMacSettingsProfile,
+    success: deleteMacSettingsProfileSuccess,
+    failure: deleteMacSettingsProfileFailure,
+  },
+] = createPaginationByIdDeleteActions('MAC_SETTINGS_PROFILES', (id, targetId) => ({ id, targetId }))

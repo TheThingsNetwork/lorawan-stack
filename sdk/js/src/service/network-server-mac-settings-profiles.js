@@ -45,6 +45,45 @@ class NsMACSettingsProfiles {
     )
     return Marshaler.payloadSingleResponse(result)
   }
+
+  async update(
+    applicationId,
+    macSettingsProfileId,
+    patch,
+    mask = Marshaler.fieldMaskFromPatch(
+      patch,
+      this._api.ClientRegistry.UpdateAllowedFieldMaskPaths,
+    ),
+  ) {
+    const result = await this._api.Update(
+      {
+        routeParams: {
+          'mac_settings_profile.ids.application_ids.application_id': applicationId,
+          'mac_settings_profile.ids.profile_id': macSettingsProfileId,
+        },
+      },
+      {
+        mac_settings_profile_ids: {
+          application_ids: { application_id: applicationId },
+          profile_id: macSettingsProfileId,
+        },
+        mac_settings_profile: patch,
+        field_mask: mask,
+      },
+    )
+    return Marshaler.payloadSingleResponse(result)
+  }
+
+  async delete(applicationId, profileId) {
+    const response = await this._api.Delete({
+      routeParams: {
+        'mac_settings_profile_ids.application_ids.application_id': applicationId,
+        'mac_settings_profile_ids.profile_id': profileId,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(response)
+  }
 }
 
 export default NsMACSettingsProfiles
