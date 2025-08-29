@@ -2185,8 +2185,69 @@ func TestADRAdaptDataRate(t *testing.T) {
 			},
 			OutputMargin: 5.0,
 		},
+		{
+			Name: "current index below min value",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:                   &band.EU_863_870_RP1_V1_0_3_Rev_A,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_2,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_3,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_2,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			OutputMargin: 0,
+		},
+		{
+			Name: "current index above max value",
+
+			MACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			Band:                   &band.EU_863_870_RP1_V1_0_3_Rev_A,
+			MinDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_2,
+			MaxDataRateIndex:       ttnpb.DataRateIndex_DATA_RATE_3,
+			AllowedDataRateIndices: newDataRateIndexRange(ttnpb.DataRateIndex_DATA_RATE_0, ttnpb.DataRateIndex_DATA_RATE_5),
+			InitialMargin:          0,
+
+			OutputMACState: &ttnpb.MACState{
+				CurrentParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_5,
+					AdrTxPowerIndex:  1,
+				},
+				DesiredParameters: &ttnpb.MACParameters{
+					AdrDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_3,
+					AdrTxPowerIndex:  1,
+				},
+			},
+			OutputMargin: 0,
+		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
