@@ -90,7 +90,7 @@ const MacSettingsProfilesTable = props => {
             <span className="c-text-neutral-light d-block">{id}</span>
           </>
         ) : (
-          <span className="mt-0 p-0 fw-bold d-block">{id}</span>
+          <span className="c-text-neutral-bold mt-0 p-0 fw-bold d-block">{id}</span>
         ),
       sortable: true,
       sortKey: 'ids.profile_id',
@@ -112,7 +112,6 @@ const MacSettingsProfilesTable = props => {
             icon={IconPencil}
             onClick={details.edit}
             secondary
-            small
           />
           <DeleteModalButton
             message={sharedMessages.delete}
@@ -120,7 +119,6 @@ const MacSettingsProfilesTable = props => {
             entityName={details.name}
             onApprove={details.delete}
             defaultMessage={m.deleteModalMessage}
-            small
           />
         </ButtonGroup>
       ),
@@ -135,7 +133,7 @@ const MacSettingsProfilesTable = props => {
         entity="mac_settings_profiles"
         defaultOrder="-ids.profile_id"
         headers={headers}
-        addMessage={m.createMacSettingsProfile}
+        addMessage={sharedMessages.createMacSettingsProfile}
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
         clickable={false}

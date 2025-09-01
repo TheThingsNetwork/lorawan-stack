@@ -702,6 +702,7 @@
   "console.containers.lora-cloud-ms-form.index.fPortSetValidationFormat": "The FPort must be a number between 1 and 223, or a comma-separated list of numbers between 1 and 223",
   "console.containers.mac-settings-profile-form.index.updated": "MAC settings profile updated",
   "console.containers.mac-settings-profile-form.index.created": "MAC settings profile created",
+  "console.containers.mac-settings-profile-form.index.profileId": "Profile ID",
   "console.containers.mac-settings-profiles-table.index.information": "MAC settings profiles are used to set MAC settings of end devices more conveniently.",
   "console.containers.mac-settings-profiles-table.index.deleteSuccess": "MAC settings profile deleted",
   "console.containers.mac-settings-profiles-table.index.deleteFail": "There was an error and the MAC settings profile could not be deleted",

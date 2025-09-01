@@ -255,6 +255,7 @@ const MacSettingsSection = props => {
           icon={IconX}
           message={sharedMessages.remove}
           onClick={handleRemoveMacSettingsProfile}
+          disabled={!hasMacSettingsProfile}
         />
       </Form.FieldContainer>
       {macSettingsProfilesOptions.length === 0 && (
@@ -269,7 +270,7 @@ const MacSettingsSection = props => {
                   replace: true,
                 })
               }
-              message={m.createMacSettingsProfile}
+              message={sharedMessages.createMacSettingsProfile}
               className="mt-cs-m"
               secondary
             />

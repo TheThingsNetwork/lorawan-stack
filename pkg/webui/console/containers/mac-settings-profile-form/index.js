@@ -51,6 +51,7 @@ import { validationSchema, initialValues } from './form-validation'
 const m = defineMessages({
   updated: 'MAC settings profile updated',
   created: 'MAC settings profile created',
+  profileId: 'Profile ID',
 })
 
 // 0...7
@@ -181,7 +182,7 @@ const MACSettingsProfileInnerForm = () => {
   return (
     <>
       <Form.Field
-        title={'Profile ID'}
+        title={m.profileId}
         name="ids.profile_id"
         component={Input}
         required

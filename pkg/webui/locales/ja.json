@@ -702,6 +702,7 @@
   "console.containers.lora-cloud-ms-form.index.fPortSetValidationFormat": "",
   "console.containers.mac-settings-profile-form.index.updated": "",
   "console.containers.mac-settings-profile-form.index.created": "",
+  "console.containers.mac-settings-profile-form.index.profileId": "",
   "console.containers.mac-settings-profiles-table.index.information": "",
   "console.containers.mac-settings-profiles-table.index.deleteSuccess": "",
   "console.containers.mac-settings-profiles-table.index.deleteFail": "",
