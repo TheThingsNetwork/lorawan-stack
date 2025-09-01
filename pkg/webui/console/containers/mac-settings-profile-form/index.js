@@ -39,7 +39,15 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 
-import { FRAME_WIDTH_COUNT, fCntWidthEncode, fCntWidthDecode } from '@console/lib/device-utils'
+import {
+  FRAME_WIDTH_COUNT,
+  fCntWidthEncode,
+  fCntWidthDecode,
+  maxDutyCycleOptions,
+  pingSlotPeriodicityOptions,
+  adrAckLimitOptions,
+  adrAckDelayOptions,
+} from '@console/lib/device-utils'
 
 import {
   createMacSettingsProfile,
@@ -53,59 +61,11 @@ const m = defineMessages({
   created: 'MAC settings profile created',
 })
 
-// 0...7
-const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `PING_EVERY_${value}S`,
-    label: <Message content={sharedMessages.secondInterval} values={{ count: value }} />,
-  }
-})
 // 0...15
-const adrAckLimitOptions = Array.from({ length: 16 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `ADR_ACK_LIMIT_${value}`,
-    label: <Message content={sharedMessages.adrAckValue} values={{ count: value }} />,
-  }
-})
-// 0...15
-const adrAckDelayOptions = Array.from({ length: 16 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `ADR_ACK_DELAY_${value}`,
-    label: <Message content={sharedMessages.adrAckValue} values={{ count: value }} />,
-  }
-})
-const maxDutyCycleOptions = [
-  { value: 'DUTY_CYCLE_1', label: '100%' },
-  { value: 'DUTY_CYCLE_16', label: '6.25%' },
-  { value: 'DUTY_CYCLE_128', label: '0.781%' },
-  { value: 'DUTY_CYCLE_1024', label: '0.098%' },
-  { value: 'DUTY_CYCLE_16384', label: '0.006%' },
-]
-
-const dataRateOverrideOptions = [
-  { value: 'data_rate_0', label: 'Data rate 0' },
-  { value: 'data_rate_1', label: 'Data rate 1' },
-  { value: 'data_rate_2', label: 'Data rate 2' },
-  { value: 'data_rate_3', label: 'Data rate 3' },
-  { value: 'data_rate_4', label: 'Data rate 4' },
-  { value: 'data_rate_5', label: 'Data rate 5' },
-  { value: 'data_rate_6', label: 'Data rate 6' },
-  { value: 'data_rate_7', label: 'Data rate 7' },
-  { value: 'data_rate_8', label: 'Data rate 8' },
-  { value: 'data_rate_9', label: 'Data rate 9' },
-  { value: 'data_rate_10', label: 'Data rate 10' },
-  { value: 'data_rate_11', label: 'Data rate 11' },
-  { value: 'data_rate_12', label: 'Data rate 12' },
-  { value: 'data_rate_13', label: 'Data rate 13' },
-  { value: 'data_rate_14', label: 'Data rate 14' },
-  { value: 'data_rate_15', label: 'Data rate 15' },
-]
+const dataRateOverrideOptions = Array.from({ length: 16 }, (_, index) => ({
+  value: `data_rate${index}`,
+  label: <Message content={sharedMessages.dataRate} values={{ n: index }} />,
+}))
 
 const MACSettingsProfileInnerForm = () => {
   const { values, setFieldValue, setFieldTouched } = useFormContext()

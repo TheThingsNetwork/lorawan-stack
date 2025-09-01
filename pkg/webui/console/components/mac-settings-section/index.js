@@ -42,6 +42,10 @@ import {
   fCntWidthEncode,
   fCntWidthDecode,
   parseLorawanMacVersion,
+  maxDutyCycleOptions,
+  pingSlotPeriodicityOptions,
+  adrAckLimitOptions,
+  adrAckDelayOptions,
 } from '@console/lib/device-utils'
 import getDataRate from '@console/lib/data-rate-utils'
 
@@ -54,41 +58,6 @@ const m = defineMessages({
     'You have no MAC settings profiles yet. Create one to be able to assign it here.',
   macSettingsProfile: 'MAC settings profile',
 })
-
-// 0...7
-const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `PING_EVERY_${value}S`,
-    label: <Message content={sharedMessages.secondInterval} values={{ count: value }} />,
-  }
-})
-// 0...15
-const adrAckLimitOptions = Array.from({ length: 16 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `ADR_ACK_LIMIT_${value}`,
-    label: <Message content={sharedMessages.adrAckValue} values={{ count: value }} />,
-  }
-})
-// 0...15
-const adrAckDelayOptions = Array.from({ length: 16 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `ADR_ACK_DELAY_${value}`,
-    label: <Message content={sharedMessages.adrAckValue} values={{ count: value }} />,
-  }
-})
-const maxDutyCycleOptions = [
-  { value: 'DUTY_CYCLE_1', label: '100%' },
-  { value: 'DUTY_CYCLE_16', label: '6.25%' },
-  { value: 'DUTY_CYCLE_128', label: '0.781%' },
-  { value: 'DUTY_CYCLE_1024', label: '0.098%' },
-  { value: 'DUTY_CYCLE_16384', label: '0.006%' },
-]
 
 const MacSettingsSection = props => {
   const {
