@@ -491,6 +491,7 @@ export default defineMessages({
   privacyPolicy: 'Privacy policy',
   profile: 'Profile',
   profileName: 'Profile name',
+  profileId: 'Profile ID',
   profileSettings: 'Profile settings',
   provider: 'Provider',
   provisionedOnExternalJoinServer: 'Provisioned on external Join Server',

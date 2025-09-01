@@ -78,20 +78,7 @@ const MacSettingsProfilesTable = props => {
   const headers = [
     {
       name: 'ids.profile_id',
-      displayName: sharedMessages.nameAndId,
-      getValue: row => ({
-        id: row.ids.profile_id,
-        name: row.name,
-      }),
-      render: ({ name, id }) =>
-        Boolean(name) ? (
-          <>
-            <span className="mt-0 mb-cs-xxs p-0 fw-bold d-block">{name}</span>
-            <span className="c-text-neutral-light d-block">{id}</span>
-          </>
-        ) : (
-          <span className="c-text-neutral-bold mt-0 p-0 fw-bold d-block">{id}</span>
-        ),
+      displayName: sharedMessages.profileId,
       sortable: true,
       sortKey: 'ids.profile_id',
     },
