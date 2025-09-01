@@ -16,6 +16,7 @@ import React, { useCallback, useMemo, useState } from 'react'
 import { get, set, isEmpty, omitBy } from 'lodash'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
+import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Radio from '@ttn-lw/components/radio-button'
@@ -46,6 +47,11 @@ import {
 } from '@console/store/actions/mac-settings-profiles'
 
 import { validationSchema, initialValues } from './form-validation'
+
+const m = defineMessages({
+  updated: 'MAC settings profile updated',
+  created: 'MAC settings profile created',
+})
 
 // 0...7
 const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
@@ -663,7 +669,7 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
       try {
         await dispatch(attachPromise(createMacSettingsProfile(appId, castedValues)))
         toast({
-          message: 'MAC settings profile created',
+          message: m.created,
           type: toast.types.SUCCESS,
         })
         navigate(`/applications/${appId}/mac-settings-profiles`)
@@ -696,7 +702,7 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
           )
         }
         toast({
-          message: 'MAC settings profile updated',
+          message: m.updated,
           type: toast.types.SUCCESS,
         })
       } catch (error) {
@@ -718,7 +724,7 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
       <SubmitBar>
         <Form.Submit
           component={SubmitButton}
-          message={edit ? sharedMessages.saveChanges : 'Create MAC settings profile'}
+          message={edit ? sharedMessages.saveChanges : sharedMessages.createMacSettingsProfile}
         />
       </SubmitBar>
     </Form>

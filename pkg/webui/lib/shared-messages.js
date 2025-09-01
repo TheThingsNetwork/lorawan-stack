@@ -168,6 +168,7 @@ export default defineMessages({
   currentCollaborators: 'Current collaborators',
   currentPassword: 'Current password',
   currentUserIndicator: '(This is you)',
+  createMacSettingsProfile: 'Create a new MAC settings profile',
   dashboard: 'Dashboard',
   data: 'Data',
   dataSheet: 'Data sheet',

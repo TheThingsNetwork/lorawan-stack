@@ -135,7 +135,7 @@ const MacSettingsProfilesTable = props => {
         entity="mac_settings_profiles"
         defaultOrder="-ids.profile_id"
         headers={headers}
-        addMessage={'Create MAC settings profile'}
+        addMessage={m.createMacSettingsProfile}
         baseDataSelector={baseDataSelector}
         getItemsAction={getItemsAction}
         clickable={false}

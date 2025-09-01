@@ -15,6 +15,7 @@
 import React from 'react'
 import { useParams } from 'react-router-dom'
 import { useSelector } from 'react-redux'
+import { defineMessages } from 'react-intl'
 
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
@@ -27,6 +28,10 @@ import MACSettingsProfileForm from '@console/containers/mac-settings-profile-for
 import { getMacSettingsProfile } from '@console/store/actions/mac-settings-profiles'
 
 import { selectMacSettingsProfileById } from '@console/store/selectors/mac-settings-profiles'
+
+const m = defineMessages({
+  editMacSettingsProfile: 'Edit a MAC settings profile',
+})
 
 const ApplicationMacSettingsProfilesEdit = () => {
   const { appId, macSettingsProfileId } = useParams()
@@ -45,7 +50,7 @@ const ApplicationMacSettingsProfilesEdit = () => {
   return (
     <RequireRequest requestAction={getMacSettingsProfile(appId, macSettingsProfileId)}>
       <div className="container container--lg grid">
-        <PageTitle title={'Edit a MAC settings profile'} className="mb-0" />
+        <PageTitle title={m.editMacSettingsProfile} className="mb-0" />
         <div className="item-12">
           <MACSettingsProfileForm
             edit

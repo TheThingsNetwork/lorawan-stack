@@ -52,6 +52,7 @@ const m = defineMessages({
   noMacSettingsProfiles: `You have no MAC settings profiles yet.`,
   noMacSettingsProfilesAction:
     'You have no MAC settings profiles yet. Create one to be able to assign it here.',
+  macSettingsProfile: 'MAC settings profile',
 })
 
 // 0...7
@@ -242,7 +243,7 @@ const MacSettingsSection = props => {
       <Form.FieldContainer horizontal className="al-end">
         <Form.Field
           name="mac_settings_profile_ids.profile_id"
-          title="MAC settings profile"
+          title={m.macSettingsProfile}
           component={Select}
           options={macSettingsProfilesOptions}
           placeholder={sharedMessages.selectMacSettingsProfile}
@@ -268,7 +269,7 @@ const MacSettingsSection = props => {
                   replace: true,
                 })
               }
-              message={'Create a new MAC profile'}
+              message={m.createMacSettingsProfile}
               className="mt-cs-m"
               secondary
             />

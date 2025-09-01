@@ -35,7 +35,7 @@ const ApplicationMacSettingsProfilesAdd = () => {
 
   return (
     <div className="container container--lg grid">
-      <PageTitle title={'Create a new MAC settings profile'} className="mb-0" />
+      <PageTitle title={sharedMessages.createMacSettingsProfile} className="mb-0" />
       <div className="item-12">
         <MACSettingsProfileForm />
       </div>
