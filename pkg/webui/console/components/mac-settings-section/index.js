@@ -207,7 +207,7 @@ const MacSettingsSection = props => {
   return (
     <Form.CollapseSection
       id="mac-settings"
-      title={sharedMessages.advancedMacSettings}
+      title={sharedMessages.customMacSettings}
       initiallyCollapsed={initiallyCollapsed}
       onCollapse={handleIsCollapsedChange}
       isCollapsed={isCollapsed}

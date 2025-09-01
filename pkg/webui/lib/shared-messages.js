@@ -564,6 +564,7 @@ export default defineMessages({
   secret: 'Secret',
   secure: 'Secure',
   security: 'Security',
+  selectMacSettingsProfile: 'Select MAC settings profile',
   sendInvitation: 'Send invitation',
   serverUrl: 'Server URL',
   serviceData: 'Service data',
@@ -705,7 +706,7 @@ export default defineMessages({
 
   delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
   factoryPresetFreqDescription: 'List of factory-preset frequencies. Note: order is respected.',
-  advancedMacSettings: 'Advanced MAC settings',
+  customMacSettings: 'Custom MAC settings',
   desiredPingSlotFrequencyTitle: 'Desired ping slot frequency',
   pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
   pingSlotDataRateTitle: 'Ping slot data rate index',

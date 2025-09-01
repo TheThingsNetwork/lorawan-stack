@@ -34,6 +34,16 @@ class NsMACSettingsProfiles {
     return Marshaler.payloadListResponse('mac_settings_profiles', result)
   }
 
+  async get(applicationId, macSettingsProfileId) {
+    const result = await this._api.Get({
+      routeParams: {
+        'mac_settings_profile_ids.application_ids.application_id': applicationId,
+        'mac_settings_profile_ids.profile_id': macSettingsProfileId,
+      },
+    })
+    return Marshaler.payloadSingleResponse(result)
+  }
+
   async create(applicationId, macSettingsProfile) {
     const result = await this._api.Create(
       {
@@ -46,20 +56,12 @@ class NsMACSettingsProfiles {
     return Marshaler.payloadSingleResponse(result)
   }
 
-  async update(
-    applicationId,
-    macSettingsProfileId,
-    patch,
-    mask = Marshaler.fieldMaskFromPatch(
-      patch,
-      this._api.ClientRegistry.UpdateAllowedFieldMaskPaths,
-    ),
-  ) {
+  async update(applicationId, macSettingsProfileId, patch) {
     const result = await this._api.Update(
       {
         routeParams: {
-          'mac_settings_profile.ids.application_ids.application_id': applicationId,
-          'mac_settings_profile.ids.profile_id': macSettingsProfileId,
+          'mac_settings_profile_ids.application_ids.application_id': applicationId,
+          'mac_settings_profile_ids.profile_id': macSettingsProfileId,
         },
       },
       {
@@ -68,7 +70,6 @@ class NsMACSettingsProfiles {
           profile_id: macSettingsProfileId,
         },
         mac_settings_profile: patch,
-        field_mask: mask,
       },
     )
     return Marshaler.payloadSingleResponse(result)

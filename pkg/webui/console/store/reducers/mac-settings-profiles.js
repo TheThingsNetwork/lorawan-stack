@@ -12,7 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import { GET_MAC_SETTINGS_PROFILES_LIST_SUCCESS } from '@console/store/actions/mac-settings-profiles'
+import {
+  CREATE_MAC_SETTINGS_PROFILE_SUCCESS,
+  GET_MAC_SETTINGS_PROFILE,
+  GET_MAC_SETTINGS_PROFILE_SUCCESS,
+  GET_MAC_SETTINGS_PROFILES_LIST_SUCCESS,
+  UPDATE_MAC_SETTINGS_PROFILE_SUCCESS,
+} from '@console/store/actions/mac-settings-profiles'
 
 const defaultState = {
   entities: {},
@@ -27,6 +33,23 @@ const macSettingsProfile = (state = {}, macSettingsProfile) => ({
 
 const macSettingsProfiles = (state = defaultState, { type, payload }) => {
   switch (type) {
+    case GET_MAC_SETTINGS_PROFILE:
+      return {
+        ...state,
+        selectedMacProfile: payload.macSettingsProfileId,
+      }
+    case GET_MAC_SETTINGS_PROFILE_SUCCESS:
+    case UPDATE_MAC_SETTINGS_PROFILE_SUCCESS:
+    case CREATE_MAC_SETTINGS_PROFILE_SUCCESS:
+      const id = payload.mac_settings_profile.ids.profile_id
+
+      return {
+        ...state,
+        entities: {
+          ...state.entities,
+          [id]: macSettingsProfile(state.entities[id], payload),
+        },
+      }
     case GET_MAC_SETTINGS_PROFILES_LIST_SUCCESS:
       const profiles = payload.entities.reduce(
         (acc, c) => {

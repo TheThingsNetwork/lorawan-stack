@@ -28,3 +28,6 @@ export const selectMacSettingsProfiles = createSelector(
 )
 export const selectMacSettingsProfilesTotalCount = state =>
   selectMacSettingsProfilesStore(state).totalCount
+
+export const selectMacSettingsProfileById = (state, id) =>
+  selectMacSettingsProfilesEntitiesStore(state)[id]

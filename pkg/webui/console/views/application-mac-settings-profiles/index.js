@@ -1,4 +1,4 @@
-// Copyright © 2021 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2025 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -24,9 +24,12 @@ import GenericNotFound from '@ttn-lw/lib/components/full-view-error/not-found'
 
 import SubViewError from '@console/views/sub-view-error'
 import ApplicationMacSettingsProfilesList from '@console/views/application-mac-settings-profiles-list'
+import ApplicationMacSettingsProfilesAdd from '@console/views/application-mac-settings-profile-add'
+import ApplicationMacSettingsProfilesEdit from '@console/views/application-mac-settings-profile-edit'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import ApplicationMacSettingsProfilesAdd from '../application-mac-settings-profile-add'
+
+import { macSettingsProfileId } from '@console/lib/regexp'
 
 const ApplicationMacSettingsProfiles = () => {
   const { appId } = useParams()
@@ -44,15 +47,16 @@ const ApplicationMacSettingsProfiles = () => {
       <Routes>
         <Route index Component={ApplicationMacSettingsProfilesList} />
         <Route path="/add" Component={ApplicationMacSettingsProfilesAdd} />
-        {/* <Route
+        <Route
           path="/:macSettingsProfileId"
           element={
             <ValidateRouteParam
-              check={{ macSettingsProfileId: macSettingsProfileIdPathRegexp }}
+              check={{ macSettingsProfileId }}
+              otherwise={{ redirect: `/applications/${appId}/mac-settings-profiles` }}
               Component={ApplicationMacSettingsProfilesEdit}
             />
           }
-        /> */}
+        />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
     </ErrorView>

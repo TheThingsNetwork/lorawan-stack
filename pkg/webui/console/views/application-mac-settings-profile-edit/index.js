@@ -14,42 +14,48 @@
 
 import React from 'react'
 import { useParams } from 'react-router-dom'
+import { useSelector } from 'react-redux'
 
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
+import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import PageTitle from '@ttn-lw/components/page-title'
 
 import RequireRequest from '@ttn-lw/lib/components/require-request'
 
 import MACSettingsProfileForm from '@console/containers/mac-settings-profile-form'
 
-import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
+import { getMacSettingsProfile } from '@console/store/actions/mac-settings-profiles'
 
-import { getNsFrequencyPlans } from '@console/store/actions/configuration'
+import { selectMacSettingsProfileById } from '@console/store/selectors/mac-settings-profiles'
 
-const nsEnabled = selectNsConfig().enabled
+const ApplicationMacSettingsProfilesEdit = () => {
+  const { appId, macSettingsProfileId } = useParams()
+  const macSettingsProfile = useSelector(state =>
+    selectMacSettingsProfileById(state, macSettingsProfileId),
+  )
 
-const ApplicationMacSettingsProfilesAdd = () => {
-  const { appId } = useParams()
   useBreadcrumbs(
-    'apps.single.mac-settings-profiles.add',
+    'apps.single.mac-settings-profiles.single',
     <Breadcrumb
-      path={`/applications/${appId}/mac-settings-profiles/add`}
-      content={sharedMessages.add}
+      path={`/applications/${appId}/mac-settings-profiles/${macSettingsProfileId}`}
+      content={macSettingsProfileId}
     />,
   )
 
   return (
-    <RequireRequest requestAction={nsEnabled ? getNsFrequencyPlans() : undefined}>
+    <RequireRequest requestAction={getMacSettingsProfile(appId, macSettingsProfileId)}>
       <div className="container container--lg grid">
-        <PageTitle title={'Create a new MAC settings profile'} className="mb-0" />
+        <PageTitle title={'Edit a MAC settings profile'} className="mb-0" />
         <div className="item-12">
-          <MACSettingsProfileForm />
+          <MACSettingsProfileForm
+            edit
+            macSettingsProfile={macSettingsProfile?.mac_settings_profile}
+            macSettingsProfileId={macSettingsProfileId}
+          />
         </div>
       </div>
     </RequireRequest>
   )
 }
 
-export default ApplicationMacSettingsProfilesAdd
+export default ApplicationMacSettingsProfilesEdit

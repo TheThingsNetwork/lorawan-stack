@@ -32,6 +32,23 @@ export const [
   },
 ] = createPaginationByParentRequestActions('MAC_SETTINGS_PROFILES')
 
+export const GET_MAC_SETTINGS_PROFILE_BASE = 'GET_MAC_SETTINGS_PROFILE'
+export const [
+  {
+    request: GET_MAC_SETTINGS_PROFILE,
+    success: GET_MAC_SETTINGS_PROFILE_SUCCESS,
+    failure: GET_MAC_SETTINGS_PROFILE_FAILURE,
+  },
+  {
+    request: getMacSettingsProfile,
+    success: getMacSettingsProfileSuccess,
+    failure: getMacSettingsProfileFailure,
+  },
+] = createRequestActions(GET_MAC_SETTINGS_PROFILE_BASE, (appId, macSettingsProfileId) => ({
+  appId,
+  macSettingsProfileId,
+}))
+
 export const CREATE_MAC_SETTINGS_PROFILE_BASE = 'CREATE_MAC_SETTINGS_PROFILE'
 export const [
   {
@@ -61,10 +78,14 @@ export const [
     success: updateMacSettingsProfileSuccess,
     failure: updateMacSettingsProfileFailure,
   },
-] = createRequestActions(UPDATE_MAC_SETTINGS_PROFILE_BASE, (appId, macSettingsProfile) => ({
-  appId,
-  macSettingsProfile,
-}))
+] = createRequestActions(
+  UPDATE_MAC_SETTINGS_PROFILE_BASE,
+  (appId, macSettingsProfileId, macSettingsProfile) => ({
+    appId,
+    macSettingsProfileId,
+    macSettingsProfile,
+  }),
+)
 
 export const DELETE_MAC_SETTINGS_PROFILE_BASE = 'DELETE_MAC_SETTINGS_PROFILE'
 export const [

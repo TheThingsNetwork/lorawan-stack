@@ -66,6 +66,7 @@ const deviceSelector = [
   'claim_authentication_code',
   'attributes',
   'skip_payload_crypto_override',
+  'mac_settings_profile_ids',
 ]
 
 const linkSelector = ['skip_payload_crypto', 'default_formatters']

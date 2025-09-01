@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useState } from 'react'
-import { get, set } from 'lodash'
+import React, { useCallback, useMemo, useState } from 'react'
+import { get, set, isEmpty, omitBy } from 'lodash'
 import { useDispatch } from 'react-redux'
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -35,10 +35,15 @@ import Message from '@ttn-lw/lib/components/message'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
+import PropTypes from '@ttn-lw/lib/prop-types'
+import diff from '@ttn-lw/lib/diff'
 
 import { FRAME_WIDTH_COUNT, fCntWidthEncode, fCntWidthDecode } from '@console/lib/device-utils'
 
-import { createMacSettingsProfile } from '@console/store/actions/mac-settings-profiles'
+import {
+  createMacSettingsProfile,
+  updateMacSettingsProfile,
+} from '@console/store/actions/mac-settings-profiles'
 
 import { validationSchema, initialValues } from './form-validation'
 
@@ -77,6 +82,25 @@ const maxDutyCycleOptions = [
   { value: 'DUTY_CYCLE_16384', label: '0.006%' },
 ]
 
+const dataRateOverrideOptions = [
+  { value: 'data_rate_0', label: 'Data rate 0' },
+  { value: 'data_rate_1', label: 'Data rate 1' },
+  { value: 'data_rate_2', label: 'Data rate 2' },
+  { value: 'data_rate_3', label: 'Data rate 3' },
+  { value: 'data_rate_4', label: 'Data rate 4' },
+  { value: 'data_rate_5', label: 'Data rate 5' },
+  { value: 'data_rate_6', label: 'Data rate 6' },
+  { value: 'data_rate_7', label: 'Data rate 7' },
+  { value: 'data_rate_8', label: 'Data rate 8' },
+  { value: 'data_rate_9', label: 'Data rate 9' },
+  { value: 'data_rate_10', label: 'Data rate 10' },
+  { value: 'data_rate_11', label: 'Data rate 11' },
+  { value: 'data_rate_12', label: 'Data rate 12' },
+  { value: 'data_rate_13', label: 'Data rate 13' },
+  { value: 'data_rate_14', label: 'Data rate 14' },
+  { value: 'data_rate_15', label: 'Data rate 15' },
+]
+
 const MACSettingsProfileInnerForm = () => {
   const { values, setFieldValue, setFieldTouched } = useFormContext()
   const { mac_settings } = values
@@ -86,19 +110,12 @@ const MACSettingsProfileInnerForm = () => {
 
     setResetsFCnt(checked)
   }, [])
-  const alreadySelectedDataRates = Object.keys(mac_settings?.adr?.dynamic?.overrides || [])
-  const dataRateOverrideOptions = []
-  // Filter out the already selected data rate indices.
-  const dataRateFilterOption = useCallback(
-    option => !alreadySelectedDataRates.includes(option.value),
-    [alreadySelectedDataRates],
-  )
 
   const isDynamicAdr = mac_settings?.adr && 'dynamic' in mac_settings?.adr
   const isStaticAdr = mac_settings?.adr && 'static' in mac_settings?.adr
-  const adrOverrides = mac_settings?.adr.dynamic?.overrides
-  const showEditNbTrans = !values.mac_settings?.adr.dynamic?._use_default_nb_trans
-  const defaultNbTransDisabled = !values.mac_settings?.adr.dynamic?._override_nb_trans_defaults
+  const adrOverrides = mac_settings?.adr?.dynamic?.overrides
+  const showEditNbTrans = !values.mac_settings?.adr?.dynamic?._use_default_nb_trans
+  const defaultNbTransDisabled = !values.mac_settings?.adr?.dynamic?._override_nb_trans_defaults
   const addOverride = useCallback(() => {
     const newOverride = { _data_rate_index: '', min_nb_trans: '', max_nb_trans: '' }
     setFieldValue(
@@ -505,7 +522,6 @@ const MACSettingsProfileInnerForm = () => {
                         valueSetter={dataRateValueSetter}
                         component={Select}
                         options={dataRateOverrideOptions}
-                        filterOption={dataRateFilterOption}
                         className="d-flex direction-column flex-grow"
                       />
                       <Form.Field
@@ -597,14 +613,52 @@ const MACSettingsProfileInnerForm = () => {
   )
 }
 
-const MACSettingsProfileForm = () => {
+const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId }) => {
   const dispatch = useDispatch()
   const { appId } = useParams()
   const navigate = useNavigate()
   const [error, setError] = useState('')
 
+  const parsedInitialValues = useMemo(() => {
+    if (!macSettingsProfile) {
+      return initialValues
+    }
+    const normalizedInitialValues = {
+      ...initialValues,
+      ...macSettingsProfile,
+      mac_settings: {
+        ...initialValues.mac_settings,
+        ...macSettingsProfile?.mac_settings,
+        adr: Boolean(macSettingsProfile?.mac_settings?.adr?.dynamic)
+          ? {
+              dynamic: {
+                ...initialValues.mac_settings.adr.dynamic,
+                ...macSettingsProfile.mac_settings.adr.dynamic,
+                min_nb_trans: macSettingsProfile.mac_settings?.adr?.dynamic?.min_nb_trans ?? null,
+                max_nb_trans: macSettingsProfile.mac_settings?.adr?.dynamic?.max_nb_trans ?? null,
+                _use_default_nb_trans:
+                  !Boolean(macSettingsProfile.mac_settings?.adr?.dynamic?.min_nb_trans) &&
+                  !Boolean(macSettingsProfile.mac_settings?.adr?.dynamic?.overrides),
+                _override_nb_trans_defaults: Boolean(
+                  macSettingsProfile.mac_settings?.adr?.dynamic?.min_nb_trans,
+                ),
+              },
+            }
+          : Boolean(macSettingsProfile?.mac_settings?.adr?.static)
+            ? {
+                ...initialValues.mac_settings.adr,
+                ...macSettingsProfile.mac_settings.adr,
+              }
+            : {
+                disabled: {},
+              },
+      },
+    }
+    return validationSchema.cast(normalizedInitialValues)
+  }, [macSettingsProfile])
+
   const handleSubmit = useCallback(
-    async values => {
+    async (values, { setSubmitting }) => {
       const castedValues = validationSchema.cast(values)
       try {
         await dispatch(attachPromise(createMacSettingsProfile(appId, castedValues)))
@@ -614,25 +668,85 @@ const MACSettingsProfileForm = () => {
         })
         navigate(`/applications/${appId}/mac-settings-profiles`)
       } catch (error) {
+        setSubmitting(false)
         setError(error)
       }
     },
     [appId, dispatch, navigate],
   )
 
+  const handleEdit = useCallback(
+    async (_, { setSubmitting }, cleanedValues) => {
+      const profileDiff = diff(macSettingsProfile, cleanedValues)
+      try {
+        if (!isEmpty(profileDiff)) {
+          profileDiff.ids = {
+            application_ids: { application_id: appId },
+            profile_id: macSettingsProfileId,
+          }
+          if (profileDiff.mac_settings?.adr?.dynamic) {
+            const cleanAdr = omitBy(profileDiff.mac_settings?.adr?.dynamic, (_, key) =>
+              key.startsWith('_'),
+            )
+            profileDiff.mac_settings.adr.dynamic = cleanAdr
+          }
+
+          await dispatch(
+            attachPromise(updateMacSettingsProfile(appId, macSettingsProfileId, profileDiff)),
+          )
+        }
+        toast({
+          message: 'MAC settings profile updated',
+          type: toast.types.SUCCESS,
+        })
+      } catch (error) {
+        setSubmitting(false)
+        setError(error)
+      }
+    },
+    [appId, dispatch, macSettingsProfile, macSettingsProfileId],
+  )
+
   return (
     <Form
       validationSchema={validationSchema}
-      initialValues={initialValues}
-      onSubmit={handleSubmit}
+      initialValues={parsedInitialValues}
+      onSubmit={edit ? handleEdit : handleSubmit}
       error={error}
     >
       <MACSettingsProfileInnerForm />
       <SubmitBar>
-        <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />
+        <Form.Submit
+          component={SubmitButton}
+          message={edit ? sharedMessages.saveChanges : 'Create MAC settings profile'}
+        />
       </SubmitBar>
     </Form>
   )
+}
+
+MACSettingsProfileForm.propTypes = {
+  edit: PropTypes.bool,
+  macSettingsProfile: PropTypes.shape({
+    ids: PropTypes.shape({}),
+    mac_settings: PropTypes.shape({
+      adr: PropTypes.shape({
+        dynamic: PropTypes.shape({
+          min_nb_trans: PropTypes.number,
+          max_nb_trans: PropTypes.number,
+          overrides: PropTypes.shape({}),
+        }),
+        static: PropTypes.shape({}),
+      }),
+    }),
+  }),
+  macSettingsProfileId: PropTypes.string,
+}
+
+MACSettingsProfileForm.defaultProps = {
+  edit: false,
+  macSettingsProfile: undefined,
+  macSettingsProfileId: undefined,
 }
 
 export default MACSettingsProfileForm
