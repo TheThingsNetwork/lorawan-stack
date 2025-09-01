@@ -12,9 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback } from 'react'
+import React from 'react'
 import { defineMessages } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
@@ -26,9 +26,6 @@ import Form from '@ttn-lw/components/form'
 import Notification from '@ttn-lw/components/notification'
 import Checkbox from '@ttn-lw/components/checkbox'
 import toast from '@ttn-lw/components/toast'
-import Select from '@ttn-lw/components/select'
-import { IconX } from '@ttn-lw/components/icon'
-import Button from '@ttn-lw/components/button'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -51,8 +48,6 @@ import {
   ACTIVATION_MODES,
   generate16BytesKey,
 } from '@console/lib/device-utils'
-
-import { selectMacSettingsProfiles } from '@console/store/selectors/mac-settings-profiles'
 
 import messages from '../messages'
 import {
@@ -118,15 +113,6 @@ const NetworkServerForm = React.memo(props => {
   const formRef = React.useRef(null)
 
   const [macSettings, setMacSettings] = React.useState(defaultMacSettings)
-  const macSettingsProfiles = useSelector(state => selectMacSettingsProfiles(state))
-  const macSettingsProfilesOptions = React.useMemo(
-    () =>
-      macSettingsProfiles.map(profile => ({
-        value: profile.ids.profile_id,
-        label: profile.ids.profile_id,
-      })),
-    [macSettingsProfiles],
-  )
 
   const [phyVersion, setPhyVersion] = React.useState(device.lorawan_phy_version)
   const phyVersionRef = React.useRef()
@@ -368,6 +354,20 @@ const NetworkServerForm = React.memo(props => {
         patch.mac_settings.use_adr = null
       }
 
+      if (Boolean(patch.mac_settings_profile_ids)) {
+        patch.mac_settings_profile_ids = {
+          ...patch.mac_settings_profile_ids,
+          application_ids: {
+            application_id: appId,
+          },
+        }
+        patch.frequency_plan_id = device.frequency_plan_id
+        patch.lorawan_version = device.lorawan_version
+        patch.lorawan_phy_version = device.lorawan_phy_version
+
+        delete patch.mac_settings
+      }
+
       setError('')
       try {
         await onSubmit(patch)
@@ -378,7 +378,7 @@ const NetworkServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [device, onSubmit, onSubmitSuccess, validationContext],
+    [device, onSubmit, onSubmitSuccess, validationContext, appId],
   )
 
   const handleDeviceClassChange = React.useCallback(
@@ -446,10 +446,6 @@ const NetworkServerForm = React.memo(props => {
     },
     [initialValues],
   )
-
-  const handleRemoveMacSettingsProfile = useCallback(() => {
-    setFieldValue('mac_settings_profile_ids', [])
-  }, [])
 
   // Notify the user that the session keys might be there, but since there are
   // no rights to read the keys we cannot display them.
@@ -610,28 +606,13 @@ const NetworkServerForm = React.memo(props => {
           onApprove={handleMacReset}
         />
       </Form.InfoField>
-      <Form.FieldContainer horizontal className="al-end">
-        <Form.Field
-          name="mac_settings_profile_ids"
-          title="MAC settings profile"
-          component={Select}
-          options={macSettingsProfilesOptions}
-          placeholder={sharedMessages.selectMacSettingsProfile}
-          fieldWidth="m"
-        />
-        <Button
-          secondary
-          icon={IconX}
-          message={sharedMessages.remove}
-          onClick={handleRemoveMacSettingsProfile}
-        />
-      </Form.FieldContainer>
       <MacSettingsSection
         activationMode={initialActivationMode}
         lorawanVersion={lorawanVersion}
         isClassB={isClassB}
         isClassC={isClassC}
         bandId={bandId}
+        appId={appId}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

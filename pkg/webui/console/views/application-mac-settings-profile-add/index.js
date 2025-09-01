@@ -19,16 +19,9 @@ import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 import { useBreadcrumbs } from '@ttn-lw/components/breadcrumbs/context'
 import PageTitle from '@ttn-lw/components/page-title'
 
-import RequireRequest from '@ttn-lw/lib/components/require-request'
-
 import MACSettingsProfileForm from '@console/containers/mac-settings-profile-form'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectNsConfig } from '@ttn-lw/lib/selectors/env'
-
-import { getNsFrequencyPlans } from '@console/store/actions/configuration'
-
-const nsEnabled = selectNsConfig().enabled
 
 const ApplicationMacSettingsProfilesAdd = () => {
   const { appId } = useParams()
@@ -41,14 +34,12 @@ const ApplicationMacSettingsProfilesAdd = () => {
   )
 
   return (
-    <RequireRequest requestAction={nsEnabled ? getNsFrequencyPlans() : undefined}>
-      <div className="container container--lg grid">
-        <PageTitle title={'Create a new MAC settings profile'} className="mb-0" />
-        <div className="item-12">
-          <MACSettingsProfileForm />
-        </div>
+    <div className="container container--lg grid">
+      <PageTitle title={'Create a new MAC settings profile'} className="mb-0" />
+      <div className="item-12">
+        <MACSettingsProfileForm />
       </div>
-    </RequireRequest>
+    </div>
   )
 }
 

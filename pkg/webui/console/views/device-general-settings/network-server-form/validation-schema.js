@@ -461,6 +461,11 @@ const validationSchema = Yup.object()
         })
       },
     ),
+    mac_settings_profile_ids: Yup.object()
+      .shape({
+        profile_id: Yup.string(),
+      })
+      .nullable(),
   })
   .noUnknown()
 

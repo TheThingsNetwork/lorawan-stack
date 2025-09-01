@@ -177,6 +177,8 @@
   "console.components.location-form.index.noLocationSetInfo": "",
   "console.components.location-form.index.updateSuccess": "",
   "console.components.lorawan-version-input.index.phyVersionError": "",
+  "console.components.mac-settings-section.index.noMacSettingsProfiles": "",
+  "console.components.mac-settings-section.index.noMacSettingsProfilesAction": "",
   "console.components.notifications.templates.api-key-changed.title": "",
   "console.components.notifications.templates.api-key-changed.body": "",
   "console.components.notifications.templates.api-key-changed.preview": "",
