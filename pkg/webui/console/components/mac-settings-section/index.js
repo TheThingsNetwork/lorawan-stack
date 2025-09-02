@@ -69,6 +69,7 @@ const MacSettingsSection = props => {
     isClassC,
     bandId,
     appId,
+    deviceId,
   } = props
 
   const navigate = useNavigate()
@@ -236,7 +237,7 @@ const MacSettingsSection = props => {
               icon={IconPlus}
               onClick={() =>
                 navigate(`/applications/${appId}/mac-settings-profiles/add`, {
-                  replace: true,
+                  state: { deviceId },
                 })
               }
               message={sharedMessages.createMacSettingsProfile}
@@ -752,6 +753,7 @@ MacSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
   appId: PropTypes.string.isRequired,
   bandId: PropTypes.string.isRequired,
+  deviceId: PropTypes.string.isRequired,
   initiallyCollapsed: PropTypes.bool,
   isClassB: PropTypes.bool,
   isClassC: PropTypes.bool,

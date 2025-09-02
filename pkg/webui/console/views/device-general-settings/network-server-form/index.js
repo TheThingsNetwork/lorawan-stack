@@ -613,6 +613,7 @@ const NetworkServerForm = React.memo(props => {
         isClassC={isClassC}
         bandId={bandId}
         appId={appId}
+        deviceId={devId}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

@@ -15,7 +15,7 @@
 import React, { useCallback, useMemo, useState } from 'react'
 import { get, set, isEmpty, omitBy } from 'lodash'
 import { useDispatch } from 'react-redux'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { defineMessages } from 'react-intl'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
@@ -67,7 +67,7 @@ const dataRateOverrideOptions = Array.from({ length: 16 }, (_, index) => ({
   label: <Message content={sharedMessages.dataRate} values={{ n: index }} />,
 }))
 
-const MACSettingsProfileInnerForm = () => {
+const MACSettingsProfileInnerForm = ({ edit }) => {
   const { values, setFieldValue, setFieldTouched } = useFormContext()
   const { mac_settings } = values
   const [resetsFCnt, setResetsFCnt] = useState(false)
@@ -146,6 +146,7 @@ const MACSettingsProfileInnerForm = () => {
         component={Input}
         required
         fieldWidth="half"
+        disabled={edit}
       />
       <Form.Field
         title={sharedMessages.frameCounterWidth}
@@ -489,6 +490,7 @@ const MACSettingsProfileInnerForm = () => {
                         component={Select}
                         options={dataRateOverrideOptions}
                         className="d-flex direction-column flex-grow"
+                        fieldWidth="quarter"
                       />
                       <Form.Field
                         title={sharedMessages.minNbTrans}
@@ -579,9 +581,18 @@ const MACSettingsProfileInnerForm = () => {
   )
 }
 
+MACSettingsProfileInnerForm.propTypes = {
+  edit: PropTypes.bool,
+}
+
+MACSettingsProfileInnerForm.defaultProps = {
+  edit: false,
+}
+
 const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId }) => {
   const dispatch = useDispatch()
   const { appId } = useParams()
+  const { state } = useLocation()
   const navigate = useNavigate()
   const [error, setError] = useState('')
 
@@ -632,13 +643,19 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
           message: m.created,
           type: toast.types.SUCCESS,
         })
-        navigate(`/applications/${appId}/mac-settings-profiles`)
+        if (state?.deviceId) {
+          navigate(`/applications/${appId}/devices/${state.deviceId}/general-settings`, {
+            preventScrollReset: true,
+          })
+        } else {
+          navigate(`/applications/${appId}/mac-settings-profiles`)
+        }
       } catch (error) {
         setSubmitting(false)
         setError(error)
       }
     },
-    [appId, dispatch, navigate],
+    [appId, dispatch, navigate, state],
   )
 
   const handleEdit = useCallback(
@@ -680,7 +697,7 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
       onSubmit={edit ? handleEdit : handleSubmit}
       error={error}
     >
-      <MACSettingsProfileInnerForm />
+      <MACSettingsProfileInnerForm edit={edit} />
       <SubmitBar>
         <Form.Submit
           component={SubmitButton}
