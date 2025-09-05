@@ -45,10 +45,11 @@ import TestForm from './test-form'
 
 const m = defineMessages({
   repository: 'Use Device Repository formatters',
-  customJavascipt: 'Custom Javascript formatter',
+  customJavascript: 'Custom Javascript formatter',
   formatterType: 'Formatter type',
   formatterCode: 'Formatter code',
-  formatterCodeReadOnly: 'Formatter code (read only)',
+  encoderReadOnly: 'Encoder code (read only)',
+  decoderReadOnly: 'Decoder code (read only)',
   grpcHost: 'GRPC host',
   grpcFieldDescription: 'The address of the service to connect to',
   appFormatter: 'Use application payload formatter',
@@ -74,11 +75,15 @@ const FIELD_NAMES = {
 const formatterOptions = [
   { label: m.appFormatter, value: TYPES.DEFAULT },
   { label: m.repository, value: TYPES.REPOSITORY },
-  { label: m.customJavascipt, value: TYPES.JAVASCRIPT },
+  { label: m.customJavascript, value: TYPES.JAVASCRIPT },
   { label: sharedMessages.grpcService, value: TYPES.GRPC },
   { label: 'CayenneLPP', value: TYPES.CAYENNELPP },
   { label: sharedMessages.none, value: TYPES.NONE },
 ]
+
+const hasRepositoryFormatter = repoFormatters =>
+  repoFormatters !== undefined &&
+  (Boolean(repoFormatters?.decoder) || Boolean(repoFormatters?.encoder))
 
 const validationSchema = Yup.object().shape({
   [FIELD_NAMES.SELECT]: Yup.string()
@@ -89,7 +94,7 @@ const validationSchema = Yup.object().shape({
     then: schema =>
       schema
         .required(sharedMessages.validateRequired)
-        // See https://github.com/TheThingsNetwork/lorawan-stack/blob/v3.14/api/messages.proto#L380
+        // See https://github.com/TheThingsNetwork/lorawan-stack/blob/v3.14/api/messages.proto#L748
         // for validation requirements.
         .max(40960, Yup.passValues(sharedMessages.validateTooLong)),
   }),
@@ -112,8 +117,7 @@ const Formatter = ({
   pasteRepoPayloadFormatters,
   darkTheme,
 }) => {
-  const hasRepoFormatter = repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
-  const repositoryPayloadFormatters = repoFormatters?.formatter_parameter
+  const hasRepoFormatter = hasRepositoryFormatter(repoFormatters)
   const showParameter =
     type === TYPES.JAVASCRIPT || (type === TYPES.DEFAULT && defaultType === 'FORMATTER_JAVASCRIPT')
   const showRepositoryParameter =
@@ -180,18 +184,36 @@ const Formatter = ({
     }
     return (
       <>
-        <Form.Field
-          readOnly
-          component={CodeEditor}
-          title={m.formatterCodeReadOnly}
-          name={FIELD_NAMES.REPOSITORY}
-          type="text"
-          height="10rem"
-          minLines={25}
-          maxLines={25}
-          value={repositoryPayloadFormatters}
-          darkTheme={darkTheme}
-        />
+        <div className="d-flex gap-cs-xxl">
+          {repoFormatters?.decoder && (
+            <Form.Field
+              readOnly
+              component={CodeEditor}
+              title={m.decoderReadOnly}
+              name={FIELD_NAMES.REPOSITORY}
+              type="text"
+              height="10rem"
+              minLines={25}
+              maxLines={25}
+              value={repoFormatters?.decoder?.formatter_parameter}
+              darkTheme={darkTheme}
+            />
+          )}
+          {repoFormatters?.encoder && (
+            <Form.Field
+              readOnly
+              component={CodeEditor}
+              title={m.encoderReadOnly}
+              name={FIELD_NAMES.REPOSITORY}
+              type="text"
+              height="10rem"
+              minLines={25}
+              maxLines={25}
+              value={repoFormatters?.encoder?.formatter_parameter}
+              darkTheme={darkTheme}
+            />
+          )}
+        </div>
         <Link.DocLink path="/integrations/payload-formatters/device-repo/" secondary>
           <Message content={m.learnMoreAboutDeviceRepo} />
         </Link.DocLink>
@@ -208,7 +230,12 @@ Formatter.propTypes = {
   pasteAppPayloadFormatter: PropTypes.func.isRequired,
   pasteRepoPayloadFormatters: PropTypes.func.isRequired,
   repoFormatters: PropTypes.shape({
-    formatter_parameter: PropTypes.string,
+    decoder: PropTypes.shape({
+      formatter_parameter: PropTypes.string,
+    }),
+    encoder: PropTypes.shape({
+      formatter_parameter: PropTypes.string,
+    }),
   }),
   type: PropTypes.string.isRequired,
 }
@@ -242,7 +269,8 @@ const PayloadFormattersForm = ({
   const [error, setError] = useState(undefined)
   const [testResult, setTestResult] = useState({})
   const formRef = useRef(null)
-  const repositoryPayloadFormatters = repoFormatters?.formatter_parameter
+  const repositoryDecoder = repoFormatters?.decoder?.formatter_parameter
+  const repositoryEncoder = repoFormatters?.encoder?.formatter_parameter
 
   // Using the unstable version of useBlocker because `useBlocker` and `usePrompt` were removes from react-router v6.
   // Reference: https://github.com/remix-run/react-router/issues/8139#issuecomment-1396078490
@@ -374,8 +402,11 @@ const PayloadFormattersForm = ({
   }, [defaultParameter, uplink])
 
   const pasteRepoPayloadFormatters = useCallback(() => {
+    const repositoryPayloadFormatters = uplink
+      ? repositoryDecoder
+      : `${repositoryEncoder ?? ''}\n${repositoryDecoder ?? ''}`
     formRef?.current?.setFieldValue(FIELD_NAMES.JAVASCRIPT, repositoryPayloadFormatters)
-  }, [repositoryPayloadFormatters])
+  }, [repositoryDecoder, repositoryEncoder, uplink])
 
   const _showTestSection = useCallback(() => {
     // Show the testing section if:
@@ -398,7 +429,8 @@ const PayloadFormattersForm = ({
     [FIELD_NAMES.GRPC]:
       initialType === TYPES.GRPC ? initialParameter : getDefaultGrpcServiceFormatter(uplink),
   }
-  const hasRepoFormatter = repoFormatters !== undefined && Object.keys(repoFormatters).length !== 0
+
+  const hasRepoFormatter = hasRepositoryFormatter(repoFormatters)
   let options = allowReset
     ? formatterOptions
     : formatterOptions.filter(o => o.value !== TYPES.DEFAULT)
@@ -513,7 +545,12 @@ PayloadFormattersForm.propTypes = {
   onTestSubmit: PropTypes.func,
   onTypeChange: PropTypes.func,
   repoFormatters: PropTypes.shape({
-    formatter_parameter: PropTypes.string,
+    decoder: PropTypes.shape({
+      formatter_parameter: PropTypes.string,
+    }),
+    encoder: PropTypes.shape({
+      formatter_parameter: PropTypes.string,
+    }),
   }),
   uplink: PropTypes.bool.isRequired,
 }

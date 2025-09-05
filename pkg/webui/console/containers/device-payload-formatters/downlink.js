@@ -55,7 +55,7 @@ const DevicePayloadFormatters = () => {
   const link = useSelector(selectApplicationLink)
   const formatters = useSelector(selectSelectedDeviceFormatters)
   const encodeDownlink = tts.As.encodeDownlink
-  const repositoryPayloadFormatters = useSelector(selectDeviceRepoPayloadFromatters)
+  const repositoryPayloadFormatters = useSelector(selectDeviceRepoPayloadFromatters)?.down_formatter
   const consolePreferences = useSelector(selectConsolePreferences)
   const darkTheme =
     consolePreferences.console_theme === 'CONSOLE_THEME_DARK' ||
