@@ -190,7 +190,7 @@ const Formatter = ({
               readOnly
               component={CodeEditor}
               title={m.decoderReadOnly}
-              name={FIELD_NAMES.REPOSITORY}
+              name={`${FIELD_NAMES.REPOSITORY}-decoder`}
               type="text"
               height="10rem"
               minLines={25}
@@ -204,7 +204,7 @@ const Formatter = ({
               readOnly
               component={CodeEditor}
               title={m.encoderReadOnly}
-              name={FIELD_NAMES.REPOSITORY}
+              name={`${FIELD_NAMES.REPOSITORY}-encoder`}
               type="text"
               height="10rem"
               minLines={25}
