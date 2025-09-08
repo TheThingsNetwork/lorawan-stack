@@ -286,7 +286,6 @@ const NetworkServerForm = React.memo(props => {
 
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
-      console.log('values', values)
       let parsedValues = values
       // If the nbTrans values are not overridden, remove them from the payload.
       if (
@@ -313,7 +312,7 @@ const NetworkServerForm = React.memo(props => {
         context: validationContext,
         stripUnknown: true,
       })
-      console.log('castedValues', castedValues)
+
       const updatedValues = diff(device, castedValues, {
         exclude: [
           '_activation_mode',
