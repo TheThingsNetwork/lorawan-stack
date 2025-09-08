@@ -704,6 +704,7 @@ const MacSettingsSection = props => {
                   component={Input}
                   type="number"
                   inputWidth="xs"
+                  min={0}
                 />
                 <Form.Field
                   title={sharedMessages.adrTransPower}

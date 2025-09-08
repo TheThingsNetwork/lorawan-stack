@@ -61,7 +61,7 @@ const m = defineMessages({
 
 // 0...15
 const dataRateOverrideOptions = Array.from({ length: 16 }, (_, index) => ({
-  value: `data_rate${index}`,
+  value: `data_rate_${index}`,
   label: <Message content={sharedMessages.dataRate} values={{ n: index }} />,
 }))
 
@@ -539,6 +539,7 @@ const MACSettingsProfileInnerForm = ({ edit }) => {
             component={Input}
             type="number"
             inputWidth="xs"
+            min={0}
           />
           <Form.Field
             title={sharedMessages.adrTransPower}
