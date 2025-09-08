@@ -334,7 +334,7 @@ describe('Payload formatters', () => {
         cy.get('button[type="submit"]').first().scrollIntoView()
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByTestId('code-editor-repository-formatter').should('be.visible')
+        cy.findByTestId('code-editor-repository-formatter-decoder').should('be.visible')
       })
 
       it('provides formatter options for devices of applications with application payload formatter', () => {
@@ -473,7 +473,7 @@ describe('Payload formatters', () => {
         cy.get('button[type="submit"]').first().scrollIntoView()
         cy.findByRole('button', { name: 'Paste repository formatter' }).should('be.visible')
         cy.findByLabelText('Formatter type').selectOption('repository')
-        cy.findByTestId('code-editor-repository-formatter').should('be.visible')
+        cy.findByTestId('code-editor-repository-formatter-encoder')
       })
 
       it('provides formatter options for devices of applications with application payload formatter', () => {
