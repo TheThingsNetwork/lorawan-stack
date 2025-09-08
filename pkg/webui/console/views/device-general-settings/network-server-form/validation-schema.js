@@ -464,7 +464,7 @@ const validationSchema = Yup.object()
       },
     ),
     mac_settings_profile_ids: Yup.lazy(value => {
-      if (!Boolean(value) || isEmpty(value)) {
+      if (value === undefined || isEmpty(value)) {
         return Yup.object().strip()
       }
       return Yup.object()

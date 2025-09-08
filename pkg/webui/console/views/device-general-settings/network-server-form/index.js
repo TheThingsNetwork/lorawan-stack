@@ -286,6 +286,7 @@ const NetworkServerForm = React.memo(props => {
 
   const handleSubmit = React.useCallback(
     async (values, { resetForm, setSubmitting }) => {
+      console.log('values', values)
       let parsedValues = values
       // If the nbTrans values are not overridden, remove them from the payload.
       if (
@@ -312,7 +313,7 @@ const NetworkServerForm = React.memo(props => {
         context: validationContext,
         stripUnknown: true,
       })
-
+      console.log('castedValues', castedValues)
       const updatedValues = diff(device, castedValues, {
         exclude: [
           '_activation_mode',
@@ -328,6 +329,7 @@ const NetworkServerForm = React.memo(props => {
       })
 
       const patch = updatedValues
+
       // Always submit current `mac_settings` values to avoid overwriting nested entries.
       patch.mac_settings = castedValues.mac_settings
 
@@ -352,6 +354,12 @@ const NetworkServerForm = React.memo(props => {
       if (patch.mac_settings?.adr) {
         patch.mac_settings.adr_margin = null
         patch.mac_settings.use_adr = null
+      }
+
+      // The validation schema strips `mac_settings_profile_ids` if it is empty.
+      // We need to explicitly set it to null in order to remove the existing profile association.
+      if (values.mac_settings_profile_ids === null) {
+        patch.mac_settings_profile_ids = null
       }
 
       if (Boolean(patch.mac_settings_profile_ids)) {
