@@ -42,12 +42,14 @@ import {
   fCntWidthEncode,
   fCntWidthDecode,
   parseLorawanMacVersion,
+} from '@console/lib/device-utils'
+import getDataRate from '@console/lib/data-rate-utils'
+import {
   maxDutyCycleOptions,
   pingSlotPeriodicityOptions,
   adrAckLimitOptions,
   adrAckDelayOptions,
-} from '@console/lib/device-utils'
-import getDataRate from '@console/lib/data-rate-utils'
+} from '@console/lib/mac-settings-utils'
 
 import { selectDataRates } from '@console/store/selectors/configuration'
 import { selectMacSettingsProfiles } from '@console/store/selectors/mac-settings-profiles'

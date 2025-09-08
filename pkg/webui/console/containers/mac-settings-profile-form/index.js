@@ -39,15 +39,13 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import diff from '@ttn-lw/lib/diff'
 
+import { FRAME_WIDTH_COUNT, fCntWidthEncode, fCntWidthDecode } from '@console/lib/device-utils'
 import {
-  FRAME_WIDTH_COUNT,
-  fCntWidthEncode,
-  fCntWidthDecode,
   maxDutyCycleOptions,
   pingSlotPeriodicityOptions,
   adrAckLimitOptions,
   adrAckDelayOptions,
-} from '@console/lib/device-utils'
+} from '@console/lib/mac-settings-utils'
 
 import {
   createMacSettingsProfile,
