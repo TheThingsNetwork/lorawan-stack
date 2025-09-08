@@ -124,7 +124,7 @@ const checkCollapsingFields = defineSmokeTest('check all end device sub pages', 
         cy.findByLabelText('Frequency plan').should('be.visible')
         cy.get('button[type="submit"]').scrollIntoView()
         cy.findByRole('button', { name: 'Save changes' }).should('be.visible')
-        cy.findByText('Advanced MAC settings').click()
+        cy.findByText('Custom MAC settings').click()
         cy.get('#mac-settings').scrollIntoView()
         cy.findByText('Frame counter width').should('be.visible')
         cy.findByTestId('error-notification').should('not.exist')
