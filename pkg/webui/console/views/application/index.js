@@ -41,6 +41,7 @@ import ApplicationIntegrationsWebhooks from '@console/views/application-integrat
 import ApplicationIntegrationsPubsubs from '@console/views/application-integrations-pubsubs'
 import ApplicationIntegrationsMqtt from '@console/views/application-integrations-mqtt'
 import ApplicationIntegrationsLoRaCloud from '@console/views/application-integrations-lora-cloud'
+import ApplicationMacSettingsProfiles from '@console/views/application-mac-settings-profiles'
 import Devices from '@console/views/devices'
 
 import { selectApplicationSiteName } from '@ttn-lw/lib/selectors/env'
@@ -129,6 +130,7 @@ const ApplicationInner = () => {
         <Route path="api-keys/*" Component={ApplicationApiKeys} />
         <Route path="devices/*" Component={Devices} />
         <Route path="collaborators/*" Component={ApplicationCollaborators} />
+        <Route path="mac-settings-profiles/*" Component={ApplicationMacSettingsProfiles} />
         <Route path="data" Component={ApplicationData} />
         <Route path="payload-formatters/*" Component={ApplicationPayloadFormatters} />
         <Route path="integrations/mqtt" Component={ApplicationIntegrationsMqtt} />

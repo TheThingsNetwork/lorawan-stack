@@ -31,6 +31,7 @@ import {
   IconPayloadFormat,
   IconUplink,
   IconLayoutDashboard,
+  IconSquare,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
@@ -148,6 +149,11 @@ const AppSideNavigation = () => {
             icon={IconCollaborators}
           />
         )}
+        <SideNavigation.Item
+          title={sharedMessages.macSettingsProfiles}
+          path={`/applications/${appId}/mac-settings-profiles`}
+          icon={IconSquare}
+        />
         {mayViewOrEditApplicationApiKeys.check(rights) && (
           <SideNavigation.Item
             title={sharedMessages.apiKeys}

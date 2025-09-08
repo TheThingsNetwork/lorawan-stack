@@ -37,6 +37,7 @@ import QRCodeGenerator from './service/qr-code-generator'
 import SearchAccounts from './service/search-accounts'
 import Notifications from './service/notifications'
 import ConnectionProfiles from './service/connection-profiles'
+import NsMACSettingsProfiles from './service/network-server-mac-settings-profiles'
 
 class TTS {
   constructor({ authorization, stackConfig, connectionType, defaultUserId, axiosConfig }) {
@@ -56,6 +57,7 @@ class TTS {
     })
     this.Js = new Js(this.api.Js)
     this.Ns = new Ns(this.api.Ns)
+    this.NsMACSettingsProfiles = new NsMACSettingsProfiles(this.api.NsMACSettingsProfileRegistry)
     this.Is = new Is(this.api.Is)
     this.As = new As(this.api)
     this.Organizations = new Organizations(this.api, {

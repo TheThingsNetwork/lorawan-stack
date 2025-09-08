@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+import { isEmpty } from 'lodash'
+
 import Yup from '@ttn-lw/lib/yup'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
@@ -325,7 +327,7 @@ const validationSchema = Yup.object()
               .default([])
               .test(
                 'is-valid-frequency',
-                sharedMessages.validateFreqNumberic,
+                sharedMessages.validateFreqNumeric,
                 factoryPresetFreqNumericTest,
               )
               .test(
@@ -461,6 +463,16 @@ const validationSchema = Yup.object()
         })
       },
     ),
+    mac_settings_profile_ids: Yup.lazy(value => {
+      if (value === undefined || isEmpty(value)) {
+        return Yup.object().strip()
+      }
+      return Yup.object()
+        .shape({
+          profile_id: Yup.string(),
+        })
+        .nullable()
+    }),
   })
   .noUnknown()
 

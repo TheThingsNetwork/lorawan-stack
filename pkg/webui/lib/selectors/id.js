@@ -128,3 +128,6 @@ export const getPacketBrokerHomeNewtorkId = (policy = {}) =>
   combinePacketBrokerIds(policy.home_network_id)
 
 export const getClientId = (client = {}) => getByPath(client, 'ids.client_id')
+
+export const getMacSettingsProfilesId = (macSettingsProfile = {}) =>
+  getByPath(macSettingsProfile, 'ids.profile_id')
