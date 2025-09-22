@@ -155,6 +155,7 @@ type Config struct {
 	DownlinkQueueCapacity      int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`                                                       // nolint: lll
 	MACSettingsProfileRegistry MACSettingsProfileRegistry   `name:"-"`
 	Pagination                 PaginationConfig             `name:"pagination" description:"Pagination configuration"`
+	MaxConfNbTrans             uint32                       `name:"max-conf-nb-trans" description:"Maximum number of confirmed uplink retransmissions"` // nolint: lll
 }
 
 // DefaultConfig is the default Network Server configuration.
@@ -188,4 +189,5 @@ var DefaultConfig = Config{
 	Pagination: PaginationConfig{
 		DefaultLimit: 100,
 	},
+	MaxConfNbTrans: 15,
 }

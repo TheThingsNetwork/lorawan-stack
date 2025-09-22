@@ -50,9 +50,6 @@ const (
 	// recentUplinkCount is the maximum amount of recent uplinks stored per device.
 	recentUplinkCount = 20
 
-	// maxConfNbTrans is the maximum number of confirmed uplink retransmissions for pre-1.0.4 devices.
-	maxConfNbTrans = 5
-
 	// joinRequestCollectionWindow is the duration for which duplicated JoinRequests are collected.
 	// This parameter is separated from the uplink collection period since the JoinRequest may have to be
 	// served by a Join Server which is either geographically far away, or simply slow to respond.
@@ -88,12 +85,12 @@ func (ns *NetworkServer) deduplicateUplink(
 	return true, nil
 }
 
-func maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
+func (ns *NetworkServer) maxTransmissionNumber(ver ttnpb.MACVersion, confirmed bool, nbTrans uint32) uint32 {
 	if !confirmed {
 		return nbTrans
 	}
 	if macspec.LimitConfirmedTransmissions(ver) {
-		return maxConfNbTrans
+		return ns.maxConfNbTrans
 	}
 	return nbTrans
 }
@@ -369,7 +366,11 @@ func (ns *NetworkServer) matchAndHandleDataUplink(ctx context.Context, dev *ttnp
 			default: // cmacFMatchResult.FullFCnt == dev.Session.LastFCntUp
 				ctx = log.NewContextWithField(ctx, "f_cnt_reset", false)
 
-				maxNbTrans := maxTransmissionNumber(dev.MacState.LorawanVersion, up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP, dev.MacState.CurrentParameters.AdrNbTrans)
+				maxNbTrans := ns.maxTransmissionNumber(
+					dev.MacState.LorawanVersion,
+					up.Payload.MHdr.MType == ttnpb.MType_CONFIRMED_UP,
+					dev.MacState.CurrentParameters.AdrNbTrans,
+				)
 				if maxNbTrans < 1 {
 					panic(fmt.Sprintf("invalid maximum transmission number %d", maxNbTrans))
 				}

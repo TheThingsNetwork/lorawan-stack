@@ -190,6 +190,8 @@ type NetworkServer struct {
 	scheduledDownlinkMatcher ScheduledDownlinkMatcher
 
 	uplinkSubmissionPool workerpool.WorkerPool[[]*ttnpb.ApplicationUp]
+
+	maxConfNbTrans uint32
 }
 
 // Option configures the NetworkServer.
@@ -302,6 +304,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deviceKEKLabel:           conf.DeviceKEKLabel,
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
+		maxConfNbTrans:           conf.MaxConfNbTrans,
 	}
 	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config[[]*ttnpb.ApplicationUp]{
 		Component:  c,
