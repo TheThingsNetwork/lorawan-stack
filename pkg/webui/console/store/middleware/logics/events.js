@@ -54,7 +54,7 @@ import { selectDeviceById } from '@console/store/selectors/devices'
  *
  * @param {string} reducerName - The name of an entity used to create the events reducer.
  * @param {string} entityName - The name of an entity.
- * @param {Function} onEventsStart - A function to be called to start the events stream.
+ * @param {(ids: string[]) => Promise<unknown>} onEventsStart - A function to be called to start the events stream.
  * Should accept a list of entity ids.
  * @returns {object} - The `redux-logic` (decorated) logic.
  */
