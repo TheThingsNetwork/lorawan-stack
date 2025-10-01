@@ -19,10 +19,12 @@ import { useSearchParams } from 'react-router-dom'
  * `useQueryState` is a hook that allows to store a value in the URL query string.
  * It returns a stateful value, and a function to update it.
  * The updated value is stored in the URL query string.
+ *
+ * @template T
  * @param {string} key - The key to store the value under in the URL query string.
- * @param {any} initialValue - The initial value to store in the URL query string.
- * @param {Function} parser - A function to parse the value from the URL query string.
- * @returns {[any, Function]} - A tuple containing the stateful value and a function to update it.
+ * @param {T} initialValue - The initial value if no value is found in the URL.
+ * @param {(value: string|null) => T} [parser] - Function to parse the value from the URL query string.
+ * @returns {[T, (newValue: T) => void]} - A tuple with the stateful value and a setter function.
  */
 const useQueryState = (key, initialValue, parser = v => v) => {
   const [searchParams, setSearchParams] = useSearchParams()

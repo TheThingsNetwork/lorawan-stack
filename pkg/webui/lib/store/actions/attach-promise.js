@@ -41,9 +41,8 @@ export const createRequestActions = (baseType, requestPayloadCreator, requestMet
  * flag which results in a promise being attached to the action by the promise
  * middleware.
  *
- * @param {object|Function} actionOrActionCreator - The original action or
- * action creator.
- * @returns {object|Function} - The modified action or action creator.
+ * @param {unknown | ((...args: unknown[]) => unknown)} actionOrActionCreator - The original action or action creator.
+ * @returns {unknown | ((...args: unknown[]) => unknown)} The modified action or action creator.
  */
 export default actionOrActionCreator => {
   const decorateAction = action => ({

@@ -18,7 +18,7 @@ import React from 'react'
  * React hook that allows subscribing to `window.onbeforeunload` and control it inside
  * a react functional component.
  *
- * @param {Function} handler - The event handler function.
+ * @param {(event: BeforeUnloadEvent) => (void | string)} handler - The event handler function.
  * @example
  *
  * // Just prompt the user if page unload is indeed needed.

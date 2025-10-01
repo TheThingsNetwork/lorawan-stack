@@ -46,7 +46,7 @@ const requestMap = {
 }
 
 /** Limit the number of concurrent promises.
- * @param {Array<Function>} promises - An array of functions that return promises.
+ * @param {Array<() => Promise<unknown>>} promises - An array of functions that return promises.
  * @param {number} limit - The number of promises to run concurrently.
  * @returns {Promise<Array>} - A promise that resolves to an array of results.
  */
@@ -65,7 +65,7 @@ const limitedPromiseAll = async (promises, limit) => {
 
 /** Fetch missing entities.
  * @param {object} topEntities - The top entities.
- * @param {Function} dispatch - The dispatch function.
+ * @param {(action: unknown) => Promise<unknown>} dispatch - The dispatch function.
  * @returns {Promise<Array>} - A promise that resolves to an array of results.
  */
 const fetchMissingEntities = (topEntities, dispatch) => {
