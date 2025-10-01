@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useMemo } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { useParams } from 'react-router-dom'
 
 import Panel from '@ttn-lw/components/panel'
 import Icon, { IconGateway, IconInfoCircle, IconBolt, IconRouterOff } from '@ttn-lw/components/icon'
@@ -30,8 +29,6 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getBackendErrorName, isBackend } from '@ttn-lw/lib/errors/utils'
-
-import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
 
 import {
   selectGatewayStatistics,
@@ -107,13 +104,13 @@ EmptyState.propTypes = {
 }
 
 const GatewayStatusPanel = () => {
-  const dispatch = useDispatch()
-  const { gtwId } = useParams()
   const gatewayStats = useSelector(selectGatewayStatistics)
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
+  const isConnected = Boolean(gatewayStats?.connected_at) && !isDisconnected
   const isFetching = !Boolean(gatewayStats) && fetching
+  const hasStatistics = Boolean(gatewayStats)
   const noConnectionYet = useMemo(
     () => isBackend(error) && getBackendErrorName(error).includes('not_connected'),
     [error],
@@ -142,13 +139,6 @@ const GatewayStatusPanel = () => {
   const showRoundTripTimes = Boolean(gatewayStats?.round_trip_times)
   const showDutyCycleUtilization = Boolean(gatewayStats?.sub_bands)
 
-  useEffect(() => {
-    dispatch(startGatewayStatistics(gtwId))
-    return () => {
-      dispatch(stopGatewayStatistics())
-    }
-  }, [dispatch, gtwId])
-
   return (
     <Panel
       title={sharedMessages.gatewayStatus}
@@ -165,9 +155,11 @@ const GatewayStatusPanel = () => {
           status={
             isDisconnected
               ? 'bad'
-              : isFetching || hasError || noConnectionYet
+              : isFetching || noConnectionYet
                 ? 'mediocre'
-                : 'green'
+                : isConnected
+                  ? 'green'
+                  : 'unknown'
           }
           pulse
           big
@@ -206,7 +198,7 @@ const GatewayStatusPanel = () => {
           </div>
         </div>
       )}
-      {!isFetching && !noConnectionYet && !isUnavailable && (
+      {hasStatistics && !isFetching && !noConnectionYet && !isUnavailable && (
         <>
           <div className={style.gtwStatusPanelUpperContainer}>
             <div className="d-flex direction-column j-between w-full sm-md:j-start">
@@ -255,6 +247,9 @@ const GatewayStatusPanel = () => {
             </div>
           </div>
         </>
+      )}
+      {!hasStatistics && !isFetching && !noConnectionYet && !isUnavailable && (
+        <EmptyState title={m.isUnavailable} message={m.isUnavailableDesc} />
       )}
     </Panel>
   )

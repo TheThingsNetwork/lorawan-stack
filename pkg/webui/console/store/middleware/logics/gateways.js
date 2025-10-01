@@ -254,6 +254,7 @@ const startGatewayStatisticsLogic = createLogic({
         }),
       )
       done()
+      return
     }
 
     let gtwGsAddress
@@ -273,6 +274,7 @@ const startGatewayStatisticsLogic = createLogic({
         }),
       )
       done()
+      return
     }
 
     if (gtwGsAddress !== consoleGsAddress) {
@@ -282,6 +284,7 @@ const startGatewayStatisticsLogic = createLogic({
         }),
       )
       done()
+      return
     }
 
     dispatch(gateways.startGatewayStatisticsSuccess())
