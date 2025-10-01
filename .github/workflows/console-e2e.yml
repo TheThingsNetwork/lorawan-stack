@@ -213,7 +213,7 @@ jobs:
           name: cypress-failed-test-spec
           path: .cache/.failed-specs-*.txt
   cross-browser-smoke:
-    name: Cross-browser smoke tests (Firefox 129.0)
+    name: Cross-browser smoke tests (Firefox 141.0)
     runs-on: ubuntu-24.04
     env:
       NODE_ENV: development
@@ -238,9 +238,10 @@ jobs:
           name: "build-files"
       - name: Unzip build artifacts
         run: unzip -o build.zip
-      - name: Install FF 115.7.0 ESR
+      - name: Install Firefox 141.0 ESR
         run: |
-          wget --no-verbose -O /tmp/firefox.tar.bz2 https://download-installer.cdn.mozilla.net/pub/firefox/releases/129.0/linux-x86_64/en-US/firefox-129.0.tar.bz2
+          FIREFOX_VERSION=141.0
+          wget --no-verbose -O /tmp/firefox.tar.bz2 "https://download-installer.cdn.mozilla.net/pub/firefox/releases/${FIREFOX_VERSION}/linux-x86_64/en-US/firefox-${FIREFOX_VERSION}.tar.bz2"
           tar -C /opt -xjf /tmp/firefox.tar.bz2
           rm /tmp/firefox.tar.bz2
           sudo ln -fs /opt/firefox/firefox /usr/bin/firefox
