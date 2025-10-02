@@ -2339,7 +2339,13 @@ func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consume
 
 			dev, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIds, devID.DeviceId,
 				[]string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
 					"mac_state",
+					"multicast",
+					"pending_mac_state",
 					"session",
 				},
 				func(_ context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
