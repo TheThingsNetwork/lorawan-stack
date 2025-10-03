@@ -2335,7 +2335,7 @@ func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consume
 			logger := log.FromContext(ctx)
 			logger.WithField("start_at", t).Debug("Process pending downlink task")
 
-			dev, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIds, devID.DeviceId,
+			_, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIds, devID.DeviceId,
 				[]string{
 					"frequency_plan_id",
 					"last_dev_status_received_at",
@@ -2363,8 +2363,9 @@ func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consume
 								CorrelationIds: pendingAppDown.CorrelationIds,
 							},
 						}
-
+						// Clear pending application downlink to avoid repeatedly sending NACKs in case of an error.
 						dev.MacState.PendingApplicationDownlink = nil
+
 						logger.Debug("Pending application downlink not confirmed in time, send NACK to application")
 						ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...)
 					}
@@ -2379,11 +2380,6 @@ func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consume
 				setErr = true
 				logger.WithError(err).Error("Failed to update device in registry")
 				return time.Time{}, err
-			}
-
-			if err := ns.updateDataDownlinkTask(ctx, dev, time.Time{}); err != nil {
-				log.FromContext(ctx).WithError(err).Error(
-					"Failed to update downlink task queue after processing pending downlink")
 			}
 
 			return time.Time{}, nil
