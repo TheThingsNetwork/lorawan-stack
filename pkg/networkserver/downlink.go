@@ -2310,8 +2310,6 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 	return err
 }
 
-const maxConfirmedDownlinkRetries = 8
-
 func (ns *NetworkServer) createProcessPendingDownlinkTask(consumerID string) func(context.Context) error {
 	return func(ctx context.Context) error {
 		return ns.processPendingDownlinkTask(ctx, consumerID)
@@ -2356,28 +2354,21 @@ func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consume
 
 					pendingAppDown := dev.MacState.GetPendingApplicationDownlink()
 					if pendingAppDown != nil {
-						pendingAppDown.FCnt = dev.Session.LastNFCntDown + 1
-						pendingAppDown.ConfirmedRetry.Attempt++
-
-						if pendingAppDown.ConfirmedRetry.Attempt > maxConfirmedDownlinkRetries {
-							dev.MacState.PendingApplicationDownlink = nil
-							logger.Warn("Max confirmed downlink retries reached, drop pending application downlink")
-							return dev, []string{
-								"mac_state.pending_application_downlink",
-							}, nil
+						queuedApplicationUplinks := []*ttnpb.ApplicationUp{
+							{
+								EndDeviceIds: dev.Ids,
+								Up: &ttnpb.ApplicationUp_DownlinkNack{
+									DownlinkNack: pendingAppDown,
+								},
+								CorrelationIds: pendingAppDown.CorrelationIds,
+							},
 						}
 
-						// Enqueue the pending application downlink at the front of the queue.
-						// This preserves the order of other queued application downlinks.
-						// The pending application downlink will be processed first in the next downlink task.
-						// This is important for confirmed downlinks, as we need to ensure that the ACK is received
-						// before processing other downlinks.
-						dev.Session.QueuedApplicationDownlinks = append(
-							[]*ttnpb.ApplicationDownlink{pendingAppDown},
-							dev.Session.QueuedApplicationDownlinks...,
-						)
 						dev.MacState.PendingApplicationDownlink = nil
+						logger.Debug("Pending application downlink not confirmed in time, send NACK to application")
+						ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...)
 					}
+
 					return dev, []string{
 						"mac_state",
 						"session",
