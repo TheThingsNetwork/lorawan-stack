@@ -2326,7 +2326,10 @@ func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consume
 	err := ns.pendingDownlinkTasks.Pop(
 		ctx,
 		consumerID,
-		func(ctx context.Context, devID *ttnpb.EndDeviceIdentifiers, t time.Time,
+		func(
+			ctx context.Context,
+			devID *ttnpb.EndDeviceIdentifiers,
+			t time.Time,
 		) (time.Time, error) {
 			ctx = log.NewContextWithFields(ctx, log.Fields(
 				"device_uid", unique.ID(ctx, devID),
