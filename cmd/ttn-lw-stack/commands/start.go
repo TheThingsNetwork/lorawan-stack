@@ -53,7 +53,12 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/web"
 )
 
-const defaultLockTTL = 10 * time.Second
+const (
+	defaultLockTTL = 10 * time.Second
+
+	downlinkKey        = "downlink"
+	pendingDownlinkKey = "pending-downlink"
+)
 
 // NewComponentDeviceRegistryRedis instantiates a new redis client with the Component Device Registry namespace.
 func NewComponentDeviceRegistryRedis(conf *Config, name string) *redis.Client {
@@ -76,6 +81,12 @@ func NewNetworkServerApplicationUplinkQueueRedis(conf *Config) *redis.Client {
 // with the Network Server Downlink Task namespace.
 func NewNetworkServerDownlinkTaskRedis(conf *Config) *redis.Client {
 	return redis.New(conf.Redis.WithNamespace("ns", "tasks"))
+}
+
+// NewNetworkServerPendingDownlinkTaskRedis instantiates a new redis client
+// with the Network Server Pending Downlink Task namespace.
+func NewNetworkServerPendingDownlinkTaskRedis(conf *Config) *redis.Client {
+	return redis.New(conf.Redis.WithNamespace("ns", "pending-tasks"))
 }
 
 // NewNetworkServerMACSettingsProfileRegistryRedis instantiates a new redis client
@@ -372,12 +383,25 @@ var startCommand = &cobra.Command{
 				100000,
 				redisConsumerGroup,
 				redis.DefaultStreamBlockLimit,
+				downlinkKey,
 			)
 			if err := downlinkTasks.Init(ctx); err != nil {
 				return shared.ErrInitializeNetworkServer.WithCause(err)
 			}
 			defer downlinkTasks.Close(ctx)
 			config.NS.DownlinkTaskQueue.Queue = downlinkTasks
+			pendingDownlinkTasks := nsredis.NewDownlinkTaskQueue(
+				NewNetworkServerPendingDownlinkTaskRedis(config),
+				100000,
+				redisConsumerGroup,
+				redis.DefaultStreamBlockLimit,
+				pendingDownlinkKey,
+			)
+			if err := pendingDownlinkTasks.Init(ctx); err != nil {
+				return shared.ErrInitializeNetworkServer.WithCause(err)
+			}
+			defer pendingDownlinkTasks.Close(ctx)
+			config.NS.PendingDownlinkTaskQueue.Queue = pendingDownlinkTasks
 			config.NS.ScheduledDownlinkMatcher = &nsredis.ScheduledDownlinkMatcher{
 				Redis: redis.New(config.Cache.Redis.WithNamespace("ns", "scheduled-downlinks")),
 			}

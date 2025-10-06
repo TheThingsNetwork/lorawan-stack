@@ -2052,6 +2052,9 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 	if conf.NetworkServer.DownlinkTaskQueue.NumConsumers == 0 {
 		conf.NetworkServer.DownlinkTaskQueue.NumConsumers = 1
 	}
+	if conf.NetworkServer.PendingDownlinkTaskQueue.NumConsumers == 0 {
+		conf.NetworkServer.PendingDownlinkTaskQueue.NumConsumers = 1
+	}
 
 	cmpOpts := []component.Option{
 		component.WithClusterNew(func(context.Context, *cluster.Config, ...cluster.Option) (cluster.Cluster, error) {
@@ -2090,6 +2093,13 @@ func StartTest(ctx context.Context, conf TestConfig) (*NetworkServer, context.Co
 			closeFuncs = append(closeFuncs, closeFn)
 		}
 		conf.NetworkServer.DownlinkTaskQueue.Queue = v
+	}
+	if conf.NetworkServer.PendingDownlinkTaskQueue.Queue == nil {
+		v, closeFn := NewDownlinkTaskQueue(ctx)
+		if closeFn != nil {
+			closeFuncs = append(closeFuncs, closeFn)
+		}
+		conf.NetworkServer.PendingDownlinkTaskQueue.Queue = v
 	}
 	if conf.NetworkServer.UplinkDeduplicator == nil {
 		v, closeFn := NewUplinkDeduplicator(ctx)
