@@ -49,7 +49,7 @@ import (
 
 const (
 	pingIntervalJitter = 0.1
-	pingTimeout        = 10 * time.Second
+	pingTimeout        = 30 * time.Second
 	subprotocol        = "v1.lora.data.gateway.thethings.industries"
 )
 
