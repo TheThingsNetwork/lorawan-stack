@@ -49,7 +49,7 @@ import (
 
 const (
 	pingIntervalJitter = 0.1
-	pingTimeout        = 10 * time.Second
+	pingTimeout        = 30 * time.Second
 	subprotocol        = "v1.lora.data.gateway.thethings.industries"
 )
 
@@ -245,14 +245,14 @@ func (f *Frontend) handleConnection(wsConn *websocket.Conn, srvConn *io.Connecti
 	gtwConfig, err := buildLoRaGatewayConfig(srvConn.PrimaryFrequencyPlan())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to build LoRa gateway configuration")
-		wsConn.Close(websocket.StatusInternalError, "failed to build LoRa gateway configuration")
+		_ = wsConn.Close(websocket.StatusInternalError, "failed to build LoRa gateway configuration")
 		return err
 	}
 
 	go func() {
 		if err := f.ping(ctx, wsConn, srvConn); err != nil && !errors.Is(err, context.Canceled) {
 			logger.WithError(err).Info("Ping failed")
-			wsConn.Close(websocket.StatusPolicyViolation, "ping failed")
+			_ = wsConn.Close(websocket.StatusPolicyViolation, "ping failed")
 		}
 	}()
 
@@ -379,14 +379,14 @@ func readGatewayMessages(
 
 		if typ != websocket.MessageBinary {
 			logger.Debug("Received message with non-binary message type")
-			wsConn.Close(websocket.StatusUnsupportedData, "unsupported message type")
+			_ = wsConn.Close(websocket.StatusUnsupportedData, "unsupported message type")
 			return errUnsupportedMessageType.New()
 		}
 
 		var envelope lorav1.GatewayMessage
 		if err := proto.Unmarshal(buf, &envelope); err != nil {
 			logger.WithError(err).Debug("Failed to unmarshal message")
-			wsConn.Close(websocket.StatusInvalidFramePayloadData, "invalid message")
+			_ = wsConn.Close(websocket.StatusInvalidFramePayloadData, "invalid message")
 			return err
 		}
 
@@ -394,7 +394,7 @@ func readGatewayMessages(
 			clientHello := envelope.GetClientHelloNotification()
 			if clientHello == nil {
 				logger.Debug("Received message without client hello")
-				wsConn.Close(websocket.StatusPolicyViolation, "client hello required")
+				_ = wsConn.Close(websocket.StatusPolicyViolation, "client hello required")
 				return errNoClientHello.New()
 			}
 			if err := srvConn.HandleStatus(gatewayStatusFromClientHello(clientHello)); err != nil {
