@@ -161,6 +161,7 @@ const resetUsedDevNoncesLogic = createRequestLogic({
     } = action
     const result = await tts.Applications.Devices.updateById(appId, deviceId, {
       used_dev_nonces: [],
+      last_dev_nonce: 0,
     })
 
     return { ...result }
