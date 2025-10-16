@@ -172,8 +172,9 @@ type NetworkServer struct {
 
 	applicationUplinks ApplicationUplinkQueue
 
-	downlinkTasks      DownlinkTaskQueue
-	downlinkPriorities DownlinkPriorities
+	downlinkTasks        DownlinkTaskQueue
+	downlinkPriorities   DownlinkPriorities
+	pendingDownlinkTasks DownlinkTaskQueue
 
 	deduplicationWindow windowDurationFunc
 	collectionWindow    windowDurationFunc
@@ -190,6 +191,8 @@ type NetworkServer struct {
 	scheduledDownlinkMatcher ScheduledDownlinkMatcher
 
 	uplinkSubmissionPool workerpool.WorkerPool[[]*ttnpb.ApplicationUp]
+
+	maxConfNbTrans uint32
 }
 
 // Option configures the NetworkServer.
@@ -209,6 +212,7 @@ const (
 	downlinkProcessTaskName           = "process_downlink"
 	applicationUplinkDispatchTaskName = "dispatch_application_uplink"
 	downlinkDispatchTaskName          = "dispatch_downlink"
+	pendingDownlinkProcessTaskName    = "process_pending_downlink"
 
 	maxInt = int(^uint(0) >> 1)
 )
@@ -228,10 +232,14 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		panic(errInvalidConfiguration.WithCause(errors.New("Devices is not specified")))
 	case conf.DownlinkTaskQueue.NumConsumers == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("DownlinkTaskQueue.NumConsumers must be greater than 0"))
+	case conf.PendingDownlinkTaskQueue.NumConsumers == 0:
+		return nil, errInvalidConfiguration.WithCause(errors.New("PendingDownlinkTaskQueue.NumConsumers must be greater than 0")) // nolint:lll
 	case conf.ApplicationUplinkQueue.NumConsumers == 0:
 		return nil, errInvalidConfiguration.WithCause(errors.New("ApplicationUplinkQueue.NumConsumers must be greater than 0"))
 	case conf.DownlinkTaskQueue.Queue == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("DownlinkTaskQueue is not specified")))
+	case conf.PendingDownlinkTaskQueue.Queue == nil:
+		panic(errInvalidConfiguration.WithCause(errors.New("PendingDownlinkTaskQueue is not specified")))
 	case conf.UplinkDeduplicator == nil:
 		panic(errInvalidConfiguration.WithCause(errors.New("UplinkDeduplicator is not specified")))
 	case conf.ScheduledDownlinkMatcher == nil:
@@ -295,6 +303,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		macSettingsProfile:       &NsMACSettingsProfileRegistry{registry: conf.MACSettingsProfileRegistry},
 		macSettingsProfiles:      conf.MACSettingsProfileRegistry,
 		downlinkTasks:            conf.DownlinkTaskQueue.Queue,
+		pendingDownlinkTasks:     conf.PendingDownlinkTaskQueue.Queue,
 		downlinkPriorities:       downlinkPriorities,
 		defaultMACSettings:       defaultMACSettings,
 		interopClient:            interopCl,
@@ -302,6 +311,7 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		deviceKEKLabel:           conf.DeviceKEKLabel,
 		downlinkQueueCapacity:    conf.DownlinkQueueCapacity,
 		scheduledDownlinkMatcher: conf.ScheduledDownlinkMatcher,
+		maxConfNbTrans:           conf.MaxConfNbTrans,
 	}
 	ns.uplinkSubmissionPool = workerpool.NewWorkerPool(workerpool.Config[[]*ttnpb.ApplicationUp]{
 		Component:  c,
@@ -355,7 +365,8 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 	for id, dispatcher := range map[string]interface {
 		Dispatch(context.Context, string) error
 	}{
-		downlinkDispatchTaskName: ns.downlinkTasks,
+		downlinkDispatchTaskName:       ns.downlinkTasks,
+		pendingDownlinkProcessTaskName: ns.pendingDownlinkTasks,
 	} {
 		dispatcher := dispatcher
 		ns.RegisterTask(&task.Config{
@@ -384,6 +395,16 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 			Context: ctx,
 			ID:      fmt.Sprintf("%s_%d", downlinkProcessTaskName, i),
 			Func:    ns.createProcessDownlinkTask(consumerID),
+			Restart: task.RestartAlways,
+			Backoff: processTaskBackoff,
+		})
+	}
+	for i := uint64(0); i < conf.PendingDownlinkTaskQueue.NumConsumers; i++ {
+		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
+		ns.RegisterTask(&task.Config{
+			Context: ctx,
+			ID:      fmt.Sprintf("%s_%d", pendingDownlinkProcessTaskName, i),
+			Func:    ns.createProcessPendingDownlinkTask(consumerID),
 			Restart: task.RestartAlways,
 			Backoff: processTaskBackoff,
 		})

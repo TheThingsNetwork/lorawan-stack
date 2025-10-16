@@ -328,6 +328,7 @@ const NetworkServerForm = React.memo(props => {
       })
 
       const patch = updatedValues
+
       // Always submit current `mac_settings` values to avoid overwriting nested entries.
       patch.mac_settings = castedValues.mac_settings
 
@@ -354,6 +355,26 @@ const NetworkServerForm = React.memo(props => {
         patch.mac_settings.use_adr = null
       }
 
+      // The validation schema strips `mac_settings_profile_ids` if it is empty.
+      // We need to explicitly set it to null in order to remove the existing profile association.
+      if (values.mac_settings_profile_ids === null) {
+        patch.mac_settings_profile_ids = null
+      }
+
+      if (Boolean(patch.mac_settings_profile_ids)) {
+        patch.mac_settings_profile_ids = {
+          ...patch.mac_settings_profile_ids,
+          application_ids: {
+            application_id: appId,
+          },
+        }
+        patch.frequency_plan_id = device.frequency_plan_id
+        patch.lorawan_version = device.lorawan_version
+        patch.lorawan_phy_version = device.lorawan_phy_version
+
+        delete patch.mac_settings
+      }
+
       setError('')
       try {
         await onSubmit(patch)
@@ -364,7 +385,7 @@ const NetworkServerForm = React.memo(props => {
         setError(err)
       }
     },
-    [device, onSubmit, onSubmitSuccess, validationContext],
+    [device, onSubmit, onSubmitSuccess, validationContext, appId],
   )
 
   const handleDeviceClassChange = React.useCallback(
@@ -598,6 +619,8 @@ const NetworkServerForm = React.memo(props => {
         isClassB={isClassB}
         isClassC={isClassC}
         bandId={bandId}
+        appId={appId}
+        deviceId={devId}
       />
       <SubmitBar>
         <Form.Submit component={SubmitButton} message={sharedMessages.saveChanges} />

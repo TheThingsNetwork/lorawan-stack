@@ -17,9 +17,10 @@ import { useState, useEffect } from 'react'
 /**
  * Custom React hook for managing state with cookies.
  *
+ * @template T
  * @param {string} cookieName - The name of the cookie to manage.
- * @param {*} defaultValue - The default value to use if the cookie is not set.
- * @returns {[*, Function]} A stateful value, and a function to update it.
+ * @param {T} defaultValue - The default value to use if the cookie is not set.
+ * @returns {[T, (newValue: T) => void]} - A stateful value, and a function to update it.
  */
 const useCookieState = (cookieName, defaultValue) => {
   const prefixedCookieName = `webui-${cookieName}`

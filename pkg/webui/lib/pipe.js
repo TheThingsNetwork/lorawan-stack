@@ -15,8 +15,9 @@
 /**
  * Performs left-to-right function composition.
  *
- * @param {Function[]}funcs - A list of functions.
- * @returns {Function} A single function composed from `funcs`.
+ * @template T
+ * @param {Array<(arg: T) => T>} funcs - A list of unary functions.
+ * @returns {(arg: T) => T} - A single function composed from `funcs`.
  */
 const pipe = (...funcs) =>
   funcs.reduce(

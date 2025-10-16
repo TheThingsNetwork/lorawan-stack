@@ -110,10 +110,16 @@ const getRepositoryPayloadFormattersLogic = createRequestLogic({
       ignoreNotFound(tts.Applications.Devices.Repository.getDownlinkEncoder, appId, version_ids),
     ])
 
+    const down_formatter = {
+      decoder: repositoryPayloadFormatters[1],
+      encoder: repositoryPayloadFormatters[2],
+    }
+    const up_formatter = {
+      decoder: repositoryPayloadFormatters[0],
+    }
     return {
-      ...repositoryPayloadFormatters[0],
-      ...repositoryPayloadFormatters[1],
-      ...repositoryPayloadFormatters[2],
+      up_formatter,
+      down_formatter,
     }
   },
 })

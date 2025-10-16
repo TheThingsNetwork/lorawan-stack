@@ -52,7 +52,7 @@ body:
       options:
         - The Things Stack Enterprise (self-hosted)
         - The Things Stack Cloud
-        - The Things Stack Community Edition
+        - The Things Stack Sandbox
         - The Things Stack Open Source (self-hosted)
     validations:
       required: true

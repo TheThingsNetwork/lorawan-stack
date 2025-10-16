@@ -109,13 +109,6 @@ const GatewayConnection = props => {
     } else if (isFetching) {
       statusIndicator = 'mediocre'
       message = sharedMessages.connecting
-    } else if (isUnavailable) {
-      statusIndicator = 'unknown'
-      message = error.message
-      if (isOtherCluster) {
-        tooltipMessage = m.otherClusterTooltip
-        docPath = '/gateways/troubleshooting/#my-gateway-shows-a-other-cluster-status-why'
-      }
     } else if (hasStatistics) {
       message = sharedMessages.connected
       statusIndicator = 'good'
@@ -127,6 +120,13 @@ const GatewayConnection = props => {
         tooltipMessage = m.connectedTooltip
       }
       docTitle = sharedMessages.moreInformation
+    } else if (isUnavailable) {
+      statusIndicator = 'unknown'
+      message = error.message
+      if (isOtherCluster) {
+        tooltipMessage = m.otherClusterTooltip
+        docPath = '/gateways/troubleshooting/#my-gateway-shows-a-other-cluster-status-why'
+      }
     } else {
       message = sharedMessages.unknown
       statusIndicator = 'unknown'

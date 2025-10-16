@@ -128,21 +128,21 @@ const Layout = () => {
           />
           <div id="modal-container" />
           <div id="dropdown-container" className="pos-absolute-container" />
-          <div className="d-flex">
-            <Sidebar />
-            <div className="w-full h-vh d-flex direction-column">
-              <Header />
-              <main
-                className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
-                ref={main}
-              >
-                <WithAuth
-                  user={user}
-                  fetching={fetching}
-                  userError={error}
-                  errorComponent={FullViewErrorInner}
-                  rights={rights}
-                  isAdmin={isAdmin}
+          <div className="d-flex h-vh">
+            <WithAuth
+              user={user}
+              fetching={fetching}
+              userError={error}
+              errorComponent={FullViewErrorInner}
+              rights={rights}
+              isAdmin={isAdmin}
+            >
+              <Sidebar />
+              <div className="w-full d-flex direction-column">
+                <Header />
+                <main
+                  className={classnames(style.main, 'd-flex', 'flex-column', 'h-full', 'flex-grow')}
+                  ref={main}
                 >
                   <div className={style.content}>
                     <div
@@ -156,9 +156,9 @@ const Layout = () => {
                       <Outlet />
                     </div>
                   </div>
-                </WithAuth>
-              </main>
-            </div>
+                </main>
+              </div>
+            </WithAuth>
           </div>
 
           <div id="split-frame" className={style.splitFrame} />

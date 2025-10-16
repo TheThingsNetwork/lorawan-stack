@@ -442,6 +442,20 @@ Cypress.Commands.add('updateGateway', (gatewayId, gateway) => {
   })
 })
 
+// Helper function to create a new application mac settings profile programmatically.
+Cypress.Commands.add('createMacSettingsProfile', (applicationId, profile) => {
+  const baseUrl = Cypress.config('baseUrl')
+  const adminApiKey = Cypress.config('adminApiKey')
+  cy.request({
+    method: 'POST',
+    url: `${baseUrl}/api/v3/ns/applications/${applicationId}/mac_settings_profiles`,
+    body: { mac_settings_profile: profile },
+    headers: {
+      Authorization: `Bearer ${adminApiKey}`,
+    },
+  })
+})
+
 // Overwrite the default `type` to make sure that subject is resolved and focused before simulating typing. This is helpful
 // when:
 // 1. The action is forced via the `forced` option for inputs that are visually hidden for styling purposes.

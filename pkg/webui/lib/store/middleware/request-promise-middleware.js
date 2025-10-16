@@ -20,7 +20,7 @@ import { CancelablePromise } from 'cancelable-promise'
  * You should usually use the middleware instead.
  *
  * @param {object} dispatch - The to be decorated dispatch function.
- * @returns {Function} - The decorated dispatch function.
+ * @returns {(action: unknown) => unknown} - The decorated dispatch function.
  */
 export const promisifyDispatch = dispatch => action => {
   if (action.meta && action.meta._attachPromise && !action.meta._resolve && !action.meta._reject) {

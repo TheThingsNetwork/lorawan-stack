@@ -70,7 +70,7 @@ func NewRedisDeviceRegistry(ctx context.Context) (DeviceRegistry, func()) {
 func NewRedisDownlinkTaskQueue(ctx context.Context) (DownlinkTaskQueue, func()) {
 	tb := test.MustTBFromContext(ctx)
 	cl, flush := test.NewRedis(ctx, append(redisNamespace[:], "downlink-tasks")...)
-	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, testStreamBlockLimit())
+	q := redis.NewDownlinkTaskQueue(cl, 10000, redisConsumerGroup, testStreamBlockLimit(), "downlink")
 	if err := q.Init(ctx); err != nil {
 		tb.Fatalf("Failed to initialize Redis downlink task queue: %s", test.FormatError(err))
 	}

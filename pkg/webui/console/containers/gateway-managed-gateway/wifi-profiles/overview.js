@@ -52,7 +52,6 @@ const m = defineMessages({
   information:
     'Connection profiles are setup to allow for multiple gateways to connect via the same settings. You can use this view to manage all your profiles or create new ones, after which you can assign them to your gateway.',
   accessPoint: 'Access point',
-  deleteProfile: 'Delete profile',
   deleteSuccess: 'WiFi profile deleted',
   deleteFail: 'There was an error and the WiFi profile could not be deleted',
   deleteModalMessage:

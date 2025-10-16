@@ -254,6 +254,7 @@ const startGatewayStatisticsLogic = createLogic({
         }),
       )
       done()
+      return
     }
 
     let gtwGsAddress
@@ -273,6 +274,7 @@ const startGatewayStatisticsLogic = createLogic({
         }),
       )
       done()
+      return
     }
 
     if (gtwGsAddress !== consoleGsAddress) {
@@ -282,6 +284,7 @@ const startGatewayStatisticsLogic = createLogic({
         }),
       )
       done()
+      return
     }
 
     dispatch(gateways.startGatewayStatisticsSuccess())
@@ -317,6 +320,8 @@ const updateGatewayStatisticsLogic = createRequestLogic({
         /* eslint-disable-next-line no-console */
         console.error(`Failed to fetch gateway statistics for ${id}`, error)
       }
+
+      dispatch(gateways.updateGatewayStatisticsFailure(error))
     }
 
     return { stats }

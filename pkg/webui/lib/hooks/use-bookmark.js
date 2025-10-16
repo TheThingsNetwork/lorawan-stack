@@ -70,8 +70,8 @@ const selectorMap = {
  * Module for getting the title, path, and icon corresponding to a bookmark.
  * Using this because for each bookmark we need to make a request to get the name of the entity, compose the path and find the icon.
  *
- * @param {*} bookmark - The bookmark object.
- * @returns {*} - An object containing the title, path, and icon of the bookmark.
+ * @param {object} bookmark - The bookmark object.
+ * @returns {object} - An object containing the title, path, and icon of the bookmark.
  */
 const useBookmark = bookmark => {
   const dispatch = useDispatch()

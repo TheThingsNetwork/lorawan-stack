@@ -38,7 +38,7 @@ class StackConfiguration {
   /**
    * Selects the url of a stack component.
    *
-   * @param {*} componentName - The abbreviation of the component, e.g. Is for the Identity Server.
+   * @param {'as'|'is'|'ns'|'js'|'gs'|'edtc'|'qrg'|'gcs'|'dcs'} componentName - The abbreviation of the component, e.g. Is for the Identity Server.
    * @returns {?string} - The url of the component or `undefined` if the component is not available.
    */
   getComponentUrlByName(componentName) {
@@ -48,7 +48,7 @@ class StackConfiguration {
   /**
    * Selects the hostname of a stack component.
    *
-   * @param {*} componentName - The abbreviation of the component, e.g. Is for the Identity Server.
+   * @param {'as'|'is'|'ns'|'js'|'gs'|'edtc'|'qrg'|'gcs'|'dcs'} componentName - The abbreviation of the component, e.g. Is for the Identity Server.
    * @returns {?string} - The hostname of the component address or `undefined` if the component is not available.
    */
   getComponentHostByName(componentName) {
@@ -65,7 +65,7 @@ class StackConfiguration {
   /**
    * Checks whether a stack component is available in the configuration.
    *
-   * @param {*} componentName - The abbreviation of the component, e.g. Is for
+   * @param {'as'|'is'|'ns'|'js'|'gs'|'edtc'|'qrg'|'gcs'|'dcs'} componentName - The abbreviation of the component, e.g. Is for
    * the Identity Server.
    * @returns {boolean} - `true` if the component is available in the
    * configuration, `false` otherwise.

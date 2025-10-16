@@ -13,10 +13,11 @@
 // limitations under the License.
 
 import React, { useCallback } from 'react'
-import { defineMessages } from 'react-intl'
 import { createSelector } from 'reselect'
 import { useSelector } from 'react-redux'
-import { get, set } from 'lodash'
+import { get, isEmpty, set } from 'lodash'
+import { defineMessages, useIntl } from 'react-intl'
+import { useNavigate } from 'react-router-dom'
 
 import Form, { useFormContext } from '@ttn-lw/components/form'
 import Select from '@ttn-lw/components/select'
@@ -26,7 +27,8 @@ import KeyValueMap from '@ttn-lw/components/key-value-map'
 import Radio from '@ttn-lw/components/radio-button'
 import UnitInput from '@ttn-lw/components/unit-input'
 import Button from '@ttn-lw/components/button'
-import Icon from '@ttn-lw/components/icon'
+import Icon, { IconInfoCircle, IconPlus, IconTrash, IconX } from '@ttn-lw/components/icon'
+import Notification from '@ttn-lw/components/notification'
 
 import Message from '@ttn-lw/lib/components/message'
 
@@ -42,87 +44,22 @@ import {
   parseLorawanMacVersion,
 } from '@console/lib/device-utils'
 import getDataRate from '@console/lib/data-rate-utils'
+import {
+  maxDutyCycleOptions,
+  pingSlotPeriodicityOptions,
+  adrAckLimitOptions,
+  adrAckDelayOptions,
+} from '@console/lib/mac-settings-utils'
 
 import { selectDataRates } from '@console/store/selectors/configuration'
+import { selectMacSettingsProfiles } from '@console/store/selectors/mac-settings-profiles'
 
 const m = defineMessages({
-  delayValue: '{count, plural, one {{count} second} other {{count} seconds}}',
-  factoryPresetFreqDescription: 'List of factory-preset frequencies. Note: order is respected.',
-  advancedMacSettings: 'Advanced MAC settings',
-  desiredPingSlotFrequencyTitle: 'Desired ping slot frequency',
-  pingSlotPeriodicityDescription: 'Periodicity of the class B ping slot',
-  pingSlotDataRateTitle: 'Ping slot data rate index',
-  desiredPingSlotDataRateTitle: 'Desired ping slot data rate',
-  resetWarning: 'Resetting is insecure and makes your device susceptible for replay attacks',
-  desiredRx1DataRateOffsetTitle: 'Desired Rx1 data rate offset',
-  desiredRx1DelayTitle: 'Desired Rx1 delay',
-  rx2DataRateIndexTitle: 'Rx2 data rate index',
-  desiredRx2DataRateIndexTitle: 'Desired Rx2 data rate index',
-  desiredRx2FrequencyTitle: 'Desired Rx2 frequency',
-  updateSuccess: 'The MAC settings updated',
-  desiredBeaconFrequency: 'Desired beacon frequency',
-  maxDutyCycle: 'Maximum duty cycle',
-  desiredMaxDutyCycle: 'Desired maximum duty cycle',
-  adrMargin: 'ADR margin',
-  adrUplinks: 'ADR number of transmissions',
-  adrAdaptiveDataRate: 'Adaptive data rate (ADR)',
-  adrDataRate: 'ADR data rate index',
-  adrTransPower: 'ADR transmission power index',
-  adrDynamic: 'Dynamic mode',
-  adrStatic: 'Static mode',
-  desiredAdrAckLimit: 'Desired ADR ack limit',
-  desiredAdrAckDelay: 'Desired ADR ack delay',
-  adrAckValue: '{count, plural, one {every message} other {every {count} messages}}',
-  statusCountPeriodicity: 'Status count periodicity',
-  statusTimePeriodicity: 'Status time periodicity',
-  dataRate: 'Data Rate {n}',
-  dataRatePlaceholder: 'Data Rate',
-  minNbTrans: 'Min. NbTrans',
-  maxNbTrans: 'Max. NbTrans',
-  useDefaultNbTrans: 'Use default settings for number of retransmissions',
-  adrNbTrans: 'ADR number of retransmissions (NbTrans)',
-  overrideNbTrans: 'Override server defaults for NbTrans (all data rates)',
-  defaultForAllRates: '(Default for all data rates)',
-  defaultNbTransMessage:
-    'Overriding the default is not required for using data rate overrides (below)',
-  specificOverrides: 'Data rate specific overrides',
-  addSpecificOverride: 'Add data rate specific override',
+  noMacSettingsProfiles: `You have no MAC settings profiles yet.`,
+  noMacSettingsProfilesAction:
+    'You have no MAC settings profiles yet. Create one to be able to assign it here.',
+  macSettingsProfile: 'MAC settings profile',
 })
-
-// 0...7
-const pingSlotPeriodicityOptions = Array.from({ length: 8 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `PING_EVERY_${value}S`,
-    label: <Message content={sharedMessages.secondInterval} values={{ count: value }} />,
-  }
-})
-// 0...15
-const adrAckLimitOptions = Array.from({ length: 16 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `ADR_ACK_LIMIT_${value}`,
-    label: <Message content={m.adrAckValue} values={{ count: value }} />,
-  }
-})
-// 0...15
-const adrAckDelayOptions = Array.from({ length: 16 }, (_, index) => {
-  const value = Math.pow(2, index)
-
-  return {
-    value: `ADR_ACK_DELAY_${value}`,
-    label: <Message content={m.adrAckValue} values={{ count: value }} />,
-  }
-})
-const maxDutyCycleOptions = [
-  { value: 'DUTY_CYCLE_1', label: '100%' },
-  { value: 'DUTY_CYCLE_16', label: '6.25%' },
-  { value: 'DUTY_CYCLE_128', label: '0.781%' },
-  { value: 'DUTY_CYCLE_1024', label: '0.098%' },
-  { value: 'DUTY_CYCLE_16384', label: '0.006%' },
-]
 
 const MacSettingsSection = props => {
   const {
@@ -133,10 +70,24 @@ const MacSettingsSection = props => {
     isClassB,
     isClassC,
     bandId,
+    appId,
+    deviceId,
   } = props
 
+  const navigate = useNavigate()
+  const { formatMessage } = useIntl()
   const { values, setFieldValue, setFieldTouched } = useFormContext()
+
   const { mac_settings } = values
+  const macSettingsProfiles = useSelector(state => selectMacSettingsProfiles(state))
+  const macSettingsProfilesOptions = React.useMemo(
+    () =>
+      macSettingsProfiles.map(profile => ({
+        value: profile.ids.profile_id,
+        label: profile.ids.profile_id,
+      })),
+    [macSettingsProfiles],
+  )
   const alreadySelectedDataRates = Object.keys(mac_settings?.adr?.dynamic?.overrides || [])
   const dataRateOverrideOptions = useSelector(
     createSelector(
@@ -162,8 +113,8 @@ const MacSettingsSection = props => {
   const isABP = activationMode === ACTIVATION_MODES.ABP
   const isMulticast = activationMode === ACTIVATION_MODES.MULTICAST
   const isOTAA = activationMode === ACTIVATION_MODES.OTAA
-  const isDynamicAdr = mac_settings.adr && 'dynamic' in mac_settings.adr
-  const isStaticAdr = mac_settings.adr && 'static' in mac_settings.adr
+  const isDynamicAdr = mac_settings?.adr && 'dynamic' in mac_settings?.adr
+  const isStaticAdr = mac_settings?.adr && 'static' in mac_settings?.adr
   const [resetsFCnt, setResetsFCnt] = React.useState(isABP && initialFCnt)
   const handleResetsFCntChange = React.useCallback(evt => {
     const { checked } = evt.target
@@ -190,9 +141,9 @@ const MacSettingsSection = props => {
     }
   }, [handleIsCollapsedChange, isABP, isClassB, isCollapsed, isMulticast, pingPeriodicityRequired])
 
-  const adrOverrides = mac_settings.adr.dynamic?.overrides
-  const showEditNbTrans = !values.mac_settings.adr.dynamic?._use_default_nb_trans
-  const defaultNbTransDisabled = !values.mac_settings.adr.dynamic?._override_nb_trans_defaults
+  const adrOverrides = mac_settings?.adr.dynamic?.overrides
+  const showEditNbTrans = !values.mac_settings?.adr.dynamic?._use_default_nb_trans
+  const defaultNbTransDisabled = !values.mac_settings?.adr.dynamic?._override_nb_trans_defaults
   const addOverride = React.useCallback(() => {
     const newOverride = { _data_rate_index: '', min_nb_trans: '', max_nb_trans: '' }
     setFieldValue(
@@ -249,505 +200,563 @@ const MacSettingsSection = props => {
   const encodeAdrMode = value => ({ [value]: getEncodedAdrModeValue(value) })
   const decodeAdrMode = value => (value !== undefined ? Object.keys(value)[0] : null)
 
+  const handleRemoveMacSettingsProfile = useCallback(
+    e => {
+      e.preventDefault()
+      setFieldValue('mac_settings_profile_ids', null)
+    },
+    [setFieldValue],
+  )
+
+  const hasMacSettingsProfile = !isEmpty(values.mac_settings_profile_ids)
+
   return (
-    <Form.CollapseSection
-      id="mac-settings"
-      title={m.advancedMacSettings}
-      initiallyCollapsed={initiallyCollapsed}
-      onCollapse={handleIsCollapsedChange}
-      isCollapsed={isCollapsed}
-    >
-      <Form.Field
-        title={sharedMessages.frameCounterWidth}
-        name="mac_settings.supports_32_bit_f_cnt"
-        component={Radio.Group}
-        encode={fCntWidthEncode}
-        decode={fCntWidthDecode}
-        tooltipId={tooltipIds.FRAME_COUNTER_WIDTH}
-        horizontal
-      >
-        <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
-        <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
-      </Form.Field>
-      {(isABP || isOTAA) && (
-        <>
-          <Form.FieldContainer horizontal>
-            {!isOTAA && (
-              <Form.Field
-                title={sharedMessages.rx1Delay}
-                type="number"
-                tooltipId={tooltipIds.RX1_DELAY}
-                append={<Message content={sharedMessages.secondsAbbreviated} />}
-                name="mac_settings.rx1_delay"
-                component={Input}
-                min={1}
-                max={15}
-                inputWidth="xs"
-                fieldWidth="xs"
-              />
-            )}
-            {!isMulticast && (
-              <Form.Field
-                title={m.desiredRx1DelayTitle}
-                type="number"
-                name="mac_settings.desired_rx1_delay"
-                append={<Message content={sharedMessages.secondsAbbreviated} />}
-                tooltipId={tooltipIds.RX1_DELAY}
-                component={Input}
-                min={1}
-                max={15}
-                inputWidth="xs"
-                fieldWidth="xs"
-              />
-            )}
-          </Form.FieldContainer>
-          <Form.FieldContainer horizontal>
-            {!isOTAA && (
-              <Form.Field
-                title={sharedMessages.rx1DataRateOffset}
-                type="number"
-                name="mac_settings.rx1_data_rate_offset"
-                inputWidth="xxs"
-                fieldWidth="xs"
-                component={Input}
-                min={0}
-                max={7}
-                tooltipId={tooltipIds.DATA_RATE_OFFSET}
-              />
-            )}
-            {!isMulticast && (
-              <Form.Field
-                title={m.desiredRx1DataRateOffsetTitle}
-                type="number"
-                inputWidth="xxs"
-                fieldWidth="xs"
-                name="mac_settings.desired_rx1_data_rate_offset"
-                component={Input}
-                min={0}
-                max={7}
-                tooltipId={tooltipIds.DATA_RATE_OFFSET}
-              />
-            )}
-          </Form.FieldContainer>
-          {!isOTAA && (
-            <Form.Field
-              label={sharedMessages.resetsFCnt}
-              onChange={handleResetsFCntChange}
-              warning={resetsFCnt ? m.resetWarning : undefined}
-              name="mac_settings.resets_f_cnt"
-              tooltipId={tooltipIds.RESETS_F_CNT}
-              component={Checkbox}
+    <>
+      <Form.FieldContainer horizontal className="al-end">
+        <Form.Field
+          name="mac_settings_profile_ids.profile_id"
+          title={m.macSettingsProfile}
+          component={Select}
+          options={macSettingsProfilesOptions}
+          placeholder={sharedMessages.selectMacSettingsProfile}
+          noOptionsMessage={() => formatMessage(m.noMacSettingsProfiles)}
+          fieldWidth="m"
+        />
+        <Button
+          secondary
+          icon={IconX}
+          message={sharedMessages.remove}
+          onClick={handleRemoveMacSettingsProfile}
+          disabled={!hasMacSettingsProfile}
+        />
+      </Form.FieldContainer>
+      {macSettingsProfilesOptions.length === 0 && (
+        <Notification
+          warning
+          content={m.noMacSettingsProfilesAction}
+          children={
+            <Button
+              icon={IconPlus}
+              onClick={() =>
+                navigate(`/applications/${appId}/mac-settings-profiles/add`, {
+                  state: { deviceId },
+                })
+              }
+              message={sharedMessages.createMacSettingsProfile}
+              className="mt-cs-m"
+              secondary
             />
-          )}
-        </>
-      )}
-      <Form.FieldContainer horizontal>
-        {!isOTAA && (
-          <Form.Field
-            title={m.rx2DataRateIndexTitle}
-            type="number"
-            name="mac_settings.rx2_data_rate_index"
-            component={Input}
-            min={0}
-            max={15}
-            tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
-            inputWidth="xxs"
-            fieldWidth="xs"
-          />
-        )}
-        {!isMulticast && (
-          <Form.Field
-            title={m.desiredRx2DataRateIndexTitle}
-            type="number"
-            name="mac_settings.desired_rx2_data_rate_index"
-            component={Input}
-            min={0}
-            max={15}
-            inputWidth="xxs"
-            tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
-            fieldWidth="xs"
-          />
-        )}
-      </Form.FieldContainer>
-      <Form.FieldContainer horizontal>
-        {!isOTAA && (
-          <Form.Field
-            type="number"
-            min={100000}
-            step={100}
-            title={sharedMessages.rx2Frequency}
-            name="mac_settings.rx2_frequency"
-            component={UnitInput.Hertz}
-            tooltipId={tooltipIds.RX2_FREQUENCY}
-            fieldWidth="xs"
-          />
-        )}
-        {!isMulticast && (
-          <Form.Field
-            type="number"
-            min={100000}
-            step={100}
-            title={m.desiredRx2FrequencyTitle}
-            name="mac_settings.desired_rx2_frequency"
-            component={UnitInput.Hertz}
-            tooltipId={tooltipIds.RX2_FREQUENCY}
-            fieldWidth="xs"
-          />
-        )}
-      </Form.FieldContainer>
-      <Form.FieldContainer horizontal>
-        {!isOTAA && (
-          <Form.Field
-            title={m.maxDutyCycle}
-            name="mac_settings.max_duty_cycle"
-            component={Select}
-            options={maxDutyCycleOptions}
-            fieldWidth="xs"
-            tooltipId={tooltipIds.MAX_DUTY_CYCLE}
-          />
-        )}
-        {!isMulticast && (
-          <Form.Field
-            title={m.desiredMaxDutyCycle}
-            name="mac_settings.desired_max_duty_cycle"
-            component={Select}
-            options={maxDutyCycleOptions}
-            fieldWidth="xs"
-            tooltipId={tooltipIds.MAX_DUTY_CYCLE}
-          />
-        )}
-      </Form.FieldContainer>
-      <Form.Field
-        indexAsKey
-        name="mac_settings.factory_preset_frequencies"
-        component={KeyValueMap}
-        title={sharedMessages.factoryPresetFrequencies}
-        description={m.factoryPresetFreqDescription}
-        addMessage={sharedMessages.freqAdd}
-        valuePlaceholder={sharedMessages.frequencyPlaceholder}
-        tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
-      />
-      {isClassC && (
-        <Form.Field
-          title={sharedMessages.classCTimeout}
-          name="mac_settings.class_c_timeout"
-          tooltipId={tooltipIds.CLASS_C_TIMEOUT}
-          component={UnitInput.Duration}
-          unitSelector={['ms', 's']}
-          type="number"
-          fieldWidth="xs"
+          }
+          small
         />
       )}
-      {(isClassB || isMulticast) && (
+      {!hasMacSettingsProfile && (
         <>
-          <Form.Field
-            title={sharedMessages.classBTimeout}
-            name="mac_settings.class_b_timeout"
-            tooltipId={tooltipIds.CLASS_B_TIMEOUT}
-            component={UnitInput.Duration}
-            unitSelector={['ms', 's']}
-            type="number"
-            fieldWidth="xs"
-          />
-          <Form.Field
-            title={sharedMessages.pingSlotPeriodicity}
-            description={m.pingSlotPeriodicityDescription}
-            name="mac_settings.ping_slot_periodicity"
-            component={Select}
-            options={pingSlotPeriodicityOptions}
-            required={pingPeriodicityRequired}
-            menuPlacement="top"
-            fieldWidth="xs"
-          />
-          <Form.FieldContainer horizontal>
-            {!isOTAA && (
-              <Form.Field
-                type="number"
-                min={100000}
-                title={sharedMessages.beaconFrequency}
-                placeholder={sharedMessages.frequencyPlaceholder}
-                name="mac_settings.beacon_frequency"
-                tooltipId={tooltipIds.BEACON_FREQUENCY}
-                component={UnitInput.Hertz}
-                fieldWidth="xs"
-              />
+          <hr className="mt-cs-xxl mb-cs-m" />
+          <Form.CollapseSection
+            id="mac-settings"
+            title={sharedMessages.customMacSettings}
+            initiallyCollapsed={initiallyCollapsed}
+            onCollapse={handleIsCollapsedChange}
+            isCollapsed={isCollapsed}
+          >
+            <Form.Field
+              title={sharedMessages.frameCounterWidth}
+              name="mac_settings.supports_32_bit_f_cnt"
+              component={Radio.Group}
+              encode={fCntWidthEncode}
+              decode={fCntWidthDecode}
+              tooltipId={tooltipIds.FRAME_COUNTER_WIDTH}
+              horizontal
+            >
+              <Radio label={sharedMessages['16Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_16_BIT} />
+              <Radio label={sharedMessages['32Bit']} value={FRAME_WIDTH_COUNT.SUPPORTS_32_BIT} />
+            </Form.Field>
+            {(isABP || isOTAA) && (
+              <>
+                <Form.FieldContainer horizontal>
+                  {!isOTAA && (
+                    <Form.Field
+                      title={sharedMessages.rx1Delay}
+                      type="number"
+                      tooltipId={tooltipIds.RX1_DELAY}
+                      append={<Message content={sharedMessages.secondsAbbreviated} />}
+                      name="mac_settings.rx1_delay"
+                      component={Input}
+                      min={1}
+                      max={15}
+                      inputWidth="xs"
+                      fieldWidth="xs"
+                    />
+                  )}
+                  {!isMulticast && (
+                    <Form.Field
+                      title={sharedMessages.desiredRx1DelayTitle}
+                      type="number"
+                      name="mac_settings.desired_rx1_delay"
+                      append={<Message content={sharedMessages.secondsAbbreviated} />}
+                      tooltipId={tooltipIds.RX1_DELAY}
+                      component={Input}
+                      min={1}
+                      max={15}
+                      inputWidth="xs"
+                      fieldWidth="xs"
+                    />
+                  )}
+                </Form.FieldContainer>
+                <Form.FieldContainer horizontal>
+                  {!isOTAA && (
+                    <Form.Field
+                      title={sharedMessages.rx1DataRateOffset}
+                      type="number"
+                      name="mac_settings.rx1_data_rate_offset"
+                      inputWidth="xxs"
+                      fieldWidth="xs"
+                      component={Input}
+                      min={0}
+                      max={7}
+                      tooltipId={tooltipIds.DATA_RATE_OFFSET}
+                    />
+                  )}
+                  {!isMulticast && (
+                    <Form.Field
+                      title={sharedMessages.desiredRx1DataRateOffsetTitle}
+                      type="number"
+                      inputWidth="xxs"
+                      fieldWidth="xs"
+                      name="mac_settings.desired_rx1_data_rate_offset"
+                      component={Input}
+                      min={0}
+                      max={7}
+                      tooltipId={tooltipIds.DATA_RATE_OFFSET}
+                    />
+                  )}
+                </Form.FieldContainer>
+                {!isOTAA && (
+                  <Form.Field
+                    label={sharedMessages.resetsFCnt}
+                    onChange={handleResetsFCntChange}
+                    warning={resetsFCnt ? sharedMessages.resetFCntWarning : undefined}
+                    name="mac_settings.resets_f_cnt"
+                    tooltipId={tooltipIds.RESETS_F_CNT}
+                    component={Checkbox}
+                  />
+                )}
+              </>
             )}
-            {!isMulticast && (
-              <Form.Field
-                type="number"
-                min={100000}
-                title={m.desiredBeaconFrequency}
-                placeholder={sharedMessages.frequencyPlaceholder}
-                name="mac_settings.desired_beacon_frequency"
-                tooltipId={tooltipIds.BEACON_FREQUENCY}
-                component={UnitInput.Hertz}
-                fieldWidth="xs"
-              />
-            )}
-          </Form.FieldContainer>
-          <Form.FieldContainer horizontal>
-            {!isOTAA && (
-              <Form.Field
-                type="number"
-                min={100000}
-                step={100}
-                title={sharedMessages.pingSlotFrequency}
-                placeholder={sharedMessages.frequencyPlaceholder}
-                name="mac_settings.ping_slot_frequency"
-                tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-                component={UnitInput.Hertz}
-                fieldWidth="xs"
-              />
-            )}
-            {!isMulticast && (
-              <Form.Field
-                type="number"
-                min={100000}
-                step={100}
-                title={m.desiredPingSlotFrequencyTitle}
-                placeholder={sharedMessages.frequencyPlaceholder}
-                name="mac_settings.desired_ping_slot_frequency"
-                tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
-                component={UnitInput.Hertz}
-                fieldWidth="xs"
-              />
-            )}
-          </Form.FieldContainer>
-          <Form.FieldContainer horizontal>
-            {!isOTAA && (
-              <Form.Field
-                title={m.pingSlotDataRateTitle}
-                name="mac_settings.ping_slot_data_rate_index"
-                tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
-                component={Input}
-                type="number"
-                inputWidth="xxs"
-                fieldWidth="xs"
-                min={0}
-                max={15}
-              />
-            )}
-            {!isMulticast && (
-              <Form.Field
-                title={m.desiredPingSlotDataRateTitle}
-                name="mac_settings.desired_ping_slot_data_rate_index"
-                tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
-                component={Input}
-                type="number"
-                fieldWidth="xs"
-                inputWidth="xxs"
-                min={0}
-                max={15}
-              />
-            )}
-          </Form.FieldContainer>
-        </>
-      )}
-      <Form.FieldContainer horizontal>
-        <Form.Field
-          title={m.statusCountPeriodicity}
-          name="mac_settings.status_count_periodicity"
-          component={Input}
-          append={<Message content={sharedMessages.messages} />}
-          type="number"
-          inputWidth="s"
-          fieldWidth="xs"
-          tooltipId={tooltipIds.STATUS_COUNT_PERIODICITY}
-        />
-        <Form.Field
-          title={m.statusTimePeriodicity}
-          name="mac_settings.status_time_periodicity"
-          component={UnitInput.Duration}
-          unitSelector={['ms', 's']}
-          type="number"
-          tooltipId={tooltipIds.STATUS_TIME_PERIODICITY}
-          fieldWidth="xs"
-        />
-      </Form.FieldContainer>
-      <Form.Field
-        name="mac_settings.adr"
-        component={Radio.Group}
-        title={m.adrAdaptiveDataRate}
-        tooltipId={tooltipIds.ADR_USE}
-        encode={encodeAdrMode}
-        decode={decodeAdrMode}
-      >
-        <Radio label={m.adrDynamic} value="dynamic" />
-        <Radio label={m.adrStatic} value="static" />
-        <Radio label={sharedMessages.disabled} value="disabled" />
-      </Form.Field>
-      {isDynamicAdr && (
-        <>
-          <Form.Field
-            title={m.adrMargin}
-            name="mac_settings.adr.dynamic.margin"
-            component={Input}
-            type="number"
-            tooltipId={tooltipIds.ADR_MARGIN}
-            min={-100}
-            max={100}
-            inputWidth="xs"
-            append="dB"
-          />
-          <Form.Field
-            label={m.useDefaultNbTrans}
-            name="mac_settings.adr.dynamic._use_default_nb_trans"
-            component={Checkbox}
-            tooltipId={tooltipIds.USE_DEFAULT_NB_TRANS}
-          />
-          {showEditNbTrans && (
-            <>
-              <Form.Field
-                title={m.adrNbTrans}
-                name="mac_settings.adr.dynamic._override_nb_trans_defaults"
-                component={Checkbox}
-                label={m.overrideNbTrans}
-              />
-              <Form.FieldContainer horizontal className="al-end mb-cs-xs">
+            <Form.FieldContainer horizontal>
+              {!isOTAA && (
                 <Form.Field
-                  title={m.minNbTrans}
-                  name="mac_settings.adr.dynamic.min_nb_trans"
-                  component={Input}
+                  title={sharedMessages.rx2DataRateIndexTitle}
                   type="number"
-                  min={1}
-                  max={3}
-                  disabled={defaultNbTransDisabled}
-                  inputWidth="xs"
-                  className="d-flex direction-column"
-                />
-                <Form.Field
-                  title={m.maxNbTrans}
-                  name="mac_settings.adr.dynamic.max_nb_trans"
+                  name="mac_settings.rx2_data_rate_index"
                   component={Input}
-                  type="number"
-                  min={1}
-                  max={3}
-                  disabled={defaultNbTransDisabled}
-                  inputWidth="xs"
-                  className="d-flex direction-column"
+                  min={0}
+                  max={15}
+                  tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
+                  inputWidth="xxs"
+                  fieldWidth="xs"
                 />
-                <Message content={m.defaultForAllRates} className="mt-cs-xl" />
-              </Form.FieldContainer>
-              {!defaultNbTransDisabled && (
-                <div>
-                  <Icon icon="info" nudgeUp className="mr-cs-xxs" />
-                  <Message content={m.defaultNbTransMessage} />
-                </div>
               )}
-              <Form.InfoField
-                title={m.specificOverrides}
-                tooltipId={tooltipIds.DATA_RATE_SPECIFIC_OVERRIDES}
-                className="mt-cs-m"
-              >
-                {adrOverrides &&
-                  Object.keys(adrOverrides).map(index => (
-                    <Form.FieldContainer horizontal className="al-end" key={index}>
+              {!isMulticast && (
+                <Form.Field
+                  title={sharedMessages.desiredRx2DataRateIndexTitle}
+                  type="number"
+                  name="mac_settings.desired_rx2_data_rate_index"
+                  component={Input}
+                  min={0}
+                  max={15}
+                  inputWidth="xxs"
+                  tooltipId={tooltipIds.RX2_DATA_RATE_INDEX}
+                  fieldWidth="xs"
+                />
+              )}
+            </Form.FieldContainer>
+            <Form.FieldContainer horizontal>
+              {!isOTAA && (
+                <Form.Field
+                  type="number"
+                  min={100000}
+                  step={100}
+                  title={sharedMessages.rx2Frequency}
+                  name="mac_settings.rx2_frequency"
+                  component={UnitInput.Hertz}
+                  tooltipId={tooltipIds.RX2_FREQUENCY}
+                  fieldWidth="xs"
+                />
+              )}
+              {!isMulticast && (
+                <Form.Field
+                  type="number"
+                  min={100000}
+                  step={100}
+                  title={sharedMessages.desiredRx2FrequencyTitle}
+                  name="mac_settings.desired_rx2_frequency"
+                  component={UnitInput.Hertz}
+                  tooltipId={tooltipIds.RX2_FREQUENCY}
+                  fieldWidth="xs"
+                />
+              )}
+            </Form.FieldContainer>
+            <Form.FieldContainer horizontal>
+              {!isOTAA && (
+                <Form.Field
+                  title={sharedMessages.maxDutyCycle}
+                  name="mac_settings.max_duty_cycle"
+                  component={Select}
+                  options={maxDutyCycleOptions}
+                  fieldWidth="xs"
+                  tooltipId={tooltipIds.MAX_DUTY_CYCLE}
+                />
+              )}
+              {!isMulticast && (
+                <Form.Field
+                  title={sharedMessages.desiredMaxDutyCycle}
+                  name="mac_settings.desired_max_duty_cycle"
+                  component={Select}
+                  options={maxDutyCycleOptions}
+                  fieldWidth="xs"
+                  tooltipId={tooltipIds.MAX_DUTY_CYCLE}
+                />
+              )}
+            </Form.FieldContainer>
+            <Form.Field
+              indexAsKey
+              name="mac_settings.factory_preset_frequencies"
+              component={KeyValueMap}
+              title={sharedMessages.factoryPresetFrequencies}
+              description={sharedMessages.factoryPresetFreqDescription}
+              addMessage={sharedMessages.freqAdd}
+              valuePlaceholder={sharedMessages.frequencyPlaceholder}
+              tooltipId={tooltipIds.FACTORY_PRESET_FREQUENCIES}
+            />
+            {isClassC && (
+              <Form.Field
+                title={sharedMessages.classCTimeout}
+                name="mac_settings.class_c_timeout"
+                tooltipId={tooltipIds.CLASS_C_TIMEOUT}
+                component={UnitInput.Duration}
+                unitSelector={['ms', 's']}
+                type="number"
+                fieldWidth="xs"
+              />
+            )}
+            {(isClassB || isMulticast) && (
+              <>
+                <Form.Field
+                  title={sharedMessages.classBTimeout}
+                  name="mac_settings.class_b_timeout"
+                  tooltipId={tooltipIds.CLASS_B_TIMEOUT}
+                  component={UnitInput.Duration}
+                  unitSelector={['ms', 's']}
+                  type="number"
+                  fieldWidth="xs"
+                />
+                <Form.Field
+                  title={sharedMessages.pingSlotPeriodicity}
+                  description={sharedMessages.pingSlotPeriodicityDescription}
+                  name="mac_settings.ping_slot_periodicity"
+                  component={Select}
+                  options={pingSlotPeriodicityOptions}
+                  required={pingPeriodicityRequired}
+                  menuPlacement="top"
+                  fieldWidth="xs"
+                />
+                <Form.FieldContainer horizontal>
+                  {!isOTAA && (
+                    <Form.Field
+                      type="number"
+                      min={100000}
+                      title={sharedMessages.beaconFrequency}
+                      placeholder={sharedMessages.frequencyPlaceholder}
+                      name="mac_settings.beacon_frequency"
+                      tooltipId={tooltipIds.BEACON_FREQUENCY}
+                      component={UnitInput.Hertz}
+                      fieldWidth="xs"
+                    />
+                  )}
+                  {!isMulticast && (
+                    <Form.Field
+                      type="number"
+                      min={100000}
+                      title={sharedMessages.desiredBeaconFrequency}
+                      placeholder={sharedMessages.frequencyPlaceholder}
+                      name="mac_settings.desired_beacon_frequency"
+                      tooltipId={tooltipIds.BEACON_FREQUENCY}
+                      component={UnitInput.Hertz}
+                      fieldWidth="xs"
+                    />
+                  )}
+                </Form.FieldContainer>
+                <Form.FieldContainer horizontal>
+                  {!isOTAA && (
+                    <Form.Field
+                      type="number"
+                      min={100000}
+                      step={100}
+                      title={sharedMessages.pingSlotFrequency}
+                      placeholder={sharedMessages.frequencyPlaceholder}
+                      name="mac_settings.ping_slot_frequency"
+                      tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
+                      component={UnitInput.Hertz}
+                      fieldWidth="xs"
+                    />
+                  )}
+                  {!isMulticast && (
+                    <Form.Field
+                      type="number"
+                      min={100000}
+                      step={100}
+                      title={sharedMessages.desiredPingSlotFrequencyTitle}
+                      placeholder={sharedMessages.frequencyPlaceholder}
+                      name="mac_settings.desired_ping_slot_frequency"
+                      tooltipId={tooltipIds.PING_SLOT_FREQUENCY}
+                      component={UnitInput.Hertz}
+                      fieldWidth="xs"
+                    />
+                  )}
+                </Form.FieldContainer>
+                <Form.FieldContainer horizontal>
+                  {!isOTAA && (
+                    <Form.Field
+                      title={sharedMessages.pingSlotDataRateTitle}
+                      name="mac_settings.ping_slot_data_rate_index"
+                      tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
+                      component={Input}
+                      type="number"
+                      inputWidth="xxs"
+                      fieldWidth="xs"
+                      min={0}
+                      max={15}
+                    />
+                  )}
+                  {!isMulticast && (
+                    <Form.Field
+                      title={sharedMessages.desiredPingSlotDataRateTitle}
+                      name="mac_settings.desired_ping_slot_data_rate_index"
+                      tooltipId={tooltipIds.PING_SLOT_DATA_RATE_INDEX}
+                      component={Input}
+                      type="number"
+                      fieldWidth="xs"
+                      inputWidth="xxs"
+                      min={0}
+                      max={15}
+                    />
+                  )}
+                </Form.FieldContainer>
+              </>
+            )}
+            <Form.FieldContainer horizontal>
+              <Form.Field
+                title={sharedMessages.statusCountPeriodicity}
+                name="mac_settings.status_count_periodicity"
+                component={Input}
+                append={<Message content={sharedMessages.messages} />}
+                type="number"
+                inputWidth="s"
+                fieldWidth="xs"
+                tooltipId={tooltipIds.STATUS_COUNT_PERIODICITY}
+              />
+              <Form.Field
+                title={sharedMessages.statusTimePeriodicity}
+                name="mac_settings.status_time_periodicity"
+                component={UnitInput.Duration}
+                unitSelector={['ms', 's']}
+                type="number"
+                tooltipId={tooltipIds.STATUS_TIME_PERIODICITY}
+                fieldWidth="xs"
+              />
+            </Form.FieldContainer>
+            <Form.Field
+              name="mac_settings.adr"
+              component={Radio.Group}
+              title={sharedMessages.adrAdaptiveDataRate}
+              tooltipId={tooltipIds.ADR_USE}
+              encode={encodeAdrMode}
+              decode={decodeAdrMode}
+            >
+              <Radio label={sharedMessages.adrDynamic} value="dynamic" />
+              <Radio label={sharedMessages.adrStatic} value="static" />
+              <Radio label={sharedMessages.disabled} value="disabled" />
+            </Form.Field>
+            {isDynamicAdr && (
+              <>
+                <Form.Field
+                  title={sharedMessages.adrMargin}
+                  name="mac_settings.adr.dynamic.margin"
+                  component={Input}
+                  type="number"
+                  tooltipId={tooltipIds.ADR_MARGIN}
+                  min={-100}
+                  max={100}
+                  inputWidth="xs"
+                  append="dB"
+                />
+                <Form.Field
+                  label={sharedMessages.useDefaultNbTrans}
+                  name="mac_settings.adr.dynamic._use_default_nb_trans"
+                  component={Checkbox}
+                  tooltipId={tooltipIds.USE_DEFAULT_NB_TRANS}
+                />
+                {showEditNbTrans && (
+                  <>
+                    <Form.Field
+                      title={sharedMessages.adrNbTrans}
+                      name="mac_settings.adr.dynamic._override_nb_trans_defaults"
+                      component={Checkbox}
+                      label={sharedMessages.overrideNbTrans}
+                    />
+                    <Form.FieldContainer horizontal className="al-end mb-cs-xs">
                       <Form.Field
-                        title={m.dataRatePlaceholder}
-                        name={`mac_settings.adr.dynamic.overrides.${index}._data_rate_index`}
-                        valueSetter={dataRateValueSetter}
-                        component={Select}
-                        options={dataRateOverrideOptions}
-                        filterOption={dataRateFilterOption}
-                        inputWidth="s"
-                        fieldWidth="xxs"
-                        className="d-flex direction-column"
-                      />
-                      <Form.Field
-                        title={m.minNbTrans}
-                        name={`mac_settings.adr.dynamic.overrides.${index}.min_nb_trans`}
+                        title={sharedMessages.minNbTrans}
+                        name="mac_settings.adr.dynamic.min_nb_trans"
                         component={Input}
-                        fieldWidth="xxs"
-                        className="d-flex direction-column"
                         type="number"
                         min={1}
                         max={3}
+                        disabled={defaultNbTransDisabled}
+                        inputWidth="xs"
+                        className="d-flex direction-column"
                       />
                       <Form.Field
-                        title={m.maxNbTrans}
-                        name={`mac_settings.adr.dynamic.overrides.${index}.max_nb_trans`}
+                        title={sharedMessages.maxNbTrans}
+                        name="mac_settings.adr.dynamic.max_nb_trans"
                         component={Input}
-                        fieldWidth="xxs"
-                        className="d-flex direction-column"
                         type="number"
                         min={1}
                         max={3}
+                        disabled={defaultNbTransDisabled}
+                        inputWidth="xs"
+                        className="d-flex direction-column"
                       />
+                      <Message content={sharedMessages.defaultForAllRates} className="mt-cs-xl" />
+                    </Form.FieldContainer>
+                    {!defaultNbTransDisabled && (
+                      <div className="d-flex al-center c-text-neutral-semilight">
+                        <Icon icon={IconInfoCircle} className="mr-cs-xxs" />
+                        <Message content={sharedMessages.defaultNbTransMessage} />
+                      </div>
+                    )}
+                    <Form.InfoField
+                      title={sharedMessages.specificOverrides}
+                      tooltipId={tooltipIds.DATA_RATE_SPECIFIC_OVERRIDES}
+                      className="mt-cs-m"
+                    >
+                      {adrOverrides &&
+                        Object.keys(adrOverrides).map(index => (
+                          <Form.FieldContainer horizontal className="al-end" key={index}>
+                            <Form.Field
+                              title={sharedMessages.dataRatePlaceholder}
+                              name={`mac_settings.adr.dynamic.overrides.${index}._data_rate_index`}
+                              valueSetter={dataRateValueSetter}
+                              component={Select}
+                              options={dataRateOverrideOptions}
+                              filterOption={dataRateFilterOption}
+                              fieldWidth="quarter"
+                              className="d-flex direction-column"
+                            />
+                            <Form.Field
+                              title={sharedMessages.minNbTrans}
+                              name={`mac_settings.adr.dynamic.overrides.${index}.min_nb_trans`}
+                              component={Input}
+                              className="d-flex direction-column"
+                              type="number"
+                              min={1}
+                              max={3}
+                            />
+                            <Form.Field
+                              title={sharedMessages.maxNbTrans}
+                              name={`mac_settings.adr.dynamic.overrides.${index}.max_nb_trans`}
+                              component={Input}
+                              className="d-flex direction-column"
+                              type="number"
+                              min={1}
+                              max={3}
+                            />
+                            <Button
+                              type="button"
+                              onClick={handleRemoveButtonClick}
+                              icon={IconTrash}
+                              message={sharedMessages.remove}
+                              value={index}
+                              secondary
+                              danger
+                            />
+                          </Form.FieldContainer>
+                        ))}
                       <Button
                         type="button"
-                        onClick={handleRemoveButtonClick}
-                        icon="delete"
-                        message={sharedMessages.remove}
-                        value={index}
+                        message={sharedMessages.addSpecificOverride}
+                        onClick={addOverride}
+                        icon={IconPlus}
+                        secondary
                       />
-                    </Form.FieldContainer>
-                  ))}
-                <Button
-                  type="button"
-                  message={m.addSpecificOverride}
-                  onClick={addOverride}
-                  icon="add"
+                    </Form.InfoField>
+                  </>
+                )}
+              </>
+            )}
+            {isStaticAdr && (
+              <>
+                <Form.Field
+                  title={sharedMessages.adrDataRate}
+                  name="mac_settings.adr.static.data_rate_index"
+                  component={Input}
+                  type="number"
+                  inputWidth="xs"
+                  min={0}
                 />
-              </Form.InfoField>
-            </>
-          )}
+                <Form.Field
+                  title={sharedMessages.adrTransPower}
+                  name="mac_settings.adr.static.tx_power_index"
+                  component={Input}
+                  type="number"
+                  inputWidth="xs"
+                  max={15}
+                />
+                <Form.Field
+                  title={sharedMessages.adrUplinks}
+                  name="mac_settings.adr.static.nb_trans"
+                  component={Input}
+                  type="number"
+                  inputWidth="xs"
+                  min={1}
+                  max={15}
+                />
+              </>
+            )}
+            {isNewLorawanVersion && !isMulticast && (
+              <>
+                <Form.Field
+                  title={sharedMessages.desiredAdrAckLimit}
+                  name="mac_settings.desired_adr_ack_limit_exponent"
+                  component={Select}
+                  options={adrAckLimitOptions}
+                  tooltipId={tooltipIds.ADR_ACK_LIMIT}
+                  fieldWidth="xs"
+                />
+                <Form.Field
+                  title={sharedMessages.desiredAdrAckDelay}
+                  name="mac_settings.desired_adr_ack_delay_exponent"
+                  component={Select}
+                  options={adrAckDelayOptions}
+                  tooltipId={tooltipIds.ADR_ACK_DELAY}
+                  fieldWidth="xs"
+                />
+              </>
+            )}
+          </Form.CollapseSection>
         </>
       )}
-      {isStaticAdr && (
-        <>
-          <Form.Field
-            title={m.adrDataRate}
-            name="mac_settings.adr.static.data_rate_index"
-            component={Input}
-            type="number"
-            inputWidth="xs"
-          />
-          <Form.Field
-            title={m.adrTransPower}
-            name="mac_settings.adr.static.tx_power_index"
-            component={Input}
-            type="number"
-            inputWidth="xs"
-            max={15}
-          />
-          <Form.Field
-            title={m.adrUplinks}
-            name="mac_settings.adr.static.nb_trans"
-            component={Input}
-            type="number"
-            inputWidth="xs"
-            min={1}
-            max={15}
-          />
-        </>
-      )}
-      {isNewLorawanVersion && !isMulticast && (
-        <>
-          <Form.Field
-            title={m.desiredAdrAckLimit}
-            name="mac_settings.desired_adr_ack_limit_exponent"
-            component={Select}
-            options={adrAckLimitOptions}
-            tooltipId={tooltipIds.ADR_ACK_LIMIT}
-            fieldWidth="xs"
-          />
-          <Form.Field
-            title={m.desiredAdrAckDelay}
-            name="mac_settings.desired_adr_ack_delay_exponent"
-            component={Select}
-            options={adrAckDelayOptions}
-            tooltipId={tooltipIds.ADR_ACK_DELAY}
-            fieldWidth="xs"
-          />
-        </>
-      )}
-    </Form.CollapseSection>
+    </>
   )
 }
 
 MacSettingsSection.propTypes = {
   activationMode: PropTypes.oneOf(Object.values(ACTIVATION_MODES)).isRequired,
+  appId: PropTypes.string.isRequired,
   bandId: PropTypes.string.isRequired,
+  deviceId: PropTypes.string.isRequired,
   initiallyCollapsed: PropTypes.bool,
   isClassB: PropTypes.bool,
   isClassC: PropTypes.bool,

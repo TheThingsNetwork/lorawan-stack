@@ -89,7 +89,6 @@ describe('Overview', () => {
       cy.get('#stage').within(() => {
         cy.findAllByText(gatewayId).should('be.visible').and('have.length', 2)
         cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
-        cy.findByText(/No uplinks yet/) // Check for no uplinks.
 
         // Check panels.
         cy.findByText('General information').should('be.visible')

@@ -26,6 +26,6 @@ type Config struct {
 
 // DefaultConfig is the default configuration for The Things Industries gateway protocol frontend.
 var DefaultConfig = Config{
-	WSPingInterval:      30 * time.Second,
+	WSPingInterval:      60 * time.Second,
 	MissedPongThreshold: 2,
 }

@@ -1473,7 +1473,15 @@ type downlinkAttemptResult struct {
 	DownlinkTaskUpdateStrategy downlinkTaskUpdateStrategy
 }
 
-func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, slot *classADownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
+func (ns *NetworkServer) attemptClassADataDownlink( // nolint:gocyclo
+	ctx context.Context,
+	dev *ttnpb.EndDevice,
+	phy *band.Band,
+	fp *frequencyplans.FrequencyPlan,
+	slot *classADownlinkSlot,
+	maxUpLength uint16,
+	profile *ttnpb.MACSettings,
+) downlinkAttemptResult {
 	ctx = events.ContextWithCorrelationID(ctx, slot.Uplink.CorrelationIds...)
 	if !dev.MacState.RxWindowsAvailable {
 		log.FromContext(ctx).Error("RX windows not available, skip class A downlink slot")
@@ -1661,6 +1669,16 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 		dev.Session.QueuedApplicationDownlinks = dev.Session.QueuedApplicationDownlinks[:0:0]
 	}
 	recordDataDownlink(dev, genState, genDown.NeedsMACAnswer, down, ns.defaultMACSettings)
+	if genState.ApplicationDownlink != nil &&
+		genState.ApplicationDownlink.Confirmed &&
+		dev.MacState.DeviceClass == ttnpb.Class_CLASS_C {
+		timeout := mac.DeviceClassCTimeout(dev, ns.defaultMACSettings, profile)
+		taskAt := time.Now().UTC().Add(timeout)
+		log.FromContext(ctx).WithField("start_at", taskAt).Debug("Add pending downlink task")
+		if err := ns.pendingDownlinkTasks.Add(ctx, dev.Ids, taskAt, true); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to add pending downlink task")
+		}
+	}
 	dev.MacState.PendingRelayDownlink = nil
 	return downlinkAttemptResult{
 		SetPaths: ttnpb.AddFields(sets,
@@ -1679,7 +1697,15 @@ func (ns *NetworkServer) attemptClassADataDownlink(ctx context.Context, dev *ttn
 	}
 }
 
-func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context, dev *ttnpb.EndDevice, phy *band.Band, fp *frequencyplans.FrequencyPlan, slot *networkInitiatedDownlinkSlot, maxUpLength uint16) downlinkAttemptResult {
+func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink( // nolint:gocyclo
+	ctx context.Context,
+	dev *ttnpb.EndDevice,
+	phy *band.Band,
+	fp *frequencyplans.FrequencyPlan,
+	slot *networkInitiatedDownlinkSlot,
+	maxUpLength uint16,
+	profile *ttnpb.MACSettings,
+) downlinkAttemptResult {
 	var drIdx ttnpb.DataRateIndex
 	var freq uint64
 	switch slot.Class {
@@ -1890,6 +1916,16 @@ func (ns *NetworkServer) attemptNetworkInitiatedDataDownlink(ctx context.Context
 	}
 
 	recordDataDownlink(dev, genState, genDown.NeedsMACAnswer, down, ns.defaultMACSettings)
+	if genState.ApplicationDownlink != nil &&
+		genState.ApplicationDownlink.Confirmed &&
+		dev.MacState.DeviceClass == ttnpb.Class_CLASS_C {
+		timeout := mac.DeviceClassCTimeout(dev, ns.defaultMACSettings, profile)
+		taskAt := time.Now().UTC().Add(timeout)
+		log.FromContext(ctx).WithField("start_at", taskAt).Debug("Add pending downlink task")
+		if err := ns.pendingDownlinkTasks.Add(ctx, dev.Ids, taskAt, true); err != nil {
+			log.FromContext(ctx).WithError(err).Warn("Failed to add pending downlink task")
+		}
+	}
 	if genState.ApplicationDownlink != nil || genState.EvictDownlinkQueueIfScheduled {
 		sets = ttnpb.AddFields(sets, "session.queued_application_downlinks")
 	}
@@ -2198,7 +2234,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 					}
 					switch slot := v.(type) {
 					case *classADownlinkSlot:
-						a := ns.attemptClassADataDownlink(ctx, dev, phy, fp, slot, maxUpLength)
+						a := ns.attemptClassADataDownlink(ctx, dev, phy, fp, slot, maxUpLength, profile.GetMacSettings())
 						queuedEvents = append(queuedEvents, a.QueuedEvents...)
 						queuedApplicationUplinks = append(queuedApplicationUplinks, a.QueuedApplicationUplinks...)
 						taskUpdateStrategy = a.DownlinkTaskUpdateStrategy
@@ -2229,7 +2265,7 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 							earliestAt = time.Now().Add(absoluteTimeSchedulingDelay / 2)
 							continue
 						}
-						a := ns.attemptNetworkInitiatedDataDownlink(ctx, dev, phy, fp, slot, maxUpLength)
+						a := ns.attemptNetworkInitiatedDataDownlink(ctx, dev, phy, fp, slot, maxUpLength, profile.GetMacSettings())
 						queuedEvents = append(queuedEvents, a.QueuedEvents...)
 						queuedApplicationUplinks = append(queuedApplicationUplinks, a.QueuedApplicationUplinks...)
 						taskUpdateStrategy = a.DownlinkTaskUpdateStrategy
@@ -2270,6 +2306,89 @@ func (ns *NetworkServer) processDownlinkTask(ctx context.Context, consumerID str
 	})
 	if err != nil && !setErr && !computeNextErr {
 		log.FromContext(ctx).WithError(err).Error("Failed to pop entry from downlink task queue")
+	}
+	return err
+}
+
+func (ns *NetworkServer) createProcessPendingDownlinkTask(consumerID string) func(context.Context) error {
+	return func(ctx context.Context) error {
+		return ns.processPendingDownlinkTask(ctx, consumerID)
+	}
+}
+
+// processPendingDownlinkTask processes the most recent pending downlink task ready for execution,
+// if such is available or wait until it is before processing it.
+// NOTE: ctx.Done() is not guaranteed to be respected by processPendingDownlinkTask.
+// The processPendingDownlinkTask receives the consumerID that will be used for popping
+// from the pending downlink task queue.
+func (ns *NetworkServer) processPendingDownlinkTask(ctx context.Context, consumerID string) error {
+	var setErr bool
+	err := ns.pendingDownlinkTasks.Pop(
+		ctx,
+		consumerID,
+		func(
+			ctx context.Context,
+			devID *ttnpb.EndDeviceIdentifiers,
+			t time.Time,
+		) (time.Time, error) {
+			ctx = log.NewContextWithFields(ctx, log.Fields(
+				"device_uid", unique.ID(ctx, devID),
+				"started_at", time.Now().UTC(),
+			))
+			logger := log.FromContext(ctx)
+			logger.WithField("start_at", t).Debug("Process pending downlink task")
+
+			_, ctx, err := ns.devices.SetByID(ctx, devID.ApplicationIds, devID.DeviceId,
+				[]string{
+					"frequency_plan_id",
+					"last_dev_status_received_at",
+					"lorawan_phy_version",
+					"mac_settings",
+					"mac_state",
+					"multicast",
+					"pending_mac_state",
+					"session",
+				},
+				func(_ context.Context, dev *ttnpb.EndDevice) (*ttnpb.EndDevice, []string, error) {
+					if dev == nil {
+						logger.Warn("Device not found")
+						return nil, nil, nil
+					}
+
+					pendingAppDown := dev.MacState.GetPendingApplicationDownlink()
+					if pendingAppDown != nil {
+						queuedApplicationUplinks := []*ttnpb.ApplicationUp{
+							{
+								EndDeviceIds: dev.Ids,
+								Up: &ttnpb.ApplicationUp_DownlinkNack{
+									DownlinkNack: pendingAppDown,
+								},
+								CorrelationIds: pendingAppDown.CorrelationIds,
+							},
+						}
+						// Clear pending application downlink to avoid repeatedly sending NACKs in case of an error.
+						dev.MacState.PendingApplicationDownlink = nil
+
+						logger.Debug("Pending application downlink not confirmed in time, send NACK to application")
+						ns.submitApplicationUplinks(ctx, queuedApplicationUplinks...)
+					}
+
+					return dev, []string{
+						"mac_state",
+						"session",
+					}, nil
+				},
+			)
+			if err != nil {
+				setErr = true
+				logger.WithError(err).Error("Failed to update device in registry")
+				return time.Time{}, err
+			}
+
+			return time.Time{}, nil
+		})
+	if err != nil && !setErr {
+		log.FromContext(ctx).WithError(err).Error("Failed to pop entry from pending downlink task queue")
 	}
 	return err
 }

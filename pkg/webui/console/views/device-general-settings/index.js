@@ -51,6 +51,7 @@ import {
 } from '@console/store/actions/devices'
 import { unclaimDevice } from '@console/store/actions/claim'
 import { getBandsList, getNsFrequencyPlans } from '@console/store/actions/configuration'
+import { getMacSettingsProfilesList } from '@console/store/actions/mac-settings-profiles'
 
 import {
   selectSelectedDevice,
@@ -210,6 +211,7 @@ const DeviceGeneralSettings = () => {
 
   const fetchData = useCallback(
     async dispatch => {
+      await dispatch(getMacSettingsProfilesList(undefined, appId))
       if (device.frequency_plan_id && device.lorawan_phy_version) {
         let frequencyPlans = storeFrequencyPlans
         if (frequencyPlans.length === 0) {
@@ -250,7 +252,7 @@ const DeviceGeneralSettings = () => {
         }
       }
     },
-    [device.lorawan_phy_version, device.frequency_plan_id, storeFrequencyPlans],
+    [device.lorawan_phy_version, device.frequency_plan_id, storeFrequencyPlans, appId],
   )
 
   return (

@@ -34,7 +34,7 @@ type ApplicationUplinkQueueConfig struct {
 	FastNumConsumers uint64 `name:"fast-num-consumers"`
 }
 
-// ApplicationUplinkQueueConfig defines downlink task queue configuration.
+// DownlinkTaskQueueConfig defines downlink task queue configuration.
 type DownlinkTaskQueueConfig struct {
 	Queue        DownlinkTaskQueue `name:"-"`
 	NumConsumers uint64            `name:"num-consumers"`
@@ -141,6 +141,7 @@ type Config struct {
 	ApplicationUplinkQueue     ApplicationUplinkQueueConfig `name:"application-uplink-queue"`
 	Devices                    DeviceRegistry               `name:"-"`
 	DownlinkTaskQueue          DownlinkTaskQueueConfig      `name:"downlink-task-queue"`
+	PendingDownlinkTaskQueue   DownlinkTaskQueueConfig      `name:"pending-downlink-task-queue"`
 	UplinkDeduplicator         UplinkDeduplicator           `name:"-"`
 	ScheduledDownlinkMatcher   ScheduledDownlinkMatcher     `name:"-"`
 	NetID                      types.NetID                  `name:"net-id" description:"NetID of this Network Server"`                                                                                   // nolint: lll
@@ -155,6 +156,7 @@ type Config struct {
 	DownlinkQueueCapacity      int                          `name:"downlink-queue-capacity" description:"Maximum downlink queue size per-session"`                                                       // nolint: lll
 	MACSettingsProfileRegistry MACSettingsProfileRegistry   `name:"-"`
 	Pagination                 PaginationConfig             `name:"pagination" description:"Pagination configuration"`
+	MaxConfNbTrans             uint32                       `name:"max-conf-nb-trans" description:"Maximum number of confirmed uplink retransmissions"` // nolint: lll
 }
 
 // DefaultConfig is the default Network Server configuration.
@@ -167,6 +169,9 @@ var DefaultConfig = Config{
 		FastNumConsumers: 128,
 	},
 	DownlinkTaskQueue: DownlinkTaskQueueConfig{
+		NumConsumers: 1,
+	},
+	PendingDownlinkTaskQueue: DownlinkTaskQueueConfig{
 		NumConsumers: 1,
 	},
 	DeduplicationWindow: 200 * time.Millisecond,
@@ -188,4 +193,5 @@ var DefaultConfig = Config{
 	Pagination: PaginationConfig{
 		DefaultLimit: 100,
 	},
+	MaxConfNbTrans: 15,
 }

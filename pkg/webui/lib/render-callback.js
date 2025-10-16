@@ -13,16 +13,20 @@
 // limitations under the License.
 
 /**
- * Allows react components to use the render prop design pattern without explicitly
- * specifying `render`, `children` and `children` as a function props.
+ * Allows React components to use the render-prop pattern without explicitly
+ * specifying `render` or `children` as function props.
  *
- * @param {object} props - The props of a component.
- * @param {Function} props.render - The render function.
- * @param {object} props.children - The component children.
- * @param {object} context - The context to be passed to children.
- *
- * @returns {*} - Processed children by the provided `render`, `children` function or just `children`
- * depending on the props.
+ * @template C
+ * @typedef {object} RenderCallbackProps
+ * @property {(context: C) => unknown} [render] - Render function.
+ * @property {unknown | ((context: C) => unknown)} [children] - Children or a render function.
+ */
+
+/**
+ * @template C
+ * @param {RenderCallbackProps<C>} props - The component props.
+ * @param {C} context - The context passed to the render/children function.
+ * @returns {unknown} - The result of `render(context)`, `children(context)`, or `children`.
  */
 const renderCallback = ({ render, children }, context) => {
   if (render) {

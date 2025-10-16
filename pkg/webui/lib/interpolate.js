@@ -16,7 +16,7 @@
  * Takes a templated string and interpolates its values using a values object.
  *
  * @param {string} str - The to be interpolated template string.
- * @param {values} values - The values to interpolate the template string with.
+ * @param {Record<string, unknown>} values - The values to interpolate the template string with.
  *
  * @returns {string} - The interpolated string.
  */

@@ -29,20 +29,16 @@ type DownlinkTaskQueue struct {
 	queue *ttnredis.TaskQueue
 }
 
-const (
-	downlinkKey = "downlink"
-)
-
 // NewDownlinkTaskQueue returns new downlink task queue.
 func NewDownlinkTaskQueue(
-	cl *ttnredis.Client, maxLen int64, group string, streamBlockLimit time.Duration,
+	cl *ttnredis.Client, maxLen int64, group string, streamBlockLimit time.Duration, key string,
 ) *DownlinkTaskQueue {
 	return &DownlinkTaskQueue{
 		queue: &ttnredis.TaskQueue{
 			Redis:            cl,
 			MaxLen:           maxLen,
 			Group:            group,
-			Key:              cl.Key(downlinkKey),
+			Key:              cl.Key(key),
 			StreamBlockLimit: streamBlockLimit,
 		},
 	}
