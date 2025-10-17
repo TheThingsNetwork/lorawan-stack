@@ -88,6 +88,7 @@ const FetchTable = props => {
     filtersClassName,
     smallCells,
     tableClassName,
+    setTab,
   } = props
 
   const globalPageSize = useSelector(selectPageSize)
@@ -96,7 +97,7 @@ const FetchTable = props => {
   const dispatch = useDispatch()
   const defaultTab = tabs.length > 0 ? tabs[0].name : undefined
   const [page, setPage] = useQueryState('page', 1, parseInt)
-  const [tab, setTab] = useQueryState('tab', defaultTab)
+  const [queryTab, setQueryTab] = useQueryState('tab', defaultTab)
   const [order, setOrder] = useQueryState('order', defaultOrder)
   const [query, setQuery] = useQueryState('query', '')
   const debouncedQuery = useDebounce(
@@ -113,7 +114,13 @@ const FetchTable = props => {
   const mayAdd = 'mayAdd' in base ? base.mayAdd : true
   const mayLink = 'mayLink' in base ? base.mayLink : true
 
-  const filters = { query: debouncedQuery, tab, order, page, limit: globalPageSize ?? pageSize }
+  const filters = {
+    query: debouncedQuery,
+    queryTab,
+    order,
+    page,
+    limit: globalPageSize ?? pageSize,
+  }
   const [fetching, setFetching] = useState(true)
   const [error, setError] = useState(undefined)
   let orderDirection, orderBy
@@ -141,10 +148,10 @@ const FetchTable = props => {
     const fetchItems = async () => {
       setFetching(true)
       const f = { query: debouncedQuery || '', page, limit: globalPageSize ?? pageSize }
-      if (tabs.find(t => t.name === tab)) {
-        f.tab = tab
+      if (tabs.find(t => t.name === queryTab)) {
+        f.tab = queryTab
       } else {
-        setTab(defaultTab)
+        setQueryTab(defaultTab)
         f.tab = undefined
       }
 
@@ -162,6 +169,7 @@ const FetchTable = props => {
           await dispatch(attachPromise(searchItemsAction(f)))
         } else {
           await dispatch(attachPromise(getItemsAction(f)))
+          setTab(f.tab)
         }
         if (isMounted.current) {
           setFetching(false)
@@ -187,9 +195,10 @@ const FetchTable = props => {
     pageSize,
     searchItemsAction,
     setOrder,
-    setTab,
-    tab,
     tabs,
+    queryTab,
+    setQueryTab,
+    setTab,
   ])
 
   const onPageChange = useCallback(
@@ -217,11 +226,11 @@ const FetchTable = props => {
 
   const onTabChange = useCallback(
     tab => {
-      setTab(tab)
+      setQueryTab(tab)
       setPage(1)
       setQuery('')
     },
-    [setPage, setQuery, setTab],
+    [setPage, setQuery, setQueryTab],
   )
 
   const rowHrefSelector = useCallback(
@@ -262,7 +271,7 @@ const FetchTable = props => {
           <div className={style.filtersLeft}>
             {tabs.length > 0 ? (
               <Tabs
-                active={tab}
+                active={queryTab}
                 className={style.tabs}
                 tabs={tabs}
                 onTabChange={onTabChange}
@@ -380,6 +389,7 @@ FetchTable.propTypes = {
   searchPlaceholderMessage: PropTypes.message,
   searchQueryMaxLength: PropTypes.number,
   searchable: PropTypes.bool,
+  setTab: PropTypes.func,
   smallCells: PropTypes.bool,
   tableClassName: PropTypes.string,
   tableTitle: PropTypes.message,
@@ -418,6 +428,7 @@ FetchTable.defaultProps = {
   filtersClassName: undefined,
   smallCells: false,
   tableClassName: undefined,
+  setTab: () => {},
 }
 
 export default FetchTable

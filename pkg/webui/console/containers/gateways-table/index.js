@@ -233,8 +233,6 @@ const GatewaysTable = () => {
     const { tab, query } = filters
     const isDeletedTab = tab === DELETED_TAB
 
-    setTab(tab)
-
     return getGatewaysList(
       { ...filters, deleted: isDeletedTab },
       ['name', 'description', 'frequency_plan_ids', 'gateway_server_address'],
@@ -258,6 +256,7 @@ const GatewaysTable = () => {
       searchPlaceholderMessage={sharedMessages.searchGateways}
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : undefined}
+      setTab={setTab}
     />
   )
 }
