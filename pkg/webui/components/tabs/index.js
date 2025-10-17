@@ -35,43 +35,53 @@ const Tabs = ({
   divider,
   narrow,
   toggleStyle,
-}) => (
-  <ul
-    className={classnames(className, style.tabs, {
-      [style.divider]: divider,
-      [style.tabsToggleStyle]: toggleStyle,
-    })}
-    data-test-id="tabs"
-  >
-    {tabs.map(
-      ({ name, disabled, narrow: nrw, link, exact, icon, title, hidden, description }, index) =>
-        !Boolean(hidden) && (
-          <Tab
-            key={index}
-            active={name === active}
-            name={name}
-            disabled={disabled}
-            onClick={onTabChange}
-            narrow={nrw || narrow}
-            link={link}
-            exact={exact}
-            tabClassName={individualTabClassName}
-            className={tabItemClassName}
-            toggleStyle={toggleStyle}
-            tooltip={description}
-          >
-            {icon && <Icon icon={icon} className={style.icon} />}
-            <Message content={title} />
-          </Tab>
-        ),
-    )}
-  </ul>
-)
+  disabled,
+}) => {
+  const handleClick = tabName => {
+    if (!disabled && onTabChange) {
+      onTabChange(tabName)
+    }
+  }
+
+  return (
+    <ul
+      className={classnames(className, style.tabs, {
+        [style.divider]: divider,
+        [style.tabsToggleStyle]: toggleStyle,
+      })}
+      data-test-id="tabs"
+    >
+      {tabs.map(
+        ({ name, disabled, narrow: nrw, link, exact, icon, title, hidden, description }, index) =>
+          !Boolean(hidden) && (
+            <Tab
+              key={index}
+              active={name === active}
+              name={name}
+              disabled={disabled}
+              onClick={handleClick}
+              narrow={nrw || narrow}
+              link={link}
+              exact={exact}
+              tabClassName={individualTabClassName}
+              className={tabItemClassName}
+              toggleStyle={toggleStyle}
+              tooltip={description}
+            >
+              {icon && <Icon icon={icon} className={style.icon} />}
+              <Message content={title} />
+            </Tab>
+          ),
+      )}
+    </ul>
+  )
+}
 
 Tabs.propTypes = {
   /** The name of the active tab. */
   active: PropTypes.string,
   className: PropTypes.string,
+  disabled: PropTypes.bool,
   /** Flag specifying whether the tab should render a bottom divider. */
   divider: PropTypes.bool,
   individualTabClassName: PropTypes.string,
@@ -104,6 +114,7 @@ Tabs.defaultProps = {
   divider: false,
   narrow: false,
   toggleStyle: false,
+  disabled: false,
 }
 
 export default Tabs
