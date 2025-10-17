@@ -267,6 +267,7 @@ const FetchTable = props => {
                 tabs={tabs}
                 onTabChange={onTabChange}
                 toggleStyle
+                disabled={fetching}
               />
             ) : (
               tableTitle && (
@@ -286,6 +287,7 @@ const FetchTable = props => {
                 className={style.searchBar}
                 inputWidth="full"
                 maxLength={searchQueryMaxLength}
+                disabled={fetching}
               />
             )}
             {(Boolean(actionItems) || mayAdd) && (
