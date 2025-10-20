@@ -26,6 +26,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Reset used DevNonces button on the Console now works for LoRaWAN 1.0.4 and 1.1 devices.
+
 ### Security
 
 ## [3.34.3] - unreleased
