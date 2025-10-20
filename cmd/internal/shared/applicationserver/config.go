@@ -83,7 +83,7 @@ var DefaultApplicationServerConfig = applicationserver.Config{
 		},
 	},
 	Formatters: applicationserver.FormattersConfig{
-		MaxParameterLength: 40960,
+		MaxParameterLength: 65536, // 64KB
 	},
 	DeviceLastSeen: applicationserver.LastSeenConfig{
 		BatchSize:     1000,
