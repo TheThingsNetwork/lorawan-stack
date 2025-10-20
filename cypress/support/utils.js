@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import crypto from 'crypto'
-
 /** Stack configuration utitlities. */
 
 /**
@@ -124,7 +122,14 @@ const generateJoinServerOnlyConfig = config => {
  * @param {number} length -  The length of the resulting hex value.
  * @returns {string} - Pseudorandom hex value of length `length`.
  */
-const generateHexValue = length => crypto.randomBytes(Math.floor(length / 2)).toString('hex')
+const generateHexValue = length => {
+  const byteLen = Math.ceil(length / 2)
+  const bytes = new Uint8Array(byteLen)
+  for (let i = 0; i < byteLen; i++) bytes[i] = Math.floor(Math.random() * 256)
+  let hex = ''
+  for (let i = 0; i < byteLen; i++) hex += bytes[i].toString(16).padStart(2, '0')
+  return hex.slice(0, length)
+}
 
 const generateCollaborator = (entity, type) => {
   const collabUserId = 'test-collab-user'
