@@ -17,6 +17,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Increased the default value from 5 to 15 for maximum number of confirmed uplink retransmission for LoRaWAN version prior 1.0.4.
 - Ping response settings for the TTIGW protocol to mark less gateway connections as disconnected.
+- Increase the payload codec formatter size limit to 64KB.
 
 ### Deprecated
 

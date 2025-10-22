@@ -96,7 +96,7 @@ const validationSchema = Yup.object().shape({
         .required(sharedMessages.validateRequired)
         // See https://github.com/TheThingsNetwork/lorawan-stack/blob/v3.14/api/messages.proto#L748
         // for validation requirements.
-        .max(40960, Yup.passValues(sharedMessages.validateTooLong)),
+        .max(65536, Yup.passValues(sharedMessages.validateTooLong)),
   }),
   [FIELD_NAMES.GRPC]: Yup.string()
     .matches(addressRegexp, Yup.passValues(sharedMessages.validateAddressFormat))
@@ -105,7 +105,7 @@ const validationSchema = Yup.object().shape({
       then: schema =>
         schema
           .required(sharedMessages.validateRequired)
-          .max(40960, Yup.passValues(sharedMessages.validateTooLong)),
+          .max(65536, Yup.passValues(sharedMessages.validateTooLong)),
     }),
 })
 
