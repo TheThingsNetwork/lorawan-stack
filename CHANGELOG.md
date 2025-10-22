@@ -26,6 +26,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - The NS resends the class C confirmed downlink after the `mac_settings.class_c_timeout` time.
+- The CLI now collects telemetry data on which commands and aliases are used. This helps us understand usage patterns and improve the tool.
 
 ### Changed
 
