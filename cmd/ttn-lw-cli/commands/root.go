@@ -102,7 +102,9 @@ var (
 			case <-telemetrySubmission:
 			}
 
-			telemetryTask.SaveData(ctx, cmd)
+			if telemetryTask != nil {
+				telemetryTask.SaveData(ctx, cmd)
+			}
 
 			err := util.SaveAuthCache(cache)
 			if err != nil {
