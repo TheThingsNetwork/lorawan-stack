@@ -147,10 +147,11 @@ jobs:
         env:
           DOCKER_CLI_EXPERIMENTAL: enabled
           DOCKER_PREFIX: thethingsnetwork
-      - uses: bufbuild/buf-push-action@v1
+      - uses: bufbuild/buf-action@v1
         with:
+          push: true
           input: api
-          buf_token: ${{ secrets.BUF_TOKEN }}
+          token: ${{ secrets.BUF_TOKEN }}
       - name: Prepare merge PR
         run: |
           export PR_URL=$(mktemp)

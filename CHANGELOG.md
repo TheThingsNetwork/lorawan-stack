@@ -36,21 +36,28 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Removed
 
-- Maximum retransmission delay window for confirmed uplinks.
-
 ### Fixed
 
 - Reset used DevNonces button on the Console now works for LoRaWAN 1.0.4 and 1.1 devices.
 
-## [3.34.3] - unreleased
+## [3.34.3] - 2025-10-14
 
 ### Added
 
 - Parsers for newly added normalized payload fields.
 
+### Changed
+
+- Increased the default value from 5 to 15 for maximum number of confirmed uplink retransmission for LoRaWAN version prior 1.0.4.
+- Ping response settings for the TTIGW protocol to mark less gateway connections as disconnected.
+
 ### Fixed
 
 - ADR respects the MAC settings `adr.mode.dynamic.min-data-rate-index` and `adr.mode.dynamic.max-data-rate-index` values
+
+### Removed
+
+- Maximum retransmission delay window for confirmed uplinks.
 
 ## [3.34.2] - 2025-07-24
 
@@ -3037,7 +3044,6 @@ NOTE: These links should respect backports. See https://github.com/TheThingsNetw
 [3.33.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.33.0...v3.33.1
 [3.33.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.3...v3.33.0
 [3.32.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.2...v3.32.3
-[3.32.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.1...v3.32.2
 [3.32.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.32.0...v3.32.1
 [3.32.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.1...v3.32.0
 [3.31.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.31.0...v3.31.1
