@@ -12,16 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package models contains telemetry models.
-package models
+package store
 
-// CLITelemetry contains telemetry information about the CLI.
-type CLITelemetry struct{ CmdData }
+import (
+	"os"
+	"path"
+)
 
-// OSTelemetry contains telemetry information about the operating system.
-type OSTelemetry struct {
-	OperatingSystem string `json:"operating_system"`
-	Arch            string `json:"arch"`
-	BinaryVersion   string `json:"binary_version" `
-	GolangVersion   string `json:"golang_version"`
+// ttnPath returns the path to the folder in which the configuration of telemetry is stored.
+func ttnPath() (string, error) {
+	configPath, err := os.UserCacheDir()
+	if err != nil {
+		return "", err
+	}
+	return path.Join(configPath, "ttn-lw-cli"), nil
+}
+
+// dbPath returns the path to the file in which the CLI telemetry is stored.
+func dbPath() (string, error) {
+	p, err := ttnPath()
+	if err != nil {
+		return "", err
+	}
+	return path.Join(p, "telemetry.json"), nil
 }

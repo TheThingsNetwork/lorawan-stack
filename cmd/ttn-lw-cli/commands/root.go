@@ -1,4 +1,4 @@
-// Copyright © 2020 The Things Network Foundation, The Things Industries B.V.
+// Copyright © 2025 The Things Network Foundation, The Things Industries B.V.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -39,7 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/experimental"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
-	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/cli"
+	telemetry "go.thethings.network/lorawan-stack/v3/pkg/telemetry/exporter/cli"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/io"
 	pkgversion "go.thethings.network/lorawan-stack/v3/pkg/version"
 	"golang.org/x/oauth2"
@@ -61,6 +61,8 @@ var (
 
 	telemetrySubmission chan struct{}
 	telemetryTimeout    = time.Second
+
+	telemetryTask telemetry.Task
 
 	// Root command is the entrypoint of the program
 	Root = &cobra.Command{
@@ -98,6 +100,10 @@ var (
 			case <-time.After(telemetryTimeout):
 				logger.Warn("Telemetry submission timed out")
 			case <-telemetrySubmission:
+			}
+
+			if telemetryTask != nil {
+				telemetryTask.SaveData(ctx, cmd)
 			}
 
 			err := util.SaveAuthCache(cache)
@@ -177,11 +183,11 @@ func preRun(tasks ...func() error) func(cmd *cobra.Command, args []string) error
 			logger.
 				WithField("documentation_url", "https://www.thethingsindustries.com/docs/reference/telemetry/cli").
 				Info("Telemetry is enabled. Check the documentation for more information on what is collected and how to disable it") // nolint:lll
+
+			telemetryTask = telemetry.NewCLITelemetry(telemetry.WithCLITarget(config.Telemetry.Target))
 			go func(ctx context.Context) {
 				defer close(telemetrySubmission)
-				cli.NewCLITelemetry(
-					cli.WithCLITarget(config.Telemetry.Target),
-				).Run(ctx)
+				telemetryTask.SendData(ctx)
 			}(ctx)
 		} else {
 			close(telemetrySubmission)

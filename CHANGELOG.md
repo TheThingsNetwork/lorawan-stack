@@ -11,8 +11,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- The NS resends the class C confirmed downlink after the `mac_settings.class_c_timeout` time.
-
 ### Changed
 
 ### Deprecated
@@ -22,6 +20,25 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 ### Security
+
+## [3.35.0] - unreleased
+
+### Added
+
+- The NS resends the class C confirmed downlink after the `mac_settings.class_c_timeout` time.
+- The CLI now collects telemetry data on which commands and aliases are used. This helps us understand usage patterns and improve the tool.
+
+### Changed
+
+- Increased the default value from 5 to 15 for maximum number of confirmed uplink retransmission for LoRaWAN version prior 1.0.4.
+- Ping response settings for the TTIGW protocol to mark less gateway connections as disconnected.
+- Increase the payload codec formatter size limit to 64KB.
+
+### Removed
+
+### Fixed
+
+- Reset used DevNonces button on the Console now works for LoRaWAN 1.0.4 and 1.1 devices.
 
 ## [3.34.3] - 2025-10-14
 
@@ -3018,7 +3035,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.3...v3.34
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.0...v3.35
+[3.35.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.3...v3.35.0
 [3.34.3]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.2...v3.34.3
 [3.34.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.1...v3.34.2
 [3.34.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.34.0...v3.34.1

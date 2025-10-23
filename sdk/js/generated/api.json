@@ -41360,7 +41360,7 @@
             },
             {
               "name": "up_formatter_parameter",
-              "description": "Parameter for the up_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration.",
+              "description": "Parameter for the up_formatter, must be set together. The API enforces a maximum length of 64KB, but the size may be restricted further by deployment configuration.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -41373,7 +41373,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 40960
+                    "value": 65536
                   }
                 ]
               }
@@ -41400,7 +41400,7 @@
             },
             {
               "name": "down_formatter_parameter",
-              "description": "Parameter for the down_formatter, must be set together. The API enforces a maximum length of 16KB, but the size may be restricted further by deployment configuration.",
+              "description": "Parameter for the down_formatter, must be set together. The API enforces a maximum length of 64KB, but the size may be restricted further by deployment configuration.",
               "label": "",
               "type": "string",
               "longType": "string",
@@ -41413,7 +41413,7 @@
                 "validate.rules": [
                   {
                     "name": "string.max_len",
-                    "value": 40960
+                    "value": 65536
                   }
                 ]
               }

@@ -12,16 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package models contains telemetry models.
 package models
 
-// CLITelemetry contains telemetry information about the CLI.
-type CLITelemetry struct{ CmdData }
+// CommandUsageData holds aggregated data for a single command's usage.
+type CommandUsageData struct {
+	CommandPath    string `json:"command_path"`
+	ExecutionCount int    `json:"execution_count"`
+	LastUsedAt     int64  `json:"last_used_at"`
+}
 
-// OSTelemetry contains telemetry information about the operating system.
-type OSTelemetry struct {
-	OperatingSystem string `json:"operating_system"`
-	Arch            string `json:"arch"`
-	BinaryVersion   string `json:"binary_version" `
-	GolangVersion   string `json:"golang_version"`
+// AliasUsageData holds aggregated data for a single alias's usage.
+type AliasUsageData struct {
+	CommandName string `json:"command_name"`
+	Alias       string `json:"alias"`
+	UsageCount  int    `json:"usage_count"`
+}
+
+// CmdData represents a snapshot of the aggregated telemetry data.
+type CmdData struct {
+	Commands []CommandUsageData `json:"commands"`
+	Aliases  []AliasUsageData   `json:"aliases"`
 }

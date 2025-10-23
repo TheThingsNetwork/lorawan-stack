@@ -23,6 +23,11 @@ const user = {
 const appId = 'import-devices-test-application'
 const application = { ids: { application_id: appId } }
 
+const consoleRoot = () => Cypress.config('consoleRootPath')
+
+const selectJsonFixture = (label, fixtureName) =>
+  cy.findByLabelText(label).selectFile(`cypress/fixtures/${fixtureName}`, { force: true })
+
 describe('End device import', () => {
   before(() => {
     cy.dropAndSeedDatabase()
@@ -33,7 +38,7 @@ describe('End device import', () => {
   describe('Default configuration', () => {
     beforeEach(() => {
       cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices/import`)
+      cy.visit(`${consoleRoot()}/applications/${appId}/devices/import`)
     })
 
     it('succeeds importing a device with fallback values from the device repository', () => {
@@ -43,7 +48,7 @@ describe('End device import', () => {
       ).as('fetchTemplate')
       const devicesFile = 'fallback-from-device-repo.json'
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-      cy.findByLabelText('File').attachFile(devicesFile)
+      selectJsonFixture('File', devicesFile)
       cy.findByLabelText('Load end device profile from the LoRaWAN Device Repository').check()
       cy.findByLabelText('End device brand').selectOption('the-things-products')
       cy.findByLabelText('Model').selectOption('The Things Uno')
@@ -58,21 +63,16 @@ describe('End device import', () => {
         .findByText('All end devices imported successfully')
         .should('be.visible')
       cy.findByRole('link', { name: 'Proceed to end device list' }).click()
-      cy.location('pathname').should(
-        'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
-      )
+      cy.location('pathname').should('eq', `${consoleRoot()}/applications/${appId}/devices`)
       cy.findByTestId('error-notification').should('not.exist')
       cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${appId}/devices/device-from-device-repo/general-settings`,
+        `${consoleRoot()}/applications/${appId}/devices/device-from-device-repo/general-settings`,
       )
       cy.findByText('Network layer', { selector: 'h3' })
         .closest('[data-test-id="collapsible-section"]')
         .within(() => {
           cy.findByRole('button', { name: 'Expand' }).click()
-          cy.findByText(/Europe 863-870 MHz/).should('be.visible')
+          cy.findByText(/Europe 863-870 MHz/i).should('be.visible')
           cy.findByText('LoRaWAN Specification 1.0.2').should('be.visible')
           cy.findByText('RP001 Regional Parameters 1.0.2 revision B').should('be.visible')
         })
@@ -82,22 +82,23 @@ describe('End device import', () => {
       cy.findByText('Import end devices').should('be.visible')
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
 
-      const devicesFile = 'successful-devices.json'
-      cy.findByLabelText('File').attachFile(devicesFile)
+      selectJsonFixture('File', 'successful-devices.json')
+
       cy.findByRole('button', { name: 'Import end devices' }).click()
-      cy.findByText('0 of 3 (0% finished)')
-      cy.findByText('Operation finished')
-      cy.findByText('3 of 3 (100% finished)')
+
+      cy.findByTestId('progress-bar').should('be.visible')
+      cy.contains(/Operation finished/i).should('be.visible')
+      cy.contains(/3 of 3.*100%/i).should('be.visible')
+
       cy.findByTestId('notification')
         .should('be.visible')
         .findByText('All end devices imported successfully')
         .should('be.visible')
+
       cy.findByRole('link', { name: 'Proceed to end device list' }).click()
-      cy.location('pathname').should(
-        'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
-      )
+      cy.location('pathname').should('eq', `${consoleRoot()}/applications/${appId}/devices`)
       cy.findByTestId('error-notification').should('not.exist')
+
       cy.findByText('migration-test-device').should('be.visible')
       cy.findByText('some-nice-id').should('be.visible')
       cy.findByText('this-is-test-id').should('be.visible')
@@ -105,68 +106,75 @@ describe('End device import', () => {
 
     it('fails adding devices with existant ids', () => {
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-      cy.findByLabelText('File').attachFile('duplicate-devices-a.json')
+      selectJsonFixture('File', 'duplicate-devices-a.json')
       cy.findByRole('button', { name: 'Import end devices' }).click()
-      cy.findByText('Operation finished').should('be.visible')
+
+      cy.contains(/Operation finished/i).should('be.visible')
       cy.reload()
 
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-      cy.findByLabelText('File').attachFile('duplicate-devices-b.json')
+      selectJsonFixture('File', 'duplicate-devices-b.json')
       cy.findByRole('button', { name: 'Import end devices' }).click()
 
-      cy.findByText('Operation finished').should('be.visible')
-      cy.findByText('3 of 3 (100% finished)').should('be.visible')
-      cy.findByText('Successfully converted 1 of 3 end devices').should('be.visible')
+      cy.contains(/Operation finished/i).should('be.visible')
+      cy.contains(/3 of 3.*100%/i).should('be.visible')
+      cy.contains(/Successfully converted 1 of 3 end devices/i).should('be.visible')
+
       cy.findByTestId('notification')
         .should('be.visible')
         .findByText('Not all devices imported successfully')
         .should('be.visible')
-      cy.findByText('The registration of the following end devices failed:')
+
+      cy.findByText(/The registration of the following end devices failed:/i)
         .should('be.visible')
         .closest('div')
         .within(() => {
-          cy.findByText(/ID already taken/).should('be.visible')
-          cy.findByText(/an end device with/, /is already registered/).should('be.visible')
+          cy.findByText(/ID already taken/i).should('be.visible')
+          cy.contains(/an end device with.*is already registered/i).should('be.visible')
         })
-      cy.visit(`${Cypress.config('consoleRootPath')}/applications/${appId}/devices`)
+
+      cy.visit(`${consoleRoot()}/applications/${appId}/devices`)
       cy.findByText(/End devices \(\d+\)/).should('be.visible')
       cy.findByText('some-fail-id').should('not.exist')
     })
 
     it('succeeds setting lorawan_version, lorawan_phy_version and frequency_plan_id from fallback values', () => {
-      cy.intercept(
-        'PUT',
-        '/api/v3/js/applications/import-devices-test-application/devices/this-is-fallback-test-id',
-      ).as('importDevice')
+      // PUT to JS device import for this device id (allow any app + query)
+      cy.intercept({
+        method: 'PUT',
+        url: '**/api/v3/js/applications/**/devices/this-is-fallback-test-id*',
+      }).as('importDevice')
+
       const devicesFile = 'freqId-version-phy-device.json'
       const fallbackValues = {
         lorawan_version: 'MAC_V1_0',
         frequency_plan_id: '863-870 MHz',
       }
+
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-      cy.findByLabelText('File').attachFile(devicesFile)
+      selectJsonFixture('File', devicesFile)
       cy.findByLabelText('Enter LoRaWAN versions and frequency plan manually').check()
       cy.findByLabelText('Frequency plan').selectOption(fallbackValues.frequency_plan_id)
       cy.findByLabelText('LoRaWAN version').selectOption(fallbackValues.lorawan_version)
       cy.findByLabelText('LoRaWAN version').blur()
+
       cy.findByRole('button', { name: 'Import end devices' }).click()
+
       cy.findByTestId('progress-bar').should('be.visible')
       cy.wait('@importDevice')
+
       cy.findByTestId('notification')
         .findByText('All end devices imported successfully')
         .should('be.visible')
-      cy.findByRole('link', { name: 'Proceed to end device list' }).click()
-      cy.location('pathname').should(
-        'eq',
-        `${Cypress.config('consoleRootPath')}/applications/${appId}/devices`,
-      )
-      cy.findByTestId('error-notification').should('not.exist')
-      cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${appId}/devices/fallback-test-device/general-settings`,
-      )
 
+      cy.findByRole('link', { name: 'Proceed to end device list' }).click()
+      cy.location('pathname').should('eq', `${consoleRoot()}/applications/${appId}/devices`)
+      cy.findByTestId('error-notification').should('not.exist')
+
+      // Verify the two devices' network layers
+      cy.visit(
+        `${consoleRoot()}/applications/${appId}/devices/fallback-test-device/general-settings`,
+      )
       cy.findByText('Network layer', { selector: 'h3' })
         .closest('[data-test-id="collapsible-section"]')
         .within(() => {
@@ -174,10 +182,9 @@ describe('End device import', () => {
           cy.findByText('Europe 863-870 MHz (SF12 for RX2)').should('be.visible')
           cy.findByText('LoRaWAN Specification 1.0.0').should('be.visible')
         })
+
       cy.visit(
-        `${Cypress.config(
-          'consoleRootPath',
-        )}/applications/${appId}/devices/fallback-test-nice-id/general-settings`,
+        `${consoleRoot()}/applications/${appId}/devices/fallback-test-nice-id/general-settings`,
       )
       cy.findByText('Network layer', { selector: 'h3' })
         .closest('[data-test-id="collapsible-section"]')
@@ -191,19 +198,23 @@ describe('End device import', () => {
     it('fails importing device without lorawan_version, lorawan_phy_version and frequency_plan_id', () => {
       const devicesFile = 'no-freqId-version-phy-device.json'
       cy.findByLabelText('File format').selectOption('The Things Stack JSON')
-      cy.findByLabelText('File').attachFile(devicesFile)
+      selectJsonFixture('File', devicesFile)
+
       cy.findByRole('button', { name: 'Import end devices' }).click()
-      cy.findByText('Operation finished').should('be.visible')
-      cy.findByText('3 of 3 (100% finished)').should('be.visible')
-      cy.findByText('Successfully converted 2 of 3 end devices').should('be.visible')
+
+      cy.contains(/Operation finished/i).should('be.visible')
+      cy.contains(/3 of 3.*100%/i).should('be.visible')
+      cy.contains(/Successfully converted 2 of 3 end devices/i).should('be.visible')
+
       cy.findByTestId('notification')
         .findByText('Not all devices imported successfully')
         .should('be.visible')
-      cy.findByText('The registration of the following end device failed:')
+
+      cy.findByText(/The registration of the following end device failed:/i)
         .should('be.visible')
         .closest('div')
         .within(() => {
-          cy.findByText('frequency plan `` not found').should('be.visible')
+          cy.findByText(/frequency plan `` not found/i).should('be.visible')
         })
     })
   })

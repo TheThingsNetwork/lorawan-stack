@@ -3169,10 +3169,10 @@ func (m *MessagePayloadFormatters) ValidateFields(paths ...string) error {
 
 		case "up_formatter_parameter":
 
-			if utf8.RuneCountInString(m.GetUpFormatterParameter()) > 40960 {
+			if utf8.RuneCountInString(m.GetUpFormatterParameter()) > 65536 {
 				return MessagePayloadFormattersValidationError{
 					field:  "up_formatter_parameter",
-					reason: "value length must be at most 40960 runes",
+					reason: "value length must be at most 65536 runes",
 				}
 			}
 
@@ -3187,10 +3187,10 @@ func (m *MessagePayloadFormatters) ValidateFields(paths ...string) error {
 
 		case "down_formatter_parameter":
 
-			if utf8.RuneCountInString(m.GetDownFormatterParameter()) > 40960 {
+			if utf8.RuneCountInString(m.GetDownFormatterParameter()) > 65536 {
 				return MessagePayloadFormattersValidationError{
 					field:  "down_formatter_parameter",
-					reason: "value length must be at most 40960 runes",
+					reason: "value length must be at most 65536 runes",
 				}
 			}
 

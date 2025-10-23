@@ -21,7 +21,7 @@ import './commands'
 const failedSpecsFilename = `./.cache/.failed-specs-${Cypress.env('MACHINE_NUMBER') || '0'}.txt`
 
 configure({ testIdAttribute: 'data-test-id' })
-Cypress.SelectorPlayground.defaults({
+Cypress.ElementSelector.defaults({
   selectorPriority: ['data-test-id', 'id', 'class', 'tag', 'attributes', 'nth-child'],
 })
 
