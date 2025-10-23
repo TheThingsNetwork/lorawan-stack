@@ -191,7 +191,6 @@ const ClientsTable = () => {
     const { tab, query } = filters
     const isDeletedTab = tab === DELETED_TAB
 
-    setTab(tab)
     return getClientsList({ ...filters, deleted: isDeletedTab }, ['name', 'description', 'state'], {
       isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
     })
@@ -209,6 +208,7 @@ const ClientsTable = () => {
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : EMPTY_ARRAY}
+      setTab={setTab}
     />
   )
 }

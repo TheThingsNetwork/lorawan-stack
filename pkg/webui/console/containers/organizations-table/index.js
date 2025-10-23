@@ -202,8 +202,6 @@ const OrganizationsTable = () => {
     const { tab, query } = filters
     const isDeletedTab = tab === DELETED_TAB
 
-    setTab(tab)
-
     return getOrganizationsList({ ...filters, deleted: isDeletedTab }, ['name', 'description'], {
       isSearch: tab === ALL_TAB || isDeletedTab || query.length > 0,
       withCollaboratorCount: true,
@@ -222,6 +220,7 @@ const OrganizationsTable = () => {
       searchable
       clickable={!isDeletedTab}
       tabs={isAdmin ? tabs : []}
+      setTab={setTab}
     />
   )
 }

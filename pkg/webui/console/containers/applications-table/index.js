@@ -265,8 +265,6 @@ const ApplicationsTable = props => {
     const { tab, query } = filters
     const isDeletedTab = tab === DELETED_TAB
 
-    setTab(tab)
-
     return getApplicationsList(
       { ...filters, deleted: isDeletedTab },
       [
@@ -297,6 +295,7 @@ const ApplicationsTable = props => {
       tabs={isAdmin ? tabs : []}
       searchPlaceholderMessage={sharedMessages.searchApplications}
       {...rest}
+      setTab={setTab}
     />
   )
 }

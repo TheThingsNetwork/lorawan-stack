@@ -306,7 +306,6 @@ const UsersTable = () => {
   const getItems = React.useCallback(params => {
     const { tab, query } = params
     const isDeletedTab = tab === DELETED_TAB
-    setTab(tab)
 
     if (tab === INVITATIONS_TAB) {
       return getUserInvitations(params, ['state'])
@@ -356,6 +355,7 @@ const UsersTable = () => {
       clickable={!isDeletedTab}
       tabs={mayInvite ? tabsWithInvitations : tabs}
       searchable={!isInvitationsTab}
+      setTab={setTab}
     />
   )
 }
