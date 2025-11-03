@@ -25,7 +25,7 @@
     "@storybook/addon-essentials": "8.6.14",
     "@storybook/addon-mdx-gfm": "8.6.14",
     "@storybook/addon-actions": "9.0.8",
-    "@storybook/cli": "9.1.15",
+    "@storybook/cli": "10.0.3",
     "@storybook/react": "8.6.14",
     "@storybook/react-webpack5": "8.6.14",
     "@testing-library/cypress": "^10.1.0",
