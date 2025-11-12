@@ -2990,6 +2990,11 @@ func (m *EndDevice) IDString() string {
 	return m.GetIds().IDString()
 }
 
+// RateLimitKey is the Implementation of the RateLimitKeyer interface.
+func (*CreateEndDeviceRequest) RateLimitKey() string {
+	return ""
+}
+
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
 func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {

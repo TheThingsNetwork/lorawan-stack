@@ -74,6 +74,11 @@ func (m *CreateApplicationRequest) IDString() string {
 	return m.GetApplication().IDString()
 }
 
+// RateLimitKey is the implementation of the RateLimitKeyer interface.
+func (*CreateApplicationRequest) RateLimitKey() string {
+	return ""
+}
+
 func (m *UpdateApplicationRequest) IDString() string {
 	return m.GetApplication().IDString()
 }

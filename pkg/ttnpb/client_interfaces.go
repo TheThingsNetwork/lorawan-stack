@@ -58,6 +58,11 @@ func (m *CreateClientRequest) IDString() string {
 	return m.GetClient().IDString()
 }
 
+// RateLimitKey is the implementation of the RateLimitKeyer interface.
+func (*CreateClientRequest) RateLimitKey() string {
+	return ""
+}
+
 func (m *UpdateClientRequest) IDString() string {
 	return m.GetClient().IDString()
 }

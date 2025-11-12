@@ -90,6 +90,13 @@ func (m *CreateUserRequest) IDString() string {
 	return m.GetUser().GetIds().IDString()
 }
 
+// RateLimitKey is the implementation of the RateLimitKeyer interface.
+// User creation requests are rate limited at the method level only,
+// not per user, since new users don't have existing identifiers.
+func (*CreateUserRequest) RateLimitKey() string {
+	return ""
+}
+
 func (m *UpdateUserRequest) IDString() string {
 	return m.GetUser().GetIds().IDString()
 }
