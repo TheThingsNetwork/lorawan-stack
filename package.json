@@ -19,7 +19,7 @@
     "@babel/preset-react": "^7.28.5",
     "@babel/register": "^7.28.3",
     "@babel/runtime-corejs2": "^7.28.4",
-    "@inquirer/prompts": "^7.10.0",
+    "@inquirer/prompts": "^8.0.1",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.6.1",
     "@storybook/addon-designs": "8.2.1",
     "@storybook/addon-essentials": "8.6.14",
