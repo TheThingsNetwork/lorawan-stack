@@ -63,7 +63,6 @@ func TestAttributes(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		tc := tc // shadow range variable.
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			assertions.New(t).So(errors.Supported(tc.V), should.Equal, tc.Expect)

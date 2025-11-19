@@ -59,7 +59,6 @@ func TestHMACHash(t *testing.T) {
 			Payload: []byte("-----BEGIN EC PRIVATE KEY-----MHcCAQEEIBVXljefOUPY++0sovcF0dboOLEJz4eZ9DoUE8o9Y7GHoAoGCCqGSM49AwEHoUQDQgAEjf3zZPXlc/sseTt7YzF0o61feXvk98JFyy+s/j0gzMzUjEka7+WzTPERi9uMQjERns1qXG/9DJLe/Qxi0r84hA==-----END EC PRIVATE KEY-----"), //nolint:lll
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			key := types.AES128Key{

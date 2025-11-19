@@ -269,7 +269,6 @@ func TestAdaptDataRate(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -372,7 +371,6 @@ func TestIssue458(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -509,7 +507,6 @@ func TestADRLossRate(t *testing.T) {
 			Rate: 1. / 3.,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: strings.Join(func() (ss []string) {
 				for _, up := range tc.Uplinks {
@@ -923,7 +920,6 @@ func TestClampDataRateRange(t *testing.T) {
 			ExpectedMaxDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_10,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1232,7 +1228,6 @@ func TestClampTxPowerRange(t *testing.T) {
 			ExpectedMaxTxPowerIndex: 10,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1480,7 +1475,6 @@ func TestClampNbTrans(t *testing.T) {
 			ExpectedNbTrans: 2,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1602,7 +1596,6 @@ func TestADRUplinks(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1777,7 +1770,6 @@ func TestADRDataRange(t *testing.T) {
 			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1870,7 +1862,6 @@ func TestADRTxPowerRange(t *testing.T) {
 			Band: &band.EU_863_870_RP1_V1_0_2_Rev_B,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1999,7 +1990,6 @@ func TestADRMargin(t *testing.T) {
 			Ok:      true,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2431,7 +2421,6 @@ func TestADRAdaptTxPowerIndex(t *testing.T) {
 			OutputMargin: -14.5,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2591,7 +2580,6 @@ func TestADRAdaptNbTrans(t *testing.T) {
 			ExpectedDevice: newEndDevice(3, 3),
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2650,7 +2638,6 @@ func TestDemodulationFloorStep(t *testing.T) {
 			Step: 6.0,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2702,7 +2689,6 @@ func TestIsNarrowDataRateIndex(t *testing.T) {
 			Ok:   false,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -2961,7 +2947,6 @@ func TestADRSteerDeviceChannels(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 

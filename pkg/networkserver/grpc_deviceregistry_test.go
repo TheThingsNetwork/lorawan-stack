@@ -321,7 +321,6 @@ func TestDeviceRegistryGet(t *testing.T) {
 			GetByIDCalls: 1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -1502,7 +1501,6 @@ func TestDeviceRegistryDelete(t *testing.T) {
 			SetCalls:     1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -2004,7 +2002,6 @@ func TestDeviceRegistryBatchDelete(t *testing.T) { // nolint:paralleltest
 			SetCalls:         3,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

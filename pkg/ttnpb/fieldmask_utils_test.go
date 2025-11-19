@@ -282,7 +282,6 @@ func TestFieldMaskPathsSet(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			actual := FieldMaskPathsSet(tc.Paths)
@@ -398,7 +397,6 @@ func TestFieldMaskPathsSetContainsAll(t *testing.T) {
 		},
 	}
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			actualContainsAll, actualMissing := FieldMaskPathsSetContainsAll(tc.Set, tc.Subset...)

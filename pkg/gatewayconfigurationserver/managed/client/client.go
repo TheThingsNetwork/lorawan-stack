@@ -67,7 +67,6 @@ func (c *client) subscribeEventData(
 	ctx, cancel := context.WithCancel(ctx)
 	wg, ctx := errgroup.WithContext(ctx)
 	for _, gtwID := range ids {
-		gtwID := gtwID
 		stream, err := client.StreamEvents(ctx, gtwID, callOpt)
 		if err != nil {
 			cancel()

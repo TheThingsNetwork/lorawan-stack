@@ -368,7 +368,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (*NetworkServer, 
 		downlinkDispatchTaskName:       ns.downlinkTasks,
 		pendingDownlinkProcessTaskName: ns.pendingDownlinkTasks,
 	} {
-		dispatcher := dispatcher
 		ns.RegisterTask(&task.Config{
 			Context: ctx,
 			ID:      id,

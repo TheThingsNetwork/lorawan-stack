@@ -552,7 +552,6 @@ func TestNextDataDownlinkSlot(t *testing.T) {
 			ExpectedOk: true,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

@@ -405,7 +405,6 @@ func (ps *PubSubStore) SubscribeWithHistory(
 	defer wg.Wait()
 	ctx, cancel := errorcontext.New(ctx)
 	for _, states := range partitionStreamStates(states, ps.streamPartitionSize) {
-		states := states
 		f := func(ctx context.Context) (err error) {
 			defer func() { cancel(err) }()
 			return ps.iterateStreamPartition(ctx, states, eventCountLimit, ch)

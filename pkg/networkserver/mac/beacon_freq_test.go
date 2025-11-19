@@ -84,7 +84,6 @@ func TestNeedsBeaconFreqReq(t *testing.T) {
 	})
 
 	for _, tc := range tcs {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -227,7 +226,6 @@ func TestHandleBeaconFreqAns(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

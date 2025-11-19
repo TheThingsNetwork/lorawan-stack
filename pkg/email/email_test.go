@@ -57,7 +57,6 @@ func TestEmail(t *testing.T) {
 	returnedTemplate := registry.GetTemplate(ctx, ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN))
 
 	for i, template := range []*email.Template{welcomeEmailTemplate, returnedTemplate} {
-		template := template
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

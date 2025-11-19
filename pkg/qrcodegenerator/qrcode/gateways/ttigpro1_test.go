@@ -92,7 +92,6 @@ func TestTTIGPRO1(t *testing.T) {
 				},
 			},
 		} {
-			tc := tc
 			t.Run(tc.Name, func(t *testing.T) {
 				t.Parallel()
 

@@ -1440,7 +1440,6 @@ func TestDeviceRegistryBatchDelete(t *testing.T) { // nolint:paralleltest
 			BatchDeleteKeysCalls: 1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

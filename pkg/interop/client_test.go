@@ -239,7 +239,6 @@ func TestGetAppSKey(t *testing.T) { //nolint:paralleltest
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
@@ -655,7 +654,6 @@ func TestHandleJoinRequest(t *testing.T) { //nolint:paralleltest
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 
@@ -832,7 +830,6 @@ func TestJoinServerRace(t *testing.T) { //nolint:paralleltest
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			a := assertions.New(t)
 

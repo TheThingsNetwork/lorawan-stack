@@ -193,7 +193,6 @@ func TestMsgpackCompatibility(t *testing.T) {
 			),
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name: fmt.Sprintf("%T/%s", tc.Value, tc.LuaExpr),
 			Func: func(ctx context.Context, _ *testing.T, a *assertions.Assertion) {

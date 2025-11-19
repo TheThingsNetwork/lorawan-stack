@@ -103,7 +103,6 @@ func TestAppendRecentUplink(t *testing.T) {
 			Expected: ups[1:3],
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     fmt.Sprintf("recent_length:%d,window:%v", len(tc.Recent), tc.Window),
 			Parallel: true,

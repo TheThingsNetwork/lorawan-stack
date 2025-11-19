@@ -299,7 +299,6 @@ func TestDLChannelReq(t *testing.T) {
 			RejectedFrequencies: []uint64{130},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: func() string {
 				formatChannels := func(chs ...*ttnpb.MACParameters_Channel) string {
@@ -689,7 +688,6 @@ func TestHandleDLChannelAns(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

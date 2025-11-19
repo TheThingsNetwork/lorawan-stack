@@ -74,7 +74,6 @@ var eventsCommand = &cobra.Command{
 		}()
 
 		for _, address := range getEventsAddresses() {
-			address := address // shadow loop variable.
 			g.Go(func() error {
 				conn, err := api.Dial(gCtx, address)
 				if err != nil {
@@ -137,7 +136,6 @@ var eventsFindRelatedCommand = &cobra.Command{
 		}()
 
 		for _, address := range getEventsAddresses() {
-			address := address // shadow loop variable.
 			g.Go(func() error {
 				conn, err := api.Dial(gCtx, address)
 				if err != nil {

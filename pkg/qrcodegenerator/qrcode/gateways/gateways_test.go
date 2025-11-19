@@ -41,8 +41,6 @@ func TestParseGatewaysAuthenticationCodes(t *testing.T) {
 			ExpectedOwnerToken: "abcdef123456",
 		},
 	} {
-		tc := tc
-
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

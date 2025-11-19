@@ -351,7 +351,6 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			CallOpt: authorizedCallOpt,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			if tc.ClaimFunc != nil {
 				mockGatewayClaimer.ClaimFunc = tc.ClaimFunc
@@ -477,7 +476,6 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			CallOpt: authorizedCallOpt,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			if tc.UnclaimFunc != nil {
 				mockGatewayClaimer.UnclaimFunc = tc.UnclaimFunc

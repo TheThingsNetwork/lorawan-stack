@@ -132,9 +132,7 @@ func TestNotificationRegistryWithOrganizationFanout(t *testing.T) {
 
 	// Register users as collaborators on both organizations.
 	for _, org := range []*ttnpb.Organization{org1, org2} {
-		org := org
 		for _, collab := range []*ttnpb.User{usr2, usr3} {
-			collab := collab
 			p.NewMembership(
 				collab.GetOrganizationOrUserIdentifiers(),
 				org.GetEntityIdentifiers(),
@@ -156,7 +154,6 @@ func TestNotificationRegistryWithOrganizationFanout(t *testing.T) {
 			app1.GetIds().GetEntityIdentifiers(),
 			app2.GetIds().GetEntityIdentifiers(),
 		} {
-			entityID := entityID
 			res, err := svc.Create(ctx, &ttnpb.CreateNotificationRequest{
 				EntityIds:        entityID,
 				NotificationType: ttnpb.GetNotificationTypeString(ttnpb.NotificationType_UNKNOWN),
@@ -180,7 +177,6 @@ func TestNotificationRegistryWithOrganizationFanout(t *testing.T) {
 			{userID: usr2.GetIds(), notificationAmount: 1, creds: usr2Creds},
 			{userID: usr3.GetIds(), notificationAmount: 1, creds: usr3Creds},
 		} {
-			tt := tt
 			ttName := fmt.Sprintf("Expect %s to have %d notifications", tt.userID.GetUserId(), tt.notificationAmount)
 			t.Run(ttName, func(t *testing.T) { // nolint:paralleltest
 				a, ctx := test.New(t)

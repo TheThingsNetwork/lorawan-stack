@@ -126,7 +126,6 @@ func TestRolloverClock(t *testing.T) {
 		sessionID int64
 	)
 	for i, xtimeIn := range timestamps {
-		xtimeIn := xtimeIn
 		diff := int64(0)
 		if prev != nil {
 			diff = xtimeIn - *prev
@@ -195,7 +194,6 @@ func TestIssue2581(t *testing.T) {
 		sessionID int64
 	)
 	for i, xtimeIn := range timestamps {
-		xtimeIn := xtimeIn
 		diff := int64(0)
 		if prev != nil {
 			diff = xtimeIn - *prev

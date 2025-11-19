@@ -160,7 +160,6 @@ func TestNeedsTxParamSetupReq(t *testing.T) {
 	}
 
 	for _, tc := range tcs {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -337,7 +336,6 @@ func TestEnqueueTxParamSetupReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -411,7 +409,6 @@ func TestHandleTxParamSetupAns(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

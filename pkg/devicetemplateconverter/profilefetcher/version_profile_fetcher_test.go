@@ -55,7 +55,6 @@ func Test_VersionIDProfileFetcher_ShouldFetchProfile(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -143,7 +142,6 @@ func Test_VersionIDProfileFetcher_FetchProfile(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

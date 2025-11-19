@@ -269,7 +269,6 @@ func TestEndDeviceClaimingServer(t *testing.T) {
 			CallOpts: authorizedCallOpt,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			_, err := edcsClient.Claim(ctx, tc.Req, tc.CallOpts)
@@ -790,7 +789,6 @@ func TestBatchOperations(t *testing.T) { // nolint:all
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			mockEndDeviceClaimer.BatchUnclaimFunc = tc.BatchUnclaimFunc
 			ret, err := edcsClient.Unclaim(ctx, tc.Req, tc.CallOpts)

@@ -106,7 +106,6 @@ func TestMarshalJSON(t *testing.T) {
 			Expected: []byte(`{"msgtype":"timesync","txtime":123.456}`),
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -240,7 +239,6 @@ func TestJoinRequest(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -422,7 +420,6 @@ func TestUplinkDataFrame(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -535,7 +532,6 @@ func TestFromUplinkDataFrame(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -631,7 +627,6 @@ func TestJreqFromUplinkDataFrame(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

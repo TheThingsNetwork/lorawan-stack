@@ -67,7 +67,6 @@ func TestWrapAES128Key(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -107,7 +106,6 @@ func TestWrapAES128Key(t *testing.T) {
 			ExpectedError: errors.IsInvalidArgument,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -496,7 +494,6 @@ func TestUnwrapSelectedSessionKeys(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

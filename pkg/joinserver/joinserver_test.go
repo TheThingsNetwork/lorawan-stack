@@ -132,7 +132,6 @@ func TestInvalidJoinRequests(t *testing.T) {
 			Assertion: errors.IsInvalidArgument,
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -2387,7 +2386,6 @@ func TestHandleJoin(t *testing.T) {
 			ErrorAssertion: errors.IsInvalidArgument,
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -2741,7 +2739,6 @@ func TestGetNwkSKeys(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -3154,7 +3151,6 @@ func TestGetAppSKey(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -3254,7 +3250,6 @@ func TestGetHomeNetID(t *testing.T) {
 			ResponseNetID: &types.NetID{0x42, 0xff, 0xff},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

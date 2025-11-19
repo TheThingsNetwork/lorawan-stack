@@ -169,7 +169,6 @@ func TestResolver(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			dns := &mockResolver{
@@ -269,7 +268,6 @@ func TestDefaultPort(t *testing.T) {
 		"[::]":           "", // Invalid address
 		"[::":            "", // Invalid address
 	} {
-		input, expected := input, expected
 		t.Run(input, func(t *testing.T) {
 			t.Parallel()
 			target, err := discover.DefaultPort(input, 8884)
@@ -326,7 +324,6 @@ func TestDefaultURL(t *testing.T) {
 			expected: "https://hostname:8443",
 		},
 	} {
-		tc := tc
 		t.Run(tc.expected, func(t *testing.T) {
 			t.Parallel()
 			target, err := discover.DefaultURL(tc.target, tc.port, tc.tls)

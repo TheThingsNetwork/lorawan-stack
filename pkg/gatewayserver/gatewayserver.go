@@ -234,8 +234,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 
 	// Start UDP listeners.
 	for addr, fallbackFrequencyPlanID := range conf.UDP.Listeners {
-		addr := addr
-		fallbackFrequencyPlanID := fallbackFrequencyPlanID
 		gs.RegisterTask(&task.Config{
 			Context: gs.Context(),
 			ID:      fmt.Sprintf("serve_udp/%s", addr),
@@ -340,7 +338,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			component.NewTCPEndpoint(version.Listen, version.Name),
 			component.NewTLSEndpoint(version.ListenTLS, version.Name, tlsconfig.WithNextProtos("h2", "http/1.1")),
 		} {
-			endpoint := endpoint
 			if endpoint.Address() == "" {
 				continue
 			}
@@ -399,7 +396,6 @@ func New(c *component.Component, conf *Config, opts ...Option) (gs *GatewayServe
 			tlsconfig.WithNextProtos("h2", "http/1.1"),
 		),
 	} {
-		endpoint := endpoint
 		if endpoint.Address() == "" {
 			continue
 		}

@@ -376,8 +376,6 @@ func TestGetPhyVersions(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
-
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -772,8 +770,6 @@ func TestBandConvertToBandDescription(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
-
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -888,7 +884,6 @@ func TestListBands(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 

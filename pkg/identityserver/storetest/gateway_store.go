@@ -651,7 +651,6 @@ func (st *StoreTest) TestGatewayBatchOperations(t *T) { // nolint:gocyclo
 				},
 			},
 		} {
-			tc := tc
 			t.Run(tc.Name, func(t *T) {
 				a := assertions.New(t)
 				deleted, err := s.BatchDeleteGateways(tc.Context, tc.Request)

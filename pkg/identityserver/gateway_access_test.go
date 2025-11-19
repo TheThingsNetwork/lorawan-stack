@@ -1203,7 +1203,6 @@ func TestGatewayBatchAccess(t *testing.T) {
 				Credentials: dualMembershipUserCreds,
 			},
 		} {
-			tc := tc
 			t.Run(tc.Name, func(t *testing.T) {
 				is.config.AdminRights.All = !tc.LimitedAdminRights
 

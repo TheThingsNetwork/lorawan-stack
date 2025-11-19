@@ -64,7 +64,6 @@ func TestV3AcceptedTopic(t *testing.T) {
 			OK:        true,
 		},
 	} {
-		tc := tc
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -139,7 +138,6 @@ func TestV3Topics(t *testing.T) {
 			Expected: fmt.Sprintf("v3/%s/devices/%s/down/replace", appUID, devID),
 		},
 	} {
-		tc := tc
 		t.Run(tc.Expected, func(t *testing.T) {
 			t.Parallel()
 			actual := strings.Join(tc.Fn(appUID, devID), "/")

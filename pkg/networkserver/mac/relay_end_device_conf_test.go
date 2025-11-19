@@ -123,7 +123,6 @@ func TestDeviceNeedsRelayEndDeviceConfReq(t *testing.T) {
 			Needs: true,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -266,7 +265,6 @@ func TestEnqueueRelayEndDeviceConfReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -475,7 +473,6 @@ func TestHandleRelayEndDeviceConfAns(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
