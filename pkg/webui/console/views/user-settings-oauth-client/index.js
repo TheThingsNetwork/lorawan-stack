@@ -38,6 +38,8 @@ import { getClient, getClientRights } from '@console/store/actions/clients'
 
 import { selectClientById } from '@console/store/selectors/clients'
 
+import OAuthClientCollaboratorEdit from '../user-settings-oauth-client-collaborator-edit'
+
 import style from './user-settings-oauth-client.styl'
 
 const OAuthClientInner = () => {
@@ -85,6 +87,10 @@ const OAuthClientInner = () => {
         <Route index Component={OAuthClientGeneralSettings} />
         <Route path="collaborators" Component={OAuthClientCollaboratorsList} />
         <Route path="collaborators/add" Component={OAuthClientCollaboratorAdd} />
+        <Route
+          path="collaborators/:collaboratorType/:collaboratorId"
+          Component={OAuthClientCollaboratorEdit}
+        />
         <Route path="*" element={<GenericNotFound />} />
       </Routes>
     </>
