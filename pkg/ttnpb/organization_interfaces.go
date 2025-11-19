@@ -74,6 +74,11 @@ func (m *CreateOrganizationRequest) IDString() string {
 	return m.GetOrganization().GetIds().IDString()
 }
 
+// RateLimitKey is the implementation of the RateLimitKeyer interface.
+func (*CreateOrganizationRequest) RateLimitKey() string {
+	return ""
+}
+
 func (m *UpdateOrganizationRequest) IDString() string {
 	return m.GetOrganization().GetIds().IDString()
 }

@@ -74,6 +74,11 @@ func (m *CreateGatewayRequest) IDString() string {
 	return m.GetGateway().IDString()
 }
 
+// RateLimitKey is the implementation of the RateLimitKeyer interface.
+func (*CreateGatewayRequest) RateLimitKey() string {
+	return ""
+}
+
 func (m *UpdateGatewayRequest) IDString() string {
 	return m.GetGateway().IDString()
 }
