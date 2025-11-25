@@ -118,6 +118,7 @@ const GatewayStatusPanel = () => {
 
   const hasError = Boolean(error) && Boolean(error.message)
   const isUnavailable = hasError && error.message === 'Unavailable' && !fetching && !gatewayStats
+  const isLoadingWithError = hasError && error.message === 'Unavailable' && !gatewayStats
 
   const maxRoundTripTime = useMemo(
     () =>
@@ -155,7 +156,7 @@ const GatewayStatusPanel = () => {
           status={
             isDisconnected
               ? 'bad'
-              : isFetching || noConnectionYet
+              : isFetching || noConnectionYet || isLoadingWithError
                 ? 'mediocre'
                 : isConnected
                   ? 'green'
