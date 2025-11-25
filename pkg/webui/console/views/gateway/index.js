@@ -45,6 +45,8 @@ import {
   stopGatewayEventsStream,
   getGatewaysRightsList,
   getGatewayClaimInfoByEui,
+  startGatewayStatistics,
+  stopGatewayStatistics,
 } from '@console/store/actions/gateways'
 import { getGsFrequencyPlans } from '@console/store/actions/configuration'
 import { trackRecencyFrequencyItem } from '@console/store/actions/recency-frequency-items'
@@ -86,12 +88,20 @@ const Gateway = () => {
       await dispatch(getGsFrequencyPlans())
 
       const { ids } = await dispatch(attachPromise(getGateway(gtwId, selector)))
+      await dispatch(startGatewayStatistics(gtwId))
 
       await dispatch(attachPromise(getGatewayClaimInfoByEui(ids.eui, true)))
     },
     [gtwId],
   )
-  useEffect(() => () => dispatch(stopGatewayEventsStream(gtwId)), [gtwId, dispatch])
+
+  useEffect(
+    () => () => {
+      dispatch(stopGatewayStatistics())
+      dispatch(stopGatewayEventsStream(gtwId))
+    },
+    [dispatch, gtwId],
+  )
 
   // Track gateway access.
   useEffect(() => {

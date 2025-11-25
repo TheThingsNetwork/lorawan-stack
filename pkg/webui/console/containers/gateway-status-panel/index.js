@@ -108,17 +108,16 @@ const GatewayStatusPanel = () => {
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
-  const isConnected = Boolean(gatewayStats?.connected_at) && !isDisconnected
   const isFetching = !Boolean(gatewayStats) && fetching
-  const hasStatistics = Boolean(gatewayStats)
   const noConnectionYet = useMemo(
     () => isBackend(error) && getBackendErrorName(error).includes('not_connected'),
     [error],
   )
+  const hasStatistics = Boolean(gatewayStats)
+  const isConnected = Boolean(gatewayStats?.connected_at) && !isDisconnected && !noConnectionYet
 
   const hasError = Boolean(error) && Boolean(error.message)
-  const isUnavailable = hasError && error.message === 'Unavailable' && !fetching && !gatewayStats
-  const isLoadingWithError = hasError && error.message === 'Unavailable' && !gatewayStats
+  const isUnavailable = hasError && error.message === 'Unavailable'
 
   const maxRoundTripTime = useMemo(
     () =>
@@ -156,7 +155,7 @@ const GatewayStatusPanel = () => {
           status={
             isDisconnected
               ? 'bad'
-              : isFetching || noConnectionYet || isLoadingWithError
+              : isFetching || noConnectionYet
                 ? 'mediocre'
                 : isConnected
                   ? 'green'
@@ -191,15 +190,7 @@ const GatewayStatusPanel = () => {
           </div>
         </div>
       )}
-      {isUnavailable && (
-        <div className="d-flex j-center al-center flex-grow">
-          <div className="d-flex direction-column j-center al-center text-center w-60 gap-cs-m mb-ls-m">
-            <Message content={m.isUnavailable} className="fw-bold fs-l lh-xs3" component="div" />
-            <Message content={m.isUnavailableDesc} className="c-text-neutral-light lh-xxs" />
-          </div>
-        </div>
-      )}
-      {hasStatistics && !isFetching && !noConnectionYet && !isUnavailable && (
+      {hasStatistics && !isFetching && !isUnavailable && (
         <>
           <div className={style.gtwStatusPanelUpperContainer}>
             <div className="d-flex direction-column j-between w-full sm-md:j-start">
@@ -249,7 +240,7 @@ const GatewayStatusPanel = () => {
           </div>
         </>
       )}
-      {!hasStatistics && !isFetching && !noConnectionYet && !isUnavailable && (
+      {(isUnavailable || (!hasStatistics && !isFetching && !noConnectionYet)) && (
         <EmptyState title={m.isUnavailable} message={m.isUnavailableDesc} />
       )}
     </Panel>
