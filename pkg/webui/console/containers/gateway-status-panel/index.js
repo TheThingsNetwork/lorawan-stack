@@ -12,10 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useMemo, useEffect } from 'react'
-import { useSelector, useDispatch } from 'react-redux'
+import React, { useMemo } from 'react'
+import { useSelector } from 'react-redux'
 import { defineMessages } from 'react-intl'
-import { useParams } from 'react-router-dom'
 
 import Panel from '@ttn-lw/components/panel'
 import Icon, { IconGateway, IconInfoCircle, IconBolt, IconRouterOff } from '@ttn-lw/components/icon'
@@ -30,8 +29,6 @@ import Message from '@ttn-lw/lib/components/message'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { getBackendErrorName, isBackend } from '@ttn-lw/lib/errors/utils'
-
-import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
 
 import {
   selectGatewayStatistics,
@@ -107,20 +104,9 @@ EmptyState.propTypes = {
 }
 
 const GatewayStatusPanel = () => {
-  const { gtwId } = useParams()
-  const dispatch = useDispatch()
   const gatewayStats = useSelector(selectGatewayStatistics)
   const error = useSelector(selectGatewayStatisticsError)
   const fetching = useSelector(selectGatewayStatisticsIsFetching)
-
-  // Start statistics fetching when component mounts
-  useEffect(() => {
-    dispatch(startGatewayStatistics(gtwId))
-    return () => {
-      dispatch(stopGatewayStatistics())
-    }
-  }, [dispatch, gtwId])
-
   const isDisconnected = Boolean(gatewayStats?.disconnected_at)
   const isConnected = Boolean(gatewayStats?.connected_at) && !isDisconnected
   const isFetching = !Boolean(gatewayStats) && fetching
@@ -131,7 +117,7 @@ const GatewayStatusPanel = () => {
   )
 
   const hasError = Boolean(error) && Boolean(error.message)
-  const isUnavailable = hasError && error.message === 'Unavailable'
+  const isUnavailable = hasError && error.message === 'Unavailable' && !fetching && !gatewayStats
 
   const maxRoundTripTime = useMemo(
     () =>
