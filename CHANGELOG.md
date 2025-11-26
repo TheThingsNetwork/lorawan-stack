@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add HSTS response headers.
+
 ### Changed
 
 ### Deprecated
