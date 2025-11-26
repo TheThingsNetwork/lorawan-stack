@@ -342,7 +342,6 @@ func TestTTSCSVConverter(t *testing.T) {
 			nExpect: 1,
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 

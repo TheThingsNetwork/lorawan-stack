@@ -128,7 +128,6 @@ func TestGPSConversion(t *testing.T) {
 			Time: epoch.Add(leap5 - 3*time.Second),
 		},
 	} {
-		tc := tc
 		t.Run(fmt.Sprintf("%d/Time:%s/UnixNano:%d/GPS:%d", i, tc.Time, tc.Time.UnixNano(), tc.GPS), func(t *testing.T) {
 			t.Parallel()
 

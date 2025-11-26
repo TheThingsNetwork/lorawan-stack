@@ -96,7 +96,6 @@ func TestDeviceDefaultChannels(t *testing.T) {
 			Channels: au915928Post102BChannels,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -181,7 +180,6 @@ func TestDeviceDesiredChannels(t *testing.T) {
 			Channels:      au915928Post102BChannels,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -647,7 +645,6 @@ func TestNewState(t *testing.T) {
 			FrequencyPlanStore: frequencyplans.NewStore(test.FrequencyPlansFetcher),
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -1055,7 +1052,6 @@ func TestBeaconTimeBefore(t *testing.T) {
 			Expected: 10 * BeaconPeriod,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Time.String(),
 			Parallel: true,
@@ -1230,7 +1226,6 @@ func TestNextPingSlotAt(t *testing.T) {
 			ExpectedOk:   true,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

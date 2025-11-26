@@ -74,7 +74,6 @@ func (is *IdentityServer) SendTemplateEmailToUsers(
 
 	var wg errgroup.Group
 	for _, receiver := range receivers {
-		receiver := receiver // shadow range variable.
 		wg.Go(func() error {
 			templateData, err := dataBuilder(
 				ctx,
@@ -101,7 +100,6 @@ func (is *IdentityServer) SendNotificationEmailToUsers(ctx context.Context, noti
 
 	var wg errgroup.Group
 	for _, receiver := range receivers {
-		receiver := receiver // shadow range variable.
 
 		// Skips over the possible `support` user.
 		// This user can only be created via the API endpoints defined in the tenant access service.

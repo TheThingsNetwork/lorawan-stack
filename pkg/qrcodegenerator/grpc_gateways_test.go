@@ -124,7 +124,6 @@ func TestGatewayQRCodeParsing(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 

@@ -1426,7 +1426,6 @@ func TestGenerateChMask(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -1542,7 +1541,6 @@ func TestCompareDatarates(t *testing.T) {
 			Expected: false,
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
@@ -1832,7 +1830,6 @@ func TestChannelsWellDefined(t *testing.T) {
 
 	for name, versions := range All {
 		for version, b := range versions {
-			b := b
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
 				t.Parallel()
 
@@ -1859,7 +1856,6 @@ func TestSubBandsWellDefined(t *testing.T) {
 
 	for name, versions := range All {
 		for version, b := range versions {
-			b := b
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
 				t.Parallel()
 

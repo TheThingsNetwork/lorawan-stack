@@ -329,7 +329,6 @@ func TestDeviceRegistries(t *testing.T) {
 			N: 8,
 		},
 	} {
-		tc := tc
 		for i := 0; i < int(tc.N); i++ {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),
@@ -633,7 +632,6 @@ func TestSessionKeyRegistries(t *testing.T) {
 			N: 8,
 		},
 	} {
-		tc := tc
 		for i := 0; i < int(tc.N); i++ {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     fmt.Sprintf("%s/%d", tc.Name, i),

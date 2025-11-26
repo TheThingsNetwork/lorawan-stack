@@ -55,7 +55,6 @@ func TestNeedsBeaconTimingReq(t *testing.T) {
 	})
 
 	for _, tc := range tcs {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -118,7 +117,6 @@ func TestHandleBeaconTimingReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

@@ -597,7 +597,6 @@ func TestForwarder(t *testing.T) {
 				},
 			},
 		} {
-			tc := tc
 			t.Run(tc.name, func(t *testing.T) { // nolint:paralleltest
 				//  If validateUpdate or setRequestContacts are not set, the tests will panic.
 				if tc.validateResponse == nil {

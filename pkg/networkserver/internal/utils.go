@@ -52,7 +52,6 @@ var LoRaWANBands = func() map[string]map[ttnpb.PHYVersion]*band.Band {
 	for id, vers := range band.All {
 		m := make(map[ttnpb.PHYVersion]*band.Band, len(vers))
 		for ver, b := range vers {
-			b := b
 			m[ver] = &b
 		}
 		bands[id] = m

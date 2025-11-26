@@ -145,7 +145,6 @@ func (m *multiplexerStore) fromSubscribers(
 	group, ctx := errgroup.WithContext(ctx)
 	res := make(chan []events.Event, len(subs))
 	for _, ps := range subs {
-		ps := ps
 		ctx := log.NewContextWithField(ctx, "events_mux_subscription_type", m.subscriberType(ps))
 		group.Go(func() error {
 			evts, err := f(ctx, ps)

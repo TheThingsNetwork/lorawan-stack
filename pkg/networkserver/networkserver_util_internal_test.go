@@ -1392,7 +1392,6 @@ func (env TestEnvironment) AssertHandleDeviceUplink(ctx context.Context, assert 
 				close(errCh)
 			}()
 			for _, up := range ups[1:] {
-				up := up
 				time.AfterFunc(env.Config.DeduplicationWindow/2, func() {
 					t.Logf("Call GsNs.HandleUplink with duplicate uplink: %v", up)
 					_, err := ttnpb.NewGsNsClient(env.ClientConn).HandleUplink(ctx, up)
@@ -1492,7 +1491,6 @@ func (env TestEnvironment) AssertHandleJoinRequest(ctx context.Context, conf Joi
 
 			ups := []*ttnpb.UplinkMessage{MakeJoinRequest(conf)}
 			for _, mds := range duplicateMDs {
-				mds := mds
 				duplicateConf := conf
 				duplicateConf.RxMetadata = mds
 				ups = append(ups, MakeJoinRequest(duplicateConf))
@@ -1884,7 +1882,6 @@ func (env TestEnvironment) AssertHandleDataUplink(ctx context.Context, conf Data
 			deduplicatedUpConf.Matched = true
 			ups := []*ttnpb.UplinkMessage{MakeDataUplink(upConf)}
 			for _, mds := range conf.RxMetadatas[1:] {
-				mds := mds
 				duplicateConf := upConf
 				duplicateConf.RxMetadata = mds
 				ups = append(ups, MakeDataUplink(duplicateConf))

@@ -89,7 +89,6 @@ func TestRedirect(t *testing.T) {
 			Redirect: "https://dev.example.com/path",
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

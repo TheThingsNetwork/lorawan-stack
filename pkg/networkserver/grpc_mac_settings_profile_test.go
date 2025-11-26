@@ -210,7 +210,6 @@ func TestMACSettingsProfileRegistryGet(t *testing.T) {
 			GetCalls:       1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -434,7 +433,6 @@ func TestMACSettingsProfileRegistryCreate(t *testing.T) {
 			SetCalls:         1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -705,7 +703,6 @@ func TestMACSettingsProfileRegistryUpdate(t *testing.T) {
 			SetCalls:         1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -990,7 +987,6 @@ func TestMACSettingsProfileRegistryDelete(t *testing.T) {
 			SetCalls:         1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -1273,7 +1269,6 @@ func TestMACSettingsProfileRegistryList(t *testing.T) {
 			PaginationCalls: 1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

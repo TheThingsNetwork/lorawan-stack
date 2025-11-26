@@ -278,7 +278,6 @@ func TestNewChannelReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: func() string {
 				formatChannels := func(chs ...*ttnpb.MACParameters_Channel) string {
@@ -575,7 +574,6 @@ func TestHandleNewChannelAns(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

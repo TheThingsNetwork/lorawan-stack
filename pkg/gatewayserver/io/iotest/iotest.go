@@ -238,7 +238,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 				ID:   &ttnpb.GatewayIdentifiers{Eui: unregisteredGatewayEUI.Bytes()},
 			},
 		} {
-			ctc := ctc
 			t.Run(ctc.Name, func(t *testing.T) {
 				ctx, cancel := context.WithCancel(ctx)
 				upCh := make(chan *ttnpb.GatewayUp)
@@ -251,7 +250,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 				defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 					PublishFunc: func(evs ...events.Event) {
 						for _, ev := range evs {
-							ev := ev
 							switch name := ev.Name(); name {
 							case "gs.gateway.connect":
 								go func() {
@@ -478,7 +476,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 						defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 							PublishFunc: func(evs ...events.Event) {
 								for _, ev := range evs {
-									ev := ev
 									t.Logf("%s event published", ev.Name())
 									switch name := ev.Name(); name {
 									case "gs.gateway.connect":
@@ -570,7 +567,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 						PublishFunc: func(evs ...events.Event) {
 							for _, ev := range evs {
-								ev := ev
 								t.Logf("%s event published", ev.Name())
 								switch name := ev.Name(); name {
 								case "gs.gateway.connect":
@@ -710,7 +706,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 							defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 								PublishFunc: func(evs ...events.Event) {
 									for _, ev := range evs {
-										ev := ev
 										switch name := ev.Name(); name {
 										case "gs.gateway.connect":
 											go func() {
@@ -1153,7 +1148,6 @@ func Frontend(t *testing.T, frontend FrontendConfig) { //nolint:gocyclo
 					defer test.SetDefaultEventsPubSub(&test.MockEventPubSub{ //nolint:revive
 						PublishFunc: func(evs ...events.Event) {
 							for _, ev := range evs {
-								ev := ev
 								switch name := ev.Name(); name {
 								case "gs.up.receive", "gs.down.tx.success", "gs.down.tx.fail", "gs.status.receive", "gs.io.up.repeat":
 									go func() {

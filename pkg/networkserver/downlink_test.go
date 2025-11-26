@@ -103,7 +103,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 			)
 		} else {
 			for i, ids := range DefaultClassBCGatewayIdentifiers {
-				ids := ids
 				downlinkPaths = append(downlinkPaths, DownlinkPath{
 					GatewayIdentifiers: ids.GatewayIds,
 					DownlinkPath: &ttnpb.DownlinkPath{
@@ -121,8 +120,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 		var lastDown *ttnpb.DownlinkMessage
 		var asserts []func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool)
 		for i, resp := range resps {
-			i := i
-			resp := resp
 			asserts = append(asserts, func(ctx, reqCtx context.Context, msg *ttnpb.DownlinkMessage) (NsGsScheduleDownlinkResponse, bool) {
 				lastDown = msg
 				_, a := test.MustNewTFromContext(ctx)
@@ -2554,7 +2551,6 @@ func TestProcessDownlinkTask(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: tc.Name,
 			Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {

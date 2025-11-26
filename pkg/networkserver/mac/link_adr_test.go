@@ -312,7 +312,6 @@ func TestLinkADRReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name: fmt.Sprintf("%s/band:%s,MAC:%s,PHY:%s,DR:%d->%d,TX:%d->%d,NB:%d->%d,rejected_DR:%v,rejected_TX:%v",
 				tc.Name,
@@ -1053,7 +1052,6 @@ func TestHandleLinkADRAns(t *testing.T) {
 			AdrEnabled: true,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

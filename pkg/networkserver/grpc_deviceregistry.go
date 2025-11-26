@@ -527,7 +527,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return st.Device.Session.Keys.GetSNwkSIntKey() != nil && st.Device.Session.Keys.SNwkSIntKey.IsZero()
 			},
 		} {
-			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}
@@ -592,7 +591,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				return len(st.Device.PendingSession.Keys.GetSessionKeyId()) == 0
 			},
 		} {
-			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}
@@ -660,7 +658,6 @@ func (ns *NetworkServer) Set(ctx context.Context, req *ttnpb.SetEndDeviceRequest
 				st.Device.PendingMacState.QueuedJoinAccept.DevAddr,
 			).OrZero().IsZero,
 		} {
-			p, isZero := p, isZero
 			if err := st.ValidateSetField(func() bool { return !isZero() }, p); err != nil {
 				return nil, err
 			}

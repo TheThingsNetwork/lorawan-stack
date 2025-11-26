@@ -104,7 +104,6 @@ func TestEmailTemplates(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.TemplateName, func(t *testing.T) {
 			t.Parallel()
 			a, ctx := test.New(t)

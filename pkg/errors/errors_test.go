@@ -223,7 +223,6 @@ func TestNetErrors(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc // shadow range variable.
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			err, ok := errors.From(tc.Error)

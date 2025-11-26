@@ -189,7 +189,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     fmt.Sprintf("Get errors/%s", tc.Name),
 			Parallel: true,
@@ -325,7 +324,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     fmt.Sprintf("Set errors/%s", tc.Name),
 			Parallel: true,
@@ -405,7 +403,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     fmt.Sprintf("Delete errors/%s", tc.Name),
 			Parallel: true,
@@ -452,7 +449,6 @@ func TestApplicationActivationSettingRegistryServer(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtestFromContext(ctx, test.SubtestConfig{
 			Name:     fmt.Sprintf("Flow/%s", tc.Name),
 			Parallel: true,

@@ -836,7 +836,6 @@ func (st *StoreTest) TestEndDeviceBatchOperations(t *T) { // nolint:gocyclo
 				},
 			},
 		} {
-			tc := tc
 			t.Run(tc.Name, func(t *T) {
 				a := assertions.New(t)
 				deleted, err := s.BatchDeleteEndDevices(tc.Context, tc.ApplicationIDs, tc.DeviceIDs)

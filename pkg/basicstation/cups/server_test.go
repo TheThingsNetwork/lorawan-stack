@@ -562,7 +562,6 @@ func TestServer(t *testing.T) { //nolint:gocyclo
 			},
 		},
 	} {
-		tt := tt
 		t.Run(tt.Name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

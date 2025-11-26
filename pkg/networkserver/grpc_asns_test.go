@@ -685,7 +685,6 @@ func TestDownlinkQueueReplace(t *testing.T) {
 			SetByIDCalls: 1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -1281,7 +1280,6 @@ func TestDownlinkQueuePush(t *testing.T) {
 			SetByIDCalls: 1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -1519,7 +1517,6 @@ func TestDownlinkQueueList(t *testing.T) {
 			GetByIDCalls: 1,
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

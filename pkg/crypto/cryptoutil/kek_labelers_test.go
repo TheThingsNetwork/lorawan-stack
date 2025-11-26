@@ -122,7 +122,6 @@ func TestComponentPrefixKEKLabeler(t *testing.T) {
 			Expected: "ns/12.34.56.78",
 		},
 	} {
-		tc := tc
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

@@ -95,7 +95,6 @@ func frequencyPlanMACCommands(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYV
 		}
 		var evBuilders []events.Builder
 		for _, req := range linkADRReqs {
-			req := req
 			evBuilders = append(evBuilders, mac.EvtEnqueueLinkADRRequest.With(events.WithData(req)))
 		}
 		return linkADRReqs, evBuilders, false
@@ -439,7 +438,6 @@ func TestFlow(t *testing.T) {
 			MakeTestCaseName("Class A", "OTAA"): makeClassAOTAAFlowTest(macVersion, phyVersion, fpID),
 			MakeTestCaseName("Class C", "OTAA"): makeClassCOTAAFlowTest(macVersion, phyVersion, fpID),
 		} {
-			handleFlowTest := handleFlowTest
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     makeName(flowName),
 				Parallel: true,

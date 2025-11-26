@@ -58,7 +58,6 @@ func TestTimePtrFromUpInfo(t *testing.T) {
 			ExpectedTime: timePtr(time.Unix(315964923, 456000000).UTC()),
 		},
 	} {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 

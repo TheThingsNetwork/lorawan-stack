@@ -307,7 +307,6 @@ func TestServer(t *testing.T) { //nolint:gocyclo
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

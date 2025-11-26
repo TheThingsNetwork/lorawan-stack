@@ -28,9 +28,7 @@ import (
 func TestRelaySharedParameters(t *testing.T) {
 	t.Parallel()
 	for name, versions := range band.All {
-		name := name
 		for version, phy := range versions {
-			version, phy := version, phy
 			t.Run(fmt.Sprintf("%v/%v", name, version), func(t *testing.T) {
 				t.Parallel()
 				a := assertions.New(t)

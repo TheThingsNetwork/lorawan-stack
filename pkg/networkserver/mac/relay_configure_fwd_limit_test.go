@@ -147,7 +147,6 @@ func TestDeviceNeedsRelayConfigureFwdLimitReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -328,7 +327,6 @@ func TestEnqueueRelayConfigureFwdLimitReq(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,
@@ -499,7 +497,6 @@ func TestHandleRelayConfigureFwdLimitAns(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		test.RunSubtest(t, test.SubtestConfig{
 			Name:     tc.Name,
 			Parallel: true,

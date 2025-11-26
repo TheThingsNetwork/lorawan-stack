@@ -47,7 +47,6 @@ func TestRewriteScheme(t *testing.T) {
 			expected: []string{"https://example.com", "wss://example.com"},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)
@@ -84,7 +83,6 @@ func TestRewriteSchemes(t *testing.T) {
 			},
 		},
 	} {
-		tc := tc
 		t.Run(tc.name, func(t *testing.T) {
 			t.Parallel()
 			a := assertions.New(t)

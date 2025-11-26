@@ -137,7 +137,6 @@ func TestNewTimeSyncCommand(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
@@ -205,7 +204,6 @@ func TestMakeCommandValidInput(t *testing.T) {
 	var fPort uint32
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
@@ -273,7 +271,6 @@ func TestMakeCommandInvalidInput(t *testing.T) {
 	var fPort uint32
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
@@ -467,7 +464,6 @@ func TestMakeCommandsValidInput(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
@@ -589,7 +585,6 @@ func TestMakeDownlinkSerializesAppTimeAns(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 			a, _ := test.New(t)
