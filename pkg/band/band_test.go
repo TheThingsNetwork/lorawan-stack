@@ -1807,7 +1807,8 @@ func TestStrictCodingRateSanityCheck(t *testing.T) {
 				t.Parallel()
 				if version >= ttnpb.PHYVersion_RP002_V1_0_0 ||
 					strings.HasPrefix(bandID, "MA") ||
-					strings.HasPrefix(bandID, "ISM") {
+					strings.HasPrefix(bandID, "ISM") ||
+					strings.HasPrefix(bandID, "UZ") {
 					if !b.StrictCodingRate {
 						t.Errorf("Strict coding rate doesn't match expected. Want true, got %v.", b.StrictCodingRate)
 					}

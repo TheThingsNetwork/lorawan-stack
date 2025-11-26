@@ -214,6 +214,20 @@ var (
 			ttnpb.PHYVersion_RP002_V1_0_3:       US_902_928_RP2_V1_0_3,
 			ttnpb.PHYVersion_RP002_V1_0_4:       US_902_928_RP2_V1_0_4,
 		},
+		UZ_923_DRAFT: {
+			ttnpb.PHYVersion_TS001_V1_0:         UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_TS001_V1_0_1:       UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP001_V1_0_2:       UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP001_V1_0_2_REV_B: UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP001_V1_0_3_REV_A: UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP001_V1_1_REV_A:   UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP001_V1_1_REV_B:   UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP002_V1_0_0:       UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP002_V1_0_1:       UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP002_V1_0_2:       UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP002_V1_0_3:       UZ_923_Draft_Universal,
+			ttnpb.PHYVersion_RP002_V1_0_4:       UZ_923_Draft_Universal,
+		},
 	}
 
 	// LatestVersion contains the latest version of each band.
@@ -237,6 +251,7 @@ var (
 		MA_869_870_DRAFT: ttnpb.PHYVersion_RP002_V1_0_4,
 		RU_864_870:       ttnpb.PHYVersion_RP002_V1_0_4,
 		US_902_928:       ttnpb.PHYVersion_RP002_V1_0_4,
+		UZ_923_DRAFT:     ttnpb.PHYVersion_RP002_V1_0_4,
 	}
 )
 
