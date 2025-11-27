@@ -24,18 +24,21 @@ import (
 )
 
 func TestHSTSHeaders(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 
 	m := webmiddleware.HSTSHeaders()
 	a.So(m, assertions.ShouldNotBeNil)
 
 	t.Run("HTTPS request should add HSTS headers", func(t *testing.T) {
+		t.Parallel()
 		a := assertions.New(t)
 
 		req := httptest.NewRequest("GET", "https://example.com", nil)
 		rec := httptest.NewRecorder()
 
-		handler := m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler := m(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
 
@@ -45,18 +48,17 @@ func TestHSTSHeaders(t *testing.T) {
 	})
 
 	t.Run("HTTP request should NOT add HSTS headers", func(t *testing.T) {
+		t.Parallel()
 		a := assertions.New(t)
 
 		req := httptest.NewRequest("GET", "http://example.com", nil)
 		rec := httptest.NewRecorder()
 
-		handler := m(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		handler := m(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
 			w.WriteHeader(http.StatusOK)
 		}))
-
 		handler.ServeHTTP(rec, req)
 
 		a.So(rec.Header().Get("Strict-Transport-Security"), assertions.ShouldBeEmpty)
 	})
-
 }
