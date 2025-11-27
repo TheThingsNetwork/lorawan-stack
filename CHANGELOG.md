@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Add HSTS response headers.
+- Draft band definition for Uzbekistan 923Mhz band.
 
 ### Changed
 
