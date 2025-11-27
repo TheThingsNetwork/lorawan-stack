@@ -196,6 +196,7 @@ func New(ctx context.Context, opts ...Option) (*Server, error) {
 		mux.MiddlewareFunc(webmiddleware.Metadata("X-Forwarded-For", "User-Agent")),
 		mux.MiddlewareFunc(webmiddleware.MaxBody(1024*1024*16)),
 		mux.MiddlewareFunc(webmiddleware.SecurityHeaders()),
+		mux.MiddlewareFunc(webmiddleware.HSTSHeaders()),
 		mux.MiddlewareFunc(webmiddleware.Log(logger, options.logIgnorePaths)),
 		mux.MiddlewareFunc(webmiddleware.Cookies(hashKey, blockKey)),
 		mux.MiddlewareFunc(webmiddleware.NoCache),
