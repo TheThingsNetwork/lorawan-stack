@@ -36,7 +36,8 @@ func TestRelaySharedParameters(t *testing.T) {
 				switch {
 				case version == ttnpb.PHYVersion_RP002_V1_0_4,
 					name == band.ISM_2400,
-					name == band.MA_869_870_DRAFT:
+					name == band.MA_869_870_DRAFT,
+					name == band.UZ_923_DRAFT:
 					expectedForwardDelay, expectedReceiveDelay = 50*time.Millisecond, 18*time.Second
 				}
 				a.So(phy.RelayForwardDelay, should.Equal, expectedForwardDelay)
