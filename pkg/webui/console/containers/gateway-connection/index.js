@@ -12,10 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import classnames from 'classnames'
 import { FormattedNumber, defineMessages } from 'react-intl'
-import { useDispatch, useSelector } from 'react-redux'
+import { useSelector } from 'react-redux'
 
 import Icon, { IconArrowsSort, IconBroadcast } from '@ttn-lw/components/icon'
 import Status from '@ttn-lw/components/status'
@@ -34,8 +34,6 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { isNotFoundError, isTranslated } from '@ttn-lw/lib/errors/utils'
 import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
-
-import { startGatewayStatistics, stopGatewayStatistics } from '@console/store/actions/gateways'
 
 import {
   selectGatewayById,
@@ -73,16 +71,7 @@ const GatewayConnection = props => {
   const lastSeen = useSelector(selectGatewayLastSeen)
   const isOtherCluster = consoleGsAddress !== gatewayServerAddress
 
-  const dispatch = useDispatch()
-
   useConnectionReactor(gtwId)
-
-  useEffect(() => {
-    dispatch(startGatewayStatistics(gtwId))
-    return () => {
-      dispatch(stopGatewayStatistics())
-    }
-  }, [dispatch, gtwId])
 
   const status = useMemo(() => {
     const statsNotFound = Boolean(error) && isNotFoundError(error)
