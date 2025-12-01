@@ -455,7 +455,7 @@ func (h *host) CompileDownlinkDecoder(
 	}, nil
 }
 
-// DecodeUplink decodes the message's FRMPayload to DecodedPayload using the given script.
+// DecodeDownlink decodes the message's FRMPayload to DecodedPayload using the given script.
 func (h *host) DecodeDownlink(
 	ctx context.Context,
 	_ *ttnpb.EndDeviceIdentifiers,
