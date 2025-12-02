@@ -60,7 +60,7 @@ const ownerTokenTypes = [
 ]
 
 const GatewayClaimFormSection = () => {
-  const { values, addToFieldRegistry, removeFromFieldRegistry, setFieldValue } = useFormikContext()
+  const { values, addToFieldRegistry, removeFromFieldRegistry, setValues } = useFormikContext()
   const isManaged = values._inputMethod === 'managed'
   const isFleet = values._isFleet
 
@@ -70,20 +70,23 @@ const GatewayClaimFormSection = () => {
 
   const onOwnerTokenTypeChange = useCallback(
     value => {
-      console.log('values', values)
       setActiveOwnerTokenType(value)
-      if (value === 'fleet') {
-        setFieldValue('authenticated_identifiers.authentication_code', values._fleet_token || '')
-      } else {
-        setFieldValue(
-          'authenticated_identifiers.authentication_code',
-          values._owner_token ? values._owner_token : '',
-        )
-      }
+      setValues(values => ({
+        ...values,
+        authenticated_identifiers: {
+          ...values.authenticated_identifiers,
+          authentication_code:
+            value === 'fleet'
+              ? btoa(values._fleet_token)
+              : value === 'gateway'
+                ? btoa(values._owner_token)
+                : '',
+        },
+      }))
     },
-    [setFieldValue, values],
+    [setValues],
   )
-  console.log('values', values)
+
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
     const hiddenFields = ['target_gateway_server_address']
@@ -132,8 +135,8 @@ const GatewayClaimFormSection = () => {
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
         description={activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined}
-        encode={!isFleet ? btoa : undefined}
-        decode={!isFleet ? atob : undefined}
+        encode={btoa}
+        decode={atob}
         sensitive
         autoFocus
       />
