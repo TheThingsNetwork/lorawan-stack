@@ -31,6 +31,8 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 import { parseGatewayQRCode } from '@console/store/actions/qr-code-generator'
 import { getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
 
+import FleetsScan from './fleets-scan.tti'
+
 const m = defineMessages({
   hasGatewayQR:
     'Does your gateway have a LoRaWAN® Gateway Identification QR Code? Scan it to speed up onboarding.',
@@ -68,6 +70,7 @@ const GatewayQRScanSection = () => {
       },
       authenticated_identifiers: {
         gateway_eui: gateway.gateway_eui,
+        // TTI only.
         authentication_code: gateway._fleet_owner_token
           ? btoa(gateway._fleet_owner_token)
           : gateway.owner_token
@@ -77,6 +80,7 @@ const GatewayQRScanSection = () => {
       _gtw_owner_token: gateway.owner_token ?? '',
       _fleet_owner_token: gateway._fleet_owner_token ?? '',
       _isFleet: Boolean(gateway._fleet_owner_token),
+      // End TTI.
     }))
 
     setQrData({ ...qrData, approved: true })
@@ -92,8 +96,10 @@ const GatewayQRScanSection = () => {
         // Get gateway from QR code
         const gateway = await dispatch(attachPromise(parseGatewayQRCode(qrCode)))
         const gatewayEui = gateway.gateway_eui
+        // TTI only.
         const { is_managed } = await dispatch(attachPromise(getGatewayClaimInfoByEui(gatewayEui)))
         gateway.is_managed = is_managed
+        // End TTI.
 
         const sheetData = [
           {
@@ -164,7 +170,9 @@ const GatewayQRScanSection = () => {
             onCancel={handleQRCodeCancel}
             onRead={handleQRCodeRead}
             qrData={qrData}
-            setQrData={setQrData}
+            // TTI only.
+            modalDataChildren={<FleetsScan qrData={qrData} setQrData={setQrData} />}
+            // End TTI.
           />
         )}
       </ButtonGroup>

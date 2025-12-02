@@ -15,23 +15,18 @@
 import React, { useCallback } from 'react'
 import { defineMessages } from 'react-intl'
 
-import { IconCamera, IconPlus } from '@ttn-lw/components/icon'
+import { IconCamera } from '@ttn-lw/components/icon'
 import Link from '@ttn-lw/components/link'
 import ModalButton from '@ttn-lw/components/button/modal-button'
-import Button from '@ttn-lw/components/button'
-import Input from '@ttn-lw/components/input'
 
 import Message from '@ttn-lw/lib/components/message'
 import ErrorMessage from '@ttn-lw/lib/components/error-message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectPluginTTSCloud } from '@ttn-lw/lib/selectors/env'
 
 import DataSheet from '../data-sheet'
 import QR from '../qr'
-
-const smUrl = selectPluginTTSCloud().subscription_management_url
 
 const QrScanDoc = (
   <Link.Anchor external secondary href="https://www.thethingsindustries.com/docs/">
@@ -42,40 +37,10 @@ const QrScanDoc = (
 const m = defineMessages({
   scanContinue: 'Please scan the QR code to continue. {qrScanDoc}',
   apply: 'Apply',
-  fleetToken: 'Fleet owner token',
-  addFleet: 'Add to Fleet',
-  addToFleetTooltip:
-    'You are registering a Managed gateway. If you want to add it to an existing fleet, click here.',
 })
 
 const QRModalButton = props => {
-  const { message, onApprove, onCancel, onRead, qrData, setQrData, invalidMessage } = props
-  const [isAddToFleet, setIsAddToFleet] = React.useState(undefined)
-  const [fleetOwnerToken, setFleetOwnerToken] = React.useState('')
-
-  const handleAddToFleet = useCallback(() => {
-    setIsAddToFleet(true)
-  }, [])
-
-  const handleRemoveFleet = useCallback(() => {
-    setIsAddToFleet(false)
-    setFleetOwnerToken('')
-    setQrData({
-      ...qrData,
-      gateway: { ...qrData.gateway, _fleet_owner_token: undefined },
-    })
-  }, [qrData, setQrData])
-
-  const handleFleetTokenChange = useCallback(
-    value => {
-      setFleetOwnerToken(value)
-      setQrData({
-        ...qrData,
-        gateway: { ...qrData.gateway, _fleet_owner_token: value },
-      })
-    },
-    [qrData, setQrData],
-  )
+  const { message, onApprove, onCancel, onRead, qrData, invalidMessage, modalDataChildren } = props
 
   const handleRead = useCallback(
     val => {
@@ -90,57 +55,7 @@ const QRModalButton = props => {
         qrData.valid ? (
           <>
             <DataSheet data={qrData.data} />
-            {qrData.gateway.is_managed && (
-              <>
-                {isAddToFleet ? (
-                  <div className="w-full mt-cs-xs">
-                    <div className="d-flex j-between">
-                      <Message content={m.fleetToken} className="c-text-neutral-semilight" />
-                      <Button
-                        message={sharedMessages.remove}
-                        onClick={handleRemoveFleet}
-                        className="c-text-neutral-light fw-bold hover-underline"
-                      />
-                    </div>
-                    <Message
-                      content={sharedMessages.fleetTokenInfo}
-                      values={{
-                        Link: val => (
-                          <Link.Anchor secondary href={`${smUrl}/dashboard`} external>
-                            {val}
-                          </Link.Anchor>
-                        ),
-                      }}
-                      className="mb-cs-xs mt-cs-xxs c-text-neutral-light fs-s"
-                      component="div"
-                    />
-                    <Input
-                      type="code"
-                      sensitive
-                      className="w-full"
-                      inputWidth="full"
-                      value={fleetOwnerToken}
-                      onChange={handleFleetTokenChange}
-                    />
-                    <Message
-                      content={sharedMessages.fleetInfo}
-                      className="mt-cs-xs c-text-neutral-light fs-s"
-                      component="div"
-                    />
-                  </div>
-                ) : (
-                  <Button
-                    tertiary
-                    message={m.addFleet}
-                    icon={IconPlus}
-                    onClick={handleAddToFleet}
-                    className="mt-cs-xs"
-                    tooltip={m.addToFleetTooltip}
-                    tooltipPlacement="bottom"
-                  />
-                )}
-              </>
-            )}
+            {modalDataChildren}
           </>
         ) : (
           <ErrorMessage content={invalidMessage} />
@@ -185,6 +100,7 @@ const QRModalButton = props => {
 QRModalButton.propTypes = {
   invalidMessage: PropTypes.message.isRequired,
   message: PropTypes.message.isRequired,
+  modalDataChildren: PropTypes.node,
   onApprove: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onRead: PropTypes.func.isRequired,
@@ -195,11 +111,11 @@ QRModalButton.propTypes = {
       is_managed: PropTypes.bool,
     }),
   }),
-  setQrData: PropTypes.func.isRequired,
 }
 
 QRModalButton.defaultProps = {
   qrData: undefined,
+  modalDataChildren: null,
 }
 
 export default QRModalButton
