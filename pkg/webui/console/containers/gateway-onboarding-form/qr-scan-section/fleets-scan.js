@@ -23,10 +23,9 @@ import Input from '@ttn-lw/components/input'
 import Message from '@ttn-lw/lib/components/message'
 
 import sharedMessages from '@ttn-lw/lib/shared-messages'
-import { selectPluginTTSCloud } from '@ttn-lw/lib/selectors/env'
 import PropTypes from '@ttn-lw/lib/prop-types'
 
-const smUrl = selectPluginTTSCloud().subscription_management_url
+const smUrl = 'https://accounts.thethingsindustries.com'
 
 const m = defineMessages({
   addFleet: 'Add to Fleet',
