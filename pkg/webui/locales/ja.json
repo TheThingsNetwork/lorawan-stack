@@ -617,6 +617,7 @@
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.deleteFail": "",
   "console.containers.gateway-managed-gateway.wifi-profiles.overview.deleteModalMessage": "",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-claim-form-section.index.claimWarning": "",
+  "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-claim-form-section.index.fleet": "",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.requireAuthenticatedConnectionDescription": "",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.index.shareGatewayInfoDescription": "",
   "console.containers.gateway-onboarding-form.gateway-provisioning-form.gateway-registration-form-section.validation-schema.validateEntry": "",

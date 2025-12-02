@@ -90,12 +90,16 @@ const QRModalButton = props => {
                 {isAddFleet ? (
                   <div className="w-full mt-cs-xs">
                     <div className="d-flex j-between">
-                      <Message content={m.fleetToken} className="fw-bold" />
-                      <Button naked message={sharedMessages.remove} onClick={handleRemoveFleet} />
+                      <Message content={m.fleetToken} className="c-text-neutral-semilight" />
+                      <Button
+                        message={sharedMessages.remove}
+                        onClick={handleRemoveFleet}
+                        className="c-text-neutral-light fw-bold hover-underline"
+                      />
                     </div>
                     <Message
                       content={sharedMessages.fleetInfo}
-                      className="mb-cs-xs c-text-neutral-light"
+                      className="mb-cs-xs mt-cs-xxs c-text-neutral-light fs-s"
                       component="div"
                     />
                     <Input
@@ -108,7 +112,7 @@ const QRModalButton = props => {
                     />
                     <Message
                       content={sharedMessages.fleetTokenInfo}
-                      className="mb-cs-xs c-text-neutral-light"
+                      className="mt-cs-xs c-text-neutral-light fs-s"
                       component="div"
                     />
                   </div>

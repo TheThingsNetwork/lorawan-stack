@@ -165,6 +165,12 @@
   .h-vh
     height: 100vh !important
 
+  .h-l
+    height: $cs.l !important
+
+  .h-content
+    height: fit-content !important
+
   for $num in (1..9)
     $percentage = percentage($num / 10)
     .w-{$num}0
@@ -474,3 +480,18 @@
 
   .border-regular
     border: 1px solid var(--c-border-neutral-light) !important
+
+  .no-wrap
+    white-space: nowrap !important
+
+  .flex-basis-1
+    flex-basis: 1rem !important
+
+  .hover-underline:hover
+    text-decoration: underline !important
+
+  // Responsive flex-basis.
+  for $name, $width in $bp
+    +media-query($width)
+      .{$name}\\:flex-basis-1
+        flex-basis: 1rem !important

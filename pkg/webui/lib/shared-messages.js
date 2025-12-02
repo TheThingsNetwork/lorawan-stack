@@ -509,7 +509,7 @@ export default defineMessages({
   resetConfirm:
     'Are you sure you want to discard QR code data? The scanned device will not be registered and the form will be reset.',
   scanSuccess: 'QR code scanned successfully',
-  scanGatewayQR: 'Scan gateway QR code',
+  scanGatewayQR: 'Gateway QR code',
   redirecting: 'Redirecting…',
   refresh: 'Refresh',
   reactivateSuccess: 'Successfully reactivated',

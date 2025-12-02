@@ -74,6 +74,7 @@ const GatewayQRScanSection = () => {
             ? btoa(gateway.owner_token)
             : '',
       },
+      _fleet_token: gateway._fleet_token,
       _isFleet: Boolean(gateway._fleet_token),
     }))
 
