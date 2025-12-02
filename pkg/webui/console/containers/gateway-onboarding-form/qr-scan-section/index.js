@@ -37,6 +37,7 @@ const m = defineMessages({
   gatewayGuide: 'Gateway registration help',
   invalidQRCode:
     'Invalid QR code data. Please note that only TTIGPRO1 Gateway Identification QR Code can be scanned. Some gateways have unrelated QR codes printed on them that cannot be used.',
+  gatewayOwnerToken: 'Gateway owner token',
 })
 
 const qrDataInitialState = {
@@ -67,15 +68,15 @@ const GatewayQRScanSection = () => {
       },
       authenticated_identifiers: {
         gateway_eui: gateway.gateway_eui,
-        authentication_code: gateway._fleet_token
-          ? btoa(gateway._fleet_token)
+        authentication_code: gateway._fleet_owner_token
+          ? btoa(gateway._fleet_owner_token)
           : gateway.owner_token
             ? btoa(gateway.owner_token)
             : '',
       },
-      _owner_token: gateway.owner_token ?? '',
-      _fleet_token: gateway._fleet_token ?? '',
-      _isFleet: Boolean(gateway._fleet_token),
+      _gtw_owner_token: gateway.owner_token ?? '',
+      _fleet_owner_token: gateway._fleet_owner_token ?? '',
+      _isFleet: Boolean(gateway._fleet_owner_token),
     }))
 
     setQrData({ ...qrData, approved: true })
@@ -99,16 +100,16 @@ const GatewayQRScanSection = () => {
             header: sharedMessages.qrCodeData,
             items: [
               {
-                key: sharedMessages.ownerToken,
-                value: gateway.owner_token,
-                type: 'code',
-                sensitive: true,
-              },
-              {
                 key: sharedMessages.gatewayEUI,
                 value: gateway.gateway_eui,
                 type: 'byte',
                 sensitive: false,
+              },
+              {
+                key: m.gatewayOwnerToken,
+                value: gateway.owner_token,
+                type: 'code',
+                sensitive: true,
               },
             ],
           },

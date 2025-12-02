@@ -76,10 +76,10 @@ const GatewayClaimFormSection = () => {
         authenticated_identifiers: {
           ...values.authenticated_identifiers,
           authentication_code:
-            value === 'fleet'
-              ? btoa(values._fleet_token)
-              : value === 'gateway'
-                ? btoa(values._owner_token)
+            value === 'fleet' && values._fleet_owner_token
+              ? btoa(values._fleet_owner_token)
+              : value === 'gateway' && values._gtw_owner_token
+                ? btoa(values._gtw_owner_token)
                 : '',
         },
       }))

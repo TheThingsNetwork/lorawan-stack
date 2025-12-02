@@ -39,34 +39,36 @@ const QrScanDoc = (
 const m = defineMessages({
   scanContinue: 'Please scan the QR code to continue. {qrScanDoc}',
   apply: 'Apply',
-  fleetToken: 'Fleet token',
-  addFleet: 'Add Fleet',
+  fleetToken: 'Fleet owner token',
+  addFleet: 'Add to Fleet',
+  addToFleetTooltip:
+    'You are registering a Managed gateway. If you want to add it to an existing fleet, click here.',
 })
 
 const QRModalButton = props => {
   const { message, onApprove, onCancel, onRead, qrData, setQrData, invalidMessage } = props
-  const [isAddFleet, setIsAddFleet] = React.useState(undefined)
-  const [fleetToken, setFleetToken] = React.useState('')
+  const [isAddToFleet, setIsAddToFleet] = React.useState(undefined)
+  const [fleetOwnerToken, setFleetOwnerToken] = React.useState('')
 
-  const handleAddFleet = useCallback(() => {
-    setIsAddFleet(true)
+  const handleAddToFleet = useCallback(() => {
+    setIsAddToFleet(true)
   }, [])
 
   const handleRemoveFleet = useCallback(() => {
-    setIsAddFleet(false)
-    setFleetToken('')
+    setIsAddToFleet(false)
+    setFleetOwnerToken('')
     setQrData({
       ...qrData,
-      gateway: { ...qrData.gateway, _fleet_token: undefined },
+      gateway: { ...qrData.gateway, _fleet_owner_token: undefined },
     })
   }, [qrData, setQrData])
 
   const handleFleetTokenChange = useCallback(
     value => {
-      setFleetToken(value)
+      setFleetOwnerToken(value)
       setQrData({
         ...qrData,
-        gateway: { ...qrData.gateway, _fleet_token: value },
+        gateway: { ...qrData.gateway, _fleet_owner_token: value },
       })
     },
     [qrData, setQrData],
@@ -87,7 +89,7 @@ const QRModalButton = props => {
             <DataSheet data={qrData.data} />
             {qrData.gateway.is_managed && (
               <>
-                {isAddFleet ? (
+                {isAddToFleet ? (
                   <div className="w-full mt-cs-xs">
                     <div className="d-flex j-between">
                       <Message content={m.fleetToken} className="c-text-neutral-semilight" />
@@ -107,7 +109,7 @@ const QRModalButton = props => {
                       sensitive
                       className="w-full"
                       inputWidth="full"
-                      value={fleetToken}
+                      value={fleetOwnerToken}
                       onChange={handleFleetTokenChange}
                     />
                     <Message
@@ -121,8 +123,10 @@ const QRModalButton = props => {
                     tertiary
                     message={m.addFleet}
                     icon={IconPlus}
-                    onClick={handleAddFleet}
+                    onClick={handleAddToFleet}
                     className="mt-cs-xs"
+                    tooltip={m.addToFleetTooltip}
+                    tooltipPlacement="bottom"
                   />
                 )}
               </>
@@ -179,7 +183,6 @@ QRModalButton.propTypes = {
     data: PropTypes.arrayOf(PropTypes.shape()),
     gateway: PropTypes.shape({
       is_managed: PropTypes.bool,
-      _fleet_token: PropTypes.string,
     }),
   }),
   setQrData: PropTypes.func.isRequired,
