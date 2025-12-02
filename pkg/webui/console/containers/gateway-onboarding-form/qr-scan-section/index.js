@@ -58,7 +58,7 @@ const GatewayQRScanSection = () => {
 
   const handleQRCodeApprove = useCallback(() => {
     const { gateway } = qrData
-
+    console.log('gateway from qr', gateway.owner_token)
     setValues(values => ({
       ...values,
       _withQRdata: true,
@@ -74,6 +74,7 @@ const GatewayQRScanSection = () => {
             ? btoa(gateway.owner_token)
             : '',
       },
+      _owner_token: gateway.owner_token ? btoa(gateway.owner_token) : '',
       _fleet_token: gateway._fleet_token,
       _isFleet: Boolean(gateway._fleet_token),
     }))

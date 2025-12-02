@@ -60,7 +60,7 @@ const ownerTokenTypes = [
 ]
 
 const GatewayClaimFormSection = () => {
-  const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
+  const { values, addToFieldRegistry, removeFromFieldRegistry, setFieldValue } = useFormikContext()
   const isManaged = values._inputMethod === 'managed'
   const isFleet = values._isFleet
 
@@ -68,10 +68,22 @@ const GatewayClaimFormSection = () => {
     isFleet ? 'fleet' : 'gateway',
   )
 
-  const onOwnerTokenTypeChange = useCallback(value => {
-    setActiveOwnerTokenType(value)
-  }, [])
-
+  const onOwnerTokenTypeChange = useCallback(
+    value => {
+      console.log('values', values)
+      setActiveOwnerTokenType(value)
+      if (value === 'fleet') {
+        setFieldValue('authenticated_identifiers.authentication_code', values._fleet_token || '')
+      } else {
+        setFieldValue(
+          'authenticated_identifiers.authentication_code',
+          values._owner_token ? values._owner_token : '',
+        )
+      }
+    },
+    [setFieldValue, values],
+  )
+  console.log('values', values)
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
     const hiddenFields = ['target_gateway_server_address']
