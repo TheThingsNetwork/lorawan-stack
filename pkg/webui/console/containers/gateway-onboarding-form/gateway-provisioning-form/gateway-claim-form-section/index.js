@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useEffect } from 'react'
+import React, { useCallback, useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import { useFormikContext } from 'formik'
 
@@ -24,6 +24,10 @@ import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
+import Link from '@ttn-lw/components/link'
+import Tabs from '@ttn-lw/components/tabs'
+
+import Message from '@ttn-lw/lib/components/message'
 
 import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
@@ -36,7 +40,10 @@ const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
 
 const m = defineMessages({
   claimWarning:
-    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the owner token printed on the inside of the mounting lid or scan the QR code to claim instantly.',
+    'We detected a Managed gateway. To claim this gateway, please use the <strong>owner token printed on the gateway</strong>, or the <strong>gateway fleet owner token</strong>.',
+  fleet: 'Fleet',
+  fleetInfo: 'Adding a gateway to a fleet will blablabla.',
+  fleetTokenInfo: 'Your fleet token is available in your account.',
 })
 
 const initialValues = {
@@ -49,10 +56,23 @@ const initialValues = {
   target_gateway_server_address: gsEnabled ? getHostFromUrl(gsBaseURL) : '',
 }
 
+const ownerTokenTypes = [
+  { name: 'gateway', title: sharedMessages.gateway },
+  { name: 'fleet', title: m.fleet },
+]
+
 const GatewayClaimFormSection = () => {
   const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
   const isManaged = values._inputMethod === 'managed'
-  const withQRdata = values._withQRdata
+  const isFleet = values._isFleet
+
+  const [activeOwnerTokenType, setActiveOwnerTokenType] = React.useState(
+    isFleet ? 'fleet' : 'gateway',
+  )
+
+  const onOwnerTokenTypeChange = useCallback(value => {
+    setActiveOwnerTokenType(value)
+  }, [])
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
@@ -64,27 +84,46 @@ const GatewayClaimFormSection = () => {
   return (
     <>
       {isManaged && (
-        <Form.InfoField>
-          <Notification
+        <>
+          <Form.InfoField>
+            <Notification
+              small
+              info
+              content={m.claimWarning}
+              messageValues={{
+                strong: txt => <strong>{txt}</strong>,
+              }}
+              className="mb-0"
+            />
+          </Form.InfoField>
+          <Message content={sharedMessages.ownerToken} className="fw-bold" />
+          <Tabs
+            active={activeOwnerTokenType}
+            tabs={ownerTokenTypes}
+            onTabChange={onOwnerTokenTypeChange}
+            toggleStyle
             small
-            info
-            content={m.claimWarning}
-            messageValues={{
-              strong: txt => <strong>{txt}</strong>,
-            }}
-            className="mb-0"
+            className="w-content p-0 mb-cs-xs mt-cs-xxs border-none br-m gap-0 fs-s"
           />
-        </Form.InfoField>
+          {activeOwnerTokenType === 'fleet' && (
+            <Message
+              content={m.fleetInfo}
+              className="mb-cs-xs c-text-neutral-light"
+              component="div"
+            />
+          )}
+        </>
       )}
       <Form.Field
         required
         title={sharedMessages.ownerToken}
+        showTitle={false}
         name="authenticated_identifiers.authentication_code"
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
-        encode={btoa}
-        decode={atob}
-        disabled={withQRdata}
+        description={activeOwnerTokenType === 'fleet' ? m.fleetTokenInfo : undefined}
+        encode={!isFleet ? btoa : undefined}
+        decode={!isFleet ? atob : undefined}
         sensitive
         autoFocus
       />
