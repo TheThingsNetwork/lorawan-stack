@@ -135,7 +135,9 @@ const GatewayClaimFormSection = () => {
         name="authenticated_identifiers.authentication_code"
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
-        description={activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined}
+        description={
+          isManaged && activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined
+        }
         descriptionValues={{
           Link: val => (
             <Link.Anchor secondary href={`${smUrl}/dashboard`} external>
