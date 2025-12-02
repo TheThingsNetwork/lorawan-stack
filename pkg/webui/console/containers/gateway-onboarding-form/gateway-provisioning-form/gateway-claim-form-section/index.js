@@ -31,15 +31,13 @@ import Message from '@ttn-lw/lib/components/message'
 
 import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
-import { selectGsConfig, selectPluginTTSCloud } from '@ttn-lw/lib/selectors/env'
+import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
-// TTI only.
-const smUrl = selectPluginTTSCloud().subscription_management_url
-// End TTI.
+const smUrl = 'https://accounts.thethingsindustries.com'
 
 const m = defineMessages({
   claimWarning:
@@ -57,17 +55,14 @@ const initialValues = {
   target_gateway_server_address: gsEnabled ? getHostFromUrl(gsBaseURL) : '',
 }
 
-// TTI only.
 const ownerTokenTypes = [
   { name: 'gateway', title: sharedMessages.gateway },
   { name: 'fleet', title: m.fleet },
 ]
-// End TTI.
 
 const GatewayClaimFormSection = () => {
   const { values, addToFieldRegistry, removeFromFieldRegistry, setValues } = useFormikContext()
   const isManaged = values._inputMethod === 'managed'
-  // TTI only.
   const isFleet = values._isFleet
 
   const [activeOwnerTokenType, setActiveOwnerTokenType] = React.useState(
@@ -92,7 +87,6 @@ const GatewayClaimFormSection = () => {
     },
     [setValues],
   )
-  // End TTI.
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
@@ -116,7 +110,6 @@ const GatewayClaimFormSection = () => {
               className="mb-0"
             />
           </Form.InfoField>
-          {/** TTI only. */}
           <Message content={sharedMessages.ownerToken} className="fw-bold" />
           <Tabs
             active={activeOwnerTokenType}
@@ -133,19 +126,15 @@ const GatewayClaimFormSection = () => {
               component="div"
             />
           )}
-          {/** End TTI. */}
         </>
       )}
       <Form.Field
         required
         title={sharedMessages.ownerToken}
-        // TTI only.
         showTitle={!isManaged}
-        // End TTI.
         name="authenticated_identifiers.authentication_code"
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
-        // TTI only.
         description={activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined}
         descriptionValues={{
           Link: val => (
@@ -154,7 +143,6 @@ const GatewayClaimFormSection = () => {
             </Link.Anchor>
           ),
         }}
-        // End TTI.
         encode={btoa}
         decode={atob}
         sensitive
