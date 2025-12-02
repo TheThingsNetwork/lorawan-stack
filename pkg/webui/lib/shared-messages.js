@@ -278,6 +278,8 @@ export default defineMessages({
   fCnt: 'FCnt',
   fetching: 'Fetching data…',
   firmwareVersion: 'Firmware version',
+  fleetInfo: 'Adding a gateway to a fleet will blablabla.',
+  fleetTokenInfo: 'Your fleet token is available in your account.',
   format: 'Format',
   fpNotFoundError:
     'The LoRaWAN version <code>{lorawanVersion}</code> does not support the <code>{freqPlan}</code> frequency plan. Please choose a different MAC version or frequency plan.',

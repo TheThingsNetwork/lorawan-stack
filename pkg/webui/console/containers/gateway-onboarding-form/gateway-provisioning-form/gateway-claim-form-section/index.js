@@ -42,8 +42,6 @@ const m = defineMessages({
   claimWarning:
     'We detected a Managed gateway. To claim this gateway, please use the <strong>owner token printed on the gateway</strong>, or the <strong>gateway fleet owner token</strong>.',
   fleet: 'Fleet',
-  fleetInfo: 'Adding a gateway to a fleet will blablabla.',
-  fleetTokenInfo: 'Your fleet token is available in your account.',
 })
 
 const initialValues = {
@@ -107,7 +105,7 @@ const GatewayClaimFormSection = () => {
           />
           {activeOwnerTokenType === 'fleet' && (
             <Message
-              content={m.fleetInfo}
+              content={sharedMessages.fleetInfo}
               className="mb-cs-xs c-text-neutral-light"
               component="div"
             />
@@ -121,7 +119,7 @@ const GatewayClaimFormSection = () => {
         name="authenticated_identifiers.authentication_code"
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
-        description={activeOwnerTokenType === 'fleet' ? m.fleetTokenInfo : undefined}
+        description={activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined}
         encode={!isFleet ? btoa : undefined}
         decode={!isFleet ? atob : undefined}
         sensitive

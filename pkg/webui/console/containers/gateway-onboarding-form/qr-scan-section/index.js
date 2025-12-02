@@ -29,6 +29,7 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 // TODO: Get the correct sdk (gateway qr code generator)
 import { parseGatewayQRCode } from '@console/store/actions/qr-code-generator'
+import { getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
 
 const m = defineMessages({
   hasGatewayQR:
@@ -67,8 +68,13 @@ const GatewayQRScanSection = () => {
       },
       authenticated_identifiers: {
         gateway_eui: gateway.gateway_eui,
-        authentication_code: gateway.owner_token ? btoa(gateway.owner_token) : '',
+        authentication_code: gateway._fleet_token
+          ? gateway._fleet_token
+          : gateway.owner_token
+            ? btoa(gateway.owner_token)
+            : '',
       },
+      _isFleet: Boolean(gateway._fleet_token),
     }))
 
     setQrData({ ...qrData, approved: true })
@@ -83,6 +89,9 @@ const GatewayQRScanSection = () => {
       try {
         // Get gateway from QR code
         const gateway = await dispatch(attachPromise(parseGatewayQRCode(qrCode)))
+        const gatewayEui = gateway.gateway_eui
+        const { is_managed } = await dispatch(attachPromise(getGatewayClaimInfoByEui(gatewayEui)))
+        gateway.is_managed = is_managed
 
         const sheetData = [
           {
@@ -153,6 +162,7 @@ const GatewayQRScanSection = () => {
             onCancel={handleQRCodeCancel}
             onRead={handleQRCodeRead}
             qrData={qrData}
+            setQrData={setQrData}
           />
         )}
       </ButtonGroup>
