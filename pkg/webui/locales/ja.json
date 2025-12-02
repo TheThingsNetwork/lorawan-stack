@@ -1092,7 +1092,6 @@
   "lib.errors.status-code-messages.504": "",
   "lib.errors.utils.notFound": "",
   "lib.errors.utils.subscriptionNotActive": "",
-  "lib.errors.utils.activationCodeExpired": "",
   "lib.errors.utils.permissionDenied": "",
   "lib.field-description-messages.idLocation": "",
   "lib.field-description-messages.freqPlanDescription": "周波数プランは、エンドデバイスやゲートウェイが使用するように設定されたデータレートを定義します。ゲートウェイとエンドデバイスが通信できるようにするためには、同じ周波数プランを使用することが重要です",
