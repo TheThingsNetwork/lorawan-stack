@@ -31,12 +31,13 @@ import Message from '@ttn-lw/lib/components/message'
 
 import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
-import { selectGsConfig } from '@ttn-lw/lib/selectors/env'
+import { selectGsConfig, selectPluginTTSCloud } from '@ttn-lw/lib/selectors/env'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
+const smUrl = selectPluginTTSCloud().subscription_management_url
 
 const m = defineMessages({
   claimWarning:
@@ -135,6 +136,13 @@ const GatewayClaimFormSection = () => {
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
         description={activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined}
+        descriptionValues={{
+          Link: val => (
+            <Link.Anchor secondary href={`${smUrl}/dashboard`} external>
+              {val}
+            </Link.Anchor>
+          ),
+        }}
         encode={btoa}
         decode={atob}
         sensitive

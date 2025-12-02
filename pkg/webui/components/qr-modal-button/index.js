@@ -26,9 +26,12 @@ import ErrorMessage from '@ttn-lw/lib/components/error-message'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
+import { selectPluginTTSCloud } from '@ttn-lw/lib/selectors/env'
 
 import DataSheet from '../data-sheet'
 import QR from '../qr'
+
+const smUrl = selectPluginTTSCloud().subscription_management_url
 
 const QrScanDoc = (
   <Link.Anchor external secondary href="https://www.thethingsindustries.com/docs/">
@@ -100,7 +103,14 @@ const QRModalButton = props => {
                       />
                     </div>
                     <Message
-                      content={sharedMessages.fleetInfo}
+                      content={sharedMessages.fleetTokenInfo}
+                      values={{
+                        Link: val => (
+                          <Link.Anchor secondary href={`${smUrl}/dashboard`} external>
+                            {val}
+                          </Link.Anchor>
+                        ),
+                      }}
                       className="mb-cs-xs mt-cs-xxs c-text-neutral-light fs-s"
                       component="div"
                     />
@@ -113,7 +123,7 @@ const QRModalButton = props => {
                       onChange={handleFleetTokenChange}
                     />
                     <Message
-                      content={sharedMessages.fleetTokenInfo}
+                      content={sharedMessages.fleetInfo}
                       className="mt-cs-xs c-text-neutral-light fs-s"
                       component="div"
                     />
