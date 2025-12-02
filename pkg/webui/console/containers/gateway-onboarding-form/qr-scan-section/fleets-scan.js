@@ -35,7 +35,7 @@ const m = defineMessages({
 })
 
 const FleetsScan = ({ qrData, setQrData }) => {
-  const [isAddToFleet, setIsAddToFleet] = React.useState(undefined)
+  const [isAddToFleet, setIsAddToFleet] = React.useState(false)
   const [fleetOwnerToken, setFleetOwnerToken] = React.useState('')
 
   const handleAddToFleet = useCallback(() => {
@@ -45,24 +45,24 @@ const FleetsScan = ({ qrData, setQrData }) => {
   const handleRemoveFleet = useCallback(() => {
     setIsAddToFleet(false)
     setFleetOwnerToken('')
-    setQrData({
-      ...qrData,
-      gateway: { ...qrData.gateway, _fleet_owner_token: undefined },
-    })
-  }, [qrData, setQrData])
+    setQrData(prevQrData => ({
+      ...prevQrData,
+      gateway: { ...prevQrData.gateway, _fleet_owner_token: undefined },
+    }))
+  }, [setQrData])
 
   const handleFleetTokenChange = useCallback(
     value => {
       setFleetOwnerToken(value)
-      setQrData({
-        ...qrData,
-        gateway: { ...qrData.gateway, _fleet_owner_token: value },
-      })
+      setQrData(prevQrData => ({
+        ...prevQrData,
+        gateway: { ...prevQrData.gateway, _fleet_owner_token: value },
+      }))
     },
-    [qrData, setQrData],
+    [setQrData],
   )
 
-  return qrData.gateway.is_managed ? (
+  return qrData?.gateway?.is_managed ? (
     <>
       {isAddToFleet ? (
         <div className="w-full mt-cs-xs">
@@ -119,6 +119,8 @@ FleetsScan.propTypes = {
   qrData: PropTypes.shape({
     gateway: PropTypes.shape({
       is_managed: PropTypes.bool,
+      _fleet_owner_token: PropTypes.string,
+      owner_token: PropTypes.string,
     }),
   }).isRequired,
   setQrData: PropTypes.func.isRequired,

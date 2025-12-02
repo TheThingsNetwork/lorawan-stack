@@ -107,9 +107,7 @@ QRModalButton.propTypes = {
   qrData: PropTypes.shape({
     valid: PropTypes.bool,
     data: PropTypes.arrayOf(PropTypes.shape()),
-    gateway: PropTypes.shape({
-      is_managed: PropTypes.bool,
-    }),
+    gateway: PropTypes.shape({}),
   }),
 }
 
