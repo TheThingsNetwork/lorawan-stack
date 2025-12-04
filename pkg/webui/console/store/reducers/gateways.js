@@ -84,10 +84,14 @@ const gateways = (state = defaultState, action) => {
         selectedGatewayClaimable: Boolean(payload.is_details && payload.supports_claiming),
       }
     case GET_GTW:
+      const newSelectedGateway = meta.options.noSelect ? state.selectedGateway : payload.id
+      const isChangingGateway = newSelectedGateway !== state.selectedGateway
+
       return {
         ...state,
-        statistics: defaultStatisticsState,
-        selectedGateway: meta.options.noSelect ? state.selectedGateway : payload.id,
+        // Only reset statistics when switching to a different gateway
+        statistics: isChangingGateway ? defaultStatisticsState : state.statistics,
+        selectedGateway: newSelectedGateway,
       }
     case GET_GTW_SUCCESS:
     case UPDATE_GTW_SUCCESS:
