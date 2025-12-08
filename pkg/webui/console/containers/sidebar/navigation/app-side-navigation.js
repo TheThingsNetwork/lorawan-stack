@@ -31,7 +31,7 @@ import {
   IconPayloadFormat,
   IconUplink,
   IconLayoutDashboard,
-  IconSquare,
+  IconUserPlus,
 } from '@ttn-lw/components/icon'
 import SideNavigation from '@ttn-lw/components/sidebar/side-menu'
 import DedicatedEntity from '@ttn-lw/components/sidebar/dedicated-entity'
@@ -152,7 +152,7 @@ const AppSideNavigation = () => {
         <SideNavigation.Item
           title={sharedMessages.macSettingsProfiles}
           path={`/applications/${appId}/mac-settings-profiles`}
-          icon={IconSquare}
+          icon={IconUserPlus}
         />
         {mayViewOrEditApplicationApiKeys.check(rights) && (
           <SideNavigation.Item
