@@ -78,7 +78,11 @@ const FleetsScan = ({ qrData, setQrData }) => {
             content={sharedMessages.fleetTokenInfo}
             values={{
               Link: val => (
-                <Link.Anchor secondary href={`${smUrl}/dashboard`} external>
+                <Link.Anchor
+                  secondary
+                  href={`${smUrl}/dashboard/subscriptions?type=gateway`}
+                  external
+                >
                   {val}
                 </Link.Anchor>
               ),
