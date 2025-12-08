@@ -122,6 +122,16 @@ const GatewayClaimFormSection = () => {
           {activeOwnerTokenType === 'fleet' && (
             <Message
               content={sharedMessages.fleetInfo}
+              values={{
+                Link: val => (
+                  <Link.DocLink
+                    secondary
+                    path="/hardware/gateways/models/thethingsindoorgatewaypro/#subscription"
+                  >
+                    {val}
+                  </Link.DocLink>
+                ),
+              }}
               className="mb-cs-xs c-text-neutral-light"
               component="div"
             />

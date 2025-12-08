@@ -278,7 +278,8 @@ export default defineMessages({
   fCnt: 'FCnt',
   fetching: 'Fetching data…',
   firmwareVersion: 'Firmware version',
-  fleetInfo: 'Adding a gateway to a Fleet will claim the gateway using an available Slot.',
+  fleetInfo:
+    'Adding a gateway to a Fleet will claim the gateway using an <Link>available Slot.</Link>',
   fleetTokenInfo: 'Your fleet token is available in <Link>your account.</Link>',
   format: 'Format',
   fpNotFoundError:

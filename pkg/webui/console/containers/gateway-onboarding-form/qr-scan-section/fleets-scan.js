@@ -96,6 +96,16 @@ const FleetsScan = ({ qrData, setQrData }) => {
           />
           <Message
             content={sharedMessages.fleetInfo}
+            values={{
+              Link: val => (
+                <Link.DocLink
+                  secondary
+                  path="/hardware/gateways/models/thethingsindoorgatewaypro/#subscription"
+                >
+                  {val}
+                </Link.DocLink>
+              ),
+            }}
             className="mt-cs-xs c-text-neutral-light fs-s"
             component="div"
           />
