@@ -108,7 +108,7 @@ const GatewayClaimFormSection = () => {
                 Link: val => (
                   <Link.Anchor
                     secondary
-                    href={`${smUrl}/docs/hardware/gateways/models/thethingsindoorgatewaypro/#finding-your-owner-token`}
+                    href="https://www.thethingsindustries.com/docs/hardware/gateways/models/thethingsindoorgatewaypro/#finding-your-owner-token"
                     external
                   >
                     {val}
