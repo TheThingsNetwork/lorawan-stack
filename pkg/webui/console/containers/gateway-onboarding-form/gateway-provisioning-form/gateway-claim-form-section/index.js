@@ -41,7 +41,7 @@ const smUrl = 'https://accounts.thethingsindustries.com'
 
 const m = defineMessages({
   claimWarning:
-    'We detected a Managed gateway. To claim this gateway, please use the <strong>owner token printed on the gateway</strong>, or the <strong>gateway fleet owner token</strong>.',
+    'We detected a Managed gateway. To claim this gateway with a subscription, use the owner token printed on the gateway, or add it to your Gateway Fleet using your <Link>fleet owner token.</Link>',
   fleet: 'Fleet',
 })
 
@@ -105,7 +105,15 @@ const GatewayClaimFormSection = () => {
               info
               content={m.claimWarning}
               messageValues={{
-                strong: txt => <strong>{txt}</strong>,
+                Link: val => (
+                  <Link.Anchor
+                    secondary
+                    href={`${smUrl}/docs/hardware/gateways/models/thethingsindoorgatewaypro/#finding-your-owner-token`}
+                    external
+                  >
+                    {val}
+                  </Link.Anchor>
+                ),
               }}
               className="mb-0"
             />
@@ -150,7 +158,7 @@ const GatewayClaimFormSection = () => {
         }
         descriptionValues={{
           Link: val => (
-            <Link.Anchor secondary href={`${smUrl}/dashboard`} external>
+            <Link.Anchor secondary href={`${smUrl}/dashboard/subscriptions?type=gateway`} external>
               {val}
             </Link.Anchor>
           ),
@@ -158,6 +166,8 @@ const GatewayClaimFormSection = () => {
         encode={btoa}
         decode={atob}
         sensitive
+        data-1p-ignore
+        data-lpignore
         autoFocus
       />
       <Form.Field
