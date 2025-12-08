@@ -40,7 +40,7 @@ const m = defineMessages({
 })
 
 const QRModalButton = props => {
-  const { message, onApprove, onCancel, onRead, qrData, invalidMessage } = props
+  const { message, onApprove, onCancel, onRead, qrData, invalidMessage, modalDataChildren } = props
 
   const handleRead = useCallback(
     val => {
@@ -53,7 +53,10 @@ const QRModalButton = props => {
     <div style={{ width: '100%' }}>
       {qrData.data ? (
         qrData.valid ? (
-          <DataSheet data={qrData.data} />
+          <>
+            <DataSheet data={qrData.data} />
+            {modalDataChildren}
+          </>
         ) : (
           <ErrorMessage content={invalidMessage} />
         )
@@ -97,17 +100,20 @@ const QRModalButton = props => {
 QRModalButton.propTypes = {
   invalidMessage: PropTypes.message.isRequired,
   message: PropTypes.message.isRequired,
+  modalDataChildren: PropTypes.node,
   onApprove: PropTypes.func.isRequired,
   onCancel: PropTypes.func.isRequired,
   onRead: PropTypes.func.isRequired,
   qrData: PropTypes.shape({
     valid: PropTypes.bool,
     data: PropTypes.arrayOf(PropTypes.shape()),
+    gateway: PropTypes.shape({}),
   }),
 }
 
 QRModalButton.defaultProps = {
   qrData: undefined,
+  modalDataChildren: null,
 }
 
 export default QRModalButton

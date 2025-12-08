@@ -36,6 +36,7 @@ const Tabs = ({
   narrow,
   toggleStyle,
   disabled,
+  small,
 }) => {
   const handleClick = tabName => {
     if (!disabled && onTabChange) {
@@ -67,6 +68,7 @@ const Tabs = ({
               className={tabItemClassName}
               toggleStyle={toggleStyle}
               tooltip={description}
+              small={small}
             >
               {icon && <Icon icon={icon} className={style.icon} />}
               <Message content={title} />
@@ -92,6 +94,7 @@ Tabs.propTypes = {
   narrow: PropTypes.bool,
   /** A list of tabs. */
   onTabChange: PropTypes.func,
+  small: PropTypes.bool,
   tabItemClassName: PropTypes.string,
   tabs: PropTypes.arrayOf(
     PropTypes.shape({
@@ -115,6 +118,7 @@ Tabs.defaultProps = {
   narrow: false,
   toggleStyle: false,
   disabled: false,
+  small: false,
 }
 
 export default Tabs

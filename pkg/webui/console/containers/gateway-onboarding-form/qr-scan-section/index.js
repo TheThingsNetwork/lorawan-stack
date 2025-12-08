@@ -29,6 +29,9 @@ import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 // TODO: Get the correct sdk (gateway qr code generator)
 import { parseGatewayQRCode } from '@console/store/actions/qr-code-generator'
+import { getGatewayClaimInfoByEui } from '@console/store/actions/gateways'
+
+import FleetsScan from './fleets-scan'
 
 const m = defineMessages({
   hasGatewayQR:
@@ -36,6 +39,7 @@ const m = defineMessages({
   gatewayGuide: 'Gateway registration help',
   invalidQRCode:
     'Invalid QR code data. Please note that only TTIGPRO1 Gateway Identification QR Code can be scanned. Some gateways have unrelated QR codes printed on them that cannot be used.',
+  gatewayOwnerToken: 'Gateway owner token',
 })
 
 const qrDataInitialState = {
@@ -57,7 +61,6 @@ const GatewayQRScanSection = () => {
 
   const handleQRCodeApprove = useCallback(() => {
     const { gateway } = qrData
-
     setValues(values => ({
       ...values,
       _withQRdata: true,
@@ -67,8 +70,15 @@ const GatewayQRScanSection = () => {
       },
       authenticated_identifiers: {
         gateway_eui: gateway.gateway_eui,
-        authentication_code: gateway.owner_token ? btoa(gateway.owner_token) : '',
+        authentication_code: gateway._fleet_owner_token
+          ? btoa(gateway._fleet_owner_token)
+          : gateway.owner_token
+            ? btoa(gateway.owner_token)
+            : '',
       },
+      _gtw_owner_token: gateway.owner_token ?? '',
+      _fleet_owner_token: gateway._fleet_owner_token ?? '',
+      _isFleet: Boolean(gateway._fleet_owner_token),
     }))
 
     setQrData({ ...qrData, approved: true })
@@ -83,22 +93,25 @@ const GatewayQRScanSection = () => {
       try {
         // Get gateway from QR code
         const gateway = await dispatch(attachPromise(parseGatewayQRCode(qrCode)))
+        const gatewayEui = gateway.gateway_eui
+        const { is_managed } = await dispatch(attachPromise(getGatewayClaimInfoByEui(gatewayEui)))
+        gateway.is_managed = is_managed
 
         const sheetData = [
           {
             header: sharedMessages.qrCodeData,
             items: [
               {
-                key: sharedMessages.ownerToken,
-                value: gateway.owner_token,
-                type: 'code',
-                sensitive: true,
-              },
-              {
                 key: sharedMessages.gatewayEUI,
                 value: gateway.gateway_eui,
                 type: 'byte',
                 sensitive: false,
+              },
+              {
+                key: m.gatewayOwnerToken,
+                value: gateway.owner_token,
+                type: 'code',
+                sensitive: true,
               },
             ],
           },
@@ -153,6 +166,7 @@ const GatewayQRScanSection = () => {
             onCancel={handleQRCodeCancel}
             onRead={handleQRCodeRead}
             qrData={qrData}
+            modalDataChildren={<FleetsScan qrData={qrData} setQrData={setQrData} />}
           />
         )}
       </ButtonGroup>

@@ -77,6 +77,7 @@ const FormField = props => {
     component: Component,
     decode,
     description,
+    descriptionValues,
     disabled: inputDisabled,
     encode,
     fieldWidth,
@@ -92,6 +93,7 @@ const FormField = props => {
     valueSetter,
     onChange,
     onBlur,
+    showTitle,
   } = props
 
   const {
@@ -222,7 +224,12 @@ const FormField = props => {
       <FieldError content={warning} title={title} warning id={describedBy} />
     </div>
   ) : showDescription ? (
-    <Message className={style.description} content={description} id={describedBy} />
+    <Message
+      className={style.description}
+      content={description}
+      values={descriptionValues}
+      id={describedBy}
+    />
   ) : null
 
   const fieldComponentProps = {
@@ -253,7 +260,7 @@ const FormField = props => {
 
   return (
     <div className={cls} data-needs-focus={showError} data-test-id="form-field">
-      {hasTitle && (
+      {hasTitle && showTitle && (
         <div className={style.label}>
           <Message
             component="label"
@@ -290,6 +297,7 @@ FormField.propTypes = {
   ]).isRequired,
   decode: PropTypes.func,
   description: PropTypes.message,
+  descriptionValues: PropTypes.shape({}),
   disabled: PropTypes.bool,
   encode: PropTypes.func,
   fieldWidth: PropTypes.oneOf([
@@ -310,6 +318,7 @@ FormField.propTypes = {
   onChange: PropTypes.func,
   readOnly: PropTypes.bool,
   required: PropTypes.bool,
+  showTitle: PropTypes.bool,
   title: PropTypes.message,
   titleChildren: PropTypes.oneOfType([PropTypes.node, PropTypes.arrayOf(PropTypes.node)]),
   tooltip: PropTypes.message,
@@ -337,6 +346,8 @@ FormField.defaultProps = {
   validate: undefined,
   valueSetter: defaultValueSetter,
   warning: '',
+  descriptionValues: {},
+  showTitle: true,
 }
 
 export default FormField
