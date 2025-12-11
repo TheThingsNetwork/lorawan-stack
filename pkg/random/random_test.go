@@ -36,19 +36,19 @@ func TestPseudoRandom(t *testing.T) {
 }
 
 func BenchmarkBytes(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		Bytes(100)
 	}
 }
 
 func BenchmarkIntn(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		Int63n(100)
 	}
 }
 
 func BenchmarkString(b *testing.B) {
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		String(100)
 	}
 }
