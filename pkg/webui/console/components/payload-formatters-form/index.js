@@ -279,7 +279,7 @@ const PayloadFormattersForm = ({
     ({ currentLocation, nextLocation }) => {
       const isDirty = Boolean(
         formRef?.current?.touched['javascript-formatter'] ||
-          formRef?.current?.touched['grpc-formatter'],
+        formRef?.current?.touched['grpc-formatter'],
       )
       return isDirty && currentLocation.pathname !== nextLocation.pathname
     },
@@ -290,7 +290,7 @@ const PayloadFormattersForm = ({
   useEffect(() => {
     const isDirty = Boolean(
       formRef?.current?.touched['javascript-formatter'] ||
-        formRef?.current?.touched['grpc-formatter'],
+      formRef?.current?.touched['grpc-formatter'],
     )
     if (blocker.state === 'blocked' && !isDirty) {
       blocker.reset()
