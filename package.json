@@ -71,7 +71,7 @@
     "react-refresh": "^0.18.0",
     "stylelint": "^16.26.1",
     "stylelint-stylus": "^1.0.0",
-    "storybook": "^8.1.8",
+    "storybook": "^8.6.15",
     "stylus": "^0.64.0",
     "stylus-loader": "^8.1.2",
     "wait-on": "^9.0.3",
