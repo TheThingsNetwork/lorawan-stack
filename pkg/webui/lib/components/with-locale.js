@@ -143,7 +143,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.NumberFormat) {
           log('Polyfilling Intl.NumberFormat')
           await import(
-            /* webpackChunkName: "locale-number-format" */ '@formatjs/intl-numberformat/polyfill'
+            /* webpackChunkName: "locale-number-format" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-numberformat/polyfill.js'
           )
         }
 
