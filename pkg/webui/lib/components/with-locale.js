@@ -152,7 +152,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.RelativeTimeFormat) {
           log('Polyfilling Intl.RelativeTimeFormat')
           await import(
-            /* webpackChunkName: "locale-date-time-format" */ '@formatjs/intl-relativetimeformat/polyfill'
+            /* webpackChunkName: "locale-date-time-format" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-relativetimeformat/polyfill.js'
           )
         }
 

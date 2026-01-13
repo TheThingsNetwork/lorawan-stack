@@ -1889,13 +1889,13 @@
     decimal.js "^10.4.3"
     tslib "^2.8.0"
 
-"@formatjs/intl-relativetimeformat@^11.4.13":
-  version "11.4.13"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-11.4.13.tgz#f77839f2e87b1b0641e8ed72e673b9386f5df79a"
-  integrity sha512-fNs6cpz9zIUEgTlE3kPSEyRfslxeMG19dT7sLz2C6U7Jxkx8xK/IH1ImZzCeqd6JlqE81O7uNW4oZTb1pz8lUw==
+"@formatjs/intl-relativetimeformat@^12.1.2":
+  version "12.1.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-12.1.2.tgz#188b088b04fa6309e47374526593529be737b770"
+  integrity sha512-bl5yZD5YFYo4CvGKRVGwuUDYO0LifLHQR5CG6EV29Vw8/9MVWfrkkFM5Al4Ec+Prq2pzMnu++1Q+oQO1Anjn6A==
   dependencies:
-    "@formatjs/ecma402-abstract" "2.3.6"
-    "@formatjs/intl-localematcher" "0.6.2"
+    "@formatjs/ecma402-abstract" "3.0.8"
+    "@formatjs/intl-localematcher" "0.7.5"
     tslib "^2.8.0"
 
 "@formatjs/intl@3.1.8":
