@@ -27,6 +27,10 @@ For details about compatibility between different releases, see the **Commitment
 
 - Rate limiting for downlink queue operations (`DownlinkQueuePush`, `DownlinkQueueReplace`) is now applied at the application level instead of per-device. This may result in more `ResourceExhausted` (429) errors when multiple devices under the same application perform downlink queue operations concurrently.
 
+### Fixed
+
+- Application Server webhook registry now uses read-only Redis client for non-paginated list operations, reducing connection holding time during high traffic.
+
 ## [3.35.1] - 2025-12-19
 
 ### Added
