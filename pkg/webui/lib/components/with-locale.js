@@ -115,7 +115,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.DisplayNames) {
           log('Polyfilling Intl.DisplayNames')
           await import(
-            /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-displaynames/polyfill'
+            /* webpackChunkName: "locale-display-names" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-displaynames/polyfill.js'
           )
           // Instead of using dynamic imports that would cause all possible locales to be bundled
           // we only load the ones we want to support which as of now are English and Japanese.
@@ -167,7 +169,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.DateTimeFormat) {
           log('Polyfilling Intl.DateTimeFormat')
           await import(
-            /* webpackChunkName: "locale-date-time-format" */ '@formatjs/intl-datetimeformat/polyfill'
+            /* webpackChunkName: "locale-date-time-format" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-datetimeformat/polyfill.js'
           )
         }
 
@@ -260,7 +264,11 @@ const LocaleLoader = ({ children }) => {
       if (window.Intl.DateTimeFormat.polyfilled) {
         log(`Polyfilling DateTimeFormat for language ${language}`)
         promises.push(
-          import(/* webpackChunkName: "locale" */ '@formatjs/intl-datetimeformat/add-all-tz'),
+          import(
+            /* webpackChunkName: "locale" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-datetimeformat/add-all-tz.js'
+          ),
         )
         switch (language) {
           case 'ja':

@@ -61,6 +61,12 @@ export default {
   module: {
     rules: [
       {
+        test: /\.m?js$/,
+        resolve: {
+          fullySpecified: false,
+        },
+      },
+      {
         test: /\.(woff|woff2|ttf|eot|jpg|jpeg|png|svg)$/i,
         use: [
           {
