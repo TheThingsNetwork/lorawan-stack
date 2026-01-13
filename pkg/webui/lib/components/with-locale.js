@@ -131,14 +131,18 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.ListFormat) {
           log('Polyfilling Intl.ListFormat')
           await import(
-            /* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'
+            /* webpackChunkName: "locale-list-format" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-listformat/polyfill.js'
           )
         }
 
         if (!window.Intl.PluralRules) {
           log('Polyfilling Intl.PluralRules')
           await import(
-            /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
+            /* webpackChunkName: "locale-plural-rules" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-pluralrules/polyfill.js'
           )
         }
 
@@ -154,7 +158,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.RelativeTimeFormat) {
           log('Polyfilling Intl.RelativeTimeFormat')
           await import(
-            /* webpackChunkName: "locale-date-time-format" */ '@formatjs/intl-relativetimeformat/polyfill'
+            /* webpackChunkName: "locale-date-time-format" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-relativetimeformat/polyfill.js'
           )
         }
 
