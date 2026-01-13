@@ -210,3 +210,13 @@ func (m *DownlinkQueueRequest) IDString() string {
 	}
 	return ids.IDString()
 }
+
+// RateLimitKey implements ratelimit.Keyer.
+// Returns an application-level key to enable rate limiting per application for downlink queue operations.
+func (m *DownlinkQueueRequest) RateLimitKey() string {
+	ids := m.EndDeviceIds
+	if ids == nil {
+		return ""
+	}
+	return "application:" + ids.GetApplicationIds().IDString()
+}
