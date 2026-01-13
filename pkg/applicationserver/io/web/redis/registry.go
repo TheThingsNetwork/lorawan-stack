@@ -102,16 +102,19 @@ func (r WebhookRegistry) List(ctx context.Context, ids *ttnpb.ApplicationIdentif
 	appUID := unique.ID(ctx, ids)
 	uidKey := r.appKey(appUID)
 
-	opts := []ttnredis.FindProtosOption{}
+	defer trace.StartRegion(ctx, "list webhooks by application id").End()
+
 	limit, offset := ttnredis.PaginationLimitAndOffsetFromContext(ctx)
-	if limit != 0 {
-		opts = append(opts,
-			ttnredis.FindProtosSorted(true),
-			ttnredis.FindProtosWithOffsetAndCount(offset, limit),
-		)
-	}
 
 	rangeProtos := func(c redis.Cmdable) error {
+		var opts []ttnredis.FindProtosOption
+		if limit != 0 {
+			opts = append(opts,
+				ttnredis.FindProtosSorted(true),
+				ttnredis.FindProtosWithOffsetAndCount(offset, limit),
+			)
+		}
+		pbs = make([]*ttnpb.ApplicationWebhook, 0)
 		return ttnredis.FindProtos(ctx, c, uidKey, r.makeIDKeyFunc(appUID), opts...).Range(
 			func() (proto.Message, func() (bool, error)) {
 				pb := &ttnpb.ApplicationWebhook{}
@@ -126,27 +129,21 @@ func (r WebhookRegistry) List(ctx context.Context, ids *ttnpb.ApplicationIdentif
 			})
 	}
 
-	defer trace.StartRegion(ctx, "list webhooks by application id").End()
-
 	var err error
 	if limit != 0 {
-		var lockerID string
-		lockerID, err = ttnredis.GenerateLockerID()
-		if err != nil {
-			return nil, err
-		}
-		err = ttnredis.LockedWatch(ctx, r.Redis, uidKey, lockerID, r.LockTTL, func(tx *redis.Tx) (err error) {
+		// Pagination requires Watch() for consistency between SCard and SORT.
+		err = r.Redis.Watch(ctx, func(tx *redis.Tx) error {
 			total, err := tx.SCard(ctx, uidKey).Result()
 			if err != nil {
 				return err
 			}
 			ttnredis.SetPaginationTotal(ctx, total)
 			return rangeProtos(tx)
-		})
+		}, uidKey)
 	} else {
+		// No pagination - use client without Watch() to reduce connection holding time.
 		err = rangeProtos(r.Redis)
 	}
-
 	if err != nil {
 		return nil, ttnredis.ConvertError(err)
 	}
