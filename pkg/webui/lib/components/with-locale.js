@@ -136,7 +136,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.PluralRules) {
           log('Polyfilling Intl.PluralRules')
           await import(
-            /* webpackChunkName: "locale-plural-rules" */ '@formatjs/intl-pluralrules/polyfill'
+            /* webpackChunkName: "locale-plural-rules" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-pluralrules/polyfill.js'
           )
         }
 
