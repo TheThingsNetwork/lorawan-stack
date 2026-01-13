@@ -1879,13 +1879,13 @@
     decimal.js "^10.4.3"
     tslib "^2.8.0"
 
-"@formatjs/intl-pluralrules@^5.4.6":
-  version "5.4.6"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-pluralrules/-/intl-pluralrules-5.4.6.tgz#4bd73c4e87974265a7962b6caf0d146e3310f3ad"
-  integrity sha512-2HlOq+c7KsSps829SJ3B5987coX5mzKx9NbPcNwQ07eq8FBHgB3HfMoxt5HvLsdk4oQwCjAEnocbtd+wVwZ2Kg==
+"@formatjs/intl-pluralrules@^6.1.2":
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-pluralrules/-/intl-pluralrules-6.1.2.tgz#d2528eac683ac3bb1ae16c370b108b59f6e17f7f"
+  integrity sha512-ZBLPaRnQrnekB18acuOwitgqsLuaRmuA0BDjUga5ni6uYjlWlYm71eI8Uy2VJ7M4hoVDQWt6KaPdfVhAjZhBEg==
   dependencies:
-    "@formatjs/ecma402-abstract" "2.3.6"
-    "@formatjs/intl-localematcher" "0.6.2"
+    "@formatjs/ecma402-abstract" "3.0.8"
+    "@formatjs/intl-localematcher" "0.7.5"
     decimal.js "^10.4.3"
     tslib "^2.8.0"
 
