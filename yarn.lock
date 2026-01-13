@@ -1835,13 +1835,13 @@
   dependencies:
     tslib "^2.8.0"
 
-"@formatjs/intl-listformat@^7.7.13":
-  version "7.7.13"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-listformat/-/intl-listformat-7.7.13.tgz#9a698257f223587688876d18ad2dd4e7e440b000"
-  integrity sha512-e1jk2w1H6VLy4kKoYyfBjvkw6IXE48AczF+7FIzWr5zB7VjdWQyrvs858t2WeQzHD8dRIxvIyX+qmeGql4jvng==
+"@formatjs/intl-listformat@^8.1.2":
+  version "8.1.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-listformat/-/intl-listformat-8.1.2.tgz#336d0b5fdc24a8c2b5cf98a4679ee4ec359f266c"
+  integrity sha512-c0Yu1yFFQbSgjGtUav3QlXYkVXN/Y2SVO2zFgL31EmPCZLhHPibRP0tzUmMKqMtCWPphdlQaHVzYAgN9Mh1JqA==
   dependencies:
-    "@formatjs/ecma402-abstract" "2.3.6"
-    "@formatjs/intl-localematcher" "0.6.2"
+    "@formatjs/ecma402-abstract" "3.0.8"
+    "@formatjs/intl-localematcher" "0.7.5"
     tslib "^2.8.0"
 
 "@formatjs/intl-locale@^4.2.13":

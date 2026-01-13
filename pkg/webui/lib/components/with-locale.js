@@ -129,7 +129,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.ListFormat) {
           log('Polyfilling Intl.ListFormat')
           await import(
-            /* webpackChunkName: "locale-list-format" */ '@formatjs/intl-listformat/polyfill'
+            /* webpackChunkName: "locale-list-format" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-listformat/polyfill.js'
           )
         }
 
