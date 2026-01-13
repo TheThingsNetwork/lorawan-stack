@@ -13,8 +13,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
-- Rate limiting for downlink queue operations (`DownlinkQueuePush`, `DownlinkQueueReplace`) is now applied at the application level instead of per-device. This may result in more `ResourceExhausted` (429) errors when multiple devices under the same application perform downlink queue operations concurrently.
-
 ### Deprecated
 
 ### Removed
@@ -29,6 +27,10 @@ For details about compatibility between different releases, see the **Commitment
 
 - Add HSTS response headers.
 - Draft band definition for Uzbekistan 923Mhz band.
+
+### Changed
+
+- Rate limiting for downlink queue operations (`DownlinkQueuePush`, `DownlinkQueueReplace`) is now applied at the application level instead of per-device. This may result in more `ResourceExhausted` (429) errors when multiple devices under the same application perform downlink queue operations concurrently.
 
 ### Fixed
 
