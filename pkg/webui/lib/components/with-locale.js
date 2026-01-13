@@ -106,7 +106,9 @@ const WithLocale = ({ children }) => {
         if (!window.Intl.Locale) {
           log('Polyfilling Intl.Locale')
           await import(
-            /* webpackChunkName: "locale-display-names" */ '@formatjs/intl-locale/polyfill'
+            /* webpackChunkName: "locale-display-names" */
+            // eslint-disable-next-line import/extensions -- package exports require explicit .js
+            '@formatjs/intl-locale/polyfill.js'
           )
         }
 
