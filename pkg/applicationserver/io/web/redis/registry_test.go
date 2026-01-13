@@ -179,6 +179,42 @@ func TestWebhookRegistry(t *testing.T) {
 		a.So(webhooks[0].Format, should.Equal, format)
 	})
 
+	t.Run("ListMultipleWithoutPagination", func(t *testing.T) {
+		t.Parallel()
+		a, ctx := test.New(t)
+
+		appID := &ttnpb.ApplicationIdentifiers{
+			ApplicationId: "myapp-list-multiple",
+		}
+
+		// Create multiple webhooks
+		for i := 1; i <= 5; i++ {
+			whIDs := &ttnpb.ApplicationWebhookIdentifiers{
+				ApplicationIds: appID,
+				WebhookId:      fmt.Sprintf("webhook-%02d", i),
+			}
+			_, err := registry.Set(ctx, whIDs, paths,
+				func(*ttnpb.ApplicationWebhook) (*ttnpb.ApplicationWebhook, []string, error) {
+					return &ttnpb.ApplicationWebhook{
+						Ids:     whIDs,
+						Format:  format,
+						BaseUrl: baseURL,
+					}, paths, nil
+				},
+			)
+			a.So(err, should.BeNil)
+		}
+
+		// List without pagination context - exercises ReadOnlyClient() path
+		webhooks, err := registry.List(ctx, appID, paths)
+		a.So(err, should.BeNil)
+		a.So(webhooks, should.HaveLength, 5)
+		for _, wh := range webhooks {
+			a.So(wh.Ids.ApplicationIds, should.Resemble, appID)
+			a.So(wh.Format, should.Equal, format)
+		}
+	})
+
 	t.Run("Pagination", func(t *testing.T) {
 		t.Parallel()
 		a, ctx := test.New(t)
