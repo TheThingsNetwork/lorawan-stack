@@ -1818,23 +1818,23 @@
     "@formatjs/ecma402-abstract" "2.3.6"
     tslib "^2.8.0"
 
-"@formatjs/intl-datetimeformat@^6.18.2":
-  version "6.18.2"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-6.18.2.tgz#46c27cedb9af0e719c209cc94f7347182645b2e8"
-  integrity sha512-XXGJVOi/vmB+eLtYDs+ggDIvba/+VNmNrDZOtMyol5D0zl+zzuPps6W3TgDflpKfzg4memAEbLnA1wC6/TBSjQ==
+"@formatjs/intl-datetimeformat@^7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-7.1.2.tgz#95795c940d67f113089f813b09e49080bd1cf02f"
+  integrity sha512-fkZcxkfQExGR1QPemva1YO15UnLiPJBTOdil1lnNA2dgZLCxL3mWSMcwJi5/s8qLmi4mO2JPfW7v41h1lKUtQQ==
   dependencies:
-    "@formatjs/ecma402-abstract" "2.3.6"
-    "@formatjs/intl-localematcher" "0.6.2"
+    "@formatjs/ecma402-abstract" "3.0.8"
+    "@formatjs/intl-localematcher" "0.7.5"
     decimal.js "^10.4.3"
     tslib "^2.8.0"
 
-"@formatjs/intl-displaynames@^6.8.13":
-  version "6.8.13"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-6.8.13.tgz#5e85980b40fbaa0b81e504608e33db6e16a3891e"
-  integrity sha512-VbY7BdYJX5eURVKLk2grndUQtnbCLNbcJId/Sb/PsX7fWXiqWvg7qt/mecVHRzqoSEoGCQToKDxzpJj8RC0s3g==
+"@formatjs/intl-displaynames@^7.1.2":
+  version "7.1.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-7.1.2.tgz#44047b4538c57a00bfa0270931d5ddc5b9c179d6"
+  integrity sha512-iuKrkUHWXm+9zHU/MQXuq+6mdbj+vhrDsApSgNKbEC68Yu00fw6vtMHAOK6n253s7K5aIppaHKQulESSOe1qUw==
   dependencies:
-    "@formatjs/ecma402-abstract" "2.3.6"
-    "@formatjs/intl-localematcher" "0.6.2"
+    "@formatjs/ecma402-abstract" "3.0.8"
+    "@formatjs/intl-localematcher" "0.7.5"
     tslib "^2.8.0"
 
 "@formatjs/intl-enumerator@2.1.2":

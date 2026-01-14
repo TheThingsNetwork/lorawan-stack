@@ -82,8 +82,8 @@
     "yargs": "^17.7.2"
   },
   "dependencies": {
-    "@formatjs/intl-datetimeformat": "^6.18.2",
-    "@formatjs/intl-displaynames": "^6.8.13",
+    "@formatjs/intl-datetimeformat": "^7.1.2",
+    "@formatjs/intl-displaynames": "^7.1.2",
     "@formatjs/intl-listformat": "^8.1.2",
     "@formatjs/intl-locale": "^5.1.2",
     "@formatjs/intl-numberformat": "^9.1.2",
