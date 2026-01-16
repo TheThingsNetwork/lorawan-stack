@@ -47,6 +47,8 @@ type GatewayRegistry interface {
 	Delete(ctx context.Context, in *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
 	// Get the gateway. This may not release the gateway ID for reuse, but it does release the EUI.
 	Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
+	// Update the gateway.
+	Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error)
 }
 
 // Registry implements GatewayRegistry.
@@ -128,4 +130,17 @@ func (reg Registry) Get(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttn
 		return nil, err
 	}
 	return gatewayRegistry.Get(ctx, req, callOpt)
+}
+
+// Update implements GatewayRegistry.
+func (reg Registry) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+	callOpt, err := reg.callOptFromContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	gatewayRegistry, err := reg.newEntityRegistryClient(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return gatewayRegistry.Update(ctx, req, callOpt)
 }
