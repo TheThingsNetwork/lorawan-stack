@@ -62,5 +62,6 @@ func RangeFromEUI64Range(start, end types.EUI64) EUI64Range {
 
 // GatewayMetadata contains metadata of a gateway, typically returned on claiming.
 type GatewayMetadata struct {
-	Antennas []*ttnpb.GatewayAntenna
+	Antennas  []*ttnpb.GatewayAntenna
+	LBSLNSKey *ttnpb.APIKey
 }

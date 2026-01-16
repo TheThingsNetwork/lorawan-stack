@@ -121,6 +121,7 @@ var (
 	errGatewayNotFound    = errors.DefineNotFound("gateway_not_found", "gateway not found")
 	errClaim              = errors.DefineAborted("claim", "claim")
 	errCreate             = errors.DefineAborted("create_gateway", "create gateway")
+	errUpdate             = errors.DefineAborted("update_gateway", "update gateway")
 	errUnclaim            = errors.DefineAborted("unclaim", "unclaim gateway")
 )
 
