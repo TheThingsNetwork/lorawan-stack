@@ -12,8 +12,11 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - Add tracing for LBS LNS and TTIGW protocol handlers.
+- TTGC LBS Root CUPS claimer.
 
 ### Changed
+
+- During the process of claiming a managed gateway, create the gateway in the registry before claiming it, not after.
 
 ### Deprecated
 
