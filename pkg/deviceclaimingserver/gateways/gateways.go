@@ -20,12 +20,16 @@ import (
 	"crypto/tls"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways/lbscups"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways/ttgc"
 	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/grpc"
 )
 
 // Component is the interface to the component.
@@ -33,6 +37,8 @@ type Component interface {
 	GetBaseConfig(context.Context) config.ServiceBase
 	GetTLSConfig(context.Context) tlsconfig.Config
 	GetTLSClientConfig(context.Context, ...tlsconfig.Option) (*tls.Config, error)
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
+	AllowInsecureForCredentials() bool
 }
 
 // Config is the configuration for the Gateway Claiming Server.
@@ -43,8 +49,9 @@ type Config struct {
 }
 
 var (
-	errInvalidUpstream = errors.DefineInvalidArgument("invalid_upstream", "upstream `{name}` is invalid")
-	errTTGCNotEnabled  = errors.DefineFailedPrecondition("ttgc_not_enabled", "TTGC is not enabled")
+	errInvalidUpstream   = errors.DefineInvalidArgument("invalid_upstream", "upstream `{name}` is invalid")
+	errTTGCNotEnabled    = errors.DefineFailedPrecondition("ttgc_not_enabled", "TTGC is not enabled")
+	errLBSCUPSNotEnabled = errors.DefineFailedPrecondition("lbs_cups_not_enabled", "TTGC LBS CUPS is not enabled")
 )
 
 // ParseGatewayEUIRanges parses the configured upstream map and returns map of ranges.
@@ -134,6 +141,13 @@ func NewUpstream(
 		}
 		hosts["ttgc"] = ttgcRanges
 	}
+	if _, lbscupsAdded := hosts["lbs-cups"]; ttgcConf.LBSCUPSEnabled && !lbscupsAdded {
+		lbscupsRanges := make([]dcstypes.EUI64Range, len(ttgcConf.LBSCUPSGatewayEUIs))
+		for i, prefix := range ttgcConf.LBSCUPSGatewayEUIs {
+			lbscupsRanges[i] = dcstypes.RangeFromEUI64Prefix(prefix)
+		}
+		hosts["lbs-cups"] = lbscupsRanges
+	}
 
 	// Setup upstream table.
 	for name, ranges := range hosts {
@@ -147,6 +161,14 @@ func NewUpstream(
 				return nil, errTTGCNotEnabled.New()
 			}
 			claimer, err = ttgc.New(ctx, c, ttgcConf)
+			if err != nil {
+				return nil, err
+			}
+		case "lbs-cups":
+			if !ttgcConf.LBSCUPSEnabled {
+				return nil, errLBSCUPSNotEnabled.New()
+			}
+			claimer, err = lbscups.New(ctx, c, ttgcConf)
 			if err != nil {
 				return nil, err
 			}
