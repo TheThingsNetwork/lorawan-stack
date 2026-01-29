@@ -32,8 +32,10 @@ import (
 )
 
 var (
-	errNoSupportedProtocol   = errors.DefineFailedPrecondition("no_supported_protocol", "no supported gateway protocol found for claiming")
-	errNoSupportedAuthMethod = errors.DefineFailedPrecondition("no_supported_auth_method", "no supported authentication method found for gateway")
+	errNoSupportedClaimOption = errors.DefineFailedPrecondition(
+		"no_supported_claim_option",
+		"no supported claim option (protocol + auth method) found for gateway",
+	)
 )
 
 const profileGroup = "tts"
@@ -65,10 +67,18 @@ func New(ctx context.Context, c component, config ttgc.Config) (*Upstream, error
 	}, nil
 }
 
+// claimOption represents the protocol and authentication method for claiming a gateway.
+type claimOption struct {
+	protocol   northboundv1.GatewayProtocolIdentifier
+	authMethod northboundv1.AuthenticationMethod
+	handler    func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
+}
+
 // Claim implements gateways.GatewayClaimer.
 func (u *Upstream) Claim(
 	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
+
 	// Get the gateway description to verify what protocol it supports.
 	gtwClient := northboundv1.NewGatewayServiceClient(u.client)
 	desc, err := gtwClient.Describe(ctx, &northboundv1.GatewayServiceDescribeRequest{
@@ -78,24 +88,42 @@ func (u *Upstream) Claim(
 		return nil, err
 	}
 
-	if u.supportsProtocol(desc, northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_TTI_V1) {
-		return u.claimTTIV1Gateway(ctx, eui, ownerToken, clusterAddress)
+	// Defines the preferred claiming options in order.
+	var claimPreferences = []claimOption{
+		{
+			protocol:   northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_TTI_V1,
+			authMethod: northboundv1.AuthenticationMethod_AUTHENTICATION_METHOD_MUTUAL_TLS,
+			handler:    u.claimTTIV1Gateway,
+		},
+		{
+			protocol:   northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_LBS_CUPS,
+			authMethod: northboundv1.AuthenticationMethod_AUTHENTICATION_METHOD_GATEWAY_TOKEN,
+			handler:    u.claimLBSCUPSGateway,
+		},
 	}
 
-	if u.supportsProtocol(desc, northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_LBS_CUPS) {
-		return u.claimLBSCUPSGateway(ctx, eui, ownerToken, clusterAddress)
+	// Select the first supported claiming option and use its handler.
+	for _, option := range claimPreferences {
+		if u.supportsOption(desc, option) {
+			return option.handler(ctx, eui, ownerToken, clusterAddress)
+		}
 	}
 
-	return nil, errNoSupportedProtocol.New()
+	return nil, errNoSupportedClaimOption.New()
 }
 
-func (*Upstream) supportsProtocol(
+func (u *Upstream) supportsOption(
 	desc *northboundv1.GatewayServiceDescribeResponse,
-	protocolID northboundv1.GatewayProtocolIdentifier,
+	option claimOption,
 ) bool {
 	for _, p := range desc.SupportedGatewayProtocols {
-		if p.GatewayProtocolId == protocolID {
-			return true
+		if p.GatewayProtocolId != option.protocol {
+			continue
+		}
+		for _, a := range p.SupportedAuthenticationMethods {
+			if a == option.authMethod {
+				return true
+			}
 		}
 	}
 
