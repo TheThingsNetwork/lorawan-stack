@@ -12,70 +12,32 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package lbscups provides functions to claim gateways using LBS CUPS protocol.
-package lbscups
+package ttgc
 
 import (
 	"bytes"
 	"context"
-	"crypto/tls"
 	"fmt"
 	"net"
 	"time"
 
 	northboundv1 "go.thethings.industries/pkg/api/gen/tti/gateway/controller/northbound/v1"
-	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
-	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
-	"go.thethings.network/lorawan-stack/v3/pkg/ttgc"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
-const profileGroup = "tts"
+var (
+	errCreateAPIKey = errors.DefineFailedPrecondition("create_api_key", "failed to create API key for gateway")
+	errDeleteAPIKey = errors.DefineAborted("delete_api_key", "delete API key")
+)
 
-type component interface {
-	GetTLSConfig(context.Context) tlsconfig.Config
-	GetTLSClientConfig(context.Context, ...tlsconfig.Option) (*tls.Config, error)
-	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
-	AllowInsecureForCredentials() bool
-}
-
-// Upstream is the client for LBS CUPS gateway claiming.
-type Upstream struct {
-	component
-	client *ttgc.Client
-
-	gatewayAccess ttnpb.GatewayAccessClient
-}
-
-// New returns a new upstream client for LBS CUPS gateway claiming.
-func New(ctx context.Context, c component, config ttgc.Config) (*Upstream, error) {
-	client, err := ttgc.NewClient(ctx, c, config)
-	if err != nil {
-		return nil, err
-	}
-	upstream := &Upstream{
-		component: c,
-		client:    client,
-	}
-	return upstream, nil
-}
-
-var errCreateAPIKey = errors.DefineAborted("create_api_key", "create API key")
-
-// Claim implements gateways.Claimer.
-// Claim does the following:
-//  1. Create CUPS and LNS API keys for the gateway
-//  2. Claim the gateway on TTGC with the CUPS key as the gateway token
-//  3. Return the LNS key in GatewayMetadata
-func (u *Upstream) Claim(
+func (u *Upstream) claimLBSCUPSGateway(
 	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
 	logger := log.FromContext(ctx)
@@ -241,35 +203,6 @@ func (u *Upstream) getGatewayAccess(ctx context.Context) (ttnpb.GatewayAccessCli
 	return ttnpb.NewGatewayAccessClient(conn), nil
 }
 
-// Unclaim implements gateways.Claimer.
-// Unclaim revokes the API keys and unclaims the gateway on TTGC.
-func (u *Upstream) Unclaim(ctx context.Context, eui types.EUI64) error {
-	ids := &ttnpb.GatewayIdentifiers{
-		Eui: eui.Bytes(),
-	}
-
-	if err := u.deleteAPIKeys(ctx, ids); err != nil {
-		return err
-	}
-
-	// Unclaim the gateway on TTGC.
-	gtwClient := northboundv1.NewGatewayServiceClient(u.client)
-	_, err := gtwClient.Unclaim(ctx, &northboundv1.GatewayServiceUnclaimRequest{
-		GatewayId: eui.MarshalNumber(),
-		Domain:    u.client.Domain(ctx),
-	})
-	if err != nil {
-		if errors.IsNotFound(err) {
-			// The gateway does not exist or is already unclaimed.
-			return nil
-		}
-		return err
-	}
-	return nil
-}
-
-var errDeleteAPIKey = errors.DefineAborted("delete_api_key", "delete API key")
-
 // deleteAPIKeys deletes the CUPS and LNS API keys for the gateway.
 func (u *Upstream) deleteAPIKeys(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	logger := log.FromContext(ctx)
@@ -311,10 +244,4 @@ func (u *Upstream) deleteAPIKeys(ctx context.Context, ids *ttnpb.GatewayIdentifi
 	}
 
 	return nil
-}
-
-// IsManagedGateway implements gateways.Claimer.
-// This method always returns true.
-func (*Upstream) IsManagedGateway(context.Context, types.EUI64) (bool, error) {
-	return true, nil
 }

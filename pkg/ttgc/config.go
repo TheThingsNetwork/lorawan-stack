@@ -21,11 +21,9 @@ import (
 
 // Config is the configuration for The Things Gateway Controller.
 type Config struct {
-	Enabled            bool                 `name:"enabled" description:"Enable The Things Gateway Controller"`
-	GatewayEUIs        []types.EUI64Prefix  `name:"gateway-euis" description:"Gateway EUI prefixes that are managed by The Things Gateway Controller"` //nolint:lll
-	LBSCUPSEnabled     bool                 `name:"lbs-cups-enabled" description:"Enable LBS CUPS protocol for gateway claiming"`
-	LBSCUPSGatewayEUIs []types.EUI64Prefix  `name:"lbs-cups-gateway-euis" description:"Gateway EUI prefixes that are managed by LBS CUPS protocol"` //nolint:lll
-	Address            string               `name:"address" description:"The address of The Things Gateway Controller"`
-	Domain             string               `name:"domain" description:"The domain of this cluster"`
-	TLS                tlsconfig.ClientAuth `name:"tls" description:"TLS configuration"`
+	Enabled     bool                 `name:"enabled" description:"Enable The Things Gateway Controller"`
+	GatewayEUIs []types.EUI64Prefix  `name:"gateway-euis" description:"Gateway EUI prefixes that are managed by The Things Gateway Controller"` //nolint:lll
+	Address     string               `name:"address" description:"The address of The Things Gateway Controller"`
+	Domain      string               `name:"domain" description:"The domain of this cluster"`
+	TLS         tlsconfig.ClientAuth `name:"tls" description:"TLS configuration"`
 }
