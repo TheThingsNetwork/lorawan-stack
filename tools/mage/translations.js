@@ -23,7 +23,7 @@ const yargs = require('yargs')
 const { mkdirp } = require('mkdirp')
 const g = require('glob')
 
-const argv = yargs.argv
+const argv = yargs(process.argv.slice(2)).parseSync()
 const env = process.env
 
 /**
