@@ -21,12 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.35.2] - unreleased
-
-### Added
-
-- Add HSTS response headers.
-- Draft band definition for Uzbekistan 923Mhz band.
+## [3.35.2] - 2026-01-30
 
 ### Changed
 
@@ -37,6 +32,11 @@ For details about compatibility between different releases, see the **Commitment
 - Application Server webhook registry now uses read-only Redis client for non-paginated list operations, reducing connection holding time during high traffic.
 
 ## [3.35.1] - 2025-12-19
+
+### Added
+
+- Add HSTS response headers.
+- Draft band definition for Uzbekistan 923Mhz band.
 
 ## [3.35.0] - 2025-11-19
 
