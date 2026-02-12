@@ -17358,6 +17358,12 @@
         },
         "unhealthy_retry_interval": {
           "type": "string"
+        },
+        "unhealthy_retry_backoff_interval_min": {
+          "type": "string"
+        },
+        "unhealthy_retry_backoff_interval_max": {
+          "type": "string"
         }
       }
     },

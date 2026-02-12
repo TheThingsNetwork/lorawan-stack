@@ -37,6 +37,8 @@ type healthCheckSink struct {
 
 	unhealthyAttemptsThreshold int
 	unhealthyRetryInterval     time.Duration
+	minBackoffInterval         time.Duration
+	maxBackoffInterval         time.Duration
 }
 
 // Process runs the health checks and sends the request to the underlying sink
@@ -82,8 +84,11 @@ func (hcs *healthCheckSink) preRunCheck(ctx context.Context) (healthState, error
 	case h.GetUnhealthy() != nil:
 		h := h.GetUnhealthy()
 		monitorOnly := hcs.unhealthyAttemptsThreshold <= 0 || hcs.unhealthyRetryInterval <= 0
-		nextAttemptAt := ttnpb.StdTime(h.LastFailedAttemptAt).Add(hcs.unhealthyRetryInterval)
+
+		backoffInterval := hcs.calculateBackoffInterval(h.FailedAttempts)
+		nextAttemptAt := ttnpb.StdTime(h.LastFailedAttemptAt).Add(backoffInterval)
 		retryIntervalPassed := time.Now().After(nextAttemptAt)
+
 		switch {
 		case monitorOnly:
 			// The system only monitors the health status, but does not block execution.
@@ -114,6 +119,36 @@ func (hcs *healthCheckSink) preRunCheck(ctx context.Context) (healthState, error
 	default:
 		panic("unreachable")
 	}
+}
+
+// calculateBackoffInterval calculates the retry interval using exponential backoff.
+// For webhooks that have been disabled (failedAttempts >= threshold), it uses exponential backoff
+// based on how many times the webhook has been disabled. The interval doubles on each disabled period
+// and is capped between minBackoffInterval and maxBackoffInterval.
+func (hcs *healthCheckSink) calculateBackoffInterval(failedAttempts uint64) time.Duration {
+	if failedAttempts < uint64(hcs.unhealthyAttemptsThreshold) {
+		return hcs.unhealthyRetryInterval
+	}
+
+	// Calculate how many times the webhook has been disabled.
+	disabledPeriods := failedAttempts / uint64(hcs.unhealthyAttemptsThreshold)
+
+	// Use exponential backoff: baseInterval * 2^disabledPeriods, capped at max.
+	backoffInterval := hcs.unhealthyRetryInterval
+	for i := uint64(1); i < disabledPeriods; i++ {
+		backoffInterval *= 2
+		if backoffInterval > hcs.maxBackoffInterval {
+			backoffInterval = hcs.maxBackoffInterval
+			break
+		}
+	}
+
+	// Ensure the backoff is at least the minimum.
+	if backoffInterval < hcs.minBackoffInterval {
+		backoffInterval = hcs.minBackoffInterval
+	}
+
+	return backoffInterval
 }
 
 // executeAndRecord runs the provided request using the underlying sink and records the health status.
@@ -164,14 +199,19 @@ func (hcs *healthCheckSink) executeAndRecord(
 }
 
 // NewHealthCheckSink creates a Sink that records the health status of the webhooks and stops them from executing if
-// too many fail in a specified interval of time.
+// too many fail in a specified interval of time. The cooldown period uses exponential backoff, starting from
+// unhealthyRetryInterval and doubling on each subsequent disabled period, capped between minBackoffInterval and
+// maxBackoffInterval.
 func NewHealthCheckSink(
-	sink Sink, registry HealthStatusRegistry, unhealthyAttemptsThreshold int, unhealthyRetryInterval time.Duration,
+	sink Sink, registry HealthStatusRegistry, unhealthyAttemptsThreshold int, unhealthyRetryInterval,
+	minBackoffInterval, maxBackoffInterval time.Duration,
 ) Sink {
 	return &healthCheckSink{
 		sink:                       sink,
 		registry:                   registry,
 		unhealthyAttemptsThreshold: unhealthyAttemptsThreshold,
 		unhealthyRetryInterval:     unhealthyRetryInterval,
+		minBackoffInterval:         minBackoffInterval,
+		maxBackoffInterval:         maxBackoffInterval,
 	}
 }

@@ -1248,6 +1248,8 @@ Application Server configuration.
 | ----- | ---- | ----- | ----------- |
 | `unhealthy_attempts_threshold` | [`int64`](#int64) |  |  |
 | `unhealthy_retry_interval` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `unhealthy_retry_backoff_interval_min` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
+| `unhealthy_retry_backoff_interval_max` | [`google.protobuf.Duration`](#google.protobuf.Duration) |  |  |
 
 ### <a name="ttn.lorawan.v3.DecodeDownlinkRequest">Message `DecodeDownlinkRequest`</a>
 

@@ -155,21 +155,25 @@ type UplinkStorageConfig struct {
 
 // WebhooksConfig defines the configuration of the webhooks integration.
 type WebhooksConfig struct {
-	Registry                   web.WebhookRegistry `name:"-"`
-	Target                     string              `name:"target" description:"Target of the integration (direct)"`
-	Timeout                    time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"` // nolint:lll
-	QueueSize                  int                 `name:"queue-size" description:"Number of requests to queue"`
-	Workers                    int                 `name:"workers" description:"Number of workers to process requests"`
-	UnhealthyAttemptsThreshold int                 `name:"unhealthy-attempts-threshold" description:"Number of failed webhook attempts before the webhook is disabled"` // nolint:lll
-	UnhealthyRetryInterval     time.Duration       `name:"unhealthy-retry-interval" description:"Time interval after which disabled webhooks may execute again"`
-	Templates                  web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
-	Downlinks                  web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
+	Registry                         web.WebhookRegistry `name:"-"`
+	Target                           string              `name:"target" description:"Target of the integration (direct)"`
+	Timeout                          time.Duration       `name:"timeout" description:"Wait timeout of the target to process the request"` // nolint:lll
+	QueueSize                        int                 `name:"queue-size" description:"Number of requests to queue"`
+	Workers                          int                 `name:"workers" description:"Number of workers to process requests"`
+	UnhealthyAttemptsThreshold       int                 `name:"unhealthy-attempts-threshold" description:"Number of failed webhook attempts before the webhook is disabled"` // nolint:lll
+	UnhealthyRetryInterval           time.Duration       `name:"unhealthy-retry-interval" description:"Time interval after which disabled webhooks may execute again"`
+	UnhealthyRetryBackoffIntervalMin time.Duration       `name:"unhealthy-retry-min-backoff-interval" description:"Minimum backoff interval for retrying unhealthy webhooks"`
+	UnhealthyRetryBackoffIntervalMax time.Duration       `name:"unhealthy-retry-max-backoff-interval" description:"Maximum backoff interval for retrying unhealthy webhooks"`
+	Templates                        web.TemplatesConfig `name:"templates" description:"The store of the webhook templates"`
+	Downlinks                        web.DownlinksConfig `name:"downlink" description:"The downlink queue operations configuration"`
 }
 
 func (c WebhooksConfig) toProto() *ttnpb.AsConfiguration_Webhooks {
 	return &ttnpb.AsConfiguration_Webhooks{
-		UnhealthyAttemptsThreshold: int64(c.UnhealthyAttemptsThreshold),
-		UnhealthyRetryInterval:     durationpb.New(c.UnhealthyRetryInterval),
+		UnhealthyAttemptsThreshold:       int64(c.UnhealthyAttemptsThreshold),
+		UnhealthyRetryInterval:           durationpb.New(c.UnhealthyRetryInterval),
+		UnhealthyRetryBackoffIntervalMin: durationpb.New(c.UnhealthyRetryBackoffIntervalMin),
+		UnhealthyRetryBackoffIntervalMax: durationpb.New(c.UnhealthyRetryBackoffIntervalMax),
 	}
 }
 
@@ -273,7 +277,7 @@ func (c WebhooksConfig) NewWebhooks(ctx context.Context, server io.Server) (web.
 	if c.UnhealthyAttemptsThreshold > 0 || c.UnhealthyRetryInterval > 0 {
 		registry := web.NewHealthStatusRegistry(c.Registry)
 		registry = web.NewCachedHealthStatusRegistry(registry)
-		target = sink.NewHealthCheckSink(target, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval)
+		target = sink.NewHealthCheckSink(target, registry, c.UnhealthyAttemptsThreshold, c.UnhealthyRetryInterval, c.UnhealthyRetryBackoffIntervalMin, c.UnhealthyRetryBackoffIntervalMax)
 	}
 	if c.QueueSize > 0 || c.Workers > 0 {
 		target = sink.NewPooledSink(ctx, server, target, c.Workers, c.QueueSize)

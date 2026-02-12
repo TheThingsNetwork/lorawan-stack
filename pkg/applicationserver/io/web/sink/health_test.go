@@ -66,7 +66,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 	target := mock.New(sinkCh)
 
 	registry := web.NewHealthStatusRegistry(webhookRegistry)
-	healthSink := sink.NewHealthCheckSink(target, registry, 4, 8*timeout)
+	healthSink := sink.NewHealthCheckSink(target, registry, 4, 8*timeout, 4*timeout, 32*timeout)
 
 	ctx = internal.WithWebhookData(ctx, &internal.WebhookData{
 		EndDeviceIDs: registeredDeviceID,
@@ -151,7 +151,7 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		}
 	}
 
-	// We wait for the cooldown period to pass.
+	// We wait for the first cooldown period to pass (8 * timeout).
 	time.Sleep(8 * timeout)
 
 	// The sink should now do one attempt, and fail the rest.
@@ -191,8 +191,11 @@ func TestHealthCheckSink(t *testing.T) { // nolint:gocyclo
 		}
 	}
 
-	// We wait for the cooldown period to pass.
-	time.Sleep(8 * timeout)
+	// We wait for the second cooldown period to pass.
+	// Since the webhook has been disabled twice now (failedAttempts went from 4 to 5, then to 8),
+	// the backoff interval doubles from 8*timeout to 16*timeout.
+	// We wait for 16*timeout to ensure the retry period has passed.
+	time.Sleep(16 * timeout)
 
 	// We reset the error and expect the health status to recover.
 	target.SetError(nil)

@@ -1708,6 +1708,30 @@ func (m *AsConfiguration_Webhooks) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "unhealthy_retry_backoff_interval_min":
+
+			if v, ok := interface{}(m.GetUnhealthyRetryBackoffIntervalMin()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AsConfiguration_WebhooksValidationError{
+						field:  "unhealthy_retry_backoff_interval_min",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "unhealthy_retry_backoff_interval_max":
+
+			if v, ok := interface{}(m.GetUnhealthyRetryBackoffIntervalMax()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return AsConfiguration_WebhooksValidationError{
+						field:  "unhealthy_retry_backoff_interval_max",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
 		default:
 			return AsConfiguration_WebhooksValidationError{
 				field:  name,

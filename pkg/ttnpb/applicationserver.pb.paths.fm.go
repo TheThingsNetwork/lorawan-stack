@@ -67,6 +67,8 @@ var AsConfigurationFieldPathsNested = []string{
 	"pubsub.providers.nats",
 	"webhooks",
 	"webhooks.unhealthy_attempts_threshold",
+	"webhooks.unhealthy_retry_backoff_interval_max",
+	"webhooks.unhealthy_retry_backoff_interval_min",
 	"webhooks.unhealthy_retry_interval",
 }
 
@@ -84,6 +86,8 @@ var GetAsConfigurationResponseFieldPathsNested = []string{
 	"configuration.pubsub.providers.nats",
 	"configuration.webhooks",
 	"configuration.webhooks.unhealthy_attempts_threshold",
+	"configuration.webhooks.unhealthy_retry_backoff_interval_max",
+	"configuration.webhooks.unhealthy_retry_backoff_interval_min",
 	"configuration.webhooks.unhealthy_retry_interval",
 }
 
@@ -445,11 +449,15 @@ var AsConfiguration_PubSubFieldPathsTopLevel = []string{
 }
 var AsConfiguration_WebhooksFieldPathsNested = []string{
 	"unhealthy_attempts_threshold",
+	"unhealthy_retry_backoff_interval_max",
+	"unhealthy_retry_backoff_interval_min",
 	"unhealthy_retry_interval",
 }
 
 var AsConfiguration_WebhooksFieldPathsTopLevel = []string{
 	"unhealthy_attempts_threshold",
+	"unhealthy_retry_backoff_interval_max",
+	"unhealthy_retry_backoff_interval_min",
 	"unhealthy_retry_interval",
 }
 var AsConfiguration_PubSub_ProvidersFieldPathsNested = []string{

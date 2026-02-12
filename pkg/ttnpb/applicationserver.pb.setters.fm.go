@@ -837,6 +837,24 @@ func (dst *AsConfiguration_Webhooks) SetFields(src *AsConfiguration_Webhooks, pa
 			} else {
 				dst.UnhealthyRetryInterval = nil
 			}
+		case "unhealthy_retry_backoff_interval_min":
+			if len(subs) > 0 {
+				return fmt.Errorf("'unhealthy_retry_backoff_interval_min' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UnhealthyRetryBackoffIntervalMin = src.UnhealthyRetryBackoffIntervalMin
+			} else {
+				dst.UnhealthyRetryBackoffIntervalMin = nil
+			}
+		case "unhealthy_retry_backoff_interval_max":
+			if len(subs) > 0 {
+				return fmt.Errorf("'unhealthy_retry_backoff_interval_max' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.UnhealthyRetryBackoffIntervalMax = src.UnhealthyRetryBackoffIntervalMax
+			} else {
+				dst.UnhealthyRetryBackoffIntervalMax = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)
