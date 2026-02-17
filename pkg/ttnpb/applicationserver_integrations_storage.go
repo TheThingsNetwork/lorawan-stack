@@ -17,11 +17,11 @@ package ttnpb
 var (
 	_ interface {
 		IDStringer
-		ExtractRequestFields(dst map[string]interface{})
+		ExtractRequestFields(dst map[string]any)
 	} = (*GetStoredApplicationUpRequest)(nil)
 	_ interface {
 		IDStringer
-		ExtractRequestFields(dst map[string]interface{})
+		ExtractRequestFields(dst map[string]any)
 	} = (*GetStoredApplicationUpCountRequest)(nil)
 )
 
@@ -75,7 +75,7 @@ func (m *GetStoredApplicationUpRequest) IDString() string {
 }
 
 // ExtractRequestFields is used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
-func (m *GetStoredApplicationUpRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetStoredApplicationUpRequest) ExtractRequestFields(dst map[string]any) {
 	if ids := m.GetEndDeviceIds(); ids != nil && !ids.IsZero() {
 		ids.ExtractRequestFields(dst)
 		return
@@ -121,7 +121,7 @@ func (m *GetStoredApplicationUpCountRequest) IDString() string {
 }
 
 // ExtractRequestFields is used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
-func (m *GetStoredApplicationUpCountRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetStoredApplicationUpCountRequest) ExtractRequestFields(dst map[string]any) {
 	if ids := m.GetEndDeviceIds(); ids != nil && !ids.IsZero() {
 		ids.ExtractRequestFields(dst)
 		return

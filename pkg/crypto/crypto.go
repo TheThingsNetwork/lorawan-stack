@@ -18,7 +18,7 @@ package crypto
 func reverse(in []byte) []byte {
 	l := len(in)
 	out := make([]byte, l)
-	for i := 0; i < l; i++ {
+	for i := range l {
 		out[l-i-1] = in[i]
 	}
 	return out

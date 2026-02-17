@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 	"runtime/trace"
+	"slices"
 	"strings"
 	"time"
 	"unicode"
@@ -166,10 +167,8 @@ func (is *IdentityServer) validatePasswordStrength(ctx context.Context, username
 		return errPasswordContainsUserID.New()
 	}
 	if requirements.RejectCommon {
-		for _, reject := range commonPasswords {
-			if strings.ToLower(password) == reject {
-				return errCommonPassword.New()
-			}
+		if slices.Contains(commonPasswords, strings.ToLower(password)) {
+			return errCommonPassword.New()
 		}
 	}
 	return nil

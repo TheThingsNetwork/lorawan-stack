@@ -33,24 +33,24 @@ type EUI struct {
 
 // MarshalJSON implements json.Marshaler.
 func (eui EUI) MarshalJSON() ([]byte, error) {
-	var res string
+	var res strings.Builder
 	if eui.Prefix != "" {
-		res += strings.ToLower(eui.Prefix) + "-"
+		res.WriteString(strings.ToLower(eui.Prefix) + "-")
 	}
 	if eui.EUI64[0] != 0 || eui.EUI64[1] != 0 {
-		res += fmt.Sprintf("%x:", uint16(eui.EUI64[0])<<8|uint16(eui.EUI64[1]))
+		res.WriteString(fmt.Sprintf("%x:", uint16(eui.EUI64[0])<<8|uint16(eui.EUI64[1])))
 	}
 	for _, g := range []uint16{
 		uint16(eui.EUI64[2])<<8 | uint16(eui.EUI64[3]),
 		uint16(eui.EUI64[4])<<8 | uint16(eui.EUI64[5]),
 	} {
 		if g != 0 {
-			res += fmt.Sprintf("%x", g)
+			res.WriteString(fmt.Sprintf("%x", g))
 		}
-		res += ":"
+		res.WriteString(":")
 	}
-	res += fmt.Sprintf("%x", uint16(eui.EUI64[6])<<8|uint16(eui.EUI64[7]))
-	return []byte(`"` + res + `"`), nil
+	res.WriteString(fmt.Sprintf("%x", uint16(eui.EUI64[6])<<8|uint16(eui.EUI64[7])))
+	return []byte(`"` + res.String() + `"`), nil
 }
 
 var (

@@ -262,12 +262,12 @@ func (st *StoreTest) TestMembershipStoreCRUD(t *T) {
 
 func (st *StoreTest) TestMembershipStorePagination(t *T) {
 	var apps []*ttnpb.Application
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		apps = append(apps, st.population.NewApplication(nil))
 	}
 
 	var memberIDs []*ttnpb.OrganizationOrUserIdentifiers
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		ids := st.population.NewUser().GetOrganizationOrUserIdentifiers()
 		memberIDs = append(memberIDs, ids)
 		st.population.NewMembership(ids, apps[0].GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
@@ -397,12 +397,12 @@ func (st *StoreTest) TestMembershipStorePaginationDefaults(t *T) {
 	})
 
 	var apps []*ttnpb.Application
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		apps = append(apps, st.population.NewApplication(nil))
 	}
 
 	var memberIDs []*ttnpb.OrganizationOrUserIdentifiers
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		ids := st.population.NewUser().GetOrganizationOrUserIdentifiers()
 		memberIDs = append(memberIDs, ids)
 		st.population.NewMembership(ids, apps[0].GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)

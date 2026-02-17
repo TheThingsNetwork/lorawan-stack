@@ -16,6 +16,7 @@ package log
 
 import (
 	"fmt"
+	"maps"
 )
 
 // Fielder interface check.
@@ -81,9 +82,7 @@ func (f *F) Fields() map[string]any {
 		r = make(map[string]any)
 	}
 
-	for k, v := range f.nodes {
-		r[k] = v
-	}
+	maps.Copy(r, f.nodes)
 
 	return r
 }

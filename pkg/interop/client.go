@@ -23,6 +23,7 @@ import (
 	"io"
 	"net/http"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -402,11 +403,8 @@ func NewClient(
 		// Skip Join Servers with unmatching component selector.
 		if len(jsEntry.Components) > 0 {
 			var found bool
-			for _, c := range jsEntry.Components {
-				if c == selector {
-					found = true
-					break
-				}
+			if slices.Contains(jsEntry.Components, selector) {
+				found = true
 			}
 			if !found {
 				continue

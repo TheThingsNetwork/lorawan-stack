@@ -16,6 +16,7 @@ package udp
 
 import (
 	"encoding/base64"
+	"maps"
 	"strconv"
 	"strings"
 	"time"
@@ -300,9 +301,7 @@ func convertStatus(stat Stat, md UpstreamMetadata) *ttnpb.GatewayStatus {
 	}
 
 	addVersions(status, stat)
-	for versionName, version := range ttnVersions {
-		status.Versions[versionName] = version
-	}
+	maps.Copy(status.Versions, ttnVersions)
 	addMetrics(status, stat)
 	return status
 }

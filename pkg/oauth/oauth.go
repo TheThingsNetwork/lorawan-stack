@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -300,10 +301,5 @@ func (s *server) Token(w http.ResponseWriter, r *http.Request) {
 }
 
 func clientHasGrant(cli *ttnpb.Client, wanted ttnpb.GrantType) bool {
-	for _, grant := range cli.Grants {
-		if grant == wanted {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(cli.Grants, wanted)
 }

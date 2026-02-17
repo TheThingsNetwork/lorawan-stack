@@ -16,11 +16,12 @@
 package normalizedpayload
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
-	"golang.org/x/exp/constraints"
 	"google.golang.org/protobuf/types/known/structpb"
 )
 
@@ -200,11 +201,9 @@ func parseString(selector func(dst *Measurement) **string, allowed []string) fie
 			return []error{errFieldType.WithAttributes("path", path)}
 		}
 		p := val.StringValue
-		for _, e := range allowed {
-			if p == e {
-				*selector(dst) = &p
-				return nil
-			}
+		if slices.Contains(allowed, p) {
+			*selector(dst) = &p
+			return nil
 		}
 		return []error{
 			errFieldNotAllowed.WithAttributes(
@@ -246,7 +245,7 @@ func parseBoolean(selector func(dst *Measurement) **bool) fieldParser {
 }
 
 // minimum returns a field validator that checks the inclusive minimum.
-func minimum[T constraints.Ordered](min T) fieldValidator[T] {
+func minimum[T cmp.Ordered](min T) fieldValidator[T] {
 	return func(v T, path string) error {
 		if v < min {
 			return errFieldMinimum.WithAttributes(
@@ -261,7 +260,7 @@ func minimum[T constraints.Ordered](min T) fieldValidator[T] {
 // exclusiveMinimum returns a field validator that checks the exclusive minimum.
 //
 //nolint:unused,deadcode
-func exclusiveMinimum[T constraints.Ordered](min T) fieldValidator[T] {
+func exclusiveMinimum[T cmp.Ordered](min T) fieldValidator[T] {
 	return func(v T, path string) error {
 		if v <= min {
 			return errFieldExclusiveMinimum.WithAttributes(
@@ -274,7 +273,7 @@ func exclusiveMinimum[T constraints.Ordered](min T) fieldValidator[T] {
 }
 
 // maximum returns a field validator that checks the inclusive maximum.
-func maximum[T constraints.Ordered](max T) fieldValidator[T] {
+func maximum[T cmp.Ordered](max T) fieldValidator[T] {
 	return func(v T, path string) error {
 		if v > max {
 			return errFieldMaximum.WithAttributes(
@@ -287,7 +286,7 @@ func maximum[T constraints.Ordered](max T) fieldValidator[T] {
 }
 
 // exclusiveMaximum returns a field validator that checks the exclusive maximum.
-func exclusiveMaximum[T constraints.Ordered](max T) fieldValidator[T] {
+func exclusiveMaximum[T cmp.Ordered](max T) fieldValidator[T] {
 	return func(v T, path string) error {
 		if v >= max {
 			return errFieldExclusiveMaximum.WithAttributes(

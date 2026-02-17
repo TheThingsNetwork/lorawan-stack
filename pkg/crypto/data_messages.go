@@ -75,7 +75,7 @@ func encryptMessage(key types.AES128Key, dir uint8, addr types.DevAddr, fCnt uin
 		copy(b[:], payload[i*aes.BlockSize:])
 		a[15] = i + 1
 		cipher.Encrypt(s[:], a[:])
-		for j := 0; j < aes.BlockSize; j++ {
+		for j := range aes.BlockSize {
 			b[j] = b[j] ^ s[j]
 		}
 		encrypted = append(encrypted, b[:]...)

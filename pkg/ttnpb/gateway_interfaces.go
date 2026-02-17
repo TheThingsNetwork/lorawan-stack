@@ -113,39 +113,39 @@ func (m *SetGatewayCollaboratorRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *Gateway) ExtractRequestFields(dst map[string]interface{}) {
+func (m *Gateway) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetGatewayRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetGatewayRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateGatewayRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateGatewayRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGateway().ExtractRequestFields(dst)
 }
 
-func (m *ListGatewayAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListGatewayAPIKeysRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *GetGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateGatewayAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *ListGatewayCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListGatewayCollaboratorsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *GetGatewayCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetGatewayCollaboratorRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 

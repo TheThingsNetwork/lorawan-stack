@@ -19,6 +19,7 @@ package errors
 import (
 	"encoding/hex"
 	"fmt"
+	"maps"
 	"sync/atomic"
 
 	"github.com/google/uuid"
@@ -73,9 +74,7 @@ func (e *Error) Fields() map[string]any {
 		res[pref] = cause.Error()
 		pref += "_cause"
 	}
-	for k, v := range Attributes(Stack(e)...) {
-		res[k] = v
-	}
+	maps.Copy(res, Attributes(Stack(e)...))
 	return res
 }
 

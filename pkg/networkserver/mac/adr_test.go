@@ -600,7 +600,7 @@ func TestADRInstability(t *testing.T) {
 	}
 
 	penalty := float32(0)
-	for i := 0; i < 50; i++ {
+	for i := range 50 {
 		macState.RecentUplinks = append(macState.RecentUplinks, makeUplink(i, penalty))
 		err := AdaptDataRate(ctx, dev, phy, nil)
 		if !a.So(err, should.BeNil) {

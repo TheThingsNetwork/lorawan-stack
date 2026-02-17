@@ -40,7 +40,7 @@ type MessageDescriptor struct {
 	Description        struct {
 		Package string `json:"package,omitempty"`
 		File    string `json:"file,omitempty"`
-	} `json:"description,omitempty"`
+	} `json:"description"`
 	id      string
 	touched bool
 	updated bool

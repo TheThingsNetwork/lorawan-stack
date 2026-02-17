@@ -21,6 +21,7 @@ import (
 	"io"
 	"os"
 	"reflect"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -249,13 +250,7 @@ func (m *Manager) Unmarshal(result any) error {
 }
 
 func (m *Manager) isDefault(path string) bool {
-	for _, def := range m.defaultPaths {
-		if def == path {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(m.defaultPaths, path)
 }
 
 func (m *Manager) inCLIFlags(path string) bool {
@@ -264,12 +259,7 @@ func (m *Manager) inCLIFlags(path string) bool {
 		return false
 	}
 
-	for _, flag := range flags {
-		if path == flag {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(flags, path)
 }
 
 // ReadInConfig will read in all defined config files (according to the config file flag set by WithConfigFileFlag).
@@ -326,7 +316,7 @@ type Stringer interface {
 	ConfigString() string
 }
 
-var configurableI = reflect.TypeOf((*Configurable)(nil)).Elem()
+var configurableI = reflect.TypeFor[Configurable]()
 
 func isConfigurableType(t reflect.Type) bool {
 	return t.Implements(configurableI) || reflect.PtrTo(t).Implements(configurableI)
@@ -336,7 +326,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config any) {
 	configValue := reflect.ValueOf(config)
 	configKind := configValue.Type().Kind()
 
-	if configKind == reflect.Interface || configKind == reflect.Ptr {
+	if configKind == reflect.Interface || configKind == reflect.Pointer {
 		configValue = configValue.Elem()
 		configKind = configValue.Type().Kind()
 	}
@@ -403,7 +393,7 @@ func (m *Manager) setDefaults(prefix string, flags *pflag.FlagSet, config any) {
 				n := val.Len()
 				defs := make([]string, 0, n)
 
-				for j := 0; j < n; j++ {
+				for j := range n {
 					c := val.Index(j).Interface()
 					str := fmt.Sprintf("%v", c)
 

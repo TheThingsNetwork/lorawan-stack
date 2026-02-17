@@ -59,7 +59,7 @@ func TestJitter(t *testing.T) {
 	a := assertions.New(t)
 	d := time.Duration(424242)
 	p := 0.1
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		// Jitter of 10%
 		t := Jitter(d, p)
 		df := float64(d)
@@ -72,7 +72,7 @@ func TestCanJitter(t *testing.T) {
 
 	a := assertions.New(t)
 	p := 0.15
-	for d := time.Duration(0); d < 10; d++ {
+	for d := range time.Duration(10) {
 		// Values smaller or equal to 3 get clamped to zero, which cannot be
 		// used as a upper bound for the random number generator.
 		a.So(CanJitter(d, p), should.Equal, d > 3)

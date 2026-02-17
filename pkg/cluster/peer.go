@@ -16,6 +16,7 @@ package cluster
 
 import (
 	"context"
+	"slices"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/grpc"
@@ -56,10 +57,5 @@ func (p *peer) Tags() map[string]string         { return p.tags }
 
 func (p *peer) HasRole(wanted ttnpb.ClusterRole) bool {
 	roles := p.Roles()
-	for _, role := range roles {
-		if role == wanted {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(roles, wanted)
 }

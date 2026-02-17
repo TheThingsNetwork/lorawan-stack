@@ -61,7 +61,7 @@ func TestRolloverClock(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			serverTime := time.Unix(0, 0).Add(time.Duration(stc.Absolute))
 			// Run twice; once synchronizing with rollover detection, and once synchronizing with the known concentrator time.
-			for i := 0; i < 2; i++ {
+			for i := range 2 {
 				t.Run([]string{"DetectRollover", "ResetAbsolute"}[i], func(t *testing.T) {
 					if i == 0 {
 						clock.Sync(stc.Relative, serverTime)

@@ -181,7 +181,7 @@ func (it *isTelemetry) countGatewaysByFreqPlan(ctx context.Context) (map[string]
 
 	m := make(map[string]uint64)
 	for _, r := range results {
-		for _, freqPlan := range strings.Split(r.FrequencyPlanID, " ") {
+		for freqPlan := range strings.SplitSeq(r.FrequencyPlanID, " ") {
 			m[freqPlan] += r.Count
 		}
 	}

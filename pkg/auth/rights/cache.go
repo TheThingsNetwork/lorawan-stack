@@ -136,10 +136,7 @@ type inMemoryCache struct {
 
 // maybeCleanup cleans up expired results if necessary.
 func (f *inMemoryCache) maybeCleanup() {
-	cleanupTTL := f.successTTL
-	if f.errorTTL > cleanupTTL {
-		cleanupTTL = f.errorTTL
-	}
+	cleanupTTL := max(f.errorTTL, f.successTTL)
 	if now().Sub(f.lastCleanup) <= cleanupTTL*10 {
 		return
 	}

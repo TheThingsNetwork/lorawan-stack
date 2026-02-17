@@ -33,7 +33,7 @@ var (
 
 	cn470510UplinkChannels = func() []Channel {
 		uplinkChannels := make([]Channel, 0, 96)
-		for i := 0; i < 96; i++ {
+		for i := range 96 {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(470300000 + 200000*i),
 				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
@@ -44,7 +44,7 @@ var (
 
 	cn470510DownlinkChannels = func() []Channel {
 		downlinkChannels := make([]Channel, 0, 48)
-		for i := 0; i < 48; i++ {
+		for i := range 48 {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(500300000 + 200000*i),
 				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5,
@@ -55,7 +55,7 @@ var (
 
 	cn470510BeaconFrequencies = func() []uint64 {
 		freqs := make([]uint64, 8)
-		for i := 0; i < 8; i++ {
+		for i := range 8 {
 			freqs[i] = 508300000 + uint64(i*200000)
 		}
 		return freqs

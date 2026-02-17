@@ -104,7 +104,7 @@ func TestNewDevAddr(t *testing.T) {
 			defer stop()
 
 			seen, total := map[types.DevAddrPrefix]float64{}, float64(0)
-			for i := 0; i < 1000; i++ {
+			for range 1000 {
 				devAddr := ns.newDevAddr(ctx)
 				for _, p := range ps {
 					if devAddr.HasPrefix(p) {
@@ -229,7 +229,7 @@ func TestMakeNewDevAddrFunc(t *testing.T) {
 			a, ctx := test.New(t)
 			newF := makeNewDevAddrFunc(tc.Prefixes...)
 			weights, total := make([]int, len(tc.Prefixes)), 0
-			for i := 0; i < 100000; i++ {
+			for range 100000 {
 				devAddr := newF(ctx)
 				found := false
 				for j, prefix := range tc.Prefixes {

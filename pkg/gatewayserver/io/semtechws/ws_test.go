@@ -1801,7 +1801,7 @@ func TestRateLimit(t *testing.T) {
 		}
 		withServer(t, defaultConfig, conf, func(t *testing.T, _ *mockis.MockDefinition, serverAddress string) {
 			a := assertions.New(t)
-			for i := uint(0); i < maxRate; i++ {
+			for range maxRate {
 				conn, _, err := websocket.DefaultDialer.Dial(serverAddress+testTrafficEndPoint, nil)
 				if !a.So(err, should.BeNil) {
 					t.Fatalf("Connection failed: %v", err)
@@ -1809,7 +1809,7 @@ func TestRateLimit(t *testing.T) {
 				conn.Close()
 			}
 
-			for i := 0; i < 3; i++ {
+			for range 3 {
 				_, resp, err := websocket.DefaultDialer.Dial(serverAddress+testTrafficEndPoint, nil)
 				a.So(err, should.NotBeNil)
 				if !a.So(errors.IsResourceExhausted(errors.FromHTTPStatusCode(resp.StatusCode)), should.BeTrue) {

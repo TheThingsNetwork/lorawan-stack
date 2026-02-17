@@ -31,7 +31,7 @@ func TestDownlinkTaskQueue(t *testing.T) {
 		t.Run(fmt.Sprintf("Consumers=%d", consumers), func(t *testing.T) {
 			_, ctx := test.New(t)
 			consumerIDs := make([]string, 0, consumers)
-			for i := 0; i < consumers; i++ {
+			for i := range consumers {
 				consumerIDs = append(consumerIDs, fmt.Sprintf("consumer-%d-%d", consumers, i))
 			}
 			q, closeFn := NewRedisDownlinkTaskQueue(ctx)

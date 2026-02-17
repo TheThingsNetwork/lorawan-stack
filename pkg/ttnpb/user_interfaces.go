@@ -147,59 +147,59 @@ func (m *CreateLoginTokenRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *GetUserRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetUserRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateUserRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateUserRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUser().GetIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateUserRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateUserRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUser().GetIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateTemporaryPasswordRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateTemporaryPasswordRequest) ExtractRequestFields(dst map[string]any) {
 	m.UserIds.ExtractRequestFields(dst)
 }
 
-func (m *UpdateUserPasswordRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateUserPasswordRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *ListUserAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListUserAPIKeysRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *GetUserAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetUserAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateUserAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateUserAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateUserAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateUserAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *UserSessionIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UserSessionIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *UserSession) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UserSession) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *ListUserSessionsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListUserSessionsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *LoginToken) ExtractRequestFields(dst map[string]interface{}) {
+func (m *LoginToken) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateLoginTokenRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateLoginTokenRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 

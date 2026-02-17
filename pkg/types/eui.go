@@ -345,7 +345,7 @@ func (prefix EUI64Prefix) ConfigString() string {
 // WithPrefix returns the EUI64, but with the first length bits replaced by the Prefix.
 func (eui EUI64) WithPrefix(prefix EUI64Prefix) (prefixed EUI64) {
 	k := uint(prefix.Length)
-	for i := 0; i < 8; i++ {
+	for i := range 8 {
 		if k < 8 {
 			prefixed[i] = (prefix.EUI64[i] & ^byte(0xff>>k)) | (eui[i] & byte(0xff>>k))
 			return

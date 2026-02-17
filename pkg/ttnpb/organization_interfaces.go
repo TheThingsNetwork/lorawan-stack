@@ -113,39 +113,39 @@ func (m *SetOrganizationCollaboratorRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *Organization) ExtractRequestFields(dst map[string]interface{}) {
+func (m *Organization) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetOrganizationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetOrganizationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateOrganizationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateOrganizationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganization().GetIds().ExtractRequestFields(dst)
 }
 
-func (m *ListOrganizationAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListOrganizationAPIKeysRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
-func (m *GetOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateOrganizationAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
-func (m *ListOrganizationCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListOrganizationCollaboratorsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 
-func (m *GetOrganizationCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetOrganizationCollaboratorRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetOrganizationIds().ExtractRequestFields(dst)
 }
 

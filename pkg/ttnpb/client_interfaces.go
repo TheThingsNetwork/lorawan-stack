@@ -81,23 +81,23 @@ func (m *SetClientCollaboratorRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *Client) ExtractRequestFields(dst map[string]interface{}) {
+func (m *Client) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetClientRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetClientRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetClientIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateClientRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateClientRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetClient().ExtractRequestFields(dst)
 }
 
-func (m *ListClientCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListClientCollaboratorsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetClientIds().ExtractRequestFields(dst)
 }
 
-func (m *GetClientCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetClientCollaboratorRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetClientIds().ExtractRequestFields(dst)
 }
 

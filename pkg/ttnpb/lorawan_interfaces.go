@@ -36,10 +36,10 @@ func (m *UplinkToken) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *GatewayAntennaIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GatewayAntennaIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetGatewayIds().ExtractRequestFields(dst)
 }
 
-func (m *UplinkToken) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UplinkToken) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }

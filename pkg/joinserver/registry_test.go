@@ -469,7 +469,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	a.So(ret, should.BeNil)
 
 	// Check number of retained session keys. Only the last 10 should be kept.
-	for i := byte(0); i < 20; i++ {
+	for i := range byte(20) {
 		sid := bytes.Repeat([]byte{i}, 4)
 		_, err := reg.SetByID(ctx, joinEUI, devEUI, sid, []string{
 			"app_s_key",
@@ -499,7 +499,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 			t.Fatalf("Error received: %v", err)
 		}
 	}
-	for i := byte(0); i < 20; i++ {
+	for i := range byte(20) {
 		_, err := reg.GetByID(ctx, joinEUI, devEUI, bytes.Repeat([]byte{i}, 4), ttnpb.SessionKeysFieldPathsTopLevel)
 		if i < 10 {
 			if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
@@ -517,7 +517,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 	if !a.So(err, should.BeNil) {
 		t.Fatalf("Error received: %v", err)
 	}
-	for i := byte(0); i < 20; i++ {
+	for i := range byte(20) {
 		_, err := reg.GetByID(ctx, joinEUI, devEUI, bytes.Repeat([]byte{i}, 4), ttnpb.SessionKeysFieldPathsTopLevel)
 		if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {
 			t.Fatalf("Error received: %v", err)
@@ -532,7 +532,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 
 	// Create keys for each device
 	for _, devEUI := range []types.EUI64{devEUI1, devEUI2, devEUI3} {
-		for i := byte(0); i < noOfKeysPerDevice; i++ {
+		for i := range noOfKeysPerDevice {
 			sid := bytes.Repeat([]byte{i}, 4)
 			_, err := reg.SetByID(ctx, joinEUI, devEUI, sid, []string{
 				"app_s_key",
@@ -590,7 +590,7 @@ func handleKeyRegistryTest(t *testing.T, reg KeyRegistry) {
 
 	// Check if all keys are deleted
 	for _, devEUI := range []types.EUI64{devEUI1, devEUI2, devEUI3} {
-		for i := byte(0); i < noOfKeysPerDevice; i++ {
+		for i := range noOfKeysPerDevice {
 			sid := bytes.Repeat([]byte{i}, 4)
 			_, err := reg.GetByID(ctx, joinEUI, devEUI, sid, ttnpb.SessionKeysFieldPathsTopLevel)
 			if !a.So(err, should.NotBeNil) || !a.So(errors.IsNotFound(err), should.BeTrue) {

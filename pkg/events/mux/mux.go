@@ -97,7 +97,7 @@ nextStream:
 
 func (*multiplexer) subscriberType(sub events.Subscriber) string {
 	t := reflect.TypeOf(sub)
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		t = t.Elem()
 	}
 	return fmt.Sprintf("%s.%s", t.PkgPath(), t.Name())

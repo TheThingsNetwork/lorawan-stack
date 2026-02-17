@@ -159,7 +159,7 @@ func List(s []any, opts ...Option) (*structpb.ListValue, error) {
 
 func valueFromReflect(rv reflect.Value, opts ...Option) (*structpb.Value, error) {
 	switch k := rv.Kind(); k {
-	case reflect.Ptr:
+	case reflect.Pointer:
 		if rv.IsNil() {
 			return &structpb.Value{Kind: &structpb.Value_NullValue{}}, nil
 		}
@@ -209,7 +209,7 @@ func valueFromReflect(rv reflect.Value, opts ...Option) (*structpb.Value, error)
 		}
 		n := rv.NumField()
 		fields := make(map[string]*structpb.Value, n)
-		for i := 0; i < n; i++ {
+		for i := range n {
 			f := rv.Field(i)
 			ft := f.Type()
 			if f.Type().PkgPath() != "" {

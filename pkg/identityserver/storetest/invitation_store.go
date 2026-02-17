@@ -216,7 +216,7 @@ func (st *StoreTest) TestInvitationStorePagination(t *T) {
 	defer s.Close()
 
 	var all []*ttnpb.Invitation
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		created, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     fmt.Sprintf("user%d@example.com", i+1),
 			Token:     fmt.Sprintf("TOKEN%d", i+1),
@@ -271,7 +271,7 @@ func (st *StoreTest) TestInvitationStorePaginationDefaults(t *T) {
 	}
 	defer s.Close()
 
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		_, err := s.CreateInvitation(ctx, &ttnpb.Invitation{
 			Email:     fmt.Sprintf("user%d@example.com", i+1),
 			Token:     fmt.Sprintf("TOKEN%d", i+1),

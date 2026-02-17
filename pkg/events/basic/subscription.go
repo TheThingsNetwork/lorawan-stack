@@ -16,6 +16,7 @@ package basic
 
 import (
 	"context"
+	"slices"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -47,12 +48,7 @@ func (s *Subscription) matchName(evt events.Event) bool {
 	if len(s.names) == 0 {
 		return true
 	}
-	for _, subName := range s.names {
-		if subName == evt.Name() {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(s.names, evt.Name())
 }
 
 func (s *Subscription) matchIdentifiers(evt events.Event) bool {

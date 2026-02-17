@@ -321,7 +321,7 @@ func (st *StoreTest) TestApplicationStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var all []*ttnpb.Application
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		all = append(all, st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -369,7 +369,7 @@ func (st *StoreTest) TestApplicationStorePaginationDefaults(t *T) {
 
 	usr1 := st.population.NewUser()
 
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 	}
 

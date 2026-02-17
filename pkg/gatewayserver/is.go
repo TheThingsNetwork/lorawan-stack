@@ -16,6 +16,7 @@ package gatewayserver
 
 import (
 	"context"
+	"maps"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -155,12 +156,8 @@ func (is IS) UpdateAttributes(ctx context.Context, ids *ttnpb.GatewayIdentifiers
 
 	// Take the union of keys with new values overwriting existing entries.
 	merged := make(map[string]string)
-	for k, v := range current {
-		merged[k] = v
-	}
-	for k, v := range new {
-		merged[k] = v
-	}
+	maps.Copy(merged, current)
+	maps.Copy(merged, new)
 
 	req := &ttnpb.UpdateGatewayRequest{
 		Gateway: &ttnpb.Gateway{

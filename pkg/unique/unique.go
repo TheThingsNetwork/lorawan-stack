@@ -72,14 +72,14 @@ func ToClientID(uid string) (id *ttnpb.ClientIdentifiers, err error) {
 // ToDeviceID returns the end device identifier of the specified unique ID.
 func ToDeviceID(uid string) (id *ttnpb.EndDeviceIdentifiers, err error) {
 	id = &ttnpb.EndDeviceIdentifiers{}
-	sepIdx := strings.Index(uid, ".")
-	if sepIdx == -1 {
+	before, after, ok := strings.Cut(uid, ".")
+	if !ok {
 		return nil, errFormat.WithAttributes("value", uid)
 	}
 	id.ApplicationIds = &ttnpb.ApplicationIdentifiers{
-		ApplicationId: uid[:sepIdx],
+		ApplicationId: before,
 	}
-	id.DeviceId = uid[sepIdx+1:]
+	id.DeviceId = after
 	if err := id.ValidateFields("device_id", "application_ids"); err != nil {
 		return nil, errUniqueIdentifier.WithCause(err).WithAttributes("uid", uid)
 	}

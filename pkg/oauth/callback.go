@@ -16,6 +16,7 @@ package oauth
 
 import (
 	"fmt"
+	"maps"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -28,9 +29,7 @@ func (s *server) redirectToLocal(w http.ResponseWriter, r *http.Request) {
 	}
 
 	params := make(url.Values)
-	for k, v := range r.URL.Query() {
-		params[k] = v
-	}
+	maps.Copy(params, r.URL.Query())
 	delete(params, "port")
 
 	url := url.URL{

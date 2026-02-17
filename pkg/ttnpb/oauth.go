@@ -76,30 +76,30 @@ func (m *ListOAuthAccessTokensRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *OAuthClientAuthorizationIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *OAuthClientAuthorizationIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *OAuthClientAuthorization) ExtractRequestFields(dst map[string]interface{}) {
+func (m *OAuthClientAuthorization) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *ListOAuthClientAuthorizationsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListOAuthClientAuthorizationsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *OAuthAuthorizationCode) ExtractRequestFields(dst map[string]interface{}) {
+func (m *OAuthAuthorizationCode) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *OAuthAccessTokenIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *OAuthAccessTokenIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *OAuthAccessToken) ExtractRequestFields(dst map[string]interface{}) {
+func (m *OAuthAccessToken) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }
 
-func (m *ListOAuthAccessTokensRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListOAuthAccessTokensRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetUserIds().ExtractRequestFields(dst)
 }

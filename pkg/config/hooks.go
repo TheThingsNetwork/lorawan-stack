@@ -36,7 +36,7 @@ func stringToTimeHookFunc(layout string) mapstructure.DecodeHookFuncType {
 		if f.Kind() != reflect.String {
 			return data, nil
 		}
-		if t != reflect.TypeOf(time.Time{}) {
+		if t != reflect.TypeFor[time.Time]() {
 			return data, nil
 		}
 		return time.Parse(layout, data.(string))
@@ -172,7 +172,7 @@ func configurableInterfaceHook(f reflect.Type, t reflect.Type, data any) (any, e
 
 	str := data.(string)
 
-	if t.Kind() == reflect.Ptr {
+	if t.Kind() == reflect.Pointer {
 		rv := reflect.New(t.Elem())
 		if err := rv.Interface().(Configurable).UnmarshalConfigString(str); err != nil {
 			return nil, err
@@ -198,7 +198,7 @@ func configurableInterfaceSliceHook(f reflect.Type, t reflect.Type, data any) (a
 	res := reflect.MakeSlice(t, len(strs), len(strs))
 
 	et := t.Elem()
-	if et.Kind() == reflect.Ptr {
+	if et.Kind() == reflect.Pointer {
 		for i, str := range strs {
 			rv := reflect.New(et.Elem())
 			if err := rv.Interface().(Configurable).UnmarshalConfigString(str); err != nil {
@@ -255,7 +255,7 @@ func stringToByteArrayHook(f reflect.Type, t reflect.Type, data any) (any, error
 
 func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	d := time.Duration(0)
-	if f.Kind() != reflect.String || t != reflect.TypeOf(&d) {
+	if f.Kind() != reflect.String || t != reflect.TypeFor[*time.Duration]() {
 		return data, nil
 	}
 	s := data.(string)
@@ -271,7 +271,7 @@ func stringToTimeDurationPointerHook(f reflect.Type, t reflect.Type, data any) (
 
 func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.RxDelay
-	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
+	if f.Kind() != reflect.String || t != reflect.TypeFor[*ttnpb.RxDelay]() {
 		return data, nil
 	}
 	s := data.(string)
@@ -290,7 +290,7 @@ func stringToRxDelayPointerHook(f reflect.Type, t reflect.Type, data any) (any, 
 
 func stringToEUI64PointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var eui types.EUI64
-	if f.Kind() != reflect.String || t != reflect.TypeOf(&eui) {
+	if f.Kind() != reflect.String || t != reflect.TypeFor[*types.EUI64]() {
 		return data, nil
 	}
 	s := data.(string)
@@ -305,7 +305,7 @@ func stringToEUI64PointerHook(f reflect.Type, t reflect.Type, data any) (any, er
 
 func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.ADRAckDelayExponent
-	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
+	if f.Kind() != reflect.String || t != reflect.TypeFor[*ttnpb.ADRAckDelayExponent]() {
 		return data, nil
 	}
 	s := data.(string)
@@ -324,7 +324,7 @@ func stringToADRAckDelayExponentPointerHook(f reflect.Type, t reflect.Type, data
 
 func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.ADRAckLimitExponent
-	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
+	if f.Kind() != reflect.String || t != reflect.TypeFor[*ttnpb.ADRAckLimitExponent]() {
 		return data, nil
 	}
 	s := data.(string)
@@ -343,7 +343,7 @@ func stringToADRAckLimitExponentPointerHook(f reflect.Type, t reflect.Type, data
 
 func stringToAggregatedDutyCyclePointerHook(f reflect.Type, t reflect.Type, data any) (any, error) {
 	var enum ttnpb.AggregatedDutyCycle
-	if f.Kind() != reflect.String || t != reflect.TypeOf(&enum) {
+	if f.Kind() != reflect.String || t != reflect.TypeFor[*ttnpb.AggregatedDutyCycle]() {
 		return data, nil
 	}
 	s := data.(string)

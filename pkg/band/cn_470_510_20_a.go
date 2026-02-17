@@ -25,7 +25,7 @@ var (
 	cn47051020AUplinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		uplinkChannels := make([]Channel, 0, 64)
 		// 20 MHz Type A Group 1
-		for i := 0; i < 32; i++ {
+		for i := range 32 {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(470300000 + 200000*i),
 				MinDataRate: minDataRateIndex,
@@ -33,7 +33,7 @@ var (
 			})
 		}
 		// 20 MHz Type A Group 2
-		for i := 0; i < 32; i++ {
+		for i := range 32 {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(503500000 + 200000*i),
 				MinDataRate: minDataRateIndex,
@@ -46,7 +46,7 @@ var (
 	cn47051020ADownlinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		downlinkChannels := make([]Channel, 0, 64)
 		// 20 MHz Type A Group 1
-		for i := 0; i < 32; i++ {
+		for i := range 32 {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(483900000 + 200000*i),
 				MinDataRate: minDataRateIndex,
@@ -54,7 +54,7 @@ var (
 			})
 		}
 		// 20 MHz Type A Group 2
-		for i := 0; i < 32; i++ {
+		for i := range 32 {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(490300000 + 200000*i),
 				MinDataRate: minDataRateIndex,

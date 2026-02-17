@@ -82,8 +82,8 @@ func WithOrder(ctx context.Context, spec string) context.Context {
 	}
 	field := spec
 	direction := "ASC"
-	if strings.HasPrefix(spec, "-") {
-		field = strings.TrimPrefix(spec, "-")
+	if after, ok := strings.CutPrefix(spec, "-"); ok {
+		field = after
 		direction = "DESC"
 	}
 	return context.WithValue(ctx, orderOptionsKey, OrderOptions{

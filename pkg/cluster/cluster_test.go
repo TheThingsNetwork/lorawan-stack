@@ -79,7 +79,7 @@ func TestCluster(t *testing.T) {
 
 	// The Identity Server playing the ACCESS role should be there within reasonable time.
 	var ac Peer
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
 		ac, err = c.GetPeer(ctx, ttnpb.ClusterRole_ACCESS, nil)
 		if err == nil {

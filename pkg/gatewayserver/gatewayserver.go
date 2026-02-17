@@ -25,6 +25,7 @@ import (
 	"math"
 	"net"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -926,11 +927,8 @@ func (host *upstreamHost) handlePacket(ctx context.Context, item any) {
 		var pass bool
 		switch {
 		case ids.DevAddr != nil:
-			for _, prefix := range host.handler.DevAddrPrefixes() {
-				if types.MustDevAddr(ids.DevAddr).HasPrefix(prefix) {
-					pass = true
-					break
-				}
+			if slices.ContainsFunc(host.handler.DevAddrPrefixes(), types.MustDevAddr(ids.DevAddr).HasPrefix) {
+				pass = true
 			}
 		default:
 			pass = true

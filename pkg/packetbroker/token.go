@@ -131,7 +131,7 @@ type IAMTokenClaims struct {
 // TokenClaims defines the Packet Broker JSON Web Token (JWT) claims.
 type TokenClaims struct {
 	jwt.Claims
-	PacketBroker IAMTokenClaims `json:"https://iam.packetbroker.net/claims,omitempty"`
+	PacketBroker IAMTokenClaims `json:"https://iam.packetbroker.net/claims"`
 }
 
 var (

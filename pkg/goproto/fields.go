@@ -57,7 +57,7 @@ func goFieldsFromProtoMasks(v reflect.Value) map[string]string {
 	}
 
 	fields := make(map[string]string)
-	for v.Kind() == reflect.Ptr {
+	for v.Kind() == reflect.Pointer {
 		v = v.Elem()
 	}
 	if v.Kind() != reflect.Struct {

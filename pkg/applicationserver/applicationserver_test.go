@@ -2158,7 +2158,7 @@ func TestApplicationServer(t *testing.T) {
 						default:
 							t.Fatal("Expected downlink error")
 						}
-						for i := 0; i < len(items); i++ {
+						for range items {
 							select {
 							case up := <-chs.up:
 								a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkQueued{})
@@ -2245,7 +2245,7 @@ func TestApplicationServer(t *testing.T) {
 					default:
 						t.Fatal("Expected downlink error")
 					}
-					for i := 0; i < 2; i++ {
+					for range 2 {
 						select {
 						case up := <-chs.up:
 							a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkQueued{})
@@ -2784,7 +2784,7 @@ func TestSkipPayloadCrypto(t *testing.T) {
 						default:
 							t.Fatal("Expected downlink error")
 						}
-						for i := 0; i < len(items); i++ {
+						for range items {
 							select {
 							case up := <-chs.up:
 								a.So(up.Up, should.HaveSameTypeAs, &ttnpb.ApplicationUp_DownlinkQueued{})
@@ -2973,7 +2973,7 @@ func TestLocationFromPayload(t *testing.T) {
 	// The uplink message and the location solved message may come out of order.
 	// Expect exactly two messages.
 	var loc *ttnpb.ApplicationLocation
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		select {
 		case msg := <-sub.Up():
 			msgLoc := msg.ApplicationUp.GetLocationSolved()
@@ -3144,7 +3144,7 @@ func TestUplinkNormalized(t *testing.T) {
 	// The uplink message and the normalized payload message may come out of order.
 	// Expect exactly two messages.
 	var normalized *ttnpb.ApplicationUplinkNormalized
-	for i := 0; i < 2; i++ {
+	for i := range 2 {
 		select {
 		case msg := <-sub.Up():
 			if n := msg.GetUplinkNormalized(); n != nil {

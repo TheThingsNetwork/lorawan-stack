@@ -36,10 +36,10 @@ func (m *SetApplicationLinkRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *GetApplicationLinkRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationLinkRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *SetApplicationLinkRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SetApplicationLinkRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }

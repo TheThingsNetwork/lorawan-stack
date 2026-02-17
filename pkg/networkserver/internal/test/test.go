@@ -314,7 +314,7 @@ func MakeDefaultEU868MACState(class ttnpb.Class, macVersion ttnpb.MACVersion, ph
 
 var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 	var chs []*ttnpb.MACParameters_Channel
-	for i := 0; i < 64; i++ {
+	for i := range 64 {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:  uint64(902300000 + 200000*i),
 			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_0,
@@ -322,7 +322,7 @@ var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 			EnableUplink:     true,
 		})
 	}
-	for i := 0; i < 8; i++ {
+	for i := range 8 {
 		chs = append(chs, &ttnpb.MACParameters_Channel{
 			UplinkFrequency:  uint64(903000000 + 1600000*i),
 			MinDataRateIndex: ttnpb.DataRateIndex_DATA_RATE_4,
@@ -330,7 +330,7 @@ var DefaultUS915Channels = func() []*ttnpb.MACParameters_Channel {
 			EnableUplink:     true,
 		})
 	}
-	for i := 0; i < 72; i++ {
+	for i := range 72 {
 		chs[i].DownlinkFrequency = uint64(923300000 + 600000*(i%8))
 	}
 	return chs

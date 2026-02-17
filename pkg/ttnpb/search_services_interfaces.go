@@ -25,6 +25,6 @@ func (m *SearchEndDevicesRequest) IDString() string {
 }
 
 // ExtractRequestFields is used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
-func (m *SearchEndDevicesRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SearchEndDevicesRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }

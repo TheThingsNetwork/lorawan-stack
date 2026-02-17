@@ -79,8 +79,8 @@ func (s *Sentry) forward(e log.Entry) *sentry.EventID {
 			evt.Tags[k] = fmt.Sprint(v)
 		default:
 			if strings.HasSuffix(k, "_id") || strings.HasSuffix(k, "_uid") || strings.HasSuffix(k, "_eui") {
-				if strings.HasPrefix(k, "grpc.request.") {
-					k = strings.TrimPrefix(k, "grpc.request.")
+				if after, ok := strings.CutPrefix(k, "grpc.request."); ok {
+					k = after
 				}
 				evt.Tags[k] = fmt.Sprint(v)
 			}

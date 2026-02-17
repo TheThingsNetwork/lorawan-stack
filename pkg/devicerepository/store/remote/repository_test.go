@@ -13,7 +13,6 @@
 // limitations under the License.
 
 //go:build slowtests
-// +build slowtests
 
 package remote_test
 

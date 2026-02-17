@@ -54,9 +54,9 @@ func GetDSN(defaultDB string) *url.URL {
 	}
 	if dbAuth := os.Getenv("SQL_DB_AUTH"); dbAuth != "" {
 		var username, password string
-		idx := strings.Index(dbAuth, ":")
-		if idx != -1 {
-			username, password = dbAuth[:idx], dbAuth[idx+1:]
+		before, after, ok := strings.Cut(dbAuth, ":")
+		if ok {
+			username, password = before, after
 		} else {
 			username = dbAuth
 		}

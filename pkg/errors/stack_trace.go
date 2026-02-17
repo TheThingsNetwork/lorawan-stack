@@ -37,7 +37,7 @@ func (s *stack) StackTrace() errors.StackTrace {
 		return nil
 	}
 	f := make([]errors.Frame, len(*s))
-	for i := 0; i < len(f); i++ {
+	for i := range f {
 		f[i] = errors.Frame((*s)[i])
 	}
 	return f

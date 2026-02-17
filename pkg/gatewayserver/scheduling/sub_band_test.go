@@ -256,7 +256,7 @@ func TestBlockingScheduling(t *testing.T) {
 
 	// The previous emission keeps the [0, 5s) interval blocked.
 	{
-		for i := 0; i < 5; i++ {
+		for i := range 5 {
 			em := scheduling.NewEmission(scheduling.ConcentratorTime(i*int(time.Second)), 500*time.Millisecond)
 			err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)
 			a.So(err, should.NotBeNil)
@@ -274,7 +274,7 @@ func TestBlockingScheduling(t *testing.T) {
 
 	// The previous emission keeps the [5s, 7s) interval blocked.
 	{
-		for i := 0; i < 2; i++ {
+		for i := range 2 {
 			t := 5*time.Second + time.Duration(i)*time.Second
 			em := scheduling.NewEmission(scheduling.ConcentratorTime(t), 200*time.Millisecond)
 			err := sb.Schedule(em, ttnpb.TxSchedulePriority_HIGHEST)

@@ -260,7 +260,7 @@ This command takes end device templates from stdin.`,
 					return err
 				}
 
-				for i := 0; i < count; i++ {
+				for range count {
 					res := ttnpb.Clone(&template)
 
 					var devEUI types.EUI64

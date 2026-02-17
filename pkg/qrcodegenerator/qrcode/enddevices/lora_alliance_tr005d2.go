@@ -98,7 +98,7 @@ func (m LoRaAllianceTR005Draft2) MarshalText() ([]byte, error) {
 	if ext != "" {
 		ext = ":" + ext
 	}
-	return []byte(fmt.Sprintf("URN:LW:DP:%X:%X:%X%X%s", m.JoinEUI[:], m.DevEUI[:], m.VendorID[:], m.ModelID[:], ext)), nil
+	return fmt.Appendf(nil, "URN:LW:DP:%X:%X:%X%X%s", m.JoinEUI[:], m.DevEUI[:], m.VendorID[:], m.ModelID[:], ext), nil
 }
 
 // UnmarshalText implements the TextUnmarshaler interface.
@@ -128,7 +128,7 @@ func (m *LoRaAllianceTR005Draft2) UnmarshalText(text []byte) error {
 	}
 	if len(parts) == 7 {
 		exts := strings.ReplaceAll(string(parts[6]), "%25", "%")
-		for _, ext := range strings.Split(exts, "%") {
+		for ext := range strings.SplitSeq(exts, "%") {
 			if len(ext) < 1 {
 				continue
 			}

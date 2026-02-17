@@ -528,7 +528,7 @@ func (a *Agent) subscribeDownlink(ctx context.Context) error {
 
 	var wg sync.WaitGroup
 	defer wg.Wait()
-	for i := 0; i < subscribeStreamCount; i++ {
+	for range subscribeStreamCount {
 		wg.Add(1)
 		a.StartTask(&task.Config{
 			Context: ctx,
@@ -847,7 +847,7 @@ func (a *Agent) subscribeUplink(ctx context.Context) error {
 
 	var wg sync.WaitGroup
 	defer wg.Wait()
-	for i := 0; i < subscribeStreamCount; i++ {
+	for range subscribeStreamCount {
 		wg.Add(1)
 		a.StartTask(&task.Config{
 			Context: ctx,

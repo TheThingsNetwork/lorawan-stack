@@ -98,7 +98,7 @@ func (m LoRaAllianceTR005) MarshalText() ([]byte, error) {
 	if m.Proprietary != "" {
 		ext += fmt.Sprintf(":P%s", m.Proprietary)
 	}
-	return []byte(fmt.Sprintf("LW:D0:%X:%X:%X%X%s", m.JoinEUI[:], m.DevEUI[:], m.VendorID[:], m.ModelID[:], ext)), nil
+	return fmt.Appendf(nil, "LW:D0:%X:%X:%X%X%s", m.JoinEUI[:], m.DevEUI[:], m.VendorID[:], m.ModelID[:], ext), nil
 }
 
 // UnmarshalText implements the TextUnmarshaler interface.

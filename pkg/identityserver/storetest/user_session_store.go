@@ -193,7 +193,7 @@ func (st *StoreTest) TestUserSessionStorePagination(t *T) {
 	defer s.Close()
 
 	var sessions []*ttnpb.UserSession
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		created, err := s.CreateSession(ctx, &ttnpb.UserSession{
 			UserIds:   usr1.GetIds(),
 			SessionId: fmt.Sprintf("SESS%d", i+1),
@@ -250,7 +250,7 @@ func (st *StoreTest) TestUserSessionStorePaginationDefaults(t *T) {
 	}
 	defer s.Close()
 
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		_, err := s.CreateSession(ctx, &ttnpb.UserSession{
 			UserIds:   usr1.GetIds(),
 			SessionId: fmt.Sprintf("SESS%d", i+1),

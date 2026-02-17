@@ -42,7 +42,7 @@ type Beacon struct {
 
 var usAuBeaconFrequencies = func() []uint64 {
 	freqs := make([]uint64, 8)
-	for i := 0; i < 8; i++ {
+	for i := range 8 {
 		freqs[i] = 923300000 + uint64(i*600000)
 	}
 	return freqs

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"slices"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/crypto"
@@ -82,12 +83,7 @@ func NewClient(c Component, fetcher fetch.Interface, conf Config) *TTJS {
 
 // SupportsJoinEUI implements EndDeviceClaimer.
 func (c *TTJS) SupportsJoinEUI(eui types.EUI64) bool {
-	for _, prefix := range c.config.JoinEUIPrefixes {
-		if eui.HasPrefix(prefix) {
-			return true
-		}
-	}
-	return false
+	return slices.ContainsFunc(c.config.JoinEUIPrefixes, eui.HasPrefix)
 }
 
 func (c *TTJS) httpClient(ctx context.Context) (*http.Client, error) {

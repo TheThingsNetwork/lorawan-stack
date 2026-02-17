@@ -105,8 +105,8 @@ func (oc *OAuthClient) defaultOAuthConfig(ctx context.Context) (*oauth2.Config, 
 	redirectURL := fmt.Sprintf("%s/oauth/callback", strings.TrimSuffix(config.RootURL, "/"))
 	if oauthRootURL, err := url.Parse(config.RootURL); err == nil {
 		rootURL := (&url.URL{Scheme: oauthRootURL.Scheme, Host: oauthRootURL.Host}).String()
-		if strings.HasPrefix(authorizeURL, rootURL) {
-			authorizeURL = strings.TrimPrefix(authorizeURL, rootURL)
+		if after, ok := strings.CutPrefix(authorizeURL, rootURL); ok {
+			authorizeURL = after
 			redirectURL = strings.TrimPrefix(redirectURL, rootURL)
 		}
 	}

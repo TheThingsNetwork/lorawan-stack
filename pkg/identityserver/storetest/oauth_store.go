@@ -423,7 +423,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var clients []*ttnpb.Client
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		clients = append(clients, st.population.NewClient(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -438,7 +438,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	defer s.Close()
 
 	var authorizations []*ttnpb.OAuthClientAuthorization
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		created, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[i].GetIds(),
@@ -452,7 +452,7 @@ func (st *StoreTest) TestOAuthStorePagination(t *T) {
 	}
 
 	var accessTokens []*ttnpb.OAuthAccessToken
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		created, err := s.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[0].GetIds(),
@@ -524,7 +524,7 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 	usr1 := st.population.NewUser()
 
 	var clients []*ttnpb.Client
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		clients = append(clients, st.population.NewClient(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 
@@ -538,7 +538,7 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 	}
 	defer s.Close()
 
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		_, err := s.Authorize(ctx, &ttnpb.OAuthClientAuthorization{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[i].GetIds(),
@@ -550,7 +550,7 @@ func (st *StoreTest) TestOAuthStorePaginationDefaults(t *T) {
 		time.Sleep(test.Delay)
 	}
 
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		_, err := s.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
 			UserIds:   usr1.GetIds(),
 			ClientIds: clients[0].GetIds(),

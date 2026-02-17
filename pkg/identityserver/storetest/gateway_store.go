@@ -505,7 +505,7 @@ func (st *StoreTest) TestGatewayStorePagination(t *T) {
 	usr1 := st.population.NewUser()
 
 	var all []*ttnpb.Gateway
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		all = append(all, st.population.NewGateway(usr1.GetOrganizationOrUserIdentifiers()))
 	}
 

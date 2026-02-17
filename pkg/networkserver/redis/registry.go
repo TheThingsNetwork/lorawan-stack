@@ -322,7 +322,7 @@ func (v *UplinkMatchSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 	if n > 5 {
 		return errInvalidFieldCount.WithAttributes("count", n)
 	}
-	for i := 0; i < n; i++ {
+	for range n {
 		s, err := dec.DecodeString()
 		if err != nil {
 			return err
@@ -387,7 +387,7 @@ func (v *UplinkMatchPendingSession) DecodeMsgpack(dec *msgpack.Decoder) error {
 	if n > 2 {
 		return errInvalidFieldCount.WithAttributes("count", n)
 	}
-	for i := 0; i < n; i++ {
+	for range n {
 		s, err := dec.DecodeString()
 		if err != nil {
 			return err

@@ -29,7 +29,7 @@ func TestTimestamps(t *testing.T) {
 
 	ret := timestamps.Append(time.Now())
 	a.So(ret, should.BeZeroValue)
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		ret := timestamps.Append(time.Now().Add(time.Hour))
 		a.So(ret, should.BeZeroValue)
 	}

@@ -142,7 +142,7 @@ func TestEndDevicesCRUD(t *testing.T) {
 
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewEndDevice(app1.GetIds())
 	}
 
@@ -220,7 +220,7 @@ func TestEndDevicesPagination(t *testing.T) {
 
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		p.NewEndDevice(app1.GetIds())
 	}
 
@@ -275,7 +275,7 @@ func TestEndDevicesBatchOperationsPermissions(t *testing.T) {
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 	devIDs := make([]string, 0, noOfDevices)
-	for i := 0; i < noOfDevices; i++ {
+	for range noOfDevices {
 		dev := p.NewEndDevice(app1.GetIds())
 		dev.Attributes = map[string]string{
 			"foo": "bar",
@@ -349,7 +349,7 @@ func TestEndDevicesBatchOperations(t *testing.T) {
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 	devIDs := make([]string, 0, noOfDevices)
-	for i := 0; i < noOfDevices; i++ {
+	for range noOfDevices {
 		dev := p.NewEndDevice(app1.GetIds())
 		dev.Attributes = map[string]string{
 			"foo": "bar",
@@ -453,7 +453,7 @@ func TestEndDevicesFilter(t *testing.T) {
 
 	usr1 := p.NewUser()
 	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewEndDevice(app1.GetIds())
 	}
 

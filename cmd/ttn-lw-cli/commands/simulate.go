@@ -154,7 +154,7 @@ func startSimulation(
 	logger.Info("Sent uplink")
 
 	expect, _ := cmd.Flags().GetInt("downlinks")
-	for i := 0; i < expect; i++ {
+	for range expect {
 		down, err := link.Recv()
 		if err != nil {
 			return err

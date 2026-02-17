@@ -100,42 +100,42 @@ func (m *SetApplicationPackageDefaultAssociationRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *ApplicationPackageAssociationIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationPackageAssociationIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDeviceIds().ExtractRequestFields(dst)
 }
 
-func (m *ApplicationPackageAssociation) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationPackageAssociation) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *ListApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *SetApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SetApplicationPackageAssociationRequest) ExtractRequestFields(dst map[string]any) {
 	m.Association.ExtractRequestFields(dst)
 }
 
-func (m *ApplicationPackageDefaultAssociationIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationPackageDefaultAssociationIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *ApplicationPackageDefaultAssociation) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationPackageDefaultAssociation) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *ListApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *SetApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SetApplicationPackageDefaultAssociationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetDefault().ExtractRequestFields(dst)
 }

@@ -27,7 +27,7 @@ var (
 	cn47051026BUplinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		uplinkChannels := make([]Channel, 0, 48)
 		// 26 MHz Type B
-		for i := 0; i < 48; i++ {
+		for i := range 48 {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(480300000 + 200000*i),
 				MinDataRate: minDataRateIndex,
@@ -40,7 +40,7 @@ var (
 	cn47051026BDownlinkChannels = func(minDataRateIndex ttnpb.DataRateIndex) []Channel {
 		downlinkChannels := make([]Channel, 0, 24)
 		// 26 MHz Type B
-		for i := 0; i < 24; i++ {
+		for i := range 24 {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(500100000 + 200000*i),
 				MinDataRate: minDataRateIndex,
