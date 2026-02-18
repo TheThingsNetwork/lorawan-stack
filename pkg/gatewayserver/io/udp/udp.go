@@ -485,6 +485,11 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 				// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
 				break
 			}
+			concentratorTime, err := encoding.ConcentratorTimestampFromDownlinkMessage(down)
+			if err != nil {
+				logger.WithError(err).Warn("Failed to get concentrator timestamp from downlink message")
+				break
+			}
 			downlinkPath := st.lastDownlinkPath.Load()
 			if downlinkPath == nil {
 				logger.Debug("Received downlink message without an active downlink path")
@@ -521,7 +526,7 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 				write()
 				break
 			}
-			serverTime := st.clock.ToServerTime(st.clock.FromTimestampTime(tx.Tmst))
+			serverTime := st.clock.ToServerTime(scheduling.ConcentratorTime(concentratorTime))
 			st.clockMu.RUnlock()
 			d := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
 			logger.WithField("duration", d).Debug("Wait to schedule downlink message late")

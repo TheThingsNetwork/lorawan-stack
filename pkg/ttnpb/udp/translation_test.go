@@ -574,3 +574,34 @@ func TestDownlinkRoundtrip(t *testing.T) {
 
 	a.So(actual, should.HaveEmptyDiff, expected)
 }
+
+func TestConcentratorTimestampFromDownlinkMessage(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	msg := &ttnpb.DownlinkMessage{
+		Settings: &ttnpb.DownlinkMessage_Scheduled{
+			Scheduled: &ttnpb.TxSettings{
+				Frequency: 925700000,
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							SpreadingFactor: 10,
+							Bandwidth:       500000,
+						},
+					},
+				},
+				Downlink: &ttnpb.TxSettings_Downlink{
+					TxPower:            20,
+					InvertPolarization: true,
+				},
+				Timestamp:             3427261656,
+				ConcentratorTimestamp: 11020007658000,
+			},
+		},
+		RawPayload: []byte{0x7d, 0xf3, 0x8e},
+	}
+	timestamp, err := udp.ConcentratorTimestampFromDownlinkMessage(msg)
+	a.So(err, should.BeNil)
+	a.So(timestamp, should.Equal, 11020007658000)
+}
