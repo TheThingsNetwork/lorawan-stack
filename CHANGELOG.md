@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- The timestamp of the udp packet is now always correct when the 'Schedule downlink late' is enabled for the gateway and downlink scheduling hits the duty cycle limit.
+
 ### Security
 
 ## [3.35.2] - 2026-01-30
