@@ -97,7 +97,7 @@ func TestBatchPublisher(t *testing.T) {
 
 	// Expect two flushes due to an overflow.
 	batcher.Publish(ev0, ev1, ev2, ev3, ev4)
-	for i := 0; i < 2; i++ {
+	for range 2 {
 		had1, had4 := false, false
 		select {
 		case <-ctx.Done():

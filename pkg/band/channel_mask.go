@@ -207,7 +207,7 @@ func generateChMaskMatrix(pairs []ChMaskCntlPair, currentChs, desiredChs []bool)
 		return nil, errInvalidChannelCount.New()
 	}
 	for i := 0; i < n/16; i++ {
-		for j := 0; j < 16; j++ {
+		for j := range 16 {
 			if currentChs[16*i+j] != desiredChs[16*i+j] {
 				pairs = append(pairs, ChMaskCntlPair{
 					Cntl: uint8(i),
@@ -460,7 +460,7 @@ func makeGenerateChMask72(supportChMaskCntl5 bool, atomic bool) func([]bool, []b
 		}
 
 		var fsbs [8]bool
-		for i := 0; i < 8; i++ {
+		for i := range 8 {
 			if trueCount(desiredChs[8*i:8*i+8]...) == 8 {
 				fsbs[i] = true
 			}

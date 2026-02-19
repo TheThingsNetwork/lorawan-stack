@@ -476,7 +476,7 @@ func (st *StoreTest) TestEndDeviceStorePagination(t *T) {
 	app1 := st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 
 	var all []*ttnpb.EndDevice
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		all = append(all, st.population.NewEndDevice(app1.GetIds()))
 	}
 
@@ -519,7 +519,7 @@ func (st *StoreTest) TestEndDeviceBatchUpdate(t *T) {
 	app1 := st.population.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 
 	var all []*ttnpb.EndDevice
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		all = append(all, st.population.NewEndDevice(app1.GetIds()))
 	}
 

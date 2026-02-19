@@ -92,7 +92,7 @@ func AssertEventPubSubPublishRequests(ctx context.Context, reqCh <-chan EventPub
 	t.Helper()
 
 	var evs []events.Event
-	for i := 0; i < n; i++ {
+	for i := range n {
 		if !AssertEventPubSubPublishRequest(ctx, reqCh, func(ev events.Event) bool {
 			t.Logf("Received event number %d out of %d expected: %v", i+1, n, ev)
 			evs = append(evs, ev)

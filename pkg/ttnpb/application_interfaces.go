@@ -113,43 +113,43 @@ func (m *SetApplicationCollaboratorRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *Application) ExtractRequestFields(dst map[string]interface{}) {
+func (m *Application) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateApplicationRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateApplicationRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplication().ExtractRequestFields(dst)
 }
 
-func (m *ListApplicationAPIKeysRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListApplicationAPIKeysRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *UpdateApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateApplicationAPIKeyRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *ListApplicationCollaboratorsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListApplicationCollaboratorsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationCollaboratorRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationCollaboratorRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationUp) ExtractRequestFields(dst map[string]any) {
 	ids := m.EndDeviceIds
 	if ids == nil {
 		return
@@ -157,7 +157,7 @@ func (m *ApplicationUp) ExtractRequestFields(dst map[string]interface{}) {
 	ids.ExtractRequestFields(dst)
 }
 
-func (m *DownlinkQueueRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *DownlinkQueueRequest) ExtractRequestFields(dst map[string]any) {
 	ids := m.EndDeviceIds
 	if ids == nil {
 		return

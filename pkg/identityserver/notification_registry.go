@@ -17,6 +17,7 @@ package identityserver
 import (
 	"context"
 	"fmt"
+	"slices"
 
 	clusterauth "go.thethings.network/lorawan-stack/v3/pkg/auth/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
@@ -47,12 +48,7 @@ var (
 )
 
 func receiversContains(receivers []ttnpb.NotificationReceiver, search ttnpb.NotificationReceiver) bool {
-	for _, receiver := range receivers {
-		if receiver == search {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(receivers, search)
 }
 
 func filterAllowedEmailReceivers(

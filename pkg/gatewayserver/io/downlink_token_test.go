@@ -30,7 +30,7 @@ func TestDownlinkTokens(t *testing.T) {
 
 	msgs := make([]*ttnpb.DownlinkMessage, 0, downlinkTokenItems*2)
 	all := []uint16{}
-	for i := 0; i < downlinkTokenItems*2; i++ {
+	for i := range downlinkTokenItems * 2 {
 
 		msgs = append(msgs, &ttnpb.DownlinkMessage{
 			RawPayload:     []byte{byte(i)},

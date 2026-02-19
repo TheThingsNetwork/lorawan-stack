@@ -158,7 +158,7 @@ func TestConcurrentTaskSet(t *testing.T) {
 	}(ctx, consumerIDPrefix)
 
 	// Create the pop loop with 3 consumers.
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		consumerID := fmt.Sprintf("%s:%d", consumerIDPrefix, i)
 		go func(ctx context.Context, consumerID string) {
 			for {

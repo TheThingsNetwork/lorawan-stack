@@ -95,7 +95,7 @@ func (v *KeyEnvelope) DecodeMsgpack(dec *msgpack.Decoder) error {
 		return err
 	}
 	v.Reset()
-	for i := 0; i < n; i++ {
+	for range n {
 		s, err := dec.DecodeString()
 		if err != nil {
 			return err

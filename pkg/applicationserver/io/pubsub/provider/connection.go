@@ -129,7 +129,7 @@ func isNil(c any) bool {
 	if c == nil {
 		return true
 	}
-	if val := reflect.ValueOf(c); val.Kind() == reflect.Ptr {
+	if val := reflect.ValueOf(c); val.Kind() == reflect.Pointer {
 		return val.IsNil()
 	}
 	return false

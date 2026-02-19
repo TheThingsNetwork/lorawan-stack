@@ -67,7 +67,7 @@ func TestRateLimit(t *testing.T) {
 			{"key1", []string{"default"}},
 			{"key2", []string{"default"}},
 		} {
-			for i := uint(0); i < maxRate; i++ {
+			for i := range maxRate {
 				limit, result := limiter.RateLimit(resource)
 
 				a.So(limit, should.BeFalse)

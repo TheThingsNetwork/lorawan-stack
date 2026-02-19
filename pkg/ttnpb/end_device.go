@@ -2997,35 +2997,35 @@ func (*CreateEndDeviceRequest) RateLimitKey() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ResetAndGetEndDeviceRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDeviceIds().ExtractRequestFields(dst)
 }
 
-func (m *CreateEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *CreateEndDeviceRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDevice().ExtractRequestFields(dst)
 }
 
-func (m *UpdateEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *UpdateEndDeviceRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDevice().ExtractRequestFields(dst)
 }
 
-func (m *SetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SetEndDeviceRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDevice().ExtractRequestFields(dst)
 }
 
-func (m *EndDeviceTemplate) ExtractRequestFields(dst map[string]interface{}) {
+func (m *EndDeviceTemplate) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDevice().ExtractRequestFields(dst)
 }
 
-func (m *GetEndDeviceRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetEndDeviceRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetEndDeviceIds().ExtractRequestFields(dst)
 }
 
-func (m *ListEndDevicesRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListEndDevicesRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *EndDevice) ExtractRequestFields(dst map[string]interface{}) {
+func (m *EndDevice) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 

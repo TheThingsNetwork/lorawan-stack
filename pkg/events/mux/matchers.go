@@ -14,6 +14,8 @@
 
 package mux
 
+import "slices"
+
 import "go.thethings.network/lorawan-stack/v3/pkg/events"
 
 // Matcher matches event names.
@@ -43,12 +45,7 @@ var (
 // MatchNames is a matcher that matches specific event names.
 func MatchNames(names ...string) Matcher {
 	return MatcherFunc(func(name string) bool {
-		for _, n := range names {
-			if n == name {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(names, name)
 	})
 }
 

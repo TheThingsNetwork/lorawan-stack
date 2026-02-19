@@ -31,7 +31,7 @@ import (
 
 func mustHavePeer(ctx context.Context, t *testing.T, c *component.Component, role ttnpb.ClusterRole) {
 	t.Helper()
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		time.Sleep(20 * time.Millisecond)
 		if _, err := c.GetPeer(ctx, role, nil); err == nil {
 			return

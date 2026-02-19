@@ -42,8 +42,7 @@ func TestAtomicConditionals(t *testing.T) {
 	value := int32(5_000)
 	lowerBound := int32(100)
 	upperBound := int32(10_000)
-	for k := 0; k < 100_000; k++ {
-		k := k
+	for k := range 100_000 {
 
 		wg.Add(1)
 		go func() {
@@ -156,7 +155,7 @@ func testWorkerPool(t *testing.T, minWorkers int, maxWorkers int, queueSize int,
 
 	totalWork := 100_000
 	expectedHandlerCalls := int32(0)
-	for i := 0; i < totalWork; i++ {
+	for i := range totalWork {
 		if err := wp.Publish(workCtx, i); err != nil {
 			workFailed.Store(i, 0)
 		} else {
@@ -248,7 +247,7 @@ func benchmarkWorkerPool(b *testing.B, processingDelay time.Duration, publishing
 		var wg sync.WaitGroup
 		publisher := func() {
 			defer wg.Done()
-			for p := 0; p < 1_000; p++ {
+			for range 1_000 {
 				if err := wp.Publish(ctx, time.Now()); err != nil {
 					atomic.AddInt64(&dropped, 1)
 				} else {

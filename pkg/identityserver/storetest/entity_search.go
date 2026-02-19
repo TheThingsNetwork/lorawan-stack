@@ -635,29 +635,29 @@ func (st *StoreTest) TestEntitySearchPagination(t *T) {
 	})
 
 	var users []*ttnpb.User
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		users = append(users, st.population.NewUser())
 	}
 
 	var applications []*ttnpb.Application
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		applications = append(applications, st.population.NewApplication(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 	var clients []*ttnpb.Client
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		clients = append(clients, st.population.NewClient(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 	var gateways []*ttnpb.Gateway
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		gateways = append(gateways, st.population.NewGateway(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 	var organizations []*ttnpb.Organization
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		organizations = append(organizations, st.population.NewOrganization(users[0].GetOrganizationOrUserIdentifiers()))
 	}
 
 	var endDevices []*ttnpb.EndDevice
-	for i := 0; i < 9; i++ {
+	for range 9 {
 		endDevices = append(endDevices, st.population.NewEndDevice(applications[0].GetIds()))
 	}
 

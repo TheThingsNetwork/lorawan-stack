@@ -23,7 +23,7 @@ import (
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) { // nolint: unparam
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		time.Sleep(20 * time.Millisecond)
 		if _, err := c.GetPeer(ctx, role, nil); err == nil {
 			return

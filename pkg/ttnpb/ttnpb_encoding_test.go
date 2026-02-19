@@ -42,44 +42,44 @@ func TestMarshalers(t *testing.T) {
 		}
 	}()
 
-	var vals [][]interface{}
+	var vals [][]any
 
-	vals = append(vals, []interface{}{
+	vals = append(vals, []any{
 		&BoolValue{},
 		&BoolValue{Value: true},
 	})
 
-	var mTypes []interface{}
+	var mTypes []any
 	for i := range MType_name {
 		mTypes = append(mTypes, MType(i))
 	}
 	vals = append(vals, mTypes)
 
-	var majors []interface{}
+	var majors []any
 	for i := range Major_name {
 		majors = append(majors, Major(i))
 	}
 	vals = append(vals, majors)
 
-	var macVers []interface{}
+	var macVers []any
 	for i := range MACVersion_name {
 		macVers = append(macVers, MACVersion(i))
 	}
 	vals = append(vals, macVers)
 
-	var phyVers []interface{}
+	var phyVers []any
 	for i := range PHYVersion_name {
 		phyVers = append(phyVers, PHYVersion(i))
 	}
 	vals = append(vals, phyVers)
 
-	var drIdxs []interface{}
+	var drIdxs []any
 	for i := range DataRateIndex_name {
 		drIdxs = append(drIdxs, DataRateIndex(i))
 	}
 	vals = append(vals, drIdxs)
 
-	var drIdxVals []interface{}
+	var drIdxVals []any
 	for i := range DataRateIndex_name {
 		drIdxVals = append(drIdxVals, &DataRateIndexValue{
 			Value: DataRateIndex(i),
@@ -87,13 +87,13 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, drIdxVals)
 
-	var drOffsets []interface{}
+	var drOffsets []any
 	for i := range DataRateOffset_name {
 		drOffsets = append(drOffsets, DataRateOffset(i))
 	}
 	vals = append(vals, drOffsets)
 
-	var drOffsetVals []interface{}
+	var drOffsetVals []any
 	for i := range DataRateOffset_name {
 		drOffsetVals = append(drOffsetVals, &DataRateOffsetValue{
 			Value: DataRateOffset(i),
@@ -101,62 +101,62 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, drOffsetVals)
 
-	vals = append(vals, []interface{}{
+	vals = append(vals, []any{
 		&FrequencyValue{Value: 100000},
 		&FrequencyValue{Value: 2000000},
 		&FrequencyValue{Value: 30000000},
 	})
 
-	vals = append(vals, []interface{}{
+	vals = append(vals, []any{
 		&ZeroableFrequencyValue{Value: 0},
 		&ZeroableFrequencyValue{Value: 100000},
 		&ZeroableFrequencyValue{Value: 2000000},
 		&ZeroableFrequencyValue{Value: 30000000},
 	})
 
-	var joinRequestTypes []interface{}
+	var joinRequestTypes []any
 	for i := range JoinRequestType_name {
 		joinRequestTypes = append(joinRequestTypes, JoinRequestType(i))
 	}
 	vals = append(vals, joinRequestTypes)
 
-	var rejoinRequestTypes []interface{}
+	var rejoinRequestTypes []any
 	for i := range RejoinRequestType_name {
 		rejoinRequestTypes = append(rejoinRequestTypes, RejoinRequestType(i))
 	}
 	vals = append(vals, rejoinRequestTypes)
 
-	var cfLists []interface{}
+	var cfLists []any
 	for i := range CFListType_name {
 		cfLists = append(cfLists, CFListType(i))
 	}
 	vals = append(vals, cfLists)
 
-	var classes []interface{}
+	var classes []any
 	for i := range Class_name {
 		classes = append(classes, Class(i))
 	}
 	vals = append(vals, classes)
 
-	var txSchedulePrios []interface{}
+	var txSchedulePrios []any
 	for i := range TxSchedulePriority_name {
 		txSchedulePrios = append(txSchedulePrios, TxSchedulePriority(i))
 	}
 	vals = append(vals, txSchedulePrios)
 
-	var cids []interface{}
+	var cids []any
 	for i := range MACCommandIdentifier_name {
 		cids = append(cids, MACCommandIdentifier(i))
 	}
 	vals = append(vals, cids)
 
-	var dutyCycles []interface{}
+	var dutyCycles []any
 	for i := range AggregatedDutyCycle_name {
 		dutyCycles = append(dutyCycles, AggregatedDutyCycle(i))
 	}
 	vals = append(vals, dutyCycles)
 
-	var dutyCycleVals []interface{}
+	var dutyCycleVals []any
 	for i := range AggregatedDutyCycle_name {
 		dutyCycleVals = append(dutyCycleVals, &AggregatedDutyCycleValue{
 			Value: AggregatedDutyCycle(i),
@@ -164,13 +164,13 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, dutyCycleVals)
 
-	var pingSlots []interface{}
+	var pingSlots []any
 	for i := range PingSlotPeriod_name {
 		pingSlots = append(pingSlots, PingSlotPeriod(i))
 	}
 	vals = append(vals, pingSlots)
 
-	var pingSlotVals []interface{}
+	var pingSlotVals []any
 	for i := range PingSlotPeriod_name {
 		pingSlotVals = append(pingSlotVals, &PingSlotPeriodValue{
 			Value: PingSlotPeriod(i),
@@ -178,31 +178,31 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, pingSlotVals)
 
-	var rejoinCounts []interface{}
+	var rejoinCounts []any
 	for i := range RejoinCountExponent_name {
 		rejoinCounts = append(rejoinCounts, RejoinCountExponent(i))
 	}
 	vals = append(vals, rejoinCounts)
 
-	var rejoinTimes []interface{}
+	var rejoinTimes []any
 	for i := range RejoinTimeExponent_name {
 		rejoinTimes = append(rejoinTimes, RejoinTimeExponent(i))
 	}
 	vals = append(vals, rejoinTimes)
 
-	var rejoinPeriods []interface{}
+	var rejoinPeriods []any
 	for i := range RejoinPeriodExponent_name {
 		rejoinPeriods = append(rejoinPeriods, RejoinPeriodExponent(i))
 	}
 	vals = append(vals, rejoinPeriods)
 
-	var deviceEIRPs []interface{}
+	var deviceEIRPs []any
 	for i := range DeviceEIRP_name {
 		deviceEIRPs = append(deviceEIRPs, DeviceEIRP(i))
 	}
 	vals = append(vals, deviceEIRPs)
 
-	var deviceEIRPVals []interface{}
+	var deviceEIRPVals []any
 	for i := range DeviceEIRP_name {
 		deviceEIRPVals = append(deviceEIRPVals, &DeviceEIRPValue{
 			Value: DeviceEIRP(i),
@@ -210,13 +210,13 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, deviceEIRPVals)
 
-	var ackLimitExponents []interface{}
+	var ackLimitExponents []any
 	for i := range ADRAckLimitExponent_name {
 		ackLimitExponents = append(ackLimitExponents, ADRAckLimitExponent(i))
 	}
 	vals = append(vals, ackLimitExponents)
 
-	var ackLimitExponentVals []interface{}
+	var ackLimitExponentVals []any
 	for i := range ADRAckLimitExponent_name {
 		ackLimitExponentVals = append(ackLimitExponentVals, &ADRAckLimitExponentValue{
 			Value: ADRAckLimitExponent(i),
@@ -224,13 +224,13 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, ackLimitExponentVals)
 
-	var ackDelayExponents []interface{}
+	var ackDelayExponents []any
 	for i := range ADRAckDelayExponent_name {
 		ackDelayExponents = append(ackDelayExponents, ADRAckDelayExponent(i))
 	}
 	vals = append(vals, ackDelayExponents)
 
-	var ackDelayExponentVals []interface{}
+	var ackDelayExponentVals []any
 	for i := range ADRAckDelayExponent_name {
 		ackDelayExponentVals = append(ackDelayExponentVals, &ADRAckDelayExponentValue{
 			Value: ADRAckDelayExponent(i),
@@ -238,13 +238,13 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, ackDelayExponentVals)
 
-	var rxDelays []interface{}
+	var rxDelays []any
 	for i := range RxDelay_name {
 		rxDelays = append(rxDelays, RxDelay(i))
 	}
 	vals = append(vals, rxDelays)
 
-	var rxDelayVals []interface{}
+	var rxDelayVals []any
 	for i := range RxDelay_name {
 		rxDelayVals = append(rxDelayVals, &RxDelayValue{
 			Value: RxDelay(i),
@@ -252,43 +252,43 @@ func TestMarshalers(t *testing.T) {
 	}
 	vals = append(vals, rxDelayVals)
 
-	var minors []interface{}
+	var minors []any
 	for i := range Minor_name {
 		minors = append(minors, Minor(i))
 	}
 	vals = append(vals, minors)
 
-	var grants []interface{}
+	var grants []any
 	for i := range GrantType_name {
 		grants = append(grants, GrantType(i))
 	}
 	vals = append(vals, grants)
 
-	var clusterRoles []interface{}
+	var clusterRoles []any
 	for i := range ClusterRole_name {
 		clusterRoles = append(clusterRoles, ClusterRole(i))
 	}
 	vals = append(vals, clusterRoles)
 
-	var states []interface{}
+	var states []any
 	for i := range State_name {
 		states = append(states, State(i))
 	}
 	vals = append(vals, states)
 
-	var locationSources []interface{}
+	var locationSources []any
 	for i := range LocationSource_name {
 		locationSources = append(locationSources, LocationSource(i))
 	}
 	vals = append(vals, locationSources)
 
-	var rights []interface{}
+	var rights []any
 	for i := range Right_name {
 		rights = append(rights, Right(i))
 	}
 	vals = append(vals, rights)
 
-	var gatewayAntennaPlacements []interface{}
+	var gatewayAntennaPlacements []any
 	for i := range GatewayAntennaPlacement_name {
 		gatewayAntennaPlacements = append(gatewayAntennaPlacements, GatewayAntennaPlacement(i))
 	}
@@ -301,7 +301,7 @@ func TestMarshalers(t *testing.T) {
 		if typ.Kind() == reflect.Pointer {
 			typName = typ.Elem().String()
 		}
-		newV := func() interface{} {
+		newV := func() any {
 			if typ.Kind() == reflect.Pointer {
 				return reflect.New(typ.Elem()).Interface()
 			}

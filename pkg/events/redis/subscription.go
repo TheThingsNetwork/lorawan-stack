@@ -15,6 +15,8 @@
 package redis
 
 import (
+	"slices"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/events"
 	"go.thethings.network/lorawan-stack/v3/pkg/events/basic"
 )
@@ -26,10 +28,8 @@ type subscription struct {
 
 func (s *subscription) matchPattern(evt events.Event) bool {
 	if evt, ok := evt.(*patternEvent); ok {
-		for _, pattern := range s.patterns {
-			if pattern == evt.pattern {
-				return true
-			}
+		if slices.Contains(s.patterns, evt.pattern) {
+			return true
 		}
 	}
 	return false

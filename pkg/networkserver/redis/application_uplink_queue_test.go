@@ -142,9 +142,9 @@ func generateRandomUplinks(t *testing.T, applicationCount, deviceCount int) []*t
 	t.Helper()
 
 	ups := make([]*ttnpb.ApplicationUp, 0, applicationCount*deviceCount)
-	for i := 0; i < applicationCount; i++ {
+	for i := range applicationCount {
 		applicationID := fmt.Sprintf("test-application-%d", i)
-		for j := 0; j < deviceCount; j++ {
+		for j := range deviceCount {
 			deviceID := fmt.Sprintf("test-device-%d", j)
 			ups = append(ups, &ttnpb.ApplicationUp{
 				EndDeviceIds: &ttnpb.EndDeviceIdentifiers{
@@ -261,7 +261,7 @@ func TestApplicationUplinkQueuePopAll(t *testing.T) {
 	uplinkCh := make(chan []*ttnpb.ApplicationUp, consumerCount*appCount)
 	wg := sync.WaitGroup{}
 
-	for i := 0; i < consumerCount; i++ {
+	for i := range consumerCount {
 		consumerID := fmt.Sprintf("test-consumer-%d", i)
 		wg.Add(1)
 		go func() {
@@ -328,7 +328,7 @@ func TestApplicationUplinkQueuePopErr(t *testing.T) {
 	uplinkCh := make(chan []*ttnpb.ApplicationUp, consumerCount*appCount)
 	wg := sync.WaitGroup{}
 
-	for i := 0; i < consumerCount; i++ {
+	for i := range consumerCount {
 		consumerID := fmt.Sprintf("test-consumer-%d", i)
 		wg.Add(1)
 		go func() {

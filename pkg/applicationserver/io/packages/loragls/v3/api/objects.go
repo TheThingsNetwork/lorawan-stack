@@ -292,7 +292,7 @@ type Hex []byte
 
 // MarshalJSON implements json.Marshaler.
 func (h Hex) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%s\"", hex.EncodeToString(h))), nil
+	return fmt.Appendf(nil, "\"%s\"", hex.EncodeToString(h)), nil
 }
 
 // String implements fmt.Stringer.

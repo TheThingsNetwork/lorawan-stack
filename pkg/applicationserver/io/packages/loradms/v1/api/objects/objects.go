@@ -312,7 +312,7 @@ type Hex []byte
 
 // MarshalJSON implements json.Marshaler.
 func (h Hex) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf("\"%s\"", hex.EncodeToString(h))), nil
+	return fmt.Appendf(nil, "\"%s\"", hex.EncodeToString(h)), nil
 }
 
 // String implements fmt.Stringer.
@@ -337,7 +337,7 @@ const (
 
 // MarshalJSON implements json.Marshaler.
 func (e EUI) MarshalJSON() ([]byte, error) {
-	return []byte(fmt.Sprintf(hyphenatedEUIPattern, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7])), nil
+	return fmt.Appendf(nil, hyphenatedEUIPattern, e[0], e[1], e[2], e[3], e[4], e[5], e[6], e[7]), nil
 }
 
 // UnmarshalJSON implements json.Unmarshaler.

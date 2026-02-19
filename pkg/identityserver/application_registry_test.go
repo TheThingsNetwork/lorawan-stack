@@ -146,12 +146,12 @@ func TestApplicationsCRUD(t *testing.T) {
 	adminCreds := rpcCreds(adminKey)
 
 	usr1 := p.NewUser()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 	}
 
 	usr2 := p.NewUser()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewApplication(usr2.GetOrganizationOrUserIdentifiers())
 	}
 
@@ -349,7 +349,7 @@ func TestApplicationsPagination(t *testing.T) {
 	p := &storetest.Population{}
 
 	usr1 := p.NewUser()
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
 	}
 

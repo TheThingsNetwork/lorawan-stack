@@ -225,7 +225,7 @@ func (st *StoreTest) TestAPIKeyStorePagination(t *T) {
 	app1 := st.population.NewApplication(nil)
 
 	var all []*ttnpb.APIKey
-	for i := 0; i < 7; i++ {
+	for i := range 7 {
 		_, key := st.population.NewAPIKey(app1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
 		key.Name = fmt.Sprintf("Key %d", i)
 		all = append(all, key)
@@ -277,7 +277,7 @@ func (st *StoreTest) TestAPIKeyStorePaginationDefaults(t *T) {
 	app1 := st.population.NewApplication(nil)
 
 	var all []*ttnpb.APIKey
-	for i := 0; i < 15; i++ {
+	for i := range 15 {
 		_, key := st.population.NewAPIKey(app1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_ALL)
 		key.Name = fmt.Sprintf("Key %d", i)
 		all = append(all, key)

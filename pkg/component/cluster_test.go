@@ -70,7 +70,7 @@ func TestPeers(t *testing.T) {
 	}
 
 	var peer cluster.Peer
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		time.Sleep(20 * time.Millisecond) // Wait for peers to join cluster.
 		peer, err = c.GetPeer(context.Background(), ttnpb.ClusterRole_NETWORK_SERVER, nil)
 		if err == nil {

@@ -73,11 +73,12 @@ func (h redisHook) ProcessPipelineHook(hook redis.ProcessPipelineHook) redis.Pro
 		if len(cmds) == 0 {
 			printLog("Executing empty pipeline")
 		} else {
-			s := fmt.Sprintf("Executing %d commands in pipeline:", len(cmds))
+			var s strings.Builder
+			s.WriteString(fmt.Sprintf("Executing %d commands in pipeline:", len(cmds)))
 			for _, cmd := range cmds {
-				s += fmt.Sprintf("\n   %s", h.formatCommand(cmd))
+				s.WriteString(fmt.Sprintf("\n   %s", h.formatCommand(cmd)))
 			}
-			printLog(s)
+			printLog(s.String())
 		}
 		return hook(ctx, cmds)
 	}

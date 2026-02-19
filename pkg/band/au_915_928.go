@@ -43,13 +43,13 @@ var (
 
 	au915928UplinkChannels = func(commonDelta, wideChannelDelta ttnpb.DataRateIndex) []Channel {
 		uplinkChannels := make([]Channel, 0, 72)
-		for i := 0; i < 64; i++ {
+		for i := range 64 {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(915200000 + 200000*i),
 				MaxDataRate: ttnpb.DataRateIndex_DATA_RATE_5 + commonDelta,
 			})
 		}
-		for i := 0; i < 8; i++ {
+		for i := range 8 {
 			uplinkChannels = append(uplinkChannels, Channel{
 				Frequency:   uint64(915900000 + 1600000*i),
 				MinDataRate: ttnpb.DataRateIndex_DATA_RATE_6 + commonDelta,
@@ -61,7 +61,7 @@ var (
 
 	au915928DownlinkChannels = func() []Channel {
 		downlinkChannels := make([]Channel, 0, 8)
-		for i := 0; i < 8; i++ {
+		for i := range 8 {
 			downlinkChannels = append(downlinkChannels, Channel{
 				Frequency:   uint64(923300000 + 600000*i),
 				MinDataRate: ttnpb.DataRateIndex_DATA_RATE_8,

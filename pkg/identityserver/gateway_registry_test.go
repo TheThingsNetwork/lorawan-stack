@@ -155,12 +155,12 @@ func TestGatewaysCRUD(t *testing.T) {
 	adminCreds := rpcCreds(adminKey)
 
 	usr1 := p.NewUser()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
 	}
 
 	usr2 := p.NewUser()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewGateway(usr2.GetOrganizationOrUserIdentifiers())
 	}
 
@@ -376,7 +376,7 @@ func TestGatewaysPagination(t *testing.T) {
 	p := &storetest.Population{}
 
 	usr1 := p.NewUser()
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
 	}
 
@@ -431,7 +431,7 @@ func TestGatewayBatchOperations(t *testing.T) {
 	usr1 := p.NewUser()
 	usr2 := p.NewUser()
 	gtwIDs := make([]*ttnpb.GatewayIdentifiers, 0, noOfGateways)
-	for i := 0; i < noOfGateways; i++ {
+	for range noOfGateways {
 		gtw := p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
 		gtw.Attributes = map[string]string{
 			"foo": "bar",
@@ -529,7 +529,7 @@ func TestGatewaysFilter(t *testing.T) {
 	p := &storetest.Population{}
 
 	usr1 := p.NewUser()
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		p.NewGateway(usr1.GetOrganizationOrUserIdentifiers())
 	}
 

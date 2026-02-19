@@ -456,7 +456,7 @@ func TestTaskQueue(t *testing.T) {
 	// specifically LUAI_MAXCSTACK.
 	for _, batchSize := range []int{512 + 1, (512 + 1) * 2, 8192} {
 		p := cl.Pipeline()
-		for i := 0; i < batchSize; i++ {
+		for i := range batchSize {
 			a.So(q.Add(ctx, p, fmt.Sprintf("test%d", i), time.Unix(int64(i), 0), false), should.BeNil)
 		}
 		a.So(func() error {
@@ -465,7 +465,7 @@ func TestTaskQueue(t *testing.T) {
 		}(), should.BeNil)
 
 		times := make(map[string]time.Time)
-		for i := 0; i < batchSize; i++ {
+		for range batchSize {
 			a.So(q.Pop(ctx, "testID", nil, func(p redis.Pipeliner, payload string, startAt time.Time) error {
 				p.Ping(ctx)
 
@@ -477,7 +477,7 @@ func TestTaskQueue(t *testing.T) {
 			}), should.BeNil)
 		}
 		a.So(times, should.HaveLength, batchSize)
-		for i := 0; i < batchSize; i++ {
+		for i := range batchSize {
 			k := fmt.Sprintf("test%d", i)
 
 			t, ok := times[k]
@@ -628,7 +628,7 @@ func TestProtoDeduplicatorRespectsLimit(t *testing.T) {
 
 	bulkedProtosLen := limit + 5
 	bulkedProtos := make([]proto.Message, bulkedProtosLen)
-	for i := 0; i < bulkedProtosLen; i++ {
+	for i := range bulkedProtosLen {
 		s := fmt.Sprintf("proto%d", protoID)
 		bulkedProtos[i] = makeProto(t, s)
 		protoID++

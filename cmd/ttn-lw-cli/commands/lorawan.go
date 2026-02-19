@@ -88,7 +88,7 @@ func decodeUplink(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFram
 		} else {
 			logger.Debug("Decrypting MAC buffer")
 			encOpts := macspec.EncryptionOptions(config.MACVersion, macspec.UplinkFrame, pld.FPort, cmdsInFOpts)
-			for msb := uint32(0); msb < 0xff; msb++ {
+			for msb := range uint32(0xff) {
 				fCnt := msb<<8 | pld.FHdr.FCnt
 				macBuf, err := crypto.DecryptUplink(config.NwkSEncKey, devAddr, fCnt, macBuf, encOpts...)
 				if err == nil {
@@ -171,7 +171,7 @@ func decodeDownlink(msg *ttnpb.Message, config lorawanConfig) (*lorawanDecodedFr
 	if len(macBuf) > 0 && (!cmdsInFOpts || macspec.EncryptFOpts(config.MACVersion)) && !config.NwkSKey.IsZero() {
 		logger.Debug("Decrypting MAC buffer")
 		encOpts := macspec.EncryptionOptions(config.MACVersion, macspec.DownlinkFrame, pld.FPort, cmdsInFOpts)
-		for msb := uint32(0); msb < 0xffff; msb++ {
+		for msb := range uint32(0xffff) {
 			fCnt := msb<<16 | pld.FHdr.FCnt
 			macBuf, err := crypto.DecryptDownlink(config.NwkSKey, devAddr, fCnt, macBuf, encOpts...)
 			if err == nil {

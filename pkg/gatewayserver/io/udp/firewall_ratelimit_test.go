@@ -56,7 +56,7 @@ func TestRateLimitingFirewall(t *testing.T) {
 					f = NewRateLimitingFirewall(f, 3, time.Hour)
 				}
 
-				for i := 0; i < 4; i++ {
+				for i := range 4 {
 					err := f.Filter(encoding.Packet{
 						GatewayEUI: eui1,
 						GatewayAddr: &net.UDPAddr{

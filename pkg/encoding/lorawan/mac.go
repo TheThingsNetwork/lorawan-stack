@@ -196,7 +196,7 @@ var DefaultMACCommands = MACCommandSpec{
 		},
 		UnmarshalDownlink: newMACUnmarshaler(ttnpb.MACCommandIdentifier_CID_LINK_ADR, "LinkADRReq", 4, func(phy band.Band, b []byte, cmd *ttnpb.MACCommand) error {
 			var chMask [16]bool
-			for i := 0; i < 16; i++ {
+			for i := range 16 {
 				chMask[i] = (b[1+i/8]>>(i%8))&1 == 1
 			}
 			cmd.Payload = &ttnpb.MACCommand_LinkAdrReq{

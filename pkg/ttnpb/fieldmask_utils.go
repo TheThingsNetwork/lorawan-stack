@@ -15,6 +15,7 @@
 package ttnpb
 
 import (
+	"slices"
 	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -158,12 +159,7 @@ func ProhibitFields(requested []string, search ...string) error {
 
 // ContainsField returns true if the given paths contains the field path.
 func ContainsField(path string, allowedPaths []string) bool {
-	for _, allowedPath := range allowedPaths {
-		if path == allowedPath {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(allowedPaths, path)
 }
 
 // AllowedFields returns the paths from the given paths that are in the allowed paths.

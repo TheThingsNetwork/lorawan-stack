@@ -15,6 +15,7 @@
 package metadata_test
 
 import (
+	"maps"
 	"testing"
 	"time"
 
@@ -136,17 +137,13 @@ func TestClusterEndDeviceRegistry(t *testing.T) { // nolint:gocyclo
 				stored.Locations = make(map[string]*ttnpb.Location, len(locationsPatch))
 			}
 
-			for k, l := range locationsPatch {
-				stored.Locations[k] = l
-			}
+			maps.Copy(stored.Locations, locationsPatch)
 
 			if len(stored.Attributes) == 0 {
 				stored.Attributes = make(map[string]string, len(attributesPatch))
 			}
 
-			for k, v := range attributesPatch {
-				stored.Attributes[k] = v
-			}
+			maps.Copy(stored.Attributes, attributesPatch)
 
 			return stored, []string{"locations", "attributes"}, nil
 		},

@@ -65,22 +65,22 @@ func (m *SetApplicationPubSubRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *ApplicationPubSubIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationPubSubIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *ApplicationPubSub) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationPubSub) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationPubSubRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationPubSubRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *ListApplicationPubSubsRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListApplicationPubSubsRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *SetApplicationPubSubRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SetApplicationPubSubRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetPubsub().ExtractRequestFields(dst)
 }

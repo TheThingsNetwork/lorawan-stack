@@ -278,7 +278,7 @@ func TestToken(t *testing.T) {
 				)
 
 				// Repeat a couple of times to test token and public key cache.
-				for i := 0; i < 10; i++ {
+				for range 10 {
 					token, err := tokenSource.Token()
 					if err != nil {
 						if tc.tokenRequestErrorAssertion == nil {

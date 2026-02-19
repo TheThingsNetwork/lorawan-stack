@@ -27,13 +27,13 @@ const (
 	shouldHaveParentContext = "Expected context to have parent '%v' (but it didn't)!"
 )
 
-var contextType = reflect.TypeOf((*context.Context)(nil)).Elem()
+var contextType = reflect.TypeFor[context.Context]()
 
 // contextParent returns the parent context of ctx and true if one is found, nil and false otherwise.
 // contextParent assumes that ctx has a parent iff it's located at field named Context.
 func contextParent(ctx context.Context) (context.Context, bool) {
 	rv := reflect.ValueOf(ctx)
-	for rv.Kind() == reflect.Ptr {
+	for rv.Kind() == reflect.Pointer {
 		rv = rv.Elem()
 	}
 	if !rv.IsValid() {
@@ -60,7 +60,7 @@ func contextParent(ctx context.Context) (context.Context, bool) {
 	}
 
 	fv := rv.FieldByName("Context")
-	if (fv.Kind() == reflect.Ptr || fv.Kind() == reflect.Interface) && fv.IsNil() {
+	if (fv.Kind() == reflect.Pointer || fv.Kind() == reflect.Interface) && fv.IsNil() {
 		return nil, true
 	}
 	return fv.Interface().(context.Context), true

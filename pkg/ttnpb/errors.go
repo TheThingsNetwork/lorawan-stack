@@ -35,7 +35,7 @@ func (e errorDetails) Error() string {
 func (e errorDetails) Namespace() string     { return e.GetNamespace() }
 func (e errorDetails) Name() string          { return e.GetName() }
 func (e errorDetails) MessageFormat() string { return e.GetMessageFormat() }
-func (e errorDetails) PublicAttributes() map[string]interface{} {
+func (e errorDetails) PublicAttributes() map[string]any {
 	attributes, err := goproto.Map(e.GetAttributes())
 	if err != nil {
 		panic(fmt.Sprintf("Failed to decode error attributes: %s", err)) // Likely a bug in goproto.
@@ -128,13 +128,13 @@ func init() {
 	}
 }
 
-type valueErr func(interface{}) *errors.Error
+type valueErr func(any) *errors.Error
 
 func unexpectedValue(err interface {
-	WithAttributes(kv ...interface{}) *errors.Error
+	WithAttributes(kv ...any) *errors.Error
 },
 ) valueErr {
-	return func(value interface{}) *errors.Error {
+	return func(value any) *errors.Error {
 		return err.WithAttributes(valueKey, value)
 	}
 }
@@ -148,11 +148,11 @@ var (
 	errInvalidField = errors.DefineInvalidArgument("field", "invalid field `{field}`")
 )
 
-func errExpectedLowerOrEqual(lorawanField string, max interface{}) valueErr {
+func errExpectedLowerOrEqual(lorawanField string, max any) valueErr {
 	return unexpectedValue(errFieldHasMax.WithAttributes("field", lorawanField, "max", max))
 }
 
-func errExpectedBetween(lorawanField string, min, max interface{}) valueErr {
+func errExpectedBetween(lorawanField string, min, max any) valueErr {
 	return unexpectedValue(errFieldBound.WithAttributes("field", lorawanField, "min", min, "max", max))
 }
 

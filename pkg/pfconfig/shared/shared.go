@@ -324,10 +324,7 @@ func BuildSX1301Config(frequencyPlan *frequencyplans.FrequencyPlan) (*SX1301Conf
 		conf.Radios[i] = rfConfig
 	}
 
-	numChannels := len(frequencyPlan.UplinkChannels)
-	if numChannels < 8 {
-		numChannels = 8
-	}
+	numChannels := max(len(frequencyPlan.UplinkChannels), 8)
 	conf.Channels = make([]IFConfig, numChannels)
 	for i, channel := range frequencyPlan.UplinkChannels {
 		ifConfig := IFConfig{

@@ -1417,11 +1417,11 @@ func (env TestEnvironment) AssertHandleDeviceUplink(ctx context.Context, assert 
 								UserAgent:      true,
 							}), expectedEvs) {
 								printEvents := func(evs []events.Event) string {
-									var s string
+									var s strings.Builder
 									for i, ev := range evs {
-										s += fmt.Sprintf("\nevent %d: %s", i, ev)
+										s.WriteString(fmt.Sprintf("\nevent %d: %s", i, ev))
 									}
-									return s
+									return s.String()
 								}
 								t.Errorf("Uplink event assertion failed.\nGot events: %s\nExpected events: %s", printEvents(evs), printEvents(expectedEvs))
 								return false

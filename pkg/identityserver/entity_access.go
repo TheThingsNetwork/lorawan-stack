@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"runtime/trace"
+	"slices"
 	"strings"
 	"time"
 
@@ -441,12 +442,7 @@ func (is *IdentityServer) RequireAdminForFieldUpdate(ctx context.Context, fields
 		return nil
 	}
 	isAdminField := func(field string) bool {
-		for _, adminField := range adminFields {
-			if field == adminField {
-				return true
-			}
-		}
-		return false
+		return slices.Contains(adminFields, field)
 	}
 	for _, field := range fields {
 		if isAdminField(field) {

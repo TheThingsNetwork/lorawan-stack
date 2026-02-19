@@ -199,7 +199,7 @@ func TestProcessDownlinkTask(t *testing.T) {
 			_, a := test.MustNewTFromContext(ctx)
 			ctx = events.ContextWithCorrelationID(ctx, down.CorrelationIds...)
 			evIDOpt := events.WithIdentifiers(ids)
-			for i := uint(0); i < n; i++ {
+			for range n {
 				if !test.AllTrue(
 					a.So(env.Events, should.ReceiveEventFunc, attemptEventEqual,
 						attempt.With(events.WithData(down)).New(ctx, evIDOpt),

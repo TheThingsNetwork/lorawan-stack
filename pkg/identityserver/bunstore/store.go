@@ -181,7 +181,7 @@ const (
 // Transact implements the store.TransactionalStore interface.
 func (s *Store) Transact(ctx context.Context, fc func(context.Context, store.Store) error) (err error) {
 	delayOnUnavailable := initialDelayOnUnavailable
-	for i := 0; i < maxAttempts; i++ {
+	for i := range maxAttempts {
 		err = s.baseStore.transact(ctx, func(ctx context.Context, idb bun.IDB) error {
 			baseStore := s.baseDB.baseStore()
 			baseStore.DB = idb

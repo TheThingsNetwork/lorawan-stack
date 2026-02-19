@@ -191,7 +191,7 @@ func handleDownlinkTaskQueueTest(ctx context.Context, q DownlinkTaskQueue, consu
 
 	// Expect 3 slots
 	receivedSlots := make(map[*ttnpb.EndDeviceIdentifiers][]time.Time, 3)
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		t.Helper()
 		a := assertions.New(t)
 		select {

@@ -63,7 +63,7 @@ func WrapKey(plaintext, kek []byte) ([]byte, error) {
 
 	// Fill R blocks
 	r := make([][8]byte, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		copy(r[i][:], plaintext[i*8:(i+1)*8])
 	}
 
@@ -80,7 +80,7 @@ func WrapKey(plaintext, kek []byte) ([]byte, error) {
 	// Build the result
 	ciphertext := make([]byte, 0, 8*(n+1))
 	ciphertext = append(ciphertext, a[:]...)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		ciphertext = append(ciphertext, r[i][:]...)
 	}
 
@@ -112,7 +112,7 @@ func UnwrapKey(ciphertext, kek []byte) ([]byte, error) {
 
 	// Fill R blocks
 	r := make([][8]byte, n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		copy(r[i][:], ciphertext[(i+1)*8:(i+2)*8])
 	}
 
@@ -133,7 +133,7 @@ func UnwrapKey(ciphertext, kek []byte) ([]byte, error) {
 
 	// Build the result
 	plaintext := make([]byte, 0, 8*n)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		plaintext = append(plaintext, r[i][:]...)
 	}
 

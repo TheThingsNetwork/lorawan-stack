@@ -27,7 +27,7 @@ import (
 )
 
 func mustHavePeer(ctx context.Context, c *component.Component, role ttnpb.ClusterRole) {
-	for i := 0; i < 20; i++ {
+	for range 20 {
 		time.Sleep(20 * time.Millisecond)
 		if _, err := c.GetPeer(ctx, role, nil); err == nil {
 			return
@@ -56,11 +56,10 @@ func (*mock) FormatID() string {
 }
 
 func (m mock) MarshalText() ([]byte, error) {
-	return []byte(fmt.Sprintf(
+	return fmt.Appendf(nil,
 		"%s:%s",
 		strings.ToUpper(hex.EncodeToString(m.ids.JoinEui)),
-		strings.ToUpper(hex.EncodeToString(m.ids.DevEui))),
-	), nil
+		strings.ToUpper(hex.EncodeToString(m.ids.DevEui))), nil
 }
 
 func (*mock) UnmarshalText([]byte) error { return nil }

@@ -407,7 +407,7 @@ func TestPba(t *testing.T) {
 			name: "RoutingPolicy/HomeNetwork/List",
 			withControlPlaneHandlers: func(p *mock.PBControlPlane) {
 				policies := make([]*packetbroker.RoutingPolicy, 42)
-				for i := 0; i < len(policies); i++ {
+				for i := range policies {
 					policies[i] = &packetbroker.RoutingPolicy{
 						ForwarderNetId:    0x13,
 						ForwarderTenantId: "foo-tenant",
@@ -746,7 +746,7 @@ func TestPba(t *testing.T) {
 
 func generateNetworks(n int) []*packetbroker.NetworkOrTenant {
 	networks := make([]*packetbroker.NetworkOrTenant, n)
-	for i := 0; i < len(networks); i++ {
+	for i := range networks {
 		networks[i] = &packetbroker.NetworkOrTenant{}
 		if i%2 == 0 {
 			networks[i].Value = &packetbroker.NetworkOrTenant_Network{

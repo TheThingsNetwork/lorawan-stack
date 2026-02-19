@@ -100,7 +100,7 @@ func EnqueueRelayCtrlUplinkListReq(
 			currentRules := dev.MacState.GetCurrentParameters().GetRelay().GetServing().GetUplinkForwardingRules()
 			desiredRules := dev.MacState.DesiredParameters.Relay.GetServing().UplinkForwardingRules
 			var reqs []*ttnpb.MACCommand_RelayCtrlUplinkListReq
-			for i := 0; i < len(currentRules); i++ {
+			for i := range currentRules {
 				switch {
 				case !DeviceNeedsRelayCtrlUplinkListReqAtIndex(dev, i):
 				case i >= len(desiredRules), proto.Equal(desiredRules[i], emptyRelayUplinkForwardingRule):

@@ -352,10 +352,7 @@ var startCommand = &cobra.Command{
 
 			logger.Info("Setting up Network Server")
 
-			applicationUplinkQueueSize := config.NS.ApplicationUplinkQueue.BufferSize
-			if config.NS.ApplicationUplinkQueue.BufferSize > math.MaxInt64 {
-				applicationUplinkQueueSize = math.MaxInt64
-			}
+			applicationUplinkQueueSize := min(config.NS.ApplicationUplinkQueue.BufferSize, math.MaxInt64)
 			applicationUplinkQueue := nsredis.NewApplicationUplinkQueue(
 				NewNetworkServerApplicationUplinkQueueRedis(config),
 				int64(applicationUplinkQueueSize),

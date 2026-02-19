@@ -17,6 +17,7 @@ package commands
 import (
 	"fmt"
 	"io"
+	"maps"
 	"os"
 	"strconv"
 	"strings"
@@ -70,9 +71,7 @@ func forceFlags() *pflag.FlagSet {
 
 func mergeKV(attributes map[string]string, kv []string) map[string]string {
 	out := make(map[string]string, len(attributes)+len(kv))
-	for k, v := range attributes {
-		out[k] = v
-	}
+	maps.Copy(out, attributes)
 	for _, kv := range kv {
 		kv := strings.SplitN(kv, "=", 2)
 		if len(kv) != 2 {

@@ -68,22 +68,22 @@ func (m *SetApplicationWebhookRequest) IDString() string {
 
 // All ExtractRequestFields methods are used by github.com/grpc-ecosystem/go-grpc-middleware/tags.
 
-func (m *ApplicationWebhookIdentifiers) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationWebhookIdentifiers) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *ApplicationWebhook) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ApplicationWebhook) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *GetApplicationWebhookRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *GetApplicationWebhookRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetIds().ExtractRequestFields(dst)
 }
 
-func (m *ListApplicationWebhooksRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *ListApplicationWebhooksRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetApplicationIds().ExtractRequestFields(dst)
 }
 
-func (m *SetApplicationWebhookRequest) ExtractRequestFields(dst map[string]interface{}) {
+func (m *SetApplicationWebhookRequest) ExtractRequestFields(dst map[string]any) {
 	m.GetWebhook().ExtractRequestFields(dst)
 }

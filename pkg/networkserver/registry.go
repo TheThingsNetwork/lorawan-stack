@@ -271,7 +271,7 @@ var replacedEndDeviceFields = []registry.ReplacedEndDeviceField{
 				if n != len(newValue) {
 					return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
 				}
-				for i := 0; i < n; i++ {
+				for i := range n {
 					if !proto.Equal(oldValue[i], newValue[i]) {
 						return errInvalidFieldValue.WithAttributes("field", "queued_application_downlinks")
 					}

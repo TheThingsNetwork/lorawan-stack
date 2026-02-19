@@ -393,7 +393,7 @@ func (prefix *DevAddrPrefix) Unmarshal(data []byte) error { return prefix.Unmars
 // MarshalJSON implements the json.Marshaler interface.
 func (prefix DevAddrPrefix) MarshalJSON() ([]byte, error) {
 	str := append([]byte(`"`+hex.EncodeToString(prefix.DevAddr[:])), '/')
-	str = append(str, []byte(fmt.Sprintf("%d", prefix.Length))...)
+	str = append(str, fmt.Appendf(nil, "%d", prefix.Length)...)
 	return append(str, '"'), nil
 }
 
@@ -525,7 +525,7 @@ func UnmarshalDevAddrPrefixSlice(s *jsonplugin.UnmarshalState) [][]byte {
 // WithPrefix returns the DevAddr, but with the first length bits replaced by the Prefix.
 func (addr DevAddr) WithPrefix(prefix DevAddrPrefix) (prefixed DevAddr) {
 	k := uint(prefix.Length)
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		if k >= 8 {
 			prefixed[i] = prefix.DevAddr[i] & 0xff
 			k -= 8

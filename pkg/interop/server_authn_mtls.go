@@ -17,6 +17,7 @@ package interop
 import (
 	"context"
 	"crypto/tls"
+	"slices"
 )
 
 func (s *Server) verifySenderCertificate(
@@ -30,17 +31,15 @@ func (s *Server) verifySenderCertificate(
 	}
 	for _, chain := range state.VerifiedChains {
 		peerCert, clientCA := chain[0], chain[len(chain)-1]
-		for _, senderClientCA := range senderClientCAs {
-			if clientCA.Equal(senderClientCA) {
-				// If the TLS client certificate contains DNS addresses, use those.
-				// Otherwise, fallback to using CommonName as address.
-				if len(peerCert.DNSNames) > 0 {
-					addrs = append([]string(nil), peerCert.DNSNames...)
-				} else {
-					addrs = []string{peerCert.Subject.CommonName}
-				}
-				return
+		if slices.ContainsFunc(senderClientCAs, clientCA.Equal) {
+			// If the TLS client certificate contains DNS addresses, use those.
+			// Otherwise, fallback to using CommonName as address.
+			if len(peerCert.DNSNames) > 0 {
+				addrs = append([]string(nil), peerCert.DNSNames...)
+			} else {
+				addrs = []string{peerCert.Subject.CommonName}
 			}
+			return
 		}
 	}
 	// TODO: Verify state.PeerCertificates[0] with senderClientCAs as Roots

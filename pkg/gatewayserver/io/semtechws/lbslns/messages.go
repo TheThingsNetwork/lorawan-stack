@@ -52,7 +52,7 @@ type DiscoverQuery struct {
 // This message is sent by the Gateway Server.
 type DiscoverResponse struct {
 	EUI   id6.EUI `json:"router"`
-	Muxs  id6.EUI `json:"muxs,omitempty"`
+	Muxs  id6.EUI `json:"muxs"`
 	URI   string  `json:"uri,omitempty"`
 	Error string  `json:"error,omitempty"`
 }

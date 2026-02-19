@@ -33,8 +33,8 @@ var (
 func headerTokens(h http.Header, key string) []string {
 	var tokens []string
 	for _, value := range h[key] {
-		value := strings.Split(strings.TrimSpace(value), ",")
-		for _, token := range value {
+		value := strings.SplitSeq(strings.TrimSpace(value), ",")
+		for token := range value {
 			token := strings.TrimSpace(token)
 			tokens = append(tokens, token)
 		}

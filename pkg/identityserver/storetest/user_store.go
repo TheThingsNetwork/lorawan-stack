@@ -463,7 +463,7 @@ func (st *StoreTest) TestUserStoreCRUD(t *T) {
 
 func (st *StoreTest) TestUserStorePagination(t *T) {
 	var all []*ttnpb.User
-	for i := 0; i < 7; i++ {
+	for range 7 {
 		all = append(all, st.population.NewUser())
 	}
 
@@ -509,7 +509,7 @@ func (st *StoreTest) TestUserStorePaginationDefaults(t *T) {
 		DefaultLimit: 7,
 	})
 
-	for i := 0; i < 15; i++ {
+	for range 15 {
 		st.population.NewUser()
 	}
 

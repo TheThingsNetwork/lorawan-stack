@@ -42,7 +42,7 @@ func TestMockTime(t *testing.T) {
 
 	n := 5
 	afterCh := clock.After(time.Duration(n) * time.Nanosecond)
-	for i := 0; i < n; i++ {
+	for range n {
 		select {
 		case <-afterCh:
 			t.Error("After channel read succeeded too soon")

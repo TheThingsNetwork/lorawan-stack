@@ -46,8 +46,8 @@ func FromProxyHeaders(h HeaderReader) (*x509.Certificate, bool, error) {
 			// See https://www.envoyproxy.io/docs/envoy/latest/configuration/http/http_conn_man/headers#x-forwarded-client-cert
 			key: "x-forwarded-client-cert",
 			parse: func(value string) (*x509.Certificate, bool, error) {
-				parts := strings.Split(value, ";")
-				for _, part := range parts {
+				parts := strings.SplitSeq(value, ";")
+				for part := range parts {
 					chainPEM, found := strings.CutPrefix(part, "Chain=")
 					if !found {
 						continue

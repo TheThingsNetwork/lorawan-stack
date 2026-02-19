@@ -58,7 +58,7 @@ func NewClusterComponentConnection(ctx context.Context,
 		return nil, nil, err
 	}
 	var cc *grpc.ClientConn
-	for i := 0; i < maxRetries; i++ {
+	for range maxRetries {
 		time.Sleep(delay)
 		cc, err = c.GetPeerConn(ctx, role, nil)
 		if err == nil {

@@ -45,10 +45,7 @@ func (em Emission) Duration() time.Duration { return em.d }
 
 // OffAir returns the time-off-air of the emission.
 func (em Emission) OffAir(toa frequencyplans.TimeOffAir) time.Duration {
-	d := time.Duration(float32(em.d) * toa.Fraction)
-	if d < toa.Duration {
-		d = toa.Duration
-	}
+	d := max(time.Duration(float32(em.d)*toa.Fraction), toa.Duration)
 	return d
 }
 

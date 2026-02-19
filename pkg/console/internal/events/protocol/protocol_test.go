@@ -173,10 +173,10 @@ func TestMarshal(t *testing.T) {
 		Error: errStatus,
 	})
 	if a.So(err, should.BeNil) {
-		a.So(b, should.Resemble, []byte(fmt.Sprintf(`{"type":"error","id":66,"error":%v}`, string(errJSON)))) // nolint:lll
+		a.So(b, should.Resemble, fmt.Appendf(nil, `{"type":"error","id":66,"error":%v}`, string(errJSON))) // nolint:lll
 	}
 	var errResp protocol.ErrorResponse
-	err = json.Unmarshal([]byte(fmt.Sprintf(`{"type":"error","id":66,"error":%v}`, string(errJSON))), &errResp) // nolint:lll
+	err = json.Unmarshal(fmt.Appendf(nil, `{"type":"error","id":66,"error":%v}`, string(errJSON)), &errResp) // nolint:lll
 	if a.So(err, should.BeNil) {
 		a.So(errResp, should.Resemble, protocol.ErrorResponse{
 			ID:    0x42,

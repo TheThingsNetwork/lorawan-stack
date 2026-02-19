@@ -40,31 +40,31 @@ func TestRegistrySearch(t *testing.T) {
 	adminUsrKey, _ := p.NewAPIKey(adminUsr.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
 	adminUsrCreds := rpcCreds(adminUsrKey)
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		app := p.NewApplication(nil)
 		if i < 5 {
 			app.Description = desc
 		}
 	}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		cli := p.NewClient(nil)
 		if i < 5 {
 			cli.Description = desc
 		}
 	}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		gtw := p.NewGateway(nil)
 		if i < 5 {
 			gtw.Description = desc
 		}
 	}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		org := p.NewOrganization(nil)
 		if i < 5 {
 			org.Description = desc
 		}
 	}
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		usr := p.NewUser()
 		if i < 5 {
 			usr.Description = desc
@@ -156,7 +156,7 @@ func TestRegistrySearchDeletedEntities(t *testing.T) { // nolint:gocyclo
 	usrs := make([]*ttnpb.User, 10)
 
 	// Making an uneven number of deleted entities just to avoid having a flaky tests.
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		apps[i] = p.NewApplication(usr.GetOrganizationOrUserIdentifiers())
 		clis[i] = p.NewClient(usr.GetOrganizationOrUserIdentifiers())
 		gtws[i] = p.NewGateway(usr.GetOrganizationOrUserIdentifiers())
@@ -179,7 +179,7 @@ func TestRegistrySearchDeletedEntities(t *testing.T) { // nolint:gocyclo
 		a, ctx := test.New(t)
 
 		// Delete some entities associated with the non admin user.
-		for i := 0; i < deletedAmount; i++ {
+		for i := range deletedAmount {
 			_, err := appReg.Delete(ctx, apps[i].Ids, usrCreds)
 			a.So(err, should.BeNil)
 			_, err = cliReg.Delete(ctx, clis[i].Ids, usrCreds)
@@ -287,7 +287,7 @@ func TestRegistrySearchDeletedEntities(t *testing.T) { // nolint:gocyclo
 		// Admin only operations
 		usrReg := ttnpb.NewUserRegistryClient(cc)
 		// Delete some users.
-		for i := 0; i < deletedAmount; i++ {
+		for i := range deletedAmount {
 			_, err := usrReg.Delete(ctx, usrs[i].Ids, adminUsrCreds)
 			a.So(err, should.BeNil)
 		}

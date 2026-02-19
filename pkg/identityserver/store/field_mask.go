@@ -14,6 +14,8 @@
 
 package store
 
+import "slices"
+
 import "strings"
 
 // FieldMask is used to specify applicable fields in SELECT or UPDATE queries.
@@ -21,12 +23,7 @@ type FieldMask []string
 
 // Contains returns true if the given field is present in the field mask.
 func (fm FieldMask) Contains(search string) bool {
-	for _, f := range fm {
-		if f == search {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(fm, search)
 }
 
 // TopLevel returns the top-level fields from the field mask.
@@ -48,8 +45,8 @@ func (fm FieldMask) TrimPrefix(prefix string) FieldMask {
 	}
 	out := make([]string, 0, len(fm))
 	for _, f := range fm {
-		if strings.HasPrefix(f, prefix) {
-			out = append(out, strings.TrimPrefix(f, prefix))
+		if after, ok := strings.CutPrefix(f, prefix); ok {
+			out = append(out, after)
 		}
 	}
 	return out

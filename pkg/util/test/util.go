@@ -30,14 +30,14 @@ func FormatError(err error) string {
 	if err == nil {
 		return "nil"
 	}
-	var s string
+	var s strings.Builder
 	for i, err := range errors.Stack(err) {
-		s += fmt.Sprintf(`
+		s.WriteString(fmt.Sprintf(`
 %s-> %s (attributes: %v)`,
 			strings.Repeat("-", i), err, errors.Attributes(err),
-		)
+		))
 	}
-	return s
+	return s.String()
 }
 
 // Delay is the value, which can be used to slowdown the execution of time-dependent tests.

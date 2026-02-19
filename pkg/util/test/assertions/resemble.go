@@ -66,7 +66,7 @@ func ShouldResembleFields(actual any, expected ...any) (message string) {
 		return fmt.Sprintf(needAtLeastValues, 1, len(expected))
 	}
 
-	ps := reflect.MakeSlice(reflect.TypeOf([]string{}), 0, 0)
+	ps := reflect.MakeSlice(reflect.TypeFor[[]string](), 0, 0)
 	for _, p := range expected[1:] {
 		pv := reflect.ValueOf(p)
 		switch pv.Kind() {
@@ -90,7 +90,7 @@ func ShouldResembleFields(actual any, expected ...any) (message string) {
 	}
 	selectFields := func(v any) (any, string) {
 		t := reflect.TypeOf(v)
-		if t.Kind() != reflect.Ptr {
+		if t.Kind() != reflect.Pointer {
 			return nil, fmt.Sprintf(needPointer, v)
 		}
 		sv := reflect.New(t.Elem())

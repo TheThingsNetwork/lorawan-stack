@@ -16,6 +16,7 @@ package experimental
 
 import (
 	"context"
+	"maps"
 	"sync"
 )
 
@@ -65,9 +66,7 @@ func (r *Registry) allFeatures() map[string]bool {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 	features := make(map[string]bool, len(r.features))
-	for k, v := range r.features {
-		features[k] = v
-	}
+	maps.Copy(features, r.features)
 	return features
 }
 
