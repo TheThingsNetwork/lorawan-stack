@@ -19,7 +19,7 @@ jobs:
       - name: Check branch
         run: echo "${{ github.ref_name }}" | grep -Pq '^release/v3\.\d+\.\d+$'
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
           submodules: true
@@ -40,7 +40,7 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: data/lorawan-devices-index
           key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}

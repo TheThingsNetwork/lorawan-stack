@@ -9,7 +9,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check out code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
       - name: Fetch base ref
         run: git fetch origin ${{ github.base_ref }}
       - name: Install Go and Dependencies
