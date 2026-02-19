@@ -441,3 +441,12 @@ func FromDownlinkMessage(msg *ttnpb.DownlinkMessage) (*TxPacket, error) {
 	}
 	return tx, nil
 }
+
+// ConcentratorTimestampFromDownlinkMessage gets the concentrator timestamp from the downlink message.
+func ConcentratorTimestampFromDownlinkMessage(msg *ttnpb.DownlinkMessage) (int64, error) {
+	scheduled := msg.GetScheduled()
+	if scheduled == nil {
+		return 0, errNotScheduled.New()
+	}
+	return scheduled.ConcentratorTimestamp, nil
+}
