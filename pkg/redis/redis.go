@@ -875,7 +875,11 @@ func LockedWatch(ctx context.Context, r WatchCmdable, k, id string, expiration t
 		return err
 	}
 	defer func() {
-		if err := UnlockMutex(ctx, r, k, id, expiration); err != nil {
+		// Use a separate context with timeout for unlocking to ensure that we attempt to unlock the mutex even if
+		// the main context is already expired.
+		unlockCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), 5*time.Second)
+		defer cancel()
+		if err := UnlockMutex(unlockCtx, r, k, id, expiration); err != nil {
 			log.FromContext(ctx).WithField("key", k).WithError(err).Error("Failed to unlock mutex")
 		}
 	}()
