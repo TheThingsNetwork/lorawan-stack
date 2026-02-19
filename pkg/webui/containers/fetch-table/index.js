@@ -296,6 +296,7 @@ const FetchTable = props => {
                 className={style.searchBar}
                 inputWidth="full"
                 maxLength={searchQueryMaxLength}
+                readOnly={fetching}
               />
             )}
             {(Boolean(actionItems) || mayAdd) && (
