@@ -16,6 +16,7 @@ package ttnpb
 
 import (
 	"fmt"
+	"html"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
@@ -69,6 +70,44 @@ func (e errorDetails) Details() []proto.Message {
 	return msgs
 }
 
+// sanitizeAttributeValue HTML-escapes strings within attribute values
+// to prevent reflected XSS when error responses are rendered as HTML.
+// Returns new values without mutating the originals.
+func sanitizeAttributeValue(v any) any {
+	switch val := v.(type) {
+	case string:
+		return html.EscapeString(val)
+	case []string:
+		escaped := make([]string, len(val))
+		for i, s := range val {
+			escaped[i] = html.EscapeString(s)
+		}
+		return escaped
+	case []any:
+		escaped := make([]any, len(val))
+		for i, item := range val {
+			escaped[i] = sanitizeAttributeValue(item)
+		}
+		return escaped
+	case map[string]any:
+		return sanitizeAttributes(val)
+	default:
+		return v
+	}
+}
+
+// sanitizeAttributes returns a new attribute map with all string values HTML-escaped.
+func sanitizeAttributes(attrs map[string]any) map[string]any {
+	if len(attrs) == 0 {
+		return attrs
+	}
+	sanitized := make(map[string]any, len(attrs))
+	for k, v := range attrs {
+		sanitized[html.EscapeString(k)] = sanitizeAttributeValue(v)
+	}
+	return sanitized
+}
+
 func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 	pb := &ErrorDetails{
 		Namespace:     e.Namespace(),
@@ -77,7 +116,7 @@ func ErrorDetailsToProto(e errors.ErrorDetails) *ErrorDetails {
 		CorrelationId: e.CorrelationID(),
 		Code:          e.Code(),
 	}
-	if attributes := e.PublicAttributes(); len(attributes) > 0 {
+	if attributes := sanitizeAttributes(e.PublicAttributes()); len(attributes) > 0 {
 		attributesStruct, err := goproto.Struct(attributes)
 		if err != nil {
 			panic(fmt.Sprintf("Failed to encode error attributes: %s", err)) // Likely a bug in ttn (invalid attribute type).

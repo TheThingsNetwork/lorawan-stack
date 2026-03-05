@@ -19,8 +19,52 @@ import (
 
 	"github.com/smarty/assertions"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/goproto"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
+
+func TestErrorDetailsToProtoXSSSanitization(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	errDef := errors.Define(
+		"test_xss_sanitization",
+		"XSS Test Error",
+		"path", "paths", "count",
+	)
+
+	xssPayload := `<script>alert("xss")</script>`
+
+	errWithXSS := errDef.WithAttributes(
+		"path", xssPayload,
+		"paths", []string{xssPayload, "safe"},
+		"count", 42,
+	)
+
+	pb := ttnpb.ErrorDetailsToProto(errWithXSS)
+	a.So(pb, should.NotBeNil)
+
+	// Recover attributes from the proto to verify sanitization.
+	attrs, err := goproto.Map(pb.GetAttributes())
+	a.So(err, should.BeNil)
+
+	// String attribute must be escaped.
+	a.So(attrs["path"], should.NotContainSubstring, "<script>")
+	a.So(attrs["path"], should.ContainSubstring, "&lt;script&gt;")
+
+	// []string attribute values must be escaped.
+	if paths, ok := attrs["paths"].([]any); ok && len(paths) >= 2 {
+		a.So(paths[0], should.NotContainSubstring, "<script>")
+		a.So(paths[0], should.ContainSubstring, "&lt;script&gt;")
+		a.So(paths[1], should.Equal, "safe")
+	} else {
+		t.Fatal("expected paths attribute to be a list with 2 elements")
+	}
+
+	// Numeric attribute must pass through unchanged.
+	a.So(attrs["count"], should.Equal, float64(42))
+}
 
 func TestGRPCConversion(t *testing.T) {
 	a := assertions.New(t)
