@@ -18,6 +18,7 @@ package rpcserver
 import (
 	"context"
 	"fmt"
+	"html"
 	"math"
 	"net/http"
 	"net/textproto"
@@ -50,6 +51,7 @@ import (
 	_ "google.golang.org/grpc/encoding/gzip" // Register gzip compression.
 	"google.golang.org/grpc/keepalive"
 	"google.golang.org/grpc/metadata"
+	grpcstatus "google.golang.org/grpc/status"
 )
 
 func init() {
@@ -131,6 +133,31 @@ func WithRateLimiter(limiter ratelimit.Interface) Option {
 
 // ErrRPCRecovered is returned when a panic is caught from an RPC.
 var ErrRPCRecovered = errors.DefineInternal("rpc_recovered", "Internal Server Error")
+
+// sanitizingHTTPErrorHandler wraps runtime.DefaultHTTPErrorHandler to HTML-escape
+// gRPC status messages before they are serialized to JSON. This prevents reflected
+// XSS from user-supplied input that flows into error messages (e.g., field mask paths,
+// strconv.ParseBool parse errors, route-not-found paths).
+//
+// Note: ErrorDetailsToProto separately sanitizes error attributes in the details
+// payload. This handler covers the top-level "message" field which contains the
+// formatted error string with raw attribute values.
+func sanitizingHTTPErrorHandler(
+	ctx context.Context,
+	mux *runtime.ServeMux,
+	marshaler runtime.Marshaler,
+	w http.ResponseWriter,
+	r *http.Request,
+	err error,
+) {
+	if st, ok := grpcstatus.FromError(err); ok {
+		// Rebuild the status with escaped message while preserving details.
+		pb := st.Proto()
+		pb.Message = html.EscapeString(pb.Message)
+		err = grpcstatus.ErrorProto(pb)
+	}
+	runtime.DefaultHTTPErrorHandler(ctx, mux, marshaler, w, r, err)
+}
 
 // New returns a new RPC server with a set of middlewares.
 // The given context is used in some of the middlewares, the given server options are passed to gRPC
@@ -234,7 +261,7 @@ func New(ctx context.Context, opts ...Option) *Server {
 	server.ServeMux = runtime.NewServeMux(
 		runtime.WithMarshalerOption("*", jsonpb.TTN()),
 		runtime.WithMarshalerOption("text/event-stream", jsonpb.TTNEventStream()),
-		runtime.WithErrorHandler(runtime.DefaultHTTPErrorHandler),
+		runtime.WithErrorHandler(sanitizingHTTPErrorHandler),
 		runtime.WithMetadata(func(ctx context.Context, req *http.Request) metadata.MD {
 			md := rpcmetadata.MD{
 				Host: req.Host,

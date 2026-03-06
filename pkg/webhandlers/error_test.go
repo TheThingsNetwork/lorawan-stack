@@ -15,6 +15,7 @@
 package webhandlers_test
 
 import (
+	"encoding/json"
 	"io"
 	"net/http"
 	"net/http/httptest"
@@ -26,6 +27,38 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	. "go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
 )
+
+func TestNotFoundXSSSanitization(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+
+	xssPath := `/api/v3/<script>alert("xss")</script>`
+
+	r := httptest.NewRequest(http.MethodGet, xssPath, nil)
+	rec := httptest.NewRecorder()
+
+	NotFound(rec, r)
+
+	res := rec.Result()
+	body, _ := io.ReadAll(res.Body)
+
+	a.So(res.StatusCode, should.Equal, http.StatusNotFound)
+
+	// Decode the JSON to inspect the attribute value after JSON decoding.
+	var resp map[string]any
+	a.So(json.Unmarshal(body, &resp), should.BeNil)
+
+	// Extract the route attribute from the error details.
+	details, _ := resp["details"].([]any) //nolint:revive
+	a.So(len(details), should.BeGreaterThan, 0)
+	detail, _ := details[0].(map[string]any)          //nolint:revive
+	attrs, _ := detail["attributes"].(map[string]any) //nolint:revive
+	route, _ := attrs["route"].(string)               //nolint:revive
+
+	// The attribute value must be HTML-escaped, not the raw XSS payload.
+	a.So(route, should.NotContainSubstring, "<script>")
+	a.So(route, should.ContainSubstring, "&lt;script&gt;")
+}
 
 func TestErrorHandler(t *testing.T) {
 	ctx, getError := NewContextWithErrorValue(test.Context())
