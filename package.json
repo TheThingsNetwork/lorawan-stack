@@ -69,7 +69,7 @@
     "pg": "^8.19.0",
     "prettier": "3.8.1",
     "react-refresh": "^0.18.0",
-    "storybook": "^8.6.17",
+    "storybook": "^8.6.18",
     "stylelint": "^16.26.1",
     "stylelint-stylus": "^1.0.0",
     "stylus": "^0.64.0",
