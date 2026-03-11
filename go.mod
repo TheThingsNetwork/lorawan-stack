@@ -1,8 +1,8 @@
 module go.thethings.network/lorawan-stack/v3
 
-go 1.24
+go 1.26
 
-toolchain go1.24.1
+toolchain go1.26.1
 
 // See https://github.com/mitchellh/mapstructure/pull/278
 replace github.com/mitchellh/mapstructure => github.com/TheThingsIndustries/mapstructure v0.0.0-20230413130846-941bcd1deec3
