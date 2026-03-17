@@ -601,6 +601,7 @@ func (f *lbsLNS) HandleUp( // nolint:gocyclo
 		}
 		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(jreq.UpInfo.XTime))
 		ct := recordTime(jreq.RefTime, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime)
+		semtechws.UpdateLastUplink(ctx, jreq.UpInfo.XTime, jreq.UpInfo.GPSTime, receivedAt)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
 		}
@@ -625,6 +626,7 @@ func (f *lbsLNS) HandleUp( // nolint:gocyclo
 		}
 		semtechws.UpdateSessionID(ctx, semtechws.SessionIDFromXTime(updf.UpInfo.XTime))
 		ct := recordTime(updf.RefTime, updf.UpInfo.XTime, updf.UpInfo.GPSTime)
+		semtechws.UpdateLastUplink(ctx, updf.UpInfo.XTime, updf.UpInfo.GPSTime, receivedAt)
 		if err := conn.HandleUp(up, ct); err != nil {
 			logger.WithError(err).Warn("Failed to handle upstream message")
 		}
@@ -650,10 +652,10 @@ func (f *lbsLNS) HandleUp( // nolint:gocyclo
 		syncClock(txConf.XTime, txConf.GPSTime, true)
 
 	case TypeUpstreamTimeSync:
-		// If the gateway sends a `timesync` request, it means that it has access to a PPS
-		// source. As such, there is no point in doing time transfers with this particular
-		// gateway.
-		semtechws.UpdateSessionTimeSync(ctx, false)
+		// The gateway sends a timesync request in order to correlate its concentrator
+		// counter with GPS time via round-trip calculation. All Basic Station gateways
+		// send this regardless of PPS availability. Continue sending LNS-initiated time
+		// transfers for direct xtime->gpstime mapping.
 		var req TimeSyncRequest
 		if err := json.Unmarshal(raw, &req); err != nil {
 			return nil, err

@@ -19,6 +19,9 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Basic Station time synchronization no longer disables LNS-initiated time transfers when the gateway sends a `timesync` request. All Basic Station gateways send `timesync` regardless of PPS availability; disabling transfers prevented non-GPS gateways from receiving time correlation updates.
+- LNS-initiated time transfers now include `xtime` and `gpstime` from recent uplinks, enabling direct concentrator-to-GPS time mapping per the Basic Station protocol specification.
+
 ### Security
 
 ## [3.36.0] - unreleased

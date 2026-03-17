@@ -305,3 +305,112 @@ func TestTransferTime(t *testing.T) {
 		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
 	}
 }
+
+func TestTimeSyncDoesNotDisableTransferTime(t *testing.T) {
+	a, ctx := test.New(t)
+	ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
+
+	f := (*lbsLNS)(nil)
+	now := time.Unix(500, 0)
+
+	// Enable timesync for the session (as version.go does on connect).
+	semtechws.UpdateSessionTimeSync(ctx, true)
+	semtechws.UpdateSessionID(ctx, 0x42)
+
+	// Process a timesync request (as upstream.go HandleUp does).
+	// Previously this called UpdateSessionTimeSync(ctx, false), which
+	// disabled LNS-initiated time transfers. After the fix, time sync
+	// should remain enabled.
+	req := TimeSyncRequest{TxTime: 123.456}
+	resp := req.Response(now)
+	a.So(resp.TxTime, should.Equal, 123.456)
+
+	// Verify time sync is still enabled.
+	enabled, ok := semtechws.GetSessionTimeSync(ctx)
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	a.So(enabled, should.BeTrue)
+
+	// Verify TransferTime still produces output (not suppressed).
+	b, err := f.TransferTime(ctx, now, nil, nil)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	if !a.So(b, should.NotBeNil) {
+		t.Fatal("TransferTime returned nil after timesync request; time transfers were incorrectly disabled")
+	}
+
+	var res TimeSyncResponse
+	if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
+}
+
+func TestTransferTimeWithUplinkXTime(t *testing.T) {
+	a, ctx := test.New(t)
+	ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
+
+	f := (*lbsLNS)(nil)
+	now := time.Unix(600, 0)
+
+	semtechws.UpdateSessionTimeSync(ctx, true)
+	semtechws.UpdateSessionID(ctx, 0x42)
+
+	// Store uplink timing from a GPS-equipped gateway.
+	xtime := int64(12666373963464220)
+	gpstime := int64(1232095200000000)
+	semtechws.UpdateLastUplink(ctx, xtime, gpstime, now)
+
+	// Retrieve and use in time transfer (as ws.go ticker does).
+	gotXTime, gotGPSTime, rxAt, ok := semtechws.GetLastUplink(ctx)
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	a.So(gotXTime, should.Equal, xtime)
+	a.So(gotGPSTime, should.Equal, gpstime)
+	a.So(rxAt, should.Equal, now)
+
+	// Build TransferTime args from uplink data (simulating the ws.go ticker logic).
+	ct := semtechws.ConcentratorTimeFromXTime(gotXTime)
+	gt := semtechws.TimeFromGPSTime(gotGPSTime)
+
+	b, err := f.TransferTime(ctx, now, &gt, &ct)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	if a.So(b, should.NotBeNil) {
+		var res TimeSyncResponse
+		if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(res.GPSTime, should.Equal, semtechws.TimeToGPSTime(gt))
+		a.So(res.XTime, should.NotEqual, 0)
+		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
+	}
+
+	// Non-GPS gateway: gpstime=0, only MuxTime should be present.
+	// TransferTime requires both gpsTime and concentratorTime to produce
+	// xtime+gpstime; with nil gpsTime it falls back to MuxTime only.
+	semtechws.UpdateLastUplink(ctx, xtime, 0, now)
+	_, gotGPSTime, _, ok = semtechws.GetLastUplink(ctx)
+	if !a.So(ok, should.BeTrue) {
+		t.FailNow()
+	}
+	a.So(gotGPSTime, should.Equal, 0)
+
+	b, err = f.TransferTime(ctx, now, nil, &ct)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	if a.So(b, should.NotBeNil) {
+		var res TimeSyncResponse
+		if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(res.GPSTime, should.Equal, 0)
+		a.So(res.XTime, should.Equal, 0)
+		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
+	}
+}

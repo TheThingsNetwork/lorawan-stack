@@ -337,9 +337,23 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 				}
 				logger.Debug("Server pong sent")
 			case <-timeSyncTickerC:
-				// TODO: Use GPS timestamp from a overlapping frames.
-				// https://github.com/TheThingsNetwork/lorawan-stack/issues/4852
-				b, err := s.formatter.TransferTime(ctx, time.Now(), nil, nil)
+				// Send LNS-initiated time transfer using xtime+gpstime from recent uplinks.
+				// References https://github.com/TheThingsNetwork/lorawan-stack/issues/4852
+				var gpsTime *time.Time
+				var concentratorTime *scheduling.ConcentratorTime
+				if xtime, gpstime, rxAt, ok := GetLastUplink(ctx); ok {
+					if time.Since(rxAt) < 10*time.Second {
+						elapsed := time.Since(rxAt)
+						extrapolatedXTime := xtime + int64(elapsed/time.Microsecond)
+						ct := ConcentratorTimeFromXTime(extrapolatedXTime)
+						concentratorTime = &ct
+						if gpstime != 0 {
+							gt := TimeFromGPSTime(gpstime).Add(elapsed)
+							gpsTime = &gt
+						}
+					}
+				}
+				b, err := s.formatter.TransferTime(ctx, time.Now(), gpsTime, concentratorTime)
 				if err != nil {
 					logger.WithError(err).Warn("Failed to generate time transfer")
 					return err
