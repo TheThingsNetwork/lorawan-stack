@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Mutex locking that caused the rights to be fetched for authorization checks sequentially. This caused gateways to reconnect slowly after Gateway Server restarts and rpcs to timeout that were asserting gateway rights.
+
 ### Security
 
 ## [3.36.0] - unreleased
