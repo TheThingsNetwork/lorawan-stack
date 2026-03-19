@@ -29,6 +29,9 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/gorilla/websocket"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/rights"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/frequencyplans"
@@ -37,6 +40,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -45,7 +49,10 @@ import (
 	"google.golang.org/grpc/metadata"
 )
 
-const pingIntervalJitter = 0.1
+const (
+	pingIntervalJitter = 0.1
+	tracerNamespace    = "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/semtechws"
+)
 
 var (
 	errGatewayID          = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
@@ -69,6 +76,7 @@ func (*srv) DutyCycleStyle() scheduling.DutyCycleStyle {
 
 // New creates a new WebSocket frontend.
 func New(ctx context.Context, server io.Server, formatter Formatter, cfg Config) (*web.Server, error) {
+	ctx = tracer.NewContextWithTracer(ctx, tracerNamespace)
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/semtechws")
 
 	s := &srv{
@@ -117,6 +125,11 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 		"remote_addr", r.RemoteAddr,
 	))
 	logger := log.FromContext(ctx)
+	ctx, span := tracer.StartFromContext(ctx, "HandleConnectionInfo", trace.WithAttributes(
+		attribute.String("protocol", s.Protocol()),
+		attribute.String("remote_addr", r.RemoteAddr),
+	))
+	defer span.End()
 
 	assertAuth := func(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 		ctx, hasAuth := withForwardedAuth(ctx, ids, r.Header.Get("Authorization"))
@@ -131,6 +144,8 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 
 	ws, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "upgrade request to websocket connection failed")
 		logger.WithError(err).Debug("Failed to upgrade request to websocket connection")
 		return
 	}
@@ -138,6 +153,8 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 
 	_, data, err := ws.ReadMessage()
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "read message failed")
 		logger.WithError(err).Debug("Failed to read message")
 		return
 	}
@@ -168,6 +185,8 @@ func (s *srv) handleConnectionInfo(w http.ResponseWriter, r *http.Request) {
 
 	resp := s.formatter.HandleConnectionInfo(ctx, data, s.server, info, assertAuth)
 	if err := ws.WriteMessage(websocket.TextMessage, resp); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "write connection info response message failed")
 		logger.WithError(err).Warn("Failed to write connection info response message")
 		return
 	}
@@ -187,6 +206,18 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		pongCh       = make(chan []byte, 1)
 		downstreamCh = make(chan []byte, 1)
 	)
+
+	ctx, span := tracer.StartFromContext(ctx, "HandleTraffic", trace.WithAttributes(
+		attribute.String("protocol", s.Protocol()),
+		attribute.String("remote_addr", r.RemoteAddr),
+	))
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, "handle traffic failed")
+		}
+		span.End()
+	}()
 
 	ctx = log.NewContextWithFields(ctx, log.Fields(
 		"endpoint", eps.Traffic,
@@ -253,6 +284,10 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 	}
 
 	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, "handle traffic failed")
+		}
 		conn.Disconnect(err)
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
