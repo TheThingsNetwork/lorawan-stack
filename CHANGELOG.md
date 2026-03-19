@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add tracing for LBS LNS and TTIGW protocol handlers.
+
 ### Changed
 
 ### Deprecated
