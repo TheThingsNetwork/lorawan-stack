@@ -28,6 +28,7 @@ import (
 	"github.com/coder/websocket"
 	"github.com/gorilla/mux"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux"
+	"go.opentelemetry.io/otel/codes"
 	lorav1 "go.thethings.industries/pkg/api/gen/tti/gateway/data/lora/v1"
 	ttica "go.thethings.industries/pkg/ca"
 	"go.thethings.network/lorawan-stack/v3/pkg/auth/mtls"
@@ -38,6 +39,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/random"
 	"go.thethings.network/lorawan-stack/v3/pkg/ratelimit"
 	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing"
+	"go.thethings.network/lorawan-stack/v3/pkg/telemetry/tracing/tracer"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/unique"
@@ -51,6 +53,7 @@ const (
 	pingIntervalJitter = 0.1
 	pingTimeout        = 30 * time.Second
 	subprotocol        = "v1.lora.data.gateway.thethings.industries"
+	tracerNamespace    = "go.thethings.network/lorawan-stack/pkg/gatewayserver/io/ttigw"
 )
 
 // Frontend implements the The Things Industries V1 gateway frontend.
@@ -64,6 +67,7 @@ var _ io.Frontend = (*Frontend)(nil)
 
 // New returns a new The Things Industries V1 gateway frontend.
 func New(ctx context.Context, server io.Server, cfg Config) (*Frontend, error) {
+	ctx = tracer.NewContextWithTracer(ctx, tracerNamespace)
 	ctx = log.NewContextWithField(ctx, "namespace", "gatewayserver/io/ttigw")
 
 	var proxyConfiguration webmiddleware.ProxyConfiguration
@@ -124,14 +128,20 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
 	logger := log.FromContext(ctx)
 
+	ctx, span := tracer.StartFromContext(ctx, "HandleGet")
+	defer span.End()
+
 	cert := mtls.ClientCertificateFromContext(ctx)
 	if cert == nil {
+		span.SetStatus(codes.Error, "no client certificate presented")
 		logger.Debug("No client certificate presented")
 		http.Error(w, "client certificate required", http.StatusUnauthorized)
 		return
 	}
 	ctx, ids, err := f.authenticate(ctx, cert)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "client certificate verification failed")
 		logger.WithError(err).Warn("Client certificate verification failed")
 		writeError(w, err)
 		return
@@ -142,6 +152,8 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 		Ip: remoteIP(r),
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "connect failed")
 		logger.WithError(err).Warn("Failed to connect")
 		writeError(w, err)
 		return
@@ -151,18 +163,23 @@ func (f *Frontend) handleGet(w http.ResponseWriter, r *http.Request) {
 		Subprotocols: []string{subprotocol},
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "upgrade request to websocket connection failed")
 		logger.WithError(err).Error("Failed to upgrade request to websocket connection")
 		writeError(w, err)
 		return
 	}
 	defer wsConn.CloseNow() //nolint:errcheck
 	if wsConn.Subprotocol() != subprotocol {
+		span.SetStatus(codes.Error, "subprotocol negotiation failed")
 		logger.Debug("Subprotocol negotiation failed")
 		wsConn.Close(websocket.StatusPolicyViolation, "subprotocol negotiation failed")
 		return
 	}
 
 	if err := f.handleConnection(wsConn, srvConn); err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, "handle connection failed")
 		logger.WithError(err).Debug("Failed to handle connection")
 	}
 }
@@ -238,9 +255,18 @@ func (f *Frontend) ping(ctx context.Context, wsConn *websocket.Conn, srvConn *io
 	}
 }
 
-func (f *Frontend) handleConnection(wsConn *websocket.Conn, srvConn *io.Connection) error {
+func (f *Frontend) handleConnection(wsConn *websocket.Conn, srvConn *io.Connection) (err error) {
 	ctx := srvConn.Context()
 	logger := log.FromContext(ctx)
+
+	ctx, span := tracer.StartFromContext(ctx, "HandleConnection")
+	defer func() {
+		if err != nil {
+			span.RecordError(err)
+			span.SetStatus(codes.Error, "handle connection failed")
+		}
+		span.End()
+	}()
 
 	gtwConfig, err := buildLoRaGatewayConfig(srvConn.PrimaryFrequencyPlan())
 	if err != nil {
