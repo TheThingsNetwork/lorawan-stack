@@ -18,6 +18,7 @@ package ttgc
 import (
 	"context"
 	"crypto/tls"
+	"slices"
 
 	northboundv1 "go.thethings.industries/pkg/api/gen/tti/gateway/controller/northbound/v1"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -31,11 +32,9 @@ import (
 	"google.golang.org/grpc"
 )
 
-var (
-	errNoSupportedClaimOption = errors.DefineFailedPrecondition(
-		"no_supported_claim_option",
-		"no supported claim option (protocol + auth method) found for gateway",
-	)
+var errNoSupportedClaimOption = errors.DefineFailedPrecondition(
+	"no_supported_claim_option",
+	"no supported claim option (protocol + auth method) found for gateway",
 )
 
 const profileGroup = "tts"
@@ -78,7 +77,6 @@ type claimOption struct {
 func (u *Upstream) Claim(
 	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
-
 	// Get the gateway description to verify what protocol it supports.
 	gtwClient := northboundv1.NewGatewayServiceClient(u.client)
 	desc, err := gtwClient.Describe(ctx, &northboundv1.GatewayServiceDescribeRequest{
@@ -89,14 +87,14 @@ func (u *Upstream) Claim(
 	}
 
 	// Defines the preferred claiming options in order.
-	var claimPreferences = []claimOption{
+	claimPreferences := []claimOption{
 		{
-			protocol:   northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_TTI_V1,
+			protocol:   northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_IDENTIFIER_TTI_V1,
 			authMethod: northboundv1.AuthenticationMethod_AUTHENTICATION_METHOD_MUTUAL_TLS,
 			handler:    u.claimTTIV1Gateway,
 		},
 		{
-			protocol:   northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_LBS_CUPS,
+			protocol:   northboundv1.GatewayProtocolIdentifier_GATEWAY_PROTOCOL_IDENTIFIER_LBS_LNS,
 			authMethod: northboundv1.AuthenticationMethod_AUTHENTICATION_METHOD_GATEWAY_TOKEN,
 			handler:    u.claimLBSCUPSGateway,
 		},
@@ -112,7 +110,7 @@ func (u *Upstream) Claim(
 	return nil, errNoSupportedClaimOption.New()
 }
 
-func (u *Upstream) supportsOption(
+func (*Upstream) supportsOption(
 	desc *northboundv1.GatewayServiceDescribeResponse,
 	option claimOption,
 ) bool {
@@ -120,10 +118,8 @@ func (u *Upstream) supportsOption(
 		if p.GatewayProtocolId != option.protocol {
 			continue
 		}
-		for _, a := range p.SupportedAuthenticationMethods {
-			if a == option.authMethod {
-				return true
-			}
+		if slices.Contains(p.SupportedAuthenticationMethods, option.authMethod) {
+			return true
 		}
 	}
 

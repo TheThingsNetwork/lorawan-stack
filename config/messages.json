@@ -4013,6 +4013,24 @@
       "file": "ttjs.go"
     }
   },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:create_api_key": {
+    "translations": {
+      "en": "failed to create API key for gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "lbscups.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:delete_api_key": {
+    "translations": {
+      "en": "delete API key"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "lbscups.go"
+    }
+  },
   "error:pkg/deviceclaimingserver/gateways/ttgc:dial_gateway_server": {
     "translations": {
       "en": "dial Gateway Gerver `{address}`"
@@ -4020,6 +4038,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver/gateways/ttgc",
       "file": "root_ca.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver/gateways/ttgc:no_supported_claim_option": {
+    "translations": {
+      "en": "no supported claim option (protocol + auth method) found for gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/gateways/ttgc",
+      "file": "ttgc.go"
     }
   },
   "error:pkg/deviceclaimingserver/gateways/ttgc:verify_gateway_server_tls": {
