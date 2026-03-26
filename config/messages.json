@@ -3671,6 +3671,33 @@
       "file": "config.go"
     }
   },
+  "error:pkg/config/tlsconfig:not_ca_certificate": {
+    "translations": {
+      "en": "certificate with subject `{subject}` is not a CA certificate"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/config/tlsconfig:parse_certificate": {
+    "translations": {
+      "en": "parse certificate"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/config/tlsconfig:parse_pem": {
+    "translations": {
+      "en": "parse PEM"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
   "error:pkg/config/tlsconfig:tls_cipher_suite_invalid": {
     "translations": {
       "en": "invalid TLS cipher suite {cipher}"
@@ -3701,6 +3728,15 @@
   "error:pkg/config/tlsconfig:tls_source_empty": {
     "translations": {
       "en": "empty TLS source"
+    },
+    "description": {
+      "package": "pkg/config/tlsconfig",
+      "file": "config.go"
+    }
+  },
+  "error:pkg/config/tlsconfig:unexpected_pem_type": {
+    "translations": {
+      "en": "unexpected PEM block of type `{pem_type}`, expected CERTIFICATE"
     },
     "description": {
       "package": "pkg/config/tlsconfig",
