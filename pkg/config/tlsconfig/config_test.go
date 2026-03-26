@@ -42,7 +42,7 @@ func (m mockFileReader) ReadFile(name string) ([]byte, error) {
 	return nil, fmt.Errorf("not found")
 }
 
-func genCert() (certPEM []byte, keyPEM []byte) {
+func genCertWithOptions(isCA bool) (certPEM []byte, keyPEM []byte) {
 	key, err := ecdsa.GenerateKey(elliptic.P256(), rand.Reader)
 	if err != nil {
 		panic(err)
@@ -60,10 +60,13 @@ func genCert() (certPEM []byte, keyPEM []byte) {
 		},
 		NotBefore:             now,
 		NotAfter:              now.Add(time.Hour),
-		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature | x509.KeyUsageCertSign,
+		KeyUsage:              x509.KeyUsageKeyEncipherment | x509.KeyUsageDigitalSignature,
 		ExtKeyUsage:           []x509.ExtKeyUsage{x509.ExtKeyUsageServerAuth},
 		BasicConstraintsValid: true,
-		IsCA:                  true,
+		IsCA:                  isCA,
+	}
+	if isCA {
+		cert.KeyUsage |= x509.KeyUsageCertSign
 	}
 	certBytes, err := x509.CreateCertificate(rand.Reader, cert, cert, key.Public(), key)
 	if err != nil {
@@ -78,6 +81,10 @@ func genCert() (certPEM []byte, keyPEM []byte) {
 		}), pem.EncodeToMemory(&pem.Block{
 			Type: "PRIVATE KEY", Bytes: keyBytes,
 		})
+}
+
+func genCert() (certPEM []byte, keyPEM []byte) {
+	return genCertWithOptions(true)
 }
 
 func TestApplyTLSClientConfig(t *testing.T) {
@@ -104,6 +111,115 @@ func TestApplyTLSClientConfig(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(tlsConfig.RootCAs, should.BeNil)
 		a.So(tlsConfig.InsecureSkipVerify, should.BeFalse)
+	})
+}
+
+func TestApplyTLSClientConfigRejectsLeafCert(t *testing.T) {
+	t.Parallel()
+	leafCert, _ := genCertWithOptions(false)
+	caCert, _ := genCertWithOptions(true)
+
+	t.Run("LeafCertificate", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"leaf.pem": leafCert,
+			},
+			RootCA: "leaf.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.NotBeNil)
+		a.So(err.Error(), should.ContainSubstring, "not a CA certificate")
+	})
+
+	t.Run("CACertificate", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"ca.pem": caCert,
+			},
+			RootCA: "ca.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.BeNil)
+		a.So(tlsConfig.RootCAs, should.NotBeNil)
+	})
+
+	t.Run("MultipleCertsOneLeaf", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		combined := append(caCert, leafCert...)
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"mixed.pem": combined,
+			},
+			RootCA: "mixed.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.NotBeNil)
+		a.So(err.Error(), should.ContainSubstring, "not a CA certificate")
+	})
+
+	t.Run("MultipleCACertificates", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		caCert2, _ := genCertWithOptions(true)
+		combined := append(caCert, caCert2...)
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"cas.pem": combined,
+			},
+			RootCA: "cas.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.BeNil)
+		a.So(tlsConfig.RootCAs, should.NotBeNil)
+	})
+
+	t.Run("InvalidPEM", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"bad.pem": []byte("not a pem"),
+			},
+			RootCA: "bad.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.NotBeNil)
+		a.So(err.Error(), should.ContainSubstring, "parse PEM")
+	})
+
+	t.Run("NonCertificatePEMBlock", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		_, keyPEM := genCertWithOptions(true)
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"key.pem": keyPEM,
+			},
+			RootCA: "key.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.NotBeNil)
+		a.So(err.Error(), should.ContainSubstring, "unexpected PEM block")
+	})
+
+	t.Run("TrailingNewlines", func(t *testing.T) {
+		t.Parallel()
+		a := assertions.New(t)
+		withNewlines := append(caCert, '\n', '\n', '\n')
+		tlsConfig := &tls.Config{} //nolint:gosec
+		err := (&tlsconfig.Client{
+			FileReader: mockFileReader{
+				"ca.pem": withNewlines,
+			},
+			RootCA: "ca.pem",
+		}).ApplyTo(tlsConfig)
+		a.So(err, should.BeNil)
+		a.So(tlsConfig.RootCAs, should.NotBeNil)
 	})
 }
 
