@@ -258,7 +258,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
-			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+			CreateFunc: func(_ context.Context, _ *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errCreate.New()
 			},
 			ErrorAssertion: errors.IsAborted,
@@ -331,9 +331,9 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
-				return nil, nil
+				return nil, nil //nolint:nilnil
 			},
-			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+			UpdateFunc: func(_ context.Context, _ *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errUpdate.New()
 			},
 			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
@@ -365,9 +365,9 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
-				return nil, nil
+				return nil, nil //nolint:nilnil
 			},
-			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+			UpdateFunc: func(_ context.Context, _ *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errUpdate.New()
 			},
 			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
