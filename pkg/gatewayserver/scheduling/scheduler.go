@@ -459,7 +459,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (res Emis
 		}
 		return em.t
 	}
-	em, err = sb.ScheduleAnytime(em.d, next, opts.Priority)
+	em, err = sb.ScheduleAnytime(em.d, next, opts.Priority, now)
 	if err != nil {
 		return Emission{}, 0, err
 	}
