@@ -34,6 +34,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 	"google.golang.org/grpc"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 var (
@@ -182,7 +183,9 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 		CallOpt        grpc.CallOption
 		ClaimFunc      func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
 		CreateFunc     func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
+		UpdateFunc     func(context.Context, *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error)
 		UnclaimFunc    func(context.Context, types.EUI64) error
+		DeleteFunc     func(context.Context, *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
 		ErrorAssertion func(error) bool
 	}{
 		{
@@ -242,6 +245,25 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			ErrorAssertion: errors.IsAlreadyExists,
 		},
 		{
+			Name: "Claim/GatewayCreationFailed",
+			Req: &ttnpb.ClaimGatewayRequest{
+				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
+				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
+						GatewayEui:         supportedEUI.Bytes(),
+						AuthenticationCode: claimAuthCode,
+					},
+				},
+				TargetGatewayId:            "test-gateway",
+				TargetGatewayServerAddress: "things.example.com",
+			},
+			CallOpt: authorizedCallOpt,
+			CreateFunc: func(_ context.Context, _ *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+				return nil, errCreate.New()
+			},
+			ErrorAssertion: errors.IsAborted,
+		},
+		{
 			Name: "Claim/EUINotRegisteredForClaiming",
 			Req: &ttnpb.ClaimGatewayRequest{
 				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
@@ -254,7 +276,13 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				TargetGatewayId:            "test-gateway",
 				TargetGatewayServerAddress: "things.example.com",
 			},
-			CallOpt:        authorizedCallOpt,
+			CallOpt: authorizedCallOpt,
+			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
+			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+				return &emptypb.Empty{}, nil
+			},
 			ErrorAssertion: errors.IsAborted,
 		},
 		{
@@ -271,13 +299,22 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
+			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
 			ClaimFunc: func(_ context.Context, _ types.EUI64, _, _ string) (*dcstypes.GatewayMetadata, error) {
 				return nil, errClaim.New()
+			},
+			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
+			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+				return &emptypb.Empty{}, nil
 			},
 			ErrorAssertion: errors.IsAborted,
 		},
 		{
-			Name: "Claim/CreateFailed",
+			Name: "Claim/UpdateFailed",
 			Req: &ttnpb.ClaimGatewayRequest{
 				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
@@ -294,7 +331,13 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
-				return nil, errCreate.New()
+				return nil, nil //nolint:nilnil
+			},
+			UpdateFunc: func(_ context.Context, _ *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+				return nil, errUpdate.New()
+			},
+			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+				return &emptypb.Empty{}, nil
 			},
 			UnclaimFunc: func(_ context.Context, eui types.EUI64) error {
 				if eui.Equal(supportedEUI) {
@@ -305,7 +348,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			ErrorAssertion: errors.IsAborted,
 		},
 		{
-			Name: "Claim/CreateFailedWithUnclaimFailed",
+			Name: "Claim/UpdateFailedWithUnclaimFailed",
 			Req: &ttnpb.ClaimGatewayRequest{
 				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
@@ -322,7 +365,13 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
-				return nil, errCreate.New()
+				return nil, nil //nolint:nilnil
+			},
+			UpdateFunc: func(_ context.Context, _ *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+				return nil, errUpdate.New()
+			},
+			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+				return &emptypb.Empty{}, nil
 			},
 			UnclaimFunc: func(context.Context, types.EUI64) error {
 				return errUnclaim.New()
@@ -330,7 +379,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			ErrorAssertion: errors.IsAborted,
 		},
 		{
-			Name: "Claim/SuccessfullyClaimedAndCreated",
+			Name: "Claim/SuccessfullyClaimedAndUpdated",
 			Req: &ttnpb.ClaimGatewayRequest{
 				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
 				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
@@ -348,6 +397,9 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return in.Gateway, nil
 			},
+			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
 			CallOpt: authorizedCallOpt,
 		},
 	} {
@@ -360,6 +412,12 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			}
 			if tc.CreateFunc != nil {
 				mockGatewayRegistry.createFunc = tc.CreateFunc
+			}
+			if tc.UpdateFunc != nil {
+				mockGatewayRegistry.updateFunc = tc.UpdateFunc
+			}
+			if tc.DeleteFunc != nil {
+				mockGatewayRegistry.deleteFunc = tc.DeleteFunc
 			}
 
 			_, err := gclsClient.Claim(ctx, tc.Req, tc.CallOpt)

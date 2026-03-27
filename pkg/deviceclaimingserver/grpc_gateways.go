@@ -27,6 +27,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 	"google.golang.org/protobuf/types/known/emptypb"
+	"google.golang.org/protobuf/types/known/fieldmaskpb"
 )
 
 type peerAccess interface {
@@ -107,6 +108,27 @@ func (gcls *gatewayClaimingServer) Claim(
 		return nil, err
 	}
 
+	// Create the gateway in the IS.
+	gateway := &ttnpb.Gateway{
+		Ids: ids,
+	}
+
+	_, err = gcls.registry.Create(ctx, &ttnpb.CreateGatewayRequest{
+		Gateway:      gateway,
+		Collaborator: req.GetCollaborator(),
+	})
+	if err != nil {
+		return nil, errCreateGateway.WithCause(err)
+	}
+	defer func() {
+		if retErr != nil {
+			logger.Warn("Failed to claim gateway, deleting created gateway")
+			if _, delErr := gcls.registry.Delete(ctx, ids); delErr != nil {
+				logger.WithError(delErr).Warn("Failed to delete created gateway after failed claim")
+			}
+		}
+	}()
+
 	// Support clients that only set a single frequency plan.
 	if len(req.TargetFrequencyPlanIds) == 0 && req.TargetFrequencyPlanId != "" { // nolint:staticcheck
 		req.TargetFrequencyPlanIds = []string{req.TargetFrequencyPlanId} // nolint:staticcheck
@@ -125,7 +147,7 @@ func (gcls *gatewayClaimingServer) Claim(
 		return nil, errClaim.WithCause(err)
 	}
 
-	// Unclaim if creation fails.
+	// Unclaim if update fails.
 	defer func(ids *ttnpb.GatewayIdentifiers) {
 		if retErr != nil {
 			observability.RegisterAbortClaim(ctx, ids.GetEntityIdentifiers(), retErr)
@@ -137,8 +159,9 @@ func (gcls *gatewayClaimingServer) Claim(
 		observability.RegisterSuccessClaim(ctx, ids.GetEntityIdentifiers())
 	}(ids)
 
-	// Create the gateway in the IS.
-	gateway := &ttnpb.Gateway{
+	// Update the gateway in the IS. If the update fails, the gateway will be unclaimed in the above deferred function
+	// and deleted in the previous one.
+	gateway = &ttnpb.Gateway{
 		Ids:                            ids,
 		GatewayServerAddress:           req.TargetGatewayServerAddress,
 		EnforceDutyCycle:               true,
@@ -147,9 +170,24 @@ func (gcls *gatewayClaimingServer) Claim(
 		Antennas:                       res.Antennas,
 	}
 
-	_, err = gcls.registry.Create(ctx, &ttnpb.CreateGatewayRequest{
-		Gateway:      gateway,
-		Collaborator: req.GetCollaborator(),
+	fieldMask := &fieldmaskpb.FieldMask{
+		Paths: []string{
+			"gateway_server_address",
+			"enforce_duty_cycle",
+			"require_authenticated_connection",
+			"frequency_plan_ids",
+			"antennas",
+		},
+	}
+
+	if res.LBSLNSKey != nil {
+		gateway.LbsLnsSecret = &ttnpb.Secret{Value: []byte(res.LBSLNSKey.Key)}
+		fieldMask.Paths = append(fieldMask.Paths, "lbs_lns_secret")
+	}
+
+	_, err = gcls.registry.Update(ctx, &ttnpb.UpdateGatewayRequest{
+		Gateway:   gateway,
+		FieldMask: fieldMask,
 	})
 	if err != nil {
 		return nil, errCreateGateway.WithCause(err)

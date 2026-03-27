@@ -113,6 +113,7 @@ type mockGatewayRegistry struct {
 	createFunc func(ctx context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
 	deleteFunc func(ctx context.Context, in *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
 	getFunc    func(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
+	updateFunc func(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error)
 }
 
 var (
@@ -120,6 +121,7 @@ var (
 	errGatewayNotFound    = errors.DefineNotFound("gateway_not_found", "gateway not found")
 	errClaim              = errors.DefineAborted("claim", "claim")
 	errCreate             = errors.DefineAborted("create_gateway", "create gateway")
+	errUpdate             = errors.DefineAborted("update_gateway", "update gateway")
 	errUnclaim            = errors.DefineAborted("unclaim", "unclaim gateway")
 )
 
@@ -162,4 +164,9 @@ func (mock mockGatewayRegistry) Delete(ctx context.Context, in *ttnpb.GatewayIde
 // Get implements GatewayRegistry.
 func (mock mockGatewayRegistry) Get(ctx context.Context, in *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
 	return mock.getFunc(ctx, in)
+}
+
+// Update implements GatewayRegistry.
+func (mock mockGatewayRegistry) Update(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+	return mock.updateFunc(ctx, req)
 }

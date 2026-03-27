@@ -20,12 +20,15 @@ import (
 	"crypto/tls"
 	"strings"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways/ttgc"
 	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
+	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
+	"google.golang.org/grpc"
 )
 
 // Component is the interface to the component.
@@ -33,6 +36,8 @@ type Component interface {
 	GetBaseConfig(context.Context) config.ServiceBase
 	GetTLSConfig(context.Context) tlsconfig.Config
 	GetTLSClientConfig(context.Context, ...tlsconfig.Option) (*tls.Config, error)
+	GetPeerConn(ctx context.Context, role ttnpb.ClusterRole, ids cluster.EntityIdentifiers) (*grpc.ClientConn, error)
+	AllowInsecureForCredentials() bool
 }
 
 // Config is the configuration for the Gateway Claiming Server.
