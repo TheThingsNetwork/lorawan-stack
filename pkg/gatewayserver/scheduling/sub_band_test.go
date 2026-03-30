@@ -172,6 +172,8 @@ func TestSubBandScheduleRestricted(t *testing.T) {
 }
 
 func TestScheduleAnytimeRestricted(t *testing.T) {
+	t.Parallel()
+
 	a := assertions.New(t)
 	params := scheduling.SubBandParameters{
 		MinFrequency: 0,
@@ -204,7 +206,8 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 			from += scheduling.ConcentratorTime(time.Second)
 			return res
 		}
-		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
+		now := scheduling.ConcentratorTime(time.Now().UnixNano())
+		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
 		a.So(err, should.BeNil)
 		a.So(em.Starts(), should.Equal, 16*time.Second)
 		// [     1       2 4 3        ]
@@ -217,7 +220,8 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 		next := func() scheduling.ConcentratorTime {
 			return scheduling.ConcentratorTime(19 * time.Second)
 		}
-		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
+		now := scheduling.ConcentratorTime(time.Now().UnixNano())
+		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
 		a.So(err, should.BeNil)
 		a.So(em.Starts(), should.Equal, 26*time.Second)
 		// [     1       2 4 3       5]
@@ -229,8 +233,57 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 		next := func() scheduling.ConcentratorTime {
 			return scheduling.ConcentratorTime(19 * time.Second)
 		}
-		_, err := sb.ScheduleAnytime(5*time.Second, next, ttnpb.TxSchedulePriority_NORMAL)
+		now := scheduling.ConcentratorTime(time.Now().UnixNano())
+		_, err := sb.ScheduleAnytime(5*time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
 		a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrDutyCycle)
+	}
+}
+
+func TestScheduleAnytimeTooFarAhead(t *testing.T) {
+	t.Parallel()
+	// In the test environment DutyCycleWindow = 10s and MaxScheduleAhead = 20s.
+	a := assertions.New(t)
+	params := scheduling.SubBandParameters{
+		MinFrequency: 0,
+		MaxFrequency: math.MaxUint64,
+		DutyCycle:    0.5,
+	}
+	clock := &mockClock{}
+	ceilings := map[ttnpb.TxSchedulePriority]float32{
+		ttnpb.TxSchedulePriority_NORMAL:  0.5, // usable = 0.25
+		ttnpb.TxSchedulePriority_HIGHEST: 1.0, // usable = 0.50
+	}
+	sb := scheduling.NewSubBand(params, clock, ceilings, scheduling.DefaultDutyCycleStyle)
+
+	// Schedule a 3-second emission at t=9s using HIGHEST priority.
+	// It occupies 30% of the duty-cycle window (10s), within HIGHEST (50%) but above
+	// NORMAL (25%). Its window [9s, 12s] falls within the checkDutyCycle range
+	// [0, 10s] for an emission starting at t=0, causing that check to fail.
+	err := sb.Schedule(
+		scheduling.NewEmission(scheduling.ConcentratorTime(9*time.Second), 3*time.Second),
+		ttnpb.TxSchedulePriority_HIGHEST,
+	)
+	a.So(err, should.BeNil)
+
+	// next() always returns the same ConcentratorTime, so ScheduleAnytime falls back
+	// to the backwards scan. newT = 9s + 3s + 10s - 1s = 21s, which exceeds
+	// now (0) + MaxScheduleAhead (20s).
+	{
+		next := func() scheduling.ConcentratorTime { return 0 }
+		now := scheduling.ConcentratorTime(0)
+		_, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
+		a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrScheduleTooFarAhead)
+	}
+
+	// With now shifted forward by 1 second, newT (21s) equals now + MaxScheduleAhead
+	// (1s + 20s = 21s) exactly, so the check (strictly greater than) does not fire
+	// and the emission is accepted.
+	{
+		next := func() scheduling.ConcentratorTime { return 0 }
+		now := scheduling.ConcentratorTime(time.Second)
+		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
+		a.So(err, should.BeNil)
+		a.So(em.Starts(), should.Equal, 21*time.Second)
 	}
 }
 

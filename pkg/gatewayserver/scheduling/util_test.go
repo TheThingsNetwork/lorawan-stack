@@ -80,4 +80,5 @@ func float32Ptr(v float32) *float32              { return &v }
 
 func init() {
 	scheduling.DutyCycleWindow = 10 * time.Second
+	scheduling.MaxScheduleAhead = 2 * scheduling.DutyCycleWindow
 }

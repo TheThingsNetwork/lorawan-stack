@@ -5687,6 +5687,15 @@
       "file": "scheduler.go"
     }
   },
+  "error:pkg/gatewayserver/scheduling:schedule_too_far_ahead": {
+    "translations": {
+      "en": "schedule time is too far in the future"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/scheduling",
+      "file": "sub_band.go"
+    }
+  },
   "error:pkg/gatewayserver/scheduling:sub_band_not_found": {
     "translations": {
       "en": "sub-band not found for frequency `{frequency}` Hz"
