@@ -11,13 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- Add tracing for LBS LNS and TTIGW protocol handlers.
+- TTGC LBS Root CUPS claiming support.
+
 ### Changed
+
+- During the process of claiming a managed gateway, create the gateway in the registry before claiming it, not after.
 
 ### Deprecated
 
 ### Removed
 
 ### Fixed
+
+- Mutex locking that caused the rights to be fetched for authorization checks sequentially. This caused gateways to reconnect slowly after Gateway Server restarts and rpcs to timeout that were asserting gateway rights.
 
 ### Security
 
@@ -26,6 +33,10 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - The timestamp of the udp packet is now always correct when the 'Schedule downlink late' is enabled for the gateway and downlink scheduling hits the duty cycle limit.
+
+### Security
+
+- HTML-escape gRPC error messages and error detail attributes to prevent reflected XSS in API error responses.
 
 ## [3.35.2] - 2026-01-30
 

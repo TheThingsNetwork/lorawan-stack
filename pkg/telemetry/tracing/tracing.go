@@ -24,6 +24,7 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.12.0"
 	otrace "go.opentelemetry.io/otel/trace"
+	"go.opentelemetry.io/otel/trace/noop"
 	"go.thethings.network/lorawan-stack/v3/pkg/version"
 )
 
@@ -49,7 +50,7 @@ func initResource(ctx context.Context) (*resource.Resource, error) {
 // If tracing is not enabled it returns a noop tracer provider instead.
 func Initialize(ctx context.Context, config *Config) (otrace.TracerProvider, func(context.Context) error, error) {
 	if !config.Enable {
-		return otrace.NewNoopTracerProvider(), func(_ context.Context) error { return nil }, nil
+		return noop.NewTracerProvider(), func(_ context.Context) error { return nil }, nil
 	}
 
 	exp, err := exporterFromConfig(ctx, config)

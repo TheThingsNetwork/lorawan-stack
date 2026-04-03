@@ -27,6 +27,11 @@ import (
 // A lower value results in balancing capacity in time, while a higher value allows for bursts.
 var DutyCycleWindow = 1 * time.Hour
 
+// MaxScheduleAhead is the maximum duration into the future that ScheduleAnytime may place an emission.
+// Emissions beyond this are rejected to avoid scheduling downlinks that would never actually be transmitted
+// in practice.
+var MaxScheduleAhead = 2 * DutyCycleWindow
+
 // DutyCycleStyle represents the of duty cycle algorithm to be used by a sub band.
 type DutyCycleStyle int
 
@@ -144,6 +149,10 @@ var (
 		"blocked",
 		"sub band is blocked for `{duration}`",
 	)
+	errScheduleTooFarAhead = errors.DefineResourceExhausted(
+		"schedule_too_far_ahead",
+		"schedule time is too far in the future",
+	)
 )
 
 // checkDutyCycle verifies if the emission complies with the duty cycle limitations, based on the style.
@@ -211,7 +220,12 @@ func (sb *SubBand) Schedule(em Emission, p ttnpb.TxSchedulePriority) error {
 // ScheduleAnytime schedules the given duration at a time when there is availability by accounting for duty-cycle.
 // The given next callback should return the next option that does not conflict with other scheduled downlinks.
 // If there is no duty-cycle limitation, this method returns the first option.
-func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime, p ttnpb.TxSchedulePriority) (Emission, error) {
+func (sb *SubBand) ScheduleAnytime(
+	d time.Duration,
+	next func() ConcentratorTime,
+	p ttnpb.TxSchedulePriority,
+	now ConcentratorTime,
+) (Emission, error) {
 	sb.mu.Lock()
 	defer sb.mu.Unlock()
 	em := NewEmission(next(), d)
@@ -241,7 +255,13 @@ func (sb *SubBand) ScheduleAnytime(d time.Duration, next func() ConcentratorTime
 			other := sb.emissions[i]
 			used += float32(other.d) / float32(DutyCycleWindow)
 			if used > usable {
-				em.t = other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
+				newT := other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
+				// If the new time is too far in the future, return an error instead of scheduling an emission that would
+				// never be transmitted in practice.
+				if newT > now+ConcentratorTime(MaxScheduleAhead) {
+					return Emission{}, errScheduleTooFarAhead.New()
+				}
+				em.t = newT
 				break
 			}
 		}

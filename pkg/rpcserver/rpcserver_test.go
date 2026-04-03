@@ -16,6 +16,10 @@ package rpcserver_test
 
 import (
 	"context"
+	"encoding/json"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"runtime"
 	"testing"
 	"time"
@@ -172,4 +176,39 @@ func (s *mockServer) Subscribe(ids *ttnpb.ApplicationIdentifiers, srv ttnpb.AppA
 func (s *mockServer) DownlinkQueuePush(ctx context.Context, req *ttnpb.DownlinkQueueRequest) (*emptypb.Empty, error) {
 	s.pushCtx, s.pushReq = ctx, req
 	return ttnpb.Empty, nil
+}
+
+func TestSanitizingHTTPErrorHandler(t *testing.T) {
+	t.Parallel()
+	a := assertions.New(t)
+	ctx := test.Context()
+
+	logHandler := memory.New()
+	logger := log.NewLogger(logHandler)
+	ctx = log.NewContext(ctx, logger)
+
+	server := rpcserver.New(ctx)
+
+	// Request a non-existent gRPC-gateway route with XSS payload in the path.
+	xssPath := `/api/v3/<script>alert("xss")</script>`
+	r := httptest.NewRequest(http.MethodGet, xssPath, nil)
+	r.Header.Set("Content-Type", "application/json")
+	rec := httptest.NewRecorder()
+
+	server.ServeHTTP(rec, r)
+
+	res := rec.Result()
+	body, _ := io.ReadAll(res.Body)
+
+	// Verify the response is valid JSON with no unescaped script tags.
+	var resp map[string]any
+	a.So(json.Unmarshal(body, &resp), should.BeNil)
+
+	// Check the message field if present.
+	if msg, ok := resp["message"].(string); ok {
+		a.So(msg, should.NotContainSubstring, "<script>")
+	}
+
+	// Also verify no unescaped tags in the raw body.
+	a.So(string(body), should.NotContainSubstring, "<script>")
 }

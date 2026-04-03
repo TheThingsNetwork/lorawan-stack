@@ -601,7 +601,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 		logger := logger.WithFields(log.Fields(
 			"rx_window", i+1,
 			"frequency", rx.frequency,
-			"data_rate", rx.dataRate,
+			"data_rate", rx.dataRate.String(),
 		))
 		logger.Debug("Attempt to schedule downlink in receive window")
 		// The maximum payload size is MACPayload only; for PHYPayload take MHDR (1 byte) and MIC (4 bytes) into account.
@@ -610,7 +610,7 @@ func (c *Connection) ScheduleDown(path *ttnpb.DownlinkPath, msg *ttnpb.DownlinkM
 			return false, false, 0, errTooLong.WithAttributes(
 				"payload_length", len(msg.RawPayload),
 				"maximum_length", maxPHYLength,
-				"data_rate", rx.dataRate,
+				"data_rate", rx.dataRate.String(),
 			)
 		}
 		eirp := phy.DefaultMaxEIRP

@@ -183,7 +183,9 @@ func (f *inMemoryCache) AuthInfo(ctx context.Context) (authInfo *ttnpb.AuthInfoR
 			cachedRes: newRes(),
 		}
 		f.authInfo[req] = res
-		go res.set(f.Fetcher.AuthInfo(ctx))
+		go func() {
+			res.set(f.Fetcher.AuthInfo(ctx))
+		}()
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
@@ -201,7 +203,9 @@ func (f *inMemoryCache) ApplicationRights(ctx context.Context, appID *ttnpb.Appl
 	if !res.valid(f.successTTL, f.errorTTL) {
 		res = newRes()
 		f.applicationRights[req] = res
-		go res.set(f.Fetcher.ApplicationRights(ctx, appID))
+		go func() {
+			res.set(f.Fetcher.ApplicationRights(ctx, appID))
+		}()
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
@@ -219,7 +223,9 @@ func (f *inMemoryCache) ClientRights(ctx context.Context, clientID *ttnpb.Client
 	if !res.valid(f.successTTL, f.errorTTL) {
 		res = newRes()
 		f.clientRights[req] = res
-		go res.set(f.Fetcher.ClientRights(ctx, clientID))
+		go func() {
+			res.set(f.Fetcher.ClientRights(ctx, clientID))
+		}()
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
@@ -237,7 +243,9 @@ func (f *inMemoryCache) GatewayRights(ctx context.Context, gtwID *ttnpb.GatewayI
 	if !res.valid(f.successTTL, f.errorTTL) {
 		res = newRes()
 		f.gatewayRights[req] = res
-		go res.set(f.Fetcher.GatewayRights(ctx, gtwID))
+		go func() {
+			res.set(f.Fetcher.GatewayRights(ctx, gtwID))
+		}()
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
@@ -255,7 +263,9 @@ func (f *inMemoryCache) OrganizationRights(ctx context.Context, orgID *ttnpb.Org
 	if !res.valid(f.successTTL, f.errorTTL) {
 		res = newRes()
 		f.organizationRights[req] = res
-		go res.set(f.Fetcher.OrganizationRights(ctx, orgID))
+		go func() {
+			res.set(f.Fetcher.OrganizationRights(ctx, orgID))
+		}()
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
@@ -273,7 +283,9 @@ func (f *inMemoryCache) UserRights(ctx context.Context, userID *ttnpb.UserIdenti
 	if !res.valid(f.successTTL, f.errorTTL) {
 		res = newRes()
 		f.userRights[req] = res
-		go res.set(f.Fetcher.UserRights(ctx, userID))
+		go func() {
+			res.set(f.Fetcher.UserRights(ctx, userID))
+		}()
 	}
 	f.maybeCleanup()
 	f.mu.Unlock()
