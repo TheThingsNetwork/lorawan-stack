@@ -450,6 +450,8 @@ var (
 )
 
 func (s *srv) handleDown(ctx context.Context, st *state) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	defer func() {
 		st.lastDownlinkPath.Store(nil)
 		st.startHandleDownMu.Lock()
