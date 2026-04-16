@@ -54,7 +54,7 @@ require (
 	github.com/howeyc/gopass v0.0.0-20210920133722-c8aef6fb66ef
 	github.com/iancoleman/strcase v0.3.0
 	github.com/jackc/pgerrcode v0.0.0-20240316143900-6e2875d9b438
-	github.com/jackc/pgx/v5 v5.7.5
+	github.com/jackc/pgx/v5 v5.9.0
 	github.com/jacobsa/crypto v0.0.0-20190317225127-9f44e2d11115
 	github.com/jarcoal/httpmock v1.4.0
 	github.com/jaytaylor/html2text v0.0.0-20230321000545-74c2419ad056
