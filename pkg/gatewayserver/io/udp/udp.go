@@ -530,16 +530,19 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 			}
 			serverTime := st.clock.ToServerTime(scheduling.ConcentratorTime(concentratorTime))
 			st.clockMu.RUnlock()
-			d := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
-			logger.WithField("duration", d).Debug("Wait to schedule downlink message late")
+			writeDelay := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
+			registerSchedulingDelay(ctx, writeDelay)
+			logger.WithField("duration", writeDelay).Debug("Wait to schedule downlink message late")
 			go func() {
-				t := time.NewTimer(d)
-				defer t.Stop()
+				timer := time.NewTimer(writeDelay)
+				defer timer.Stop()
 				select {
-				case <-t.C:
-					write()
 				case <-ctx.Done():
+					return
 				case <-st.io.Context().Done():
+					return
+				case <-timer.C:
+					write()
 				}
 			}()
 		case <-healthCheck.C:

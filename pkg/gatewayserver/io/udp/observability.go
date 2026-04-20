@@ -17,6 +17,7 @@ package udp
 import (
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/prometheus/client_golang/prometheus"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
@@ -59,6 +60,14 @@ var udpMetrics = &messageMetrics{
 		},
 		[]string{"type", "struct", "field"},
 	),
+	schedulingDelay: metrics.NewHistogram(
+		prometheus.HistogramOpts{
+			Subsystem: subsystem,
+			Name:      "scheduling_delay_seconds",
+			Help:      "Histogram of the delay (seconds) introduced when scheduling downlink messages late",
+			Buckets:   []float64{1, 60, 300, 600, 1800, 3600, 5400, 7200},
+		},
+	),
 }
 
 func init() {
@@ -71,6 +80,7 @@ type messageMetrics struct {
 	messageDropped   *prometheus.CounterVec
 
 	unmarshalTypeErrors *prometheus.CounterVec
+	schedulingDelay     prometheus.Histogram
 }
 
 // Describe implements prometheus.Collector.
@@ -80,6 +90,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.messageDropped.Describe(ch)
 
 	m.unmarshalTypeErrors.Describe(ch)
+	m.schedulingDelay.Describe(ch)
 }
 
 // Collect implements prometheus.Collector.
@@ -89,6 +100,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.messageDropped.Collect(ch)
 
 	m.unmarshalTypeErrors.Collect(ch)
+	m.schedulingDelay.Collect(ch)
 }
 
 func registerMessageReceived(_ context.Context) {
@@ -97,6 +109,10 @@ func registerMessageReceived(_ context.Context) {
 
 func registerMessageForwarded(_ context.Context, tp encoding.PacketType) {
 	udpMetrics.messageForwarded.WithLabelValues(tp.String()).Inc()
+}
+
+func registerSchedulingDelay(_ context.Context, delay time.Duration) {
+	udpMetrics.schedulingDelay.Observe(delay.Seconds())
 }
 
 func registerMessageDropped(_ context.Context, err error) {
