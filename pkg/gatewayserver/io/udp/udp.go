@@ -533,7 +533,9 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 			writeDelay := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
 			registerSchedulingDelay(ctx, writeDelay)
 			logger.WithField("duration", writeDelay).Debug("Wait to schedule downlink message late")
+			registerPendingDownlinkAdded(ctx)
 			go func() {
+				defer registerPendingDownlinkRemoved(ctx)
 				timer := time.NewTimer(writeDelay)
 				defer timer.Stop()
 				select {

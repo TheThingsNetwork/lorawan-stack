@@ -68,6 +68,13 @@ var udpMetrics = &messageMetrics{
 			Buckets:   []float64{1, 60, 300, 600, 1800, 3600, 5400, 7200},
 		},
 	),
+	pendingDownlinks: metrics.NewGauge(
+		prometheus.GaugeOpts{
+			Subsystem: subsystem,
+			Name:      "pending_downlinks",
+			Help:      "Number of late-scheduled downlink messages waiting to be written",
+		},
+	),
 }
 
 func init() {
@@ -81,6 +88,7 @@ type messageMetrics struct {
 
 	unmarshalTypeErrors *prometheus.CounterVec
 	schedulingDelay     prometheus.Histogram
+	pendingDownlinks    prometheus.Gauge
 }
 
 // Describe implements prometheus.Collector.
@@ -91,6 +99,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 	m.unmarshalTypeErrors.Describe(ch)
 	m.schedulingDelay.Describe(ch)
+	m.pendingDownlinks.Describe(ch)
 }
 
 // Collect implements prometheus.Collector.
@@ -101,6 +110,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 	m.unmarshalTypeErrors.Collect(ch)
 	m.schedulingDelay.Collect(ch)
+	m.pendingDownlinks.Collect(ch)
 }
 
 func registerMessageReceived(_ context.Context) {
@@ -113,6 +123,14 @@ func registerMessageForwarded(_ context.Context, tp encoding.PacketType) {
 
 func registerSchedulingDelay(_ context.Context, delay time.Duration) {
 	udpMetrics.schedulingDelay.Observe(delay.Seconds())
+}
+
+func registerPendingDownlinkAdded(_ context.Context) {
+	udpMetrics.pendingDownlinks.Inc()
+}
+
+func registerPendingDownlinkRemoved(_ context.Context) {
+	udpMetrics.pendingDownlinks.Dec()
 }
 
 func registerMessageDropped(_ context.Context, err error) {
