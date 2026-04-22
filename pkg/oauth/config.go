@@ -15,6 +15,8 @@
 package oauth
 
 import (
+	"time"
+
 	"go.thethings.network/lorawan-stack/v3/pkg/webui"
 )
 
@@ -39,9 +41,17 @@ type FrontendConfig struct {
 	ConsoleURL             string `json:"console_url" name:"console-url" description:"The URL that points to the root of the Console"`
 }
 
+// LoginConfig holds user login settings shared between the OAuth and Account
+// servers. Values here are populated by the Identity Server from its own
+// config and are not part of the user-facing OAuth config surface.
+type LoginConfig struct {
+	SessionTTL time.Duration `name:"-"`
+}
+
 // Config is the configuration for the OAuth server.
 type Config struct {
-	Mount       string   `name:"mount" description:"Path on the server where the Account application and OAuth services will be served"`
-	UI          UIConfig `name:"ui"`
-	CSRFAuthKey []byte   `name:"-"`
+	Mount       string      `name:"mount" description:"Path on the server where the Account application and OAuth services will be served"`
+	UI          UIConfig    `name:"ui"`
+	CSRFAuthKey []byte      `name:"-"`
+	Login       LoginConfig `name:"-"`
 }

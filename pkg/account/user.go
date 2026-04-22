@@ -30,6 +30,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/oauth"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/webhandlers"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 var tokenHashSettings auth.HashValidator = pbkdf2.PBKDF2{
@@ -190,12 +191,16 @@ func (s *server) CreateUserSession(w http.ResponseWriter, r *http.Request, userI
 	if err != nil {
 		return err
 	}
+	newSession := &ttnpb.UserSession{
+		UserIds:       userIDs,
+		SessionSecret: hashedSecret,
+	}
+	if ttl := s.configFromContext(ctx).Login.SessionTTL; ttl > 0 {
+		newSession.ExpiresAt = timestamppb.New(time.Now().Add(ttl))
+	}
 	var session *ttnpb.UserSession
 	err = s.store.Transact(ctx, func(ctx context.Context, st store.Interface) error {
-		session, err = st.CreateSession(ctx, &ttnpb.UserSession{
-			UserIds:       userIDs,
-			SessionSecret: hashedSecret,
-		})
+		session, err = st.CreateSession(ctx, newSession)
 		return err
 	})
 	if err != nil {

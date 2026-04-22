@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Add tracing for LBS LNS and TTIGW protocol handlers.
 - TTGC LBS Root CUPS claiming support.
+- Configurable Identity Server user login session TTL via `is.user-login.session-ttl`. Defaults to `0` (no expiry, matching previous behavior). When set, the auth cookie becomes persistent with a matching `Max-Age`.
 
 ### Changed
 
