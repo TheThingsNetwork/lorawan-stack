@@ -179,6 +179,8 @@ var errNoRefreshToken = errors.DefineInvalidArgument(
 
 var errInvalidToken = errors.DefineInvalidArgument("token", "invalid token")
 
+var errSessionExpired = errors.DefineUnauthenticated("session_expired", "session expired")
+
 func (s *storage) SaveAccess(data *osin.AccessData) error {
 	var accessHash, refreshHash string
 	tokenType, accessID, accessKey, err := auth.SplitToken(data.AccessToken)
@@ -312,6 +314,24 @@ func (s *storage) LoadRefresh(token string) (*osin.AccessData, error) {
 	valid, err := auth.Validate(data.RefreshToken, tokenKey)
 	if !valid || err != nil {
 		return nil, errInvalidToken.New()
+	}
+	if userSessionIDs := data.UserData.(userData).UserSessionIdentifiers; userSessionIDs.GetSessionId() != "" {
+		err = s.store.Transact(s.ctx, func(ctx context.Context, st oauth_store.Interface) error {
+			session, err := st.GetSession(ctx, userSessionIDs.GetUserIds(), userSessionIDs.GetSessionId())
+			if err != nil {
+				if errors.IsNotFound(err) {
+					return errSessionExpired.WithCause(err)
+				}
+				return err
+			}
+			if expiresAt := ttnpb.StdTime(session.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
+				return errSessionExpired.New()
+			}
+			return nil
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 	return data, nil
 }

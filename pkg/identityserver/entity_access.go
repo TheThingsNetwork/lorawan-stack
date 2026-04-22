@@ -197,6 +197,18 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			if expiresAt := ttnpb.StdTime(accessToken.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 				return errTokenExpired.New()
 			}
+			if accessToken.UserSessionId != "" {
+				session, err := st.GetSession(ctx, accessToken.UserIds, accessToken.UserSessionId)
+				if err != nil {
+					if errors.IsNotFound(err) {
+						return errTokenExpired.WithCause(err)
+					}
+					return err
+				}
+				if expiresAt := ttnpb.StdTime(session.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
+					return errTokenExpired.New()
+				}
+			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
 			accessToken.Rights = ttnpb.RightsFrom(accessToken.Rights...).Implied().GetRights()
 			res.AccessMethod = &ttnpb.AuthInfoResponse_OauthAccessToken{

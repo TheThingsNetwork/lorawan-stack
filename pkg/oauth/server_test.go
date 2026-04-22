@@ -753,6 +753,7 @@ func TestTokenExchange(t *testing.T) {
 			Name: "Exchange Refresh Token",
 			StoreSetup: func(s *mockStore) {
 				s.res.client = mockClient
+				s.res.session = mockSession
 				s.res.accessToken = &ttnpb.OAuthAccessToken{
 					UserIds:       mockUser.GetIds(),
 					ClientIds:     mockClient.GetIds(),
@@ -786,6 +787,43 @@ func TestTokenExchange(t *testing.T) {
 				a.So(s.req.token.RefreshToken, should.NotBeEmpty)
 				a.So(s.req.token.UserSessionId, should.Equal, mockSession.SessionId)
 				a.So(s.req.previousID, should.Equal, "IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A")
+			},
+		},
+		{
+			Name: "Exchange Refresh Token with Expired Session",
+			StoreSetup: func(s *mockStore) {
+				s.res.client = mockClient
+				s.res.session = &ttnpb.UserSession{
+					UserIds:   mockUser.GetIds(),
+					SessionId: mockSession.SessionId,
+					CreatedAt: timestamppb.New(now.Add(-2 * time.Hour)),
+					ExpiresAt: timestamppb.New(now.Add(-time.Hour)),
+				}
+				s.res.accessToken = &ttnpb.OAuthAccessToken{
+					UserIds:       mockUser.GetIds(),
+					ClientIds:     mockClient.GetIds(),
+					UserSessionId: mockSession.SessionId,
+					Id:            "SFUBFRKYTGULGPAXXM4SHIBYMKCPTIMQBM63ZGQ",
+					RefreshToken:  "PBKDF2$sha256$20000$IGAiKs46xX_M64E5$4xpyqnQT8SOa_Vf4xhEPk6WOZnhmAjG2mqGQiYBhm2s",
+					Rights:        mockClient.Rights,
+					CreatedAt:     timestamppb.New(now),
+					ExpiresAt:     timestamppb.New(anHourFromNow),
+				}
+			},
+			Method: "POST",
+			Path:   "/oauth/token",
+			Body: map[string]string{
+				"grant_type":    "refresh_token",
+				"refresh_token": "OJSWM.IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A.GCPIASDUP7UZJ6YL5OP2ESZB7CKRFV4JJQYTMDOSDIOE7O75IAMQ",
+				"client_id":     "client",
+				"client_secret": "secret",
+			},
+			ExpectedCode: http.StatusUnauthorized,
+			StoreCheck: func(t *testing.T, s *mockStore) {
+				a := assertions.New(t)
+				a.So(s.calls, should.Contain, "GetAccessToken")
+				a.So(s.calls, should.Contain, "GetSession")
+				a.So(s.calls, should.NotContain, "CreateAccessToken")
 			},
 		},
 	} {
