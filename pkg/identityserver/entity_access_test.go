@@ -15,11 +15,15 @@
 package identityserver
 
 import (
+	"context"
 	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/auth"
+	"go.thethings.network/lorawan-stack/v3/pkg/auth/pbkdf2"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/identityserver/storetest"
+	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
@@ -64,7 +68,86 @@ func TestEntityAccess(t *testing.T) {
 	storedKey.ExpiresAt = timestamppb.New(time.Now().Add(-10 * time.Minute))
 	expiredCreds := rpcCreds(expiredKey)
 
+	oauthUsr := p.NewUser()
+	oauthClient := p.NewClient(oauthUsr.GetOrganizationOrUserIdentifiers())
+	oauthClient.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL}
+
+	// Session that is already expired.
+	expiredSession := p.NewUserSession(oauthUsr.GetIds())
+	p.UserSessions[len(p.UserSessions)-1].ExpiresAt = timestamppb.New(time.Now().Add(-10 * time.Minute))
+
+	// Session that is still valid.
+	validSession := p.NewUserSession(oauthUsr.GetIds())
+	p.UserSessions[len(p.UserSessions)-1].ExpiresAt = timestamppb.New(time.Now().Add(10 * time.Minute))
+
+	// Generate access token bearer strings. The stored AccessToken is the hashed key.
+	newBearerAccessToken := func() (bearer, tokenID, hashed string) {
+		t.Helper()
+		raw, err := auth.AccessToken.Generate(context.Background(), "")
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, tokenID, key, err := auth.SplitToken(raw)
+		if err != nil {
+			t.Fatal(err)
+		}
+		hashValidator := pbkdf2.Default()
+		hashValidator.Iterations = 10
+		hashed, err = auth.Hash(auth.NewContextWithHashValidator(context.Background(), hashValidator), key)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return raw, tokenID, hashed
+	}
+
+	expiredSessionToken, expiredSessionTokenID, expiredSessionTokenHash := newBearerAccessToken()
+	missingSessionToken, missingSessionTokenID, missingSessionTokenHash := newBearerAccessToken()
+	validSessionToken, validSessionTokenID, validSessionTokenHash := newBearerAccessToken()
+
+	bearerCreds := func(bearer string) grpc.CallOption {
+		return grpc.PerRPCCredentials(rpcmetadata.MD{
+			AuthType:      "bearer",
+			AuthValue:     bearer,
+			AllowInsecure: true,
+		})
+	}
+
 	testWithIdentityServer(t, func(is *IdentityServer, cc *grpc.ClientConn) {
+		ctx := test.Context()
+		if _, err := is.store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+			UserIds:       oauthUsr.GetIds(),
+			ClientIds:     oauthClient.GetIds(),
+			UserSessionId: expiredSession.GetSessionId(),
+			Id:            expiredSessionTokenID,
+			AccessToken:   expiredSessionTokenHash,
+			Rights:        oauthClient.GetRights(),
+			ExpiresAt:     timestamppb.New(time.Now().Add(time.Hour)),
+		}, ""); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := is.store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+			UserIds:       oauthUsr.GetIds(),
+			ClientIds:     oauthClient.GetIds(),
+			UserSessionId: "00000000-0000-0000-0000-000000000000",
+			Id:            missingSessionTokenID,
+			AccessToken:   missingSessionTokenHash,
+			Rights:        oauthClient.GetRights(),
+			ExpiresAt:     timestamppb.New(time.Now().Add(time.Hour)),
+		}, ""); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := is.store.CreateAccessToken(ctx, &ttnpb.OAuthAccessToken{
+			UserIds:       oauthUsr.GetIds(),
+			ClientIds:     oauthClient.GetIds(),
+			UserSessionId: validSession.GetSessionId(),
+			Id:            validSessionTokenID,
+			AccessToken:   validSessionTokenHash,
+			Rights:        oauthClient.GetRights(),
+			ExpiresAt:     timestamppb.New(time.Now().Add(time.Hour)),
+		}, ""); err != nil {
+			t.Fatal(err)
+		}
+
 		is.config.UserRegistration.ContactInfoValidation.Required = true
 
 		cli := ttnpb.NewEntityAccessClient(cc)
@@ -162,6 +245,30 @@ func TestEntityAccess(t *testing.T) {
 			a, ctx := test.New(t)
 			var md metadata.MD
 			_, err := cli.AuthInfo(ctx, ttnpb.Empty, expiredCreds, grpc.Header(&md))
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Access Token with Valid Session", func(t *testing.T) {
+			a, ctx := test.New(t)
+			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, bearerCreds(validSessionToken))
+			if a.So(err, should.BeNil) && a.So(authInfo, should.NotBeNil) {
+				a.So(authInfo.GetOauthAccessToken(), should.NotBeNil)
+			}
+		})
+
+		t.Run("Access Token with Expired Session", func(t *testing.T) {
+			a, ctx := test.New(t)
+			_, err := cli.AuthInfo(ctx, ttnpb.Empty, bearerCreds(expiredSessionToken))
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsUnauthenticated(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Access Token with Missing Session", func(t *testing.T) {
+			a, ctx := test.New(t)
+			_, err := cli.AuthInfo(ctx, ttnpb.Empty, bearerCreds(missingSessionToken))
 			if a.So(err, should.NotBeNil) {
 				a.So(errors.IsUnauthenticated(err), should.BeTrue)
 			}

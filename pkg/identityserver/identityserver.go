@@ -160,6 +160,12 @@ func New(c *component.Component, config *Config) (is *IdentityServer, err error)
 
 	is.config.OAuth.CSRFAuthKey = is.GetBaseConfig(is.Context()).HTTP.Cookie.HashKey
 	is.config.OAuth.UI.FrontendConfig.EnableUserRegistration = is.config.UserRegistration.Enabled
+	if is.config.UserLogin.SessionTTL < 0 {
+		log.FromContext(is.Context()).WithField("session_ttl", is.config.UserLogin.SessionTTL).Warn(
+			"Negative is.user-login.session-ttl; resetting to 0 (sessions never expire)",
+		)
+		is.config.UserLogin.SessionTTL = 0
+	}
 	is.config.OAuth.Login.SessionTTL = is.config.UserLogin.SessionTTL
 	is.oauth, err = oauth.NewServer(c, &oauthAppStore{is.store}, is.config.OAuth, GenerateCSPString)
 	if err != nil {

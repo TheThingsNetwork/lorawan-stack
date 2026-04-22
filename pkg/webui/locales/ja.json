@@ -2871,6 +2871,7 @@
   "error:pkg/oauth:no_access_token": "提供されたトークンはアクセストークンではありません",
   "error:pkg/oauth:no_refresh_token": "提供されたトークンは更新トークンではありません",
   "error:pkg/oauth:parse": "リクエストボディの解析",
+  "error:pkg/oauth:session_expired": "",
   "error:pkg/oauth:token": "無効なトークン",
   "error:pkg/oauth:token_mismatch": "更新トークンID `{refresh_token_id}` はアクセストークンID `{access_token_id}` と一致しません",
   "error:pkg/oauth:unauthorized_client": "クライアントがこの手段でトークンを要求することは認証されていません",

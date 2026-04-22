@@ -698,6 +698,54 @@ func (s *oauthStore) GetAccessToken(ctx context.Context, id string) (*ttnpb.OAut
 	return pb, nil
 }
 
+func (s *oauthStore) GetAccessTokenWithSession(
+	ctx context.Context, id string,
+) (*ttnpb.OAuthAccessToken, *ttnpb.UserSession, error) {
+	ctx, span := tracer.StartFromContext(ctx, "GetAccessTokenWithSession")
+	defer span.End()
+
+	model := &AccessToken{}
+	selectQuery := s.newSelectModel(ctx, model).
+		Where("token_id = ?", id).
+		Relation("User", func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.Column("account_uid")
+		}).
+		Relation("Client", func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.Column("client_id")
+		}).
+		Relation("UserSession")
+
+	if err := selectQuery.Scan(ctx); err != nil {
+		err = storeutil.WrapDriverError(err)
+		if errors.IsNotFound(err) {
+			return nil, nil, store.ErrAccessTokenNotFound.WithAttributes(
+				"access_token_id", id,
+			)
+		}
+		return nil, nil, err
+	}
+
+	// NOTE: This imposes a limitation on the client's rights if the token's user is the unique support user.
+	if model.User.Account.UID == ttnpb.SupportUserID {
+		model.Rights = convertIntSlice[ttnpb.Right, int](ttnpb.AllReadAdminRights.GetRights())
+	}
+
+	pb, err := accessTokenToPB(model, nil, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	var sessionPB *ttnpb.UserSession
+	if model.UserSession != nil {
+		sessionPB, err = userSessionToPB(model.UserSession, pb.UserIds)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	return pb, sessionPB, nil
+}
+
 func (s *oauthStore) DeleteAccessToken(ctx context.Context, id string) error {
 	ctx, span := tracer.StartFromContext(ctx, "DeleteAccessToken")
 	defer span.End()
