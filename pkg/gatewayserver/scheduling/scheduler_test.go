@@ -202,6 +202,67 @@ func TestScheduleAt(t *testing.T) { //nolint:tparallel
 	}
 }
 
+func TestScheduleAtTooFarAhead(t *testing.T) { //nolint:paralleltest
+	// Tighten MaxScheduleAhead to the 2*DutyCycleWindow default for this test only.
+	// No t.Parallel() because we mutate a package-level variable.
+	prevMaxScheduleAhead := scheduling.MaxScheduleAhead
+	scheduling.MaxScheduleAhead = 2 * scheduling.DutyCycleWindow
+	t.Cleanup(func() { scheduling.MaxScheduleAhead = prevMaxScheduleAhead })
+
+	a := assertions.New(t)
+	ctx := test.Context()
+	fps := []*frequencyplans.FrequencyPlan{{
+		BandID: band.EU_863_870,
+	}}
+	timeSource := &mockTimeSource{
+		Time: time.Unix(0, 0),
+	}
+	scheduler, err := scheduling.NewScheduler(ctx, fps, true, scheduling.DefaultDutyCycleStyle, nil, timeSource)
+	a.So(err, should.BeNil)
+	scheduler.SyncWithGatewayAbsolute(0, timeSource.Time, time.Unix(0, 0))
+
+	settings := &ttnpb.TxSettings{
+		DataRate: &ttnpb.DataRate{
+			Modulation: &ttnpb.DataRate_Lora{
+				Lora: &ttnpb.LoRaDataRate{
+					Bandwidth:       125000,
+					SpreadingFactor: 7,
+					CodingRate:      band.Cr4_5,
+				},
+			},
+		},
+		Frequency: 869525000,
+	}
+
+	// Absolute time beyond MaxScheduleAhead (30s > 20s) is rejected.
+	settings.Time = timestamppb.New(time.Unix(0, int64(30*time.Second)))
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+		PayloadSize: 10,
+		TxSettings:  settings,
+		Priority:    ttnpb.TxSchedulePriority_NORMAL,
+	})
+	a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrScheduleTooFarAhead)
+
+	// Timestamp beyond MaxScheduleAhead is likewise rejected.
+	settings.Time = nil
+	settings.Timestamp = 25000000 // 25s
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+		PayloadSize: 10,
+		TxSettings:  settings,
+		Priority:    ttnpb.TxSchedulePriority_NORMAL,
+	})
+	a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrScheduleTooFarAhead)
+
+	// Within the bound, scheduling succeeds.
+	settings.Timestamp = 10000000 // 10s
+	_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+		PayloadSize: 10,
+		TxSettings:  settings,
+		Priority:    ttnpb.TxSchedulePriority_NORMAL,
+	})
+	a.So(err, should.BeNil)
+}
+
 func TestScheduleAtWithBandDutyCycle(t *testing.T) { //nolint:tparallel
 	t.Parallel()
 	a := assertions.New(t)

@@ -240,8 +240,12 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 }
 
 func TestScheduleAnytimeTooFarAhead(t *testing.T) {
-	t.Parallel()
-	// In the test environment DutyCycleWindow = 10s and MaxScheduleAhead = 20s.
+	// DutyCycleWindow stays at the 10s test default; tighten MaxScheduleAhead to 20s just for this
+	// test to exercise the bound. No t.Parallel() because we mutate a package-level variable.
+	prevMaxScheduleAhead := scheduling.MaxScheduleAhead
+	scheduling.MaxScheduleAhead = 2 * scheduling.DutyCycleWindow
+	t.Cleanup(func() { scheduling.MaxScheduleAhead = prevMaxScheduleAhead })
+
 	a := assertions.New(t)
 	params := scheduling.SubBandParameters{
 		MinFrequency: 0,
