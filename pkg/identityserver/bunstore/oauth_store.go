@@ -713,7 +713,9 @@ func (s *oauthStore) GetAccessTokenWithSession(
 		Relation("Client", func(q *bun.SelectQuery) *bun.SelectQuery {
 			return q.Column("client_id")
 		}).
-		Relation("UserSession")
+		Relation("UserSession", func(q *bun.SelectQuery) *bun.SelectQuery {
+			return q.ExcludeColumn("session_secret")
+		})
 
 	if err := selectQuery.Scan(ctx); err != nil {
 		err = storeutil.WrapDriverError(err)

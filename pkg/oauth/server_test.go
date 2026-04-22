@@ -813,13 +813,15 @@ func TestTokenExchange(t *testing.T) {
 			Method: "POST",
 			Path:   "/oauth/token",
 			Body: map[string]string{
-				"grant_type":    "refresh_token",
-				"refresh_token": "OJSWM.IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A.GCPIASDUP7UZJ6YL5OP2ESZB7CKRFV4JJQYTMDOSDIOE7O75IAMQ",
+				"grant_type": "refresh_token",
+				"refresh_token": "OJSWM.IBTFXELDVVT64Y26IZZFFNSL7GWZY2Y3ALQQI3A" +
+					".GCPIASDUP7UZJ6YL5OP2ESZB7CKRFV4JJQYTMDOSDIOE7O75IAMQ",
 				"client_id":     "client",
 				"client_secret": "secret",
 			},
 			ExpectedCode: http.StatusUnauthorized,
 			StoreCheck: func(t *testing.T, s *mockStore) {
+				t.Helper()
 				a := assertions.New(t)
 				a.So(s.calls, should.Contain, "GetAccessToken")
 				a.So(s.calls, should.Contain, "GetSession")

@@ -72,13 +72,17 @@ func TestEntityAccess(t *testing.T) {
 	oauthClient := p.NewClient(oauthUsr.GetOrganizationOrUserIdentifiers())
 	oauthClient.Rights = []ttnpb.Right{ttnpb.Right_RIGHT_USER_ALL}
 
-	// Session that is already expired.
-	expiredSession := p.NewUserSession(oauthUsr.GetIds())
-	p.UserSessions[len(p.UserSessions)-1].ExpiresAt = timestamppb.New(time.Now().Add(-10 * time.Minute))
+	// Session that is already expired. CreateSession assigns the session ID,
+	// so we reference the population slice entry to read the actual ID after
+	// Populate runs.
+	p.NewUserSession(oauthUsr.GetIds())
+	expiredSession := p.UserSessions[len(p.UserSessions)-1]
+	expiredSession.ExpiresAt = timestamppb.New(time.Now().Add(-10 * time.Minute))
 
 	// Session that is still valid.
-	validSession := p.NewUserSession(oauthUsr.GetIds())
-	p.UserSessions[len(p.UserSessions)-1].ExpiresAt = timestamppb.New(time.Now().Add(10 * time.Minute))
+	p.NewUserSession(oauthUsr.GetIds())
+	validSession := p.UserSessions[len(p.UserSessions)-1]
+	validSession.ExpiresAt = timestamppb.New(time.Now().Add(10 * time.Minute))
 
 	// Generate access token bearer strings. The stored AccessToken is the hashed key.
 	newBearerAccessToken := func() (bearer, tokenID, hashed string) {
@@ -250,7 +254,7 @@ func TestEntityAccess(t *testing.T) {
 			}
 		})
 
-		t.Run("Access Token with Valid Session", func(t *testing.T) {
+		t.Run("Access Token with Valid Session", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			authInfo, err := cli.AuthInfo(ctx, ttnpb.Empty, bearerCreds(validSessionToken))
 			if a.So(err, should.BeNil) && a.So(authInfo, should.NotBeNil) {
@@ -258,7 +262,7 @@ func TestEntityAccess(t *testing.T) {
 			}
 		})
 
-		t.Run("Access Token with Expired Session", func(t *testing.T) {
+		t.Run("Access Token with Expired Session", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			_, err := cli.AuthInfo(ctx, ttnpb.Empty, bearerCreds(expiredSessionToken))
 			if a.So(err, should.NotBeNil) {
@@ -266,7 +270,7 @@ func TestEntityAccess(t *testing.T) {
 			}
 		})
 
-		t.Run("Access Token with Missing Session", func(t *testing.T) {
+		t.Run("Access Token with Missing Session", func(t *testing.T) { // nolint:paralleltest
 			a, ctx := test.New(t)
 			_, err := cli.AuthInfo(ctx, ttnpb.Empty, bearerCreds(missingSessionToken))
 			if a.So(err, should.NotBeNil) {
