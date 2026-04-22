@@ -50,7 +50,7 @@ type LoginConfig struct {
 
 // Config is the configuration for the OAuth server.
 type Config struct {
-	Mount       string      `name:"mount" description:"Path on the server where the Account application and OAuth services will be served"`
+	Mount       string      `name:"mount" description:"Path on the server where the Account application and OAuth services will be served"` //nolint:lll
 	UI          UIConfig    `name:"ui"`
 	CSRFAuthKey []byte      `name:"-"`
 	Login       LoginConfig `name:"-"`

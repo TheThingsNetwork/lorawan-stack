@@ -399,6 +399,7 @@ func TestAuthentication(t *testing.T) {
 }
 
 func TestAuthenticationWithSessionTTL(t *testing.T) {
+	t.Parallel()
 	const sessionTTL = time.Hour
 
 	store := &mockStore{}
