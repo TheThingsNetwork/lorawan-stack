@@ -16,9 +16,11 @@
 package tlsconfig
 
 import (
+	"bytes"
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/pem"
 	"os"
 	"strings"
 	"sync/atomic"
@@ -46,6 +48,14 @@ var (
 	errMissingACMEDir         = errors.Define("missing_acme_dir", "missing ACME storage directory")
 	errMissingACMEEndpoint    = errors.Define("missing_acme_endpoint", "missing ACME endpoint")
 	errMissingACMEDefaultHost = errors.Define("missing_acme_default_host", "missing ACME default host")
+	errParsePEM               = errors.DefineInvalidArgument("parse_pem", "parse PEM")
+	errUnexpectedPEMType      = errors.DefineInvalidArgument(
+		"unexpected_pem_type", "unexpected PEM block of type `{pem_type}`, expected CERTIFICATE",
+	)
+	errParseCertificate = errors.DefineInvalidArgument("parse_certificate", "parse certificate")
+	errNotCACertificate = errors.DefineInvalidArgument(
+		"not_ca_certificate", "certificate with subject `{subject}` is not a CA certificate",
+	)
 )
 
 // Initialize initializes the autocert manager for the ACME configuration.
@@ -190,15 +200,51 @@ func (c Client) ApplyTo(tlsConfig *tls.Config) error {
 	}
 
 	if len(rootCABytes) > 0 {
+		certs, err := parseAndValidateCACerts(rootCABytes)
+		if err != nil {
+			return err
+		}
+
 		if tlsConfig.RootCAs == nil {
 			if tlsConfig.RootCAs, err = x509.SystemCertPool(); err != nil {
 				tlsConfig.RootCAs = x509.NewCertPool()
 			}
 		}
-		tlsConfig.RootCAs.AppendCertsFromPEM(rootCABytes)
+
+		for _, cert := range certs {
+			tlsConfig.RootCAs.AddCert(cert)
+		}
 	}
 	tlsConfig.InsecureSkipVerify = c.InsecureSkipVerify
 	return nil
+}
+
+func parseAndValidateCACerts(pemBytes []byte) ([]*x509.Certificate, error) {
+	var certs []*x509.Certificate
+	for {
+		pemBytes = bytes.TrimSpace(pemBytes)
+		if len(pemBytes) == 0 {
+			break
+		}
+		block, rest := pem.Decode(pemBytes)
+		if block == nil {
+			return nil, errParsePEM.New()
+		}
+		if block.Type != "CERTIFICATE" {
+			return nil, errUnexpectedPEMType.WithAttributes("pem_type", block.Type)
+		}
+		pemBytes = rest
+
+		cert, err := x509.ParseCertificate(block.Bytes)
+		if err != nil {
+			return nil, errParseCertificate.WithCause(err)
+		}
+		if !cert.IsCA {
+			return nil, errNotCACertificate.WithAttributes("subject", cert.Subject.String())
+		}
+		certs = append(certs, cert)
+	}
+	return certs, nil
 }
 
 func readCert(fileReader FileReader, certFile, keyFile string) (*tls.Certificate, error) {

@@ -13,6 +13,7 @@ For details about compatibility between different releases, see the **Commitment
 
 - Add tracing for LBS LNS and TTIGW protocol handlers.
 - TTGC LBS Root CUPS claiming support.
+- Validate that root CA certificates are actually CA certificates on startup of The Things Stack, rejecting leaf certificates configured as root CAs.
 
 ### Changed
 
