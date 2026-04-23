@@ -8,6 +8,9 @@ replace go.thethings.network/lorawan-stack/v3 => ../
 
 replace github.com/olekukonko/tablewriter => github.com/olekukonko/tablewriter v0.0.5
 
+// New versions break support for specifying a SQL migration file
+replace github.com/uptrace/bun => github.com/uptrace/bun v1.2.15
+
 require (
 	github.com/TheThingsIndustries/magepkg v0.0.0-20190214092847-6c0299b7c3ed
 	github.com/blang/semver v3.5.1+incompatible
@@ -197,9 +200,9 @@ require (
 	github.com/subosito/gotenv v1.6.0 // indirect
 	github.com/throttled/throttled/v2 v2.15.0 // indirect
 	github.com/tmthrgd/go-hex v0.0.0-20190904060850-447a3041c3bc // indirect
-	github.com/uptrace/bun v1.2.18 // indirect
-	github.com/uptrace/bun/dialect/pgdialect v1.2.18 // indirect
-	github.com/uptrace/bun/driver/pgdriver v1.2.18 // indirect
+	github.com/uptrace/bun v1.2.15 // indirect
+	github.com/uptrace/bun/dialect/pgdialect v1.2.15 // indirect
+	github.com/uptrace/bun/driver/pgdriver v1.2.15 // indirect
 	github.com/vmihailenco/msgpack/v5 v5.4.1 // indirect
 	github.com/vmihailenco/tagparser/v2 v2.0.0 // indirect
 	github.com/weppos/publicsuffix-go v0.30.0 // indirect

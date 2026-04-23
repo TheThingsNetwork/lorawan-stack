@@ -14,6 +14,9 @@ replace gocloud.dev/pubsub/natspubsub => gocloud.dev/pubsub/natspubsub v0.41.0
 
 replace github.com/olekukonko/tablewriter => github.com/olekukonko/tablewriter v0.0.5
 
+// New versions break support for specifying a SQL migration file
+replace github.com/uptrace/bun => github.com/uptrace/bun v1.2.15
+
 require (
 	github.com/KimMachineGun/automemlimit v0.7.5
 	github.com/Masterminds/sprig/v3 v3.3.0
@@ -82,9 +85,9 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/throttled/throttled/v2 v2.15.0
-	github.com/uptrace/bun v1.2.18
-	github.com/uptrace/bun/dialect/pgdialect v1.2.18
-	github.com/uptrace/bun/driver/pgdriver v1.2.18
+	github.com/uptrace/bun v1.2.15
+	github.com/uptrace/bun/dialect/pgdialect v1.2.15
+	github.com/uptrace/bun/driver/pgdriver v1.2.15
 	github.com/vmihailenco/msgpack/v5 v5.4.1
 	go.opentelemetry.io/contrib/instrumentation/github.com/gorilla/mux/otelmux v0.68.0
 	go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc v0.68.0
