@@ -66,10 +66,13 @@ func (s *sessionStore) Transact(ctx context.Context, f func(ctx context.Context,
 // NewServer returns a new OAuth server on top of the given store.
 func NewServer(c *component.Component, store oauth_store.TransactionalInterface, config Config, cspFunc func(config *Config, nonce string) string) (Server, error) {
 	s := &server{
-		c:             c,
-		config:        config,
-		store:         store,
-		session:       session.Session{Store: &sessionStore{store}},
+		c:      c,
+		config: config,
+		store:  store,
+		session: session.Session{
+			Store:        &sessionStore{store},
+			CookieMaxAge: config.Login.SessionTTL,
+		},
 		generateCSP:   cspFunc,
 		schemaDecoder: schema.NewDecoder(),
 	}

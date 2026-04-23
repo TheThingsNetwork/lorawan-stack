@@ -35,6 +35,10 @@ var errIncorrectPasswordOrUserID = errors.DefineInvalidArgument("no_user_id_pass
 // Session is the session helper.
 type Session struct {
 	Store TransactionalStore
+
+	// CookieMaxAge sets the Max-Age of the auth cookie. Zero means a
+	// browser-session cookie (cleared when the browser closes).
+	CookieMaxAge time.Duration
 }
 
 // Store used by the account app server.
@@ -57,6 +61,7 @@ func (s *Session) authCookie() *cookie.Cookie {
 		Name:     authCookieName,
 		Path:     "/",
 		HTTPOnly: true,
+		MaxAge:   s.CookieMaxAge,
 	}
 }
 

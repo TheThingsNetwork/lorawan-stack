@@ -310,6 +310,9 @@ type OAuthStore interface {
 		ctx context.Context, userIDs *ttnpb.UserIdentifiers, clientIDs *ttnpb.ClientIdentifiers,
 	) ([]*ttnpb.OAuthAccessToken, error)
 	GetAccessToken(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, error)
+	// GetAccessTokenWithSession returns the access token and its linked user session.
+	// The returned session is nil if the token is not linked to a session or the session no longer exists.
+	GetAccessTokenWithSession(ctx context.Context, id string) (*ttnpb.OAuthAccessToken, *ttnpb.UserSession, error)
 	DeleteAccessToken(ctx context.Context, id string) error
 }
 

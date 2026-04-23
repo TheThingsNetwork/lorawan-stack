@@ -178,7 +178,7 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 		}
 	case auth.AccessToken:
 		fetch = func(ctx context.Context, st store.Store) error {
-			accessToken, err := st.GetAccessToken(ctx, tokenID)
+			accessToken, session, err := st.GetAccessTokenWithSession(ctx, tokenID)
 			if err != nil {
 				if errors.IsNotFound(err) {
 					return errTokenNotFound.WithCause(err)
@@ -196,6 +196,14 @@ func (is *IdentityServer) authInfo(ctx context.Context) (info *ttnpb.AuthInfoRes
 			}
 			if expiresAt := ttnpb.StdTime(accessToken.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
 				return errTokenExpired.New()
+			}
+			if accessToken.UserSessionId != "" {
+				if session == nil {
+					return errTokenExpired.New()
+				}
+				if expiresAt := ttnpb.StdTime(session.ExpiresAt); expiresAt != nil && expiresAt.Before(time.Now()) {
+					return errTokenExpired.New()
+				}
 			}
 			accessToken.AccessToken, accessToken.RefreshToken = "", ""
 			accessToken.Rights = ttnpb.RightsFrom(accessToken.Rights...).Implied().GetRights()

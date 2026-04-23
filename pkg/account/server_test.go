@@ -397,3 +397,84 @@ func TestAuthentication(t *testing.T) {
 		})
 	}
 }
+
+func TestAuthenticationWithSessionTTL(t *testing.T) {
+	t.Parallel()
+	const sessionTTL = time.Hour
+
+	store := &mockStore{}
+	c := componenttest.NewComponent(t, &component.Config{
+		ServiceBase: config.ServiceBase{
+			HTTP: config.HTTP{
+				Cookie: config.Cookie{
+					HashKey:  []byte("12345678123456781234567812345678"),
+					BlockKey: []byte("12345678123456781234567812345678"),
+				},
+			},
+		},
+	})
+	s, err := account.NewServer(c, store, oauth.Config{
+		Mount:       "/oauth",
+		CSRFAuthKey: []byte("12345678123456781234567812345678"),
+		UI: oauth.UIConfig{
+			TemplateData: webui.TemplateData{
+				SiteName:     "The Things Network",
+				Title:        "Account",
+				CanonicalURL: "https://example.com/oauth",
+			},
+		},
+		Login: oauth.LoginConfig{SessionTTL: sessionTTL},
+	}, identityserver.GenerateCSPString)
+	if err != nil {
+		panic(err)
+	}
+	c.RegisterWeb(s)
+	componenttest.StartComponent(t, c)
+
+	// Obtain CSRF token.
+	req := httptest.NewRequest("GET", "/oauth/login", nil)
+	req.URL.Scheme, req.URL.Host = "http", req.Host
+	rr := httptest.NewRecorder()
+	c.ServeHTTP(rr, req)
+	csrfToken := rr.Header().Get("X-CSRF-Token")
+	csrfCookies := rr.Result().Cookies()
+
+	store.res.user = mockUser
+	store.res.session = mockSession
+
+	body, _ := json.Marshal(loginFormData{"json", "user", "pass"})
+	loginReq := httptest.NewRequest("POST", "/oauth/api/auth/login", bytes.NewBuffer(body))
+	loginReq.URL.Scheme, loginReq.URL.Host = "http", loginReq.Host
+	loginReq.Header.Set("Content-Type", "application/json")
+	loginReq.Header.Set("X-CSRF-Token", csrfToken)
+	for _, c := range csrfCookies {
+		loginReq.AddCookie(c)
+	}
+
+	before := time.Now()
+	loginRes := httptest.NewRecorder()
+	c.ServeHTTP(loginRes, loginReq)
+	after := time.Now()
+
+	a := assertions.New(t)
+	a.So(loginRes.Code, should.Equal, http.StatusNoContent)
+
+	if a.So(store.req.session, should.NotBeNil) {
+		expiresAt := ttnpb.StdTime(store.req.session.ExpiresAt)
+		if a.So(expiresAt, should.NotBeNil) {
+			a.So(expiresAt.After(before.Add(sessionTTL-time.Minute)), should.BeTrue)
+			a.So(expiresAt.Before(after.Add(sessionTTL+time.Minute)), should.BeTrue)
+		}
+	}
+
+	var authCookie *http.Cookie
+	for _, c := range loginRes.Result().Cookies() {
+		if c.Name == "_session" {
+			authCookie = c
+			break
+		}
+	}
+	if a.So(authCookie, should.NotBeNil) {
+		a.So(authCookie.MaxAge, should.Equal, int(sessionTTL.Seconds()))
+	}
+}

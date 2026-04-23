@@ -8846,6 +8846,15 @@
       "file": "oauth.go"
     }
   },
+  "error:pkg/oauth:session_expired": {
+    "translations": {
+      "en": "session expired"
+    },
+    "description": {
+      "package": "pkg/oauth",
+      "file": "storage.go"
+    }
+  },
   "error:pkg/oauth:token": {
     "translations": {
       "en": "invalid token"
