@@ -239,7 +239,7 @@ func TestScheduleAnytimeRestricted(t *testing.T) {
 	}
 }
 
-func TestScheduleAnytimeTooFarAhead(t *testing.T) {
+func TestScheduleAnytimeTooFarAhead(t *testing.T) { //nolint:paralleltest
 	// DutyCycleWindow stays at the 10s test default; tighten MaxScheduleAhead to 20s just for this
 	// test to exercise the bound. No t.Parallel() because we mutate a package-level variable.
 	prevMaxScheduleAhead := scheduling.MaxScheduleAhead
@@ -289,6 +289,50 @@ func TestScheduleAnytimeTooFarAhead(t *testing.T) {
 		a.So(err, should.BeNil)
 		a.So(em.Starts(), should.Equal, 21*time.Second)
 	}
+}
+
+// TestScheduleAnytimeTooFarAheadOnSuccessPath covers the path where next() returns a value
+// for which checkDutyCycle succeeds, but the emission lands beyond MaxScheduleAhead.
+func TestScheduleAnytimeTooFarAheadOnSuccessPath(t *testing.T) { //nolint:paralleltest
+	prevMaxScheduleAhead := scheduling.MaxScheduleAhead
+	scheduling.MaxScheduleAhead = 2 * scheduling.DutyCycleWindow
+	t.Cleanup(func() { scheduling.MaxScheduleAhead = prevMaxScheduleAhead })
+
+	params := scheduling.SubBandParameters{
+		MinFrequency: 0,
+		MaxFrequency: math.MaxUint64,
+		DutyCycle:    0.5,
+	}
+	clock := &mockClock{}
+
+	// Empty sub-band, next() returns a time beyond now+MaxScheduleAhead. With an empty
+	// emissions list, checkDutyCycle passes on the first iteration, so the loop breaks
+	// without entering the recovery branch. The outer bound check must reject the
+	// emission.
+	t.Run("BeyondBound", func(t *testing.T) { //nolint:paralleltest
+		a := assertions.New(t)
+		sb := scheduling.NewSubBand(params, clock, nil, scheduling.DefaultDutyCycleStyle)
+		next := func() scheduling.ConcentratorTime {
+			return scheduling.ConcentratorTime(50 * time.Second)
+		}
+		now := scheduling.ConcentratorTime(0)
+		_, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
+		a.So(err, should.HaveSameErrorDefinitionAs, scheduling.ErrScheduleTooFarAhead)
+	})
+
+	// Boundary case on the success path: em.t equal to now+MaxScheduleAhead is accepted
+	// (the bound check uses strictly greater than).
+	t.Run("AtBound", func(t *testing.T) { //nolint:paralleltest
+		a := assertions.New(t)
+		sb := scheduling.NewSubBand(params, clock, nil, scheduling.DefaultDutyCycleStyle)
+		next := func() scheduling.ConcentratorTime {
+			return scheduling.ConcentratorTime(20 * time.Second)
+		}
+		now := scheduling.ConcentratorTime(0)
+		em, err := sb.ScheduleAnytime(time.Second, next, ttnpb.TxSchedulePriority_NORMAL, now)
+		a.So(err, should.BeNil)
+		a.So(em.Starts(), should.Equal, 20*time.Second)
+	})
 }
 
 func TestBlockingScheduling(t *testing.T) {
