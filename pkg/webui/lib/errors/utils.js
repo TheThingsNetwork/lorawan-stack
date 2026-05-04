@@ -598,12 +598,17 @@ export const ingestError = (error, extras = {}, tags = {}) => {
  * @param {object} error - The error object.
  * @returns {object|undefined} - The corresponding error message, or undefined if no match.
  */
+const qrCodeSuffix = 'Open the Gateway Status page by scanning the QR code on the gateway.'
+
 export const getClaimGatewayErrorMessage = error => {
   const m = defineMessages({
     notFound: "Gateway doesn't exist. Please confirm that the gateway EUI is correct.",
-    subscriptionNotActive:
-      'There is no gateway subscription attached or active. Please get a <link>Gateway Subscription</link> or activate your subscription following the steps in the documentation. If this gateway is part of a fleet, you should use a Fleet Owner Token during the registration process.',
+    subscriptionDetached: `The gateway billing is detached. ${qrCodeSuffix}`,
+    subscriptionSuspended: `Your gateway billing is suspended. ${qrCodeSuffix}`,
+    subscriptionUnknown: `The gateway billing is not set up yet. ${qrCodeSuffix}`,
+    noSlotsAvailable: `There are no available Gateway Licenses for this gateway. ${qrCodeSuffix}`,
     permissionDenied: 'The owner token is invalid.',
+    fleetIdMismatch: `The gateway EUI matches a Gateway License, but the fleet ID does not match. ${qrCodeSuffix}`,
   })
 
   const rootCause = getBackendErrorRootCause(error)
@@ -613,11 +618,27 @@ export const getClaimGatewayErrorMessage = error => {
     case 5: // NOT_FOUND
       return m.notFound
     case 9: // FAILED_PRECONDITION
-      if (backendErrorMessage.includes('gateway subscription not attached and active')) {
-        return m.subscriptionNotActive
+      if (backendErrorMessage.includes('no available slots in gateway fleet')) {
+        return m.noSlotsAvailable
+      }
+      if (backendErrorMessage.includes('gateway subscription is detached')) {
+        return m.subscriptionDetached
+      }
+
+      if (backendErrorMessage.includes('gateway subscription is suspended')) {
+        return m.subscriptionSuspended
+      }
+
+      if (backendErrorMessage.includes('gateway subscription is not set')) {
+        return m.subscriptionUnknown
       }
       return undefined
     case 7: // PERMISSION_DENIED
+      if (
+        backendErrorMessage.includes('slot found with the gateway ID, but fleet ID does not match')
+      ) {
+        return m.fleetIdMismatch
+      }
       return m.permissionDenied
     default:
       return undefined
