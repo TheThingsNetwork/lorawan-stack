@@ -255,17 +255,16 @@ func (sb *SubBand) ScheduleAnytime(
 			other := sb.emissions[i]
 			used += float32(other.d) / float32(DutyCycleWindow)
 			if used > usable {
-				newT := other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
-				// If the new time is too far in the future, return an error instead of scheduling an emission that would
-				// never be transmitted in practice.
-				if newT > now+ConcentratorTime(MaxScheduleAhead) {
-					return Emission{}, errScheduleTooFarAhead.New()
-				}
-				em.t = newT
+				em.t = other.Ends() + ConcentratorTime(DutyCycleWindow) - ConcentratorTime(em.d)
 				break
 			}
 		}
 		break
+	}
+	// Reject emissions placed too far in the future to avoid scheduling downlinks that would never actually
+	// be transmitted in practice.
+	if em.t > now+ConcentratorTime(MaxScheduleAhead) {
+		return Emission{}, errScheduleTooFarAhead.New()
 	}
 	sb.emissions = sb.emissions.Insert(em)
 	return em, nil
