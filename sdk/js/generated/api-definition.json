@@ -3013,6 +3013,18 @@
         "last_seen_at"
       ]
     },
+    "Count": {
+      "file": "ttn/lorawan/v3/end_device_services.proto",
+      "http": [
+        {
+          "method": "get",
+          "pattern": "/applications/{application_ids.application_id}/devices/count",
+          "parameters": [
+            "application_ids.application_id"
+          ]
+        }
+      ]
+    },
     "Update": {
       "file": "ttn/lorawan/v3/end_device_services.proto",
       "http": [

@@ -4002,6 +4002,63 @@ func (dst *ListEndDevicesRequest) SetFields(src *ListEndDevicesRequest, paths ..
 	return nil
 }
 
+func (dst *CountEndDevicesRequest) SetFields(src *CountEndDevicesRequest, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "application_ids":
+			if len(subs) > 0 {
+				var newDst, newSrc *ApplicationIdentifiers
+				if (src == nil || src.ApplicationIds == nil) && dst.ApplicationIds == nil {
+					continue
+				}
+				if src != nil {
+					newSrc = src.ApplicationIds
+				}
+				if dst.ApplicationIds != nil {
+					newDst = dst.ApplicationIds
+				} else {
+					newDst = &ApplicationIdentifiers{}
+					dst.ApplicationIds = newDst
+				}
+				if err := newDst.SetFields(newSrc, subs...); err != nil {
+					return err
+				}
+			} else {
+				if src != nil {
+					dst.ApplicationIds = src.ApplicationIds
+				} else {
+					dst.ApplicationIds = nil
+				}
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
+func (dst *CountEndDevicesResponse) SetFields(src *CountEndDevicesResponse, paths ...string) error {
+	for name, subs := range _processPaths(paths) {
+		switch name {
+		case "count":
+			if len(subs) > 0 {
+				return fmt.Errorf("'count' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Count = src.Count
+			} else {
+				var zero uint64
+				dst.Count = zero
+			}
+
+		default:
+			return fmt.Errorf("invalid field: '%s'", name)
+		}
+	}
+	return nil
+}
+
 func (dst *SetEndDeviceRequest) SetFields(src *SetEndDeviceRequest, paths ...string) error {
 	for name, subs := range _processPaths(paths) {
 		switch name {
