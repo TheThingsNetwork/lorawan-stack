@@ -69,6 +69,13 @@ var udpMetrics = &messageMetrics{
 			Buckets: []float64{1, 60, 300, 600, 1800, 3600, 5400, 7200, 10800, 14400, 21600},
 		},
 	),
+	scheduleDelayDropped: metrics.NewCounter(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "schedule_delay_dropped_total",
+			Help:      "Total number of downlinks dropped because their scheduling delay exceeded MaxScheduleAhead",
+		},
+	),
 	pendingDownlinks: metrics.NewGauge(
 		prometheus.GaugeOpts{
 			Subsystem: subsystem,
@@ -87,9 +94,10 @@ type messageMetrics struct {
 	messageForwarded *prometheus.CounterVec
 	messageDropped   *prometheus.CounterVec
 
-	unmarshalTypeErrors *prometheus.CounterVec
-	schedulingDelay     prometheus.Histogram
-	pendingDownlinks    prometheus.Gauge
+	unmarshalTypeErrors  *prometheus.CounterVec
+	schedulingDelay      prometheus.Histogram
+	scheduleDelayDropped prometheus.Counter
+	pendingDownlinks     prometheus.Gauge
 }
 
 // Describe implements prometheus.Collector.
@@ -100,6 +108,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 	m.unmarshalTypeErrors.Describe(ch)
 	m.schedulingDelay.Describe(ch)
+	m.scheduleDelayDropped.Describe(ch)
 	m.pendingDownlinks.Describe(ch)
 }
 
@@ -111,6 +120,7 @@ func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 
 	m.unmarshalTypeErrors.Collect(ch)
 	m.schedulingDelay.Collect(ch)
+	m.scheduleDelayDropped.Collect(ch)
 	m.pendingDownlinks.Collect(ch)
 }
 
@@ -124,6 +134,10 @@ func registerMessageForwarded(_ context.Context, tp encoding.PacketType) {
 
 func registerSchedulingDelay(_ context.Context, delay time.Duration) {
 	udpMetrics.schedulingDelay.Observe(delay.Seconds())
+}
+
+func registerScheduleDelayDropped(_ context.Context) {
+	udpMetrics.scheduleDelayDropped.Inc()
 }
 
 func registerPendingDownlinkAdded(_ context.Context) {
