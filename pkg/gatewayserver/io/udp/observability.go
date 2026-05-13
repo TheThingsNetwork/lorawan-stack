@@ -65,7 +65,8 @@ var udpMetrics = &messageMetrics{
 			Subsystem: subsystem,
 			Name:      "scheduling_delay_seconds",
 			Help:      "Histogram of the delay (seconds) introduced when scheduling downlink messages late",
-			Buckets:   []float64{1, 60, 300, 600, 1800, 3600, 5400, 7200},
+			// 1s, 1m, 5m, 10m, 30m, 1h, 1h30m, 2h, 3h, 4h, 6h.
+			Buckets: []float64{1, 60, 300, 600, 1800, 3600, 5400, 7200, 10800, 14400, 21600},
 		},
 	),
 	pendingDownlinks: metrics.NewGauge(
