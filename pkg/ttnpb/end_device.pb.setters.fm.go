@@ -4030,6 +4030,15 @@ func (dst *CountEndDevicesRequest) SetFields(src *CountEndDevicesRequest, paths 
 					dst.ApplicationIds = nil
 				}
 			}
+		case "filters":
+			if len(subs) > 0 {
+				return fmt.Errorf("'filters' has no subfields, but %s were specified", subs)
+			}
+			if src != nil {
+				dst.Filters = src.Filters
+			} else {
+				dst.Filters = nil
+			}
 
 		default:
 			return fmt.Errorf("invalid field: '%s'", name)

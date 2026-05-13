@@ -3991,6 +3991,7 @@ Configuration options for static ADR.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `filters` | [`ListEndDevicesRequest.Filter`](#ttn.lorawan.v3.ListEndDevicesRequest.Filter) | repeated |  |
 
 #### Field Rules
 

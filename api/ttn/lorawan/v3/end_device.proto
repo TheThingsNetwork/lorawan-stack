@@ -1348,6 +1348,7 @@ message ListEndDevicesRequest {
 
 message CountEndDevicesRequest {
   ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  repeated ListEndDevicesRequest.Filter filters = 2;
 }
 
 message CountEndDevicesResponse {

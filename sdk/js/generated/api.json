@@ -16060,6 +16060,18 @@
                   }
                 ]
               }
+            },
+            {
+              "name": "filters",
+              "description": "",
+              "label": "repeated",
+              "type": "Filter",
+              "longType": "ListEndDevicesRequest.Filter",
+              "fullType": "ttn.lorawan.v3.ListEndDevicesRequest.Filter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
             }
           ]
         },

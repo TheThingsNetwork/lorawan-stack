@@ -340,6 +340,13 @@ func (is *IdentityServer) countEndDevices(
 	); err != nil {
 		return nil, err
 	}
+	if req.Filters != nil {
+		for _, filter := range req.Filters {
+			if _, ok := filter.GetField().(*ttnpb.ListEndDevicesRequest_Filter_UpdatedSince); ok {
+				ctx = store.WithFilter(ctx, "updated_at", filter.GetUpdatedSince().AsTime().Format(time.RFC3339Nano))
+			}
+		}
+	}
 	var count uint64
 	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
 		count, err = st.CountEndDevices(ctx, req.GetApplicationIds())

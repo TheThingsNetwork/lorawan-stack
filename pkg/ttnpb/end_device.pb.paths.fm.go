@@ -3900,10 +3900,12 @@ var ListEndDevicesRequestFieldPathsTopLevel = []string{
 var CountEndDevicesRequestFieldPathsNested = []string{
 	"application_ids",
 	"application_ids.application_id",
+	"filters",
 }
 
 var CountEndDevicesRequestFieldPathsTopLevel = []string{
 	"application_ids",
+	"filters",
 }
 var CountEndDevicesResponseFieldPathsNested = []string{
 	"count",

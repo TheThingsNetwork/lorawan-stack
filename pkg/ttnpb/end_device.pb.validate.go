@@ -4720,6 +4720,23 @@ func (m *CountEndDevicesRequest) ValidateFields(paths ...string) error {
 				}
 			}
 
+		case "filters":
+
+			for idx, item := range m.GetFilters() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return CountEndDevicesRequestValidationError{
+							field:  fmt.Sprintf("filters[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
 		default:
 			return CountEndDevicesRequestValidationError{
 				field:  name,
