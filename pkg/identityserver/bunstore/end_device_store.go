@@ -439,7 +439,9 @@ func (s *endDeviceStore) CountEndDevices(ctx context.Context, ids *ttnpb.Applica
 		by = s.selectWithID(ctx, ids.GetApplicationId())
 	}
 
-	selectQuery := s.newSelectModel(ctx, &EndDevice{}).Apply(by)
+	selectQuery := s.newSelectModel(ctx, &EndDevice{}).
+		Apply(by).
+		Apply(selectWithFilterFromContext(ctx))
 
 	// Count the total number of results.
 	count, err := selectQuery.Count(ctx)

@@ -16032,6 +16032,74 @@
           ]
         },
         {
+          "name": "CountEndDevicesRequest",
+          "longName": "CountEndDevicesRequest",
+          "fullName": "ttn.lorawan.v3.CountEndDevicesRequest",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "application_ids",
+              "description": "",
+              "label": "",
+              "type": "ApplicationIdentifiers",
+              "longType": "ApplicationIdentifiers",
+              "fullType": "ttn.lorawan.v3.ApplicationIdentifiers",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": "",
+              "options": {
+                "validate.rules": [
+                  {
+                    "name": "message.required",
+                    "value": true
+                  }
+                ]
+              }
+            },
+            {
+              "name": "filters",
+              "description": "",
+              "label": "repeated",
+              "type": "Filter",
+              "longType": "ListEndDevicesRequest.Filter",
+              "fullType": "ttn.lorawan.v3.ListEndDevicesRequest.Filter",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
+          "name": "CountEndDevicesResponse",
+          "longName": "CountEndDevicesResponse",
+          "fullName": "ttn.lorawan.v3.CountEndDevicesResponse",
+          "description": "",
+          "hasExtensions": false,
+          "hasFields": true,
+          "hasOneofs": false,
+          "extensions": [],
+          "fields": [
+            {
+              "name": "count",
+              "description": "",
+              "label": "",
+              "type": "uint64",
+              "longType": "uint64",
+              "fullType": "uint64",
+              "ismap": false,
+              "isoneof": false,
+              "oneofdecl": "",
+              "defaultValue": ""
+            }
+          ]
+        },
+        {
           "name": "CreateEndDeviceRequest",
           "longName": "CreateEndDeviceRequest",
           "fullName": "ttn.lorawan.v3.CreateEndDeviceRequest",
@@ -20976,6 +21044,28 @@
                       "method": "POST",
                       "pattern": "/applications/{application_ids.application_id}/devices/filter",
                       "body": "*"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Count",
+              "description": "Count end devices in the given application.",
+              "requestType": "CountEndDevicesRequest",
+              "requestLongType": "CountEndDevicesRequest",
+              "requestFullType": "ttn.lorawan.v3.CountEndDevicesRequest",
+              "requestStreaming": false,
+              "responseType": "CountEndDevicesResponse",
+              "responseLongType": "CountEndDevicesResponse",
+              "responseFullType": "ttn.lorawan.v3.CountEndDevicesResponse",
+              "responseStreaming": false,
+              "options": {
+                "google.api.http": {
+                  "rules": [
+                    {
+                      "method": "GET",
+                      "pattern": "/applications/{application_ids.application_id}/devices/count"
                     }
                   ]
                 }
