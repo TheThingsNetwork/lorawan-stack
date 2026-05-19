@@ -36,9 +36,10 @@ import (
 //  3. Upsert a Geolocation profile
 //  4. Update the gateway with the profiles
 func (u *Upstream) claimTTIV1Gateway(
-	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
+	ctx context.Context, ids *ttnpb.GatewayIdentifiers, ownerToken, clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
 	logger := log.FromContext(ctx)
+	eui := types.MustEUI64(ids.Eui).OrZero()
 
 	// Claim the gateway.
 	gtwClient := northboundv1.NewGatewayServiceClient(u.client)

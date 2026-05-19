@@ -181,10 +181,10 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 		Name           string
 		Req            *ttnpb.ClaimGatewayRequest
 		CallOpt        grpc.CallOption
-		ClaimFunc      func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
+		ClaimFunc      func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error)
 		CreateFunc     func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
 		UpdateFunc     func(context.Context, *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error)
-		UnclaimFunc    func(context.Context, types.EUI64) error
+		UnclaimFunc    func(context.Context, *ttnpb.GatewayIdentifiers) error
 		DeleteFunc     func(context.Context, *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
 		ErrorAssertion func(error) bool
 	}{
@@ -302,7 +302,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return in.Gateway, nil
 			},
-			ClaimFunc: func(_ context.Context, _ types.EUI64, _, _ string) (*dcstypes.GatewayMetadata, error) {
+			ClaimFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers, _, _ string) (*dcstypes.GatewayMetadata, error) {
 				return nil, errClaim.New()
 			},
 			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
@@ -327,7 +327,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
-			ClaimFunc: func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error) {
+			ClaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error) {
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
@@ -339,8 +339,8 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				return &emptypb.Empty{}, nil
 			},
-			UnclaimFunc: func(_ context.Context, eui types.EUI64) error {
-				if eui.Equal(supportedEUI) {
+			UnclaimFunc: func(_ context.Context, ids *ttnpb.GatewayIdentifiers) error {
+				if types.MustEUI64(ids.Eui).OrZero().Equal(supportedEUI) {
 					return nil
 				}
 				return errUnclaim.New()
@@ -361,7 +361,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				TargetGatewayServerAddress: "things.example.com",
 			},
 			CallOpt: authorizedCallOpt,
-			ClaimFunc: func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error) {
+			ClaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error) {
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
@@ -373,7 +373,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				return &emptypb.Empty{}, nil
 			},
-			UnclaimFunc: func(context.Context, types.EUI64) error {
+			UnclaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers) error {
 				return errUnclaim.New()
 			},
 			ErrorAssertion: errors.IsAborted,
@@ -391,7 +391,66 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				TargetGatewayId:            "test-gateway",
 				TargetGatewayServerAddress: "things.example.com",
 			},
-			ClaimFunc: func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error) {
+			ClaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error) {
+				return &dcstypes.GatewayMetadata{}, nil
+			},
+			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
+			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
+			CallOpt: authorizedCallOpt,
+		},
+		{
+			Name: "Claim/EmptyTargetGatewayIDDefaultsToEUIAndDeletesOnFailedClaim",
+			Req: &ttnpb.ClaimGatewayRequest{
+				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
+				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
+						GatewayEui:         supportedEUI.Bytes(),
+						AuthenticationCode: claimAuthCode,
+					},
+				},
+				TargetGatewayServerAddress: "things.example.com",
+			},
+			CallOpt: authorizedCallOpt,
+			ClaimFunc: func(
+				_ context.Context, ids *ttnpb.GatewayIdentifiers, _, _ string,
+			) (*dcstypes.GatewayMetadata, error) {
+				a.So(ids.GatewayId, should.Equal, "58a0cbfffe800001")
+				a.So(ids.Eui, should.Resemble, supportedEUI.Bytes())
+				return nil, errClaim.New()
+			},
+			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+				a.So(in.Gateway.GetIds().GetGatewayId(), should.Equal, "58a0cbfffe800001")
+				return in.Gateway, nil
+			},
+			DeleteFunc: func(_ context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+				a.So(ids.GatewayId, should.Equal, "58a0cbfffe800001")
+				a.So(ids.Eui, should.Resemble, supportedEUI.Bytes())
+				return &emptypb.Empty{}, nil
+			},
+			ErrorAssertion: errors.IsAborted,
+		},
+		{
+			Name: "Claim/ForwardsGatewayIdentifiers",
+			Req: &ttnpb.ClaimGatewayRequest{
+				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
+				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
+						GatewayEui:         supportedEUI.Bytes(),
+						AuthenticationCode: claimAuthCode,
+					},
+				},
+				TargetGatewayId:            "forwarded-gateway",
+				TargetGatewayServerAddress: "things.example.com",
+			},
+			ClaimFunc: func(
+				_ context.Context, ids *ttnpb.GatewayIdentifiers, _, _ string,
+			) (*dcstypes.GatewayMetadata, error) {
+				a.So(ids.GatewayId, should.Equal, "forwarded-gateway")
+				a.So(ids.Eui, should.Resemble, supportedEUI.Bytes())
 				return &dcstypes.GatewayMetadata{}, nil
 			},
 			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
@@ -437,7 +496,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 		Req            *ttnpb.GatewayIdentifiers
 		CallOpt        grpc.CallOption
 		GetFunc        func(context.Context, *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
-		UnclaimFunc    func(context.Context, types.EUI64) error
+		UnclaimFunc    func(context.Context, *ttnpb.GatewayIdentifiers) error
 		ErrorAssertion func(error) bool
 	}{
 		{
@@ -508,7 +567,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 					GatewayServerAddress: "test.example.com",
 				}, nil
 			},
-			UnclaimFunc: func(context.Context, types.EUI64) error {
+			UnclaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers) error {
 				return errUnclaim.New()
 			},
 			CallOpt:        authorizedCallOpt,
@@ -528,7 +587,28 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 					GatewayServerAddress: "test.example.com",
 				}, nil
 			},
-			UnclaimFunc: func(context.Context, types.EUI64) error {
+			UnclaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers) error {
+				return nil
+			},
+			CallOpt: authorizedCallOpt,
+		},
+		{
+			Name: "Unclaim/ForwardsGatewayIdentifiers",
+			Req: &ttnpb.GatewayIdentifiers{
+				GatewayId: "forwarded-gateway",
+			},
+			GetFunc: func(context.Context, *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+				return &ttnpb.Gateway{
+					Ids: &ttnpb.GatewayIdentifiers{
+						GatewayId: "forwarded-gateway",
+						Eui:       supportedEUI.Bytes(),
+					},
+					GatewayServerAddress: "test.example.com",
+				}, nil
+			},
+			UnclaimFunc: func(_ context.Context, ids *ttnpb.GatewayIdentifiers) error {
+				a.So(ids.GatewayId, should.Equal, "forwarded-gateway")
+				a.So(ids.Eui, should.Resemble, supportedEUI.Bytes())
 				return nil
 			},
 			CallOpt: authorizedCallOpt,

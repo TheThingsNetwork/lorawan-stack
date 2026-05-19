@@ -70,13 +70,15 @@ func New(ctx context.Context, c component, config ttgc.Config) (*Upstream, error
 type claimOption struct {
 	protocol   northboundv1.GatewayProtocolIdentifier
 	authMethod northboundv1.AuthenticationMethod
-	handler    func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
+	handler    func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error)
 }
 
 // Claim implements gateways.GatewayClaimer.
 func (u *Upstream) Claim(
-	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
+	ctx context.Context, ids *ttnpb.GatewayIdentifiers, ownerToken, clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
+	eui := types.MustEUI64(ids.Eui).OrZero()
+
 	// Get the gateway description to verify what protocol it supports.
 	gtwClient := northboundv1.NewGatewayServiceClient(u.client)
 	desc, err := gtwClient.Describe(ctx, &northboundv1.GatewayServiceDescribeRequest{
@@ -103,7 +105,7 @@ func (u *Upstream) Claim(
 	// Select the first supported claiming option and use its handler.
 	for _, option := range claimPreferences {
 		if u.supportsOption(desc, option) {
-			return option.handler(ctx, eui, ownerToken, clusterAddress)
+			return option.handler(ctx, ids, ownerToken, clusterAddress)
 		}
 	}
 
@@ -127,9 +129,11 @@ func (*Upstream) supportsOption(
 }
 
 // Unclaim implements gateways.GatewayClaimer.
-func (u *Upstream) Unclaim(ctx context.Context, eui types.EUI64) error {
+func (u *Upstream) Unclaim(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
+	eui := types.MustEUI64(ids.Eui).OrZero()
+
 	// Delete the CUPS and LNS API keys for the gateway.
-	if err := u.deleteAPIKeys(ctx, &ttnpb.GatewayIdentifiers{Eui: eui.Bytes()}); err != nil {
+	if err := u.deleteAPIKeys(ctx, ids); err != nil {
 		// Don't fail unclaiming if deleting the API keys fails.
 		log.FromContext(ctx).WithError(err).Warn("Failed to delete API keys for gateway")
 	}
