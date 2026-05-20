@@ -25,7 +25,7 @@ import (
 	"google.golang.org/protobuf/types/known/emptypb"
 )
 
-// MockEndDeviceClaimer is a mock Claimer.
+// MockEndDeviceClaimer is a mock end device Claimer.
 type MockEndDeviceClaimer struct {
 	JoinEUIs []types.EUI64
 
@@ -81,24 +81,26 @@ func (m MockEndDeviceClaimer) BatchUnclaim(
 type MockGatewayClaimer struct {
 	EUIs []types.EUI64
 
-	ClaimFunc            func(context.Context, types.EUI64, string, string) (*dcstypes.GatewayMetadata, error)
-	UnclaimFunc          func(context.Context, types.EUI64) error
+	ClaimFunc func(
+		context.Context, *ttnpb.GatewayIdentifiers, string, string,
+	) (*dcstypes.GatewayMetadata, error)
+	UnclaimFunc          func(context.Context, *ttnpb.GatewayIdentifiers) error
 	IsManagedGatewayFunc func(context.Context, types.EUI64) (bool, error)
 }
 
 // Claim implements gateways.Claimer.
 func (claimer MockGatewayClaimer) Claim(
 	ctx context.Context,
-	eui types.EUI64,
+	ids *ttnpb.GatewayIdentifiers,
 	ownerToken string,
 	clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
-	return claimer.ClaimFunc(ctx, eui, ownerToken, clusterAddress)
+	return claimer.ClaimFunc(ctx, ids, ownerToken, clusterAddress)
 }
 
 // Unclaim implements gateways.Claimer.
-func (claimer MockGatewayClaimer) Unclaim(ctx context.Context, eui types.EUI64) error {
-	return claimer.UnclaimFunc(ctx, eui)
+func (claimer MockGatewayClaimer) Unclaim(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
+	return claimer.UnclaimFunc(ctx, ids)
 }
 
 // IsManagedGateway implements gateways.Claimer.

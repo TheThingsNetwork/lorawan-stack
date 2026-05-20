@@ -17,6 +17,7 @@ package deviceclaimingserver
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/observability"
@@ -95,9 +96,13 @@ func (gcls *gatewayClaimingServer) Claim(
 	logger = logger.WithFields(log.Fields(
 		"gateway_eui", gatewayEUI,
 	))
+	gatewayID := req.TargetGatewayId
+	if gatewayID == "" {
+		gatewayID = strings.ToLower(gatewayEUI.String())
+	}
 	ids = &ttnpb.GatewayIdentifiers{
 		Eui:       gatewayEUI.Bytes(),
-		GatewayId: req.TargetGatewayId,
+		GatewayId: gatewayID,
 	}
 
 	// Check if the gateway already exists.
@@ -113,21 +118,24 @@ func (gcls *gatewayClaimingServer) Claim(
 		Ids: ids,
 	}
 
-	_, err = gcls.registry.Create(ctx, &ttnpb.CreateGatewayRequest{
+	created, err := gcls.registry.Create(ctx, &ttnpb.CreateGatewayRequest{
 		Gateway:      gateway,
 		Collaborator: req.GetCollaborator(),
 	})
 	if err != nil {
 		return nil, errCreateGateway.WithCause(err)
 	}
-	defer func() {
+	if createdIDs := created.GetIds(); createdIDs != nil {
+		ids = createdIDs
+	}
+	defer func(ids *ttnpb.GatewayIdentifiers) {
 		if retErr != nil {
 			logger.Warn("Failed to claim gateway, deleting created gateway")
 			if _, delErr := gcls.registry.Delete(ctx, ids); delErr != nil {
 				logger.WithError(delErr).Warn("Failed to delete created gateway after failed claim")
 			}
 		}
-	}()
+	}(ids)
 
 	// Support clients that only set a single frequency plan.
 	if len(req.TargetFrequencyPlanIds) == 0 && req.TargetFrequencyPlanId != "" { // nolint:staticcheck
@@ -141,7 +149,7 @@ func (gcls *gatewayClaimingServer) Claim(
 	}
 
 	// Claim the gateway on the upstream.
-	res, err := claimer.Claim(ctx, gatewayEUI, string(authCode), req.TargetGatewayServerAddress)
+	res, err := claimer.Claim(ctx, ids, string(authCode), req.TargetGatewayServerAddress)
 	if err != nil {
 		observability.RegisterFailClaim(ctx, ids.GetEntityIdentifiers(), err)
 		return nil, errClaim.WithCause(err)
@@ -151,7 +159,7 @@ func (gcls *gatewayClaimingServer) Claim(
 	defer func(ids *ttnpb.GatewayIdentifiers) {
 		if retErr != nil {
 			observability.RegisterAbortClaim(ctx, ids.GetEntityIdentifiers(), retErr)
-			if err := claimer.Unclaim(ctx, gatewayEUI); err != nil {
+			if err := claimer.Unclaim(ctx, ids); err != nil {
 				logger.WithError(err).Warn("Failed to unclaim gateway")
 			}
 			return
@@ -256,7 +264,7 @@ func (gcls gatewayClaimingServer) Unclaim(ctx context.Context, req *ttnpb.Gatewa
 		return nil, errGatewayClaimingNotSupported.WithAttributes("eui", gatewayEUI)
 	}
 
-	if err := claimer.Unclaim(ctx, gatewayEUI); err != nil {
+	if err := claimer.Unclaim(ctx, gtw.Ids); err != nil {
 		observability.RegisterFailUnclaim(ctx, gtw.GetEntityIdentifiers(), err)
 		return nil, err
 	}
