@@ -598,7 +598,7 @@ export const ingestError = (error, extras = {}, tags = {}) => {
  * @param {object} error - The error object.
  * @returns {object|undefined} - The corresponding error message, or undefined if no match.
  */
-const qrCodeSuffix = 'Open the Gateway Status page by scanning the QR code on the gateway.'
+const qrCodeSuffix = 'Scan the QR code on the gateway to open the Gateway Status page.'
 
 export const getClaimGatewayErrorMessage = error => {
   const m = defineMessages({
