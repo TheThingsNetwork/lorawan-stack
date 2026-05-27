@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import React, { useCallback, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import { defineMessages } from 'react-intl'
 import { useFormikContext } from 'formik'
 
@@ -24,10 +24,6 @@ import Notification from '@ttn-lw/components/notification'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import FormSubmit from '@ttn-lw/components/form/submit'
 import SubmitButton from '@ttn-lw/components/submit-button'
-import Link from '@ttn-lw/components/link'
-import Tabs from '@ttn-lw/components/tabs'
-
-import Message from '@ttn-lw/lib/components/message'
 
 import { GsFrequencyPlansSelect as FrequencyPlansSelect } from '@console/containers/freq-plans-select'
 
@@ -37,12 +33,10 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import getHostFromUrl from '@ttn-lw/lib/host-from-url'
 
 const { enabled: gsEnabled, base_url: gsBaseURL } = selectGsConfig()
-const smUrl = 'https://accounts.thethingsindustries.com'
 
 const m = defineMessages({
   claimWarning:
-    'We detected a Managed gateway. To claim this gateway with a subscription, use the owner token printed on the gateway, or add it to your Gateway Fleet using your <Link>fleet owner token.</Link>',
-  fleet: 'Fleet',
+    'We detected that your gateway is a <strong>Managed Gateway</strong>. To claim this gateway, please use the owner token printed on the inside of the mounting lid or scan the QR code to claim instantly.',
 })
 
 const initialValues = {
@@ -55,38 +49,10 @@ const initialValues = {
   target_gateway_server_address: gsEnabled ? getHostFromUrl(gsBaseURL) : '',
 }
 
-const ownerTokenTypes = [
-  { name: 'gateway', title: sharedMessages.gateway },
-  { name: 'fleet', title: m.fleet },
-]
-
 const GatewayClaimFormSection = () => {
-  const { values, addToFieldRegistry, removeFromFieldRegistry, setValues } = useFormikContext()
+  const { values, addToFieldRegistry, removeFromFieldRegistry } = useFormikContext()
   const isManaged = values._inputMethod === 'managed'
-  const isFleet = values._isFleet
-
-  const [activeOwnerTokenType, setActiveOwnerTokenType] = React.useState(
-    isFleet ? 'fleet' : 'gateway',
-  )
-
-  const onOwnerTokenTypeChange = useCallback(
-    value => {
-      setActiveOwnerTokenType(value)
-      setValues(values => ({
-        ...values,
-        authenticated_identifiers: {
-          ...values.authenticated_identifiers,
-          authentication_code:
-            value === 'fleet' && values._fleet_owner_token
-              ? btoa(values._fleet_owner_token)
-              : value === 'gateway' && values._gtw_owner_token
-                ? btoa(values._gtw_owner_token)
-                : '',
-        },
-      }))
-    },
-    [setValues],
-  )
+  const withQRdata = values._withQRdata
 
   // Register hidden fields so they don't get cleaned.
   useEffect(() => {
@@ -98,76 +64,28 @@ const GatewayClaimFormSection = () => {
   return (
     <>
       {isManaged && (
-        <>
-          <Form.InfoField>
-            <Notification
-              small
-              info
-              content={m.claimWarning}
-              messageValues={{
-                Link: val => (
-                  <Link.Anchor
-                    secondary
-                    href="https://www.thethingsindustries.com/docs/hardware/gateways/models/thethingsindoorgatewaypro/#finding-your-owner-token"
-                    external
-                  >
-                    {val}
-                  </Link.Anchor>
-                ),
-              }}
-              className="mb-0"
-            />
-          </Form.InfoField>
-          <Message content={sharedMessages.ownerToken} className="fw-bold" />
-          <Tabs
-            active={activeOwnerTokenType}
-            tabs={ownerTokenTypes}
-            onTabChange={onOwnerTokenTypeChange}
-            toggleStyle
+        <Form.InfoField>
+          <Notification
             small
-            className="w-content p-0 mb-cs-xs mt-cs-xxs border-none br-m gap-0 fs-s"
+            info
+            content={m.claimWarning}
+            messageValues={{
+              strong: txt => <strong>{txt}</strong>,
+            }}
+            className="mb-0"
           />
-          {activeOwnerTokenType === 'fleet' && (
-            <Message
-              content={sharedMessages.fleetInfo}
-              values={{
-                Link: val => (
-                  <Link.DocLink
-                    secondary
-                    path="/hardware/gateways/models/thethingsindoorgatewaypro/#subscription"
-                  >
-                    {val}
-                  </Link.DocLink>
-                ),
-              }}
-              className="mb-cs-xs c-text-neutral-light"
-              component="div"
-            />
-          )}
-        </>
+        </Form.InfoField>
       )}
       <Form.Field
         required
         title={sharedMessages.ownerToken}
-        showTitle={!isManaged}
         name="authenticated_identifiers.authentication_code"
         tooltipId={tooltipIds.CLAIM_AUTH_CODE}
         component={Input}
-        description={
-          isManaged && activeOwnerTokenType === 'fleet' ? sharedMessages.fleetTokenInfo : undefined
-        }
-        descriptionValues={{
-          Link: val => (
-            <Link.Anchor secondary href={`${smUrl}/dashboard/subscriptions?type=gateway`} external>
-              {val}
-            </Link.Anchor>
-          ),
-        }}
         encode={btoa}
         decode={atob}
+        disabled={withQRdata}
         sensitive
-        data-1p-ignore
-        data-lpignore
         autoFocus
       />
       <Form.Field
