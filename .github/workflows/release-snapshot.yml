@@ -10,6 +10,21 @@ env:
   NODE_ENV: production
 
 jobs:
+  summary:
+    name: Workflow summary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow summary
+        run: |
+          cat << EOF >> $GITHUB_STEP_SUMMARY
+          ## Snapshot Release
+
+          | Property | Value |
+          | --- | --- |
+          | **Branch** | \`${{ github.ref_name }}\` |
+          | **Commit** | \`${{ github.sha }}\` |
+          | **Triggered by** | [${{ github.actor }}](https://github.com/${{ github.actor }}) |
+          EOF
   release:
     name: Snapshot release
     runs-on: ubuntu-24.04
