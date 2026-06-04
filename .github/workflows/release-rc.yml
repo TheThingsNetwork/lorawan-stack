@@ -11,6 +11,22 @@ env:
   NODE_ENV: production
 
 jobs:
+  summary:
+    name: Workflow summary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow summary
+        run: |
+          cat << EOF >> $GITHUB_STEP_SUMMARY
+          ## Release Candidate
+
+          | Property | Value |
+          | --- | --- |
+          | **Branch** | \`${{ github.ref_name }}\` |
+          | **Commit** | \`${{ github.sha }}\` |
+          | **RC Version** | \`${{ inputs.rc_version }}\` |
+          | **Triggered by** | [${{ github.actor }}](https://github.com/${{ github.actor }}) |
+          EOF
   release:
     name: Release-candidate release
     runs-on: ubuntu-24.04
