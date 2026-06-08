@@ -14,8 +14,15 @@ replace gocloud.dev/pubsub/natspubsub => gocloud.dev/pubsub/natspubsub v0.41.0
 
 replace github.com/olekukonko/tablewriter => github.com/olekukonko/tablewriter v0.0.5
 
+// New versions break Network Server tests
+replace github.com/redis/go-redis/v9 => github.com/redis/go-redis/v9 v9.18.0
+
 // New versions break support for specifying a SQL migration file
-replace github.com/uptrace/bun => github.com/uptrace/bun v1.2.15
+replace (
+	github.com/uptrace/bun => github.com/uptrace/bun v1.2.15
+	github.com/uptrace/bun/dialect/pgdialect => github.com/uptrace/bun/dialect/pgdialect v1.2.15
+	github.com/uptrace/bun/driver/pgdriver => github.com/uptrace/bun/driver/pgdriver v1.2.15
+)
 
 require (
 	github.com/KimMachineGun/automemlimit v0.7.5
@@ -76,7 +83,7 @@ require (
 	github.com/pkg/browser v0.0.0-20240102092130-5ac0b6a4141c
 	github.com/pkg/errors v0.9.1
 	github.com/prometheus/client_golang v1.23.2
-	github.com/redis/go-redis/v9 v9.20.0
+	github.com/redis/go-redis/v9 v9.18.0
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e
 	github.com/smarty/assertions v1.16.0
@@ -187,6 +194,7 @@ require (
 	github.com/cncf/xds/go v0.0.0-20250501225837-2ac532fd4443 // indirect
 	github.com/couchbase/vellum v1.0.2 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.7 // indirect
+	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
 	github.com/dlclark/regexp2 v1.11.5 // indirect
 	github.com/emersion/go-sasl v0.0.0-20241020182733-b788ff22d5a6 // indirect
 	github.com/envoyproxy/go-control-plane/envoy v1.32.4 // indirect
