@@ -72,6 +72,11 @@ service EndDeviceRegistry {
     };
   }
 
+  // Count end devices in the given application.
+  rpc Count(CountEndDevicesRequest) returns (CountEndDevicesResponse) {
+    option (google.api.http) = {get: "/applications/{application_ids.application_id}/devices/count"};
+  }
+
   // Update the end device, changing the fields specified by the field mask to the provided values.
   rpc Update(UpdateEndDeviceRequest) returns (EndDevice) {
     option (google.api.http) = {

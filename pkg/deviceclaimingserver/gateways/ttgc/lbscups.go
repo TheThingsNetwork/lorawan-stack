@@ -38,13 +38,10 @@ var (
 )
 
 func (u *Upstream) claimLBSCUPSGateway(
-	ctx context.Context, eui types.EUI64, ownerToken, clusterAddress string,
+	ctx context.Context, ids *ttnpb.GatewayIdentifiers, ownerToken, clusterAddress string,
 ) (*dcstypes.GatewayMetadata, error) {
 	logger := log.FromContext(ctx)
-
-	ids := &ttnpb.GatewayIdentifiers{
-		Eui: eui.Bytes(),
-	}
+	eui := types.MustEUI64(ids.Eui).OrZero()
 
 	// Create CUPS and LNS API keys for the gateway. The CUPS key will be used as gateway token when claiming on TTGC and
 	// the LNS key will be returned in the metadata. The caller is responsible for updating the LNS key in the gateway.
@@ -165,7 +162,7 @@ func (u *Upstream) createAPIKeys(
 
 	cupsKey, err = gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 		GatewayIds: ids,
-		Name:       fmt.Sprintf("LBS CUPS Key (TTGC claim), generated %s", time.Now().UTC().Format(time.RFC3339)),
+		Name:       fmt.Sprintf("LBS CUPS Key (TTGC), %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.Right_RIGHT_GATEWAY_INFO,
 			ttnpb.Right_RIGHT_GATEWAY_SETTINGS_BASIC,
@@ -179,7 +176,7 @@ func (u *Upstream) createAPIKeys(
 
 	lnsKey, err = gatewayAccess.CreateAPIKey(ctx, &ttnpb.CreateGatewayAPIKeyRequest{
 		GatewayIds: ids,
-		Name:       fmt.Sprintf("LBS LNS Key (TTGC claim), generated %s", time.Now().UTC().Format(time.RFC3339)),
+		Name:       fmt.Sprintf("LBS LNS Key (TTGC), %s", time.Now().UTC().Format(time.RFC3339)),
 		Rights: []ttnpb.Right{
 			ttnpb.Right_RIGHT_GATEWAY_LINK,
 		},

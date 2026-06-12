@@ -3897,6 +3897,23 @@ var ListEndDevicesRequestFieldPathsTopLevel = []string{
 	"order",
 	"page",
 }
+var CountEndDevicesRequestFieldPathsNested = []string{
+	"application_ids",
+	"application_ids.application_id",
+	"filters",
+}
+
+var CountEndDevicesRequestFieldPathsTopLevel = []string{
+	"application_ids",
+	"filters",
+}
+var CountEndDevicesResponseFieldPathsNested = []string{
+	"count",
+}
+
+var CountEndDevicesResponseFieldPathsTopLevel = []string{
+	"count",
+}
 var SetEndDeviceRequestFieldPathsNested = []string{
 	"end_device",
 	"end_device.activated_at",

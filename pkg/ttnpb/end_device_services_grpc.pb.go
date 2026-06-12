@@ -38,6 +38,7 @@ const (
 	EndDeviceRegistry_Get_FullMethodName                   = "/ttn.lorawan.v3.EndDeviceRegistry/Get"
 	EndDeviceRegistry_GetIdentifiersForEUIs_FullMethodName = "/ttn.lorawan.v3.EndDeviceRegistry/GetIdentifiersForEUIs"
 	EndDeviceRegistry_List_FullMethodName                  = "/ttn.lorawan.v3.EndDeviceRegistry/List"
+	EndDeviceRegistry_Count_FullMethodName                 = "/ttn.lorawan.v3.EndDeviceRegistry/Count"
 	EndDeviceRegistry_Update_FullMethodName                = "/ttn.lorawan.v3.EndDeviceRegistry/Update"
 	EndDeviceRegistry_BatchUpdateLastSeen_FullMethodName   = "/ttn.lorawan.v3.EndDeviceRegistry/BatchUpdateLastSeen"
 	EndDeviceRegistry_Delete_FullMethodName                = "/ttn.lorawan.v3.EndDeviceRegistry/Delete"
@@ -64,6 +65,8 @@ type EndDeviceRegistryClient interface {
 	// Similar to Get, this selects the fields given by the field mask.
 	// More or less fields may be returned, depending on the rights of the caller.
 	List(ctx context.Context, in *ListEndDevicesRequest, opts ...grpc.CallOption) (*EndDevices, error)
+	// Count end devices in the given application.
+	Count(ctx context.Context, in *CountEndDevicesRequest, opts ...grpc.CallOption) (*CountEndDevicesResponse, error)
 	// Update the end device, changing the fields specified by the field mask to the provided values.
 	Update(ctx context.Context, in *UpdateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error)
 	// Update the last seen timestamp for a batch of end devices.
@@ -122,6 +125,15 @@ func (c *endDeviceRegistryClient) List(ctx context.Context, in *ListEndDevicesRe
 	return out, nil
 }
 
+func (c *endDeviceRegistryClient) Count(ctx context.Context, in *CountEndDevicesRequest, opts ...grpc.CallOption) (*CountEndDevicesResponse, error) {
+	out := new(CountEndDevicesResponse)
+	err := c.cc.Invoke(ctx, EndDeviceRegistry_Count_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *endDeviceRegistryClient) Update(ctx context.Context, in *UpdateEndDeviceRequest, opts ...grpc.CallOption) (*EndDevice, error) {
 	out := new(EndDevice)
 	err := c.cc.Invoke(ctx, EndDeviceRegistry_Update_FullMethodName, in, out, opts...)
@@ -170,6 +182,8 @@ type EndDeviceRegistryServer interface {
 	// Similar to Get, this selects the fields given by the field mask.
 	// More or less fields may be returned, depending on the rights of the caller.
 	List(context.Context, *ListEndDevicesRequest) (*EndDevices, error)
+	// Count end devices in the given application.
+	Count(context.Context, *CountEndDevicesRequest) (*CountEndDevicesResponse, error)
 	// Update the end device, changing the fields specified by the field mask to the provided values.
 	Update(context.Context, *UpdateEndDeviceRequest) (*EndDevice, error)
 	// Update the last seen timestamp for a batch of end devices.
@@ -200,6 +214,9 @@ func (UnimplementedEndDeviceRegistryServer) GetIdentifiersForEUIs(context.Contex
 }
 func (UnimplementedEndDeviceRegistryServer) List(context.Context, *ListEndDevicesRequest) (*EndDevices, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method List not implemented")
+}
+func (UnimplementedEndDeviceRegistryServer) Count(context.Context, *CountEndDevicesRequest) (*CountEndDevicesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Count not implemented")
 }
 func (UnimplementedEndDeviceRegistryServer) Update(context.Context, *UpdateEndDeviceRequest) (*EndDevice, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Update not implemented")
@@ -295,6 +312,24 @@ func _EndDeviceRegistry_List_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _EndDeviceRegistry_Count_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CountEndDevicesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(EndDeviceRegistryServer).Count(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: EndDeviceRegistry_Count_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(EndDeviceRegistryServer).Count(ctx, req.(*CountEndDevicesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _EndDeviceRegistry_Update_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateEndDeviceRequest)
 	if err := dec(in); err != nil {
@@ -371,6 +406,10 @@ var EndDeviceRegistry_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "List",
 			Handler:    _EndDeviceRegistry_List_Handler,
+		},
+		{
+			MethodName: "Count",
+			Handler:    _EndDeviceRegistry_Count_Handler,
 		},
 		{
 			MethodName: "Update",
