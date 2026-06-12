@@ -11,12 +11,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
-- Add tracing for LBS LNS and TTIGW protocol handlers.
-- TTGC LBS Root CUPS claiming support.
-
 ### Changed
-
-- During the process of claiming a managed gateway, create the gateway in the registry before claiming it, not after.
 
 ### Deprecated
 
@@ -24,9 +19,26 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Mutex locking that caused the rights to be fetched for authorization checks sequentially. This caused gateways to reconnect slowly after Gateway Server restarts and rpcs to timeout that were asserting gateway rights.
-
 ### Security
+
+## [3.36.1] - unreleased
+
+### Added
+
+- `Count` RPC on `EndDeviceRegistry` to efficiently retrieve the number of end devices in an application.
+- Add tracing for LBS LNS and TTIGW protocol handlers.
+- TTGC LBS Root CUPS claiming support.
+- Configurable Identity Server user login session TTL via `is.user-login.session-ttl`:
+  - Defaults to `0` (no expiry, matching previous behavior).
+  - When set, the auth cookie becomes persistent with a matching `Max-Age`, and OAuth access tokens linked to a session are rejected once the session has expired.
+
+### Changed
+
+- During the process of claiming a managed gateway, create the gateway in the registry before claiming it, not after.
+
+### Fixed
+
+- Mutex locking that caused the rights to be fetched for authorization checks sequentially. This caused gateways to reconnect slowly after Gateway Server restarts and rpcs to timeout that were asserting gateway rights.
 
 ## [3.36.0] - unreleased
 
@@ -3067,7 +3079,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.0...v3.36
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.1...v3.36
+[3.36.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.0...v3.36.1
 [3.36.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.2...v3.36.0
 [3.35.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.1...v3.35.2
 [3.35.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.0...v3.35.1

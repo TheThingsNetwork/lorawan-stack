@@ -4686,6 +4686,206 @@ var _ListEndDevicesRequest_Order_InLookup = map[string]struct{}{
 	"-last_seen_at": {},
 }
 
+// ValidateFields checks the field values on CountEndDevicesRequest with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CountEndDevicesRequest) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CountEndDevicesRequestFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "application_ids":
+
+			if m.GetApplicationIds() == nil {
+				return CountEndDevicesRequestValidationError{
+					field:  "application_ids",
+					reason: "value is required",
+				}
+			}
+
+			if v, ok := interface{}(m.GetApplicationIds()).(interface{ ValidateFields(...string) error }); ok {
+				if err := v.ValidateFields(subs...); err != nil {
+					return CountEndDevicesRequestValidationError{
+						field:  "application_ids",
+						reason: "embedded message failed validation",
+						cause:  err,
+					}
+				}
+			}
+
+		case "filters":
+
+			for idx, item := range m.GetFilters() {
+				_, _ = idx, item
+
+				if v, ok := interface{}(item).(interface{ ValidateFields(...string) error }); ok {
+					if err := v.ValidateFields(subs...); err != nil {
+						return CountEndDevicesRequestValidationError{
+							field:  fmt.Sprintf("filters[%v]", idx),
+							reason: "embedded message failed validation",
+							cause:  err,
+						}
+					}
+				}
+
+			}
+
+		default:
+			return CountEndDevicesRequestValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CountEndDevicesRequestValidationError is the validation error returned by
+// CountEndDevicesRequest.ValidateFields if the designated constraints aren't met.
+type CountEndDevicesRequestValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CountEndDevicesRequestValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CountEndDevicesRequestValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CountEndDevicesRequestValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CountEndDevicesRequestValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CountEndDevicesRequestValidationError) ErrorName() string {
+	return "CountEndDevicesRequestValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CountEndDevicesRequestValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCountEndDevicesRequest.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CountEndDevicesRequestValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CountEndDevicesRequestValidationError{}
+
+// ValidateFields checks the field values on CountEndDevicesResponse with the
+// rules defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *CountEndDevicesResponse) ValidateFields(paths ...string) error {
+	if m == nil {
+		return nil
+	}
+
+	if len(paths) == 0 {
+		paths = CountEndDevicesResponseFieldPathsNested
+	}
+
+	for name, subs := range _processPaths(append(paths[:0:0], paths...)) {
+		_ = subs
+		switch name {
+		case "count":
+			// no validation rules for Count
+		default:
+			return CountEndDevicesResponseValidationError{
+				field:  name,
+				reason: "invalid field path",
+			}
+		}
+	}
+	return nil
+}
+
+// CountEndDevicesResponseValidationError is the validation error returned by
+// CountEndDevicesResponse.ValidateFields if the designated constraints aren't met.
+type CountEndDevicesResponseValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e CountEndDevicesResponseValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e CountEndDevicesResponseValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e CountEndDevicesResponseValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e CountEndDevicesResponseValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e CountEndDevicesResponseValidationError) ErrorName() string {
+	return "CountEndDevicesResponseValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e CountEndDevicesResponseValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sCountEndDevicesResponse.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = CountEndDevicesResponseValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = CountEndDevicesResponseValidationError{}
+
 // ValidateFields checks the field values on SetEndDeviceRequest with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

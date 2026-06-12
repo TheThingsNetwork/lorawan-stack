@@ -332,6 +332,34 @@ func (is *IdentityServer) listEndDevices(ctx context.Context, req *ttnpb.ListEnd
 	return devs, nil
 }
 
+func (is *IdentityServer) countEndDevices(
+	ctx context.Context, req *ttnpb.CountEndDevicesRequest,
+) (*ttnpb.CountEndDevicesResponse, error) {
+	if err := rights.RequireApplication(
+		ctx, req.GetApplicationIds(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ,
+	); err != nil {
+		return nil, err
+	}
+	if req.Filters != nil {
+		for _, filter := range req.Filters {
+			if _, ok := filter.GetField().(*ttnpb.ListEndDevicesRequest_Filter_UpdatedSince); ok {
+				ctx = store.WithFilter(ctx, "updated_at", filter.GetUpdatedSince().AsTime().Format(time.RFC3339Nano))
+			}
+		}
+	}
+	var count uint64
+	err := is.store.Transact(ctx, func(ctx context.Context, st store.Store) (err error) {
+		count, err = st.CountEndDevices(ctx, req.GetApplicationIds())
+		return err
+	})
+	if err != nil {
+		return nil, err
+	}
+	return &ttnpb.CountEndDevicesResponse{
+		Count: count,
+	}, nil
+}
+
 func (is *IdentityServer) setFullEndDevicePictureURL(ctx context.Context, dev *ttnpb.EndDevice) {
 	bucketURL := is.configFromContext(ctx).EndDevicePicture.BucketURL
 	if bucketURL == "" {
@@ -589,6 +617,12 @@ func (dr *endDeviceRegistry) BatchUpdateLastSeen(ctx context.Context, req *ttnpb
 
 func (dr *endDeviceRegistry) Delete(ctx context.Context, req *ttnpb.EndDeviceIdentifiers) (*emptypb.Empty, error) {
 	return dr.deleteEndDevice(ctx, req)
+}
+
+func (dr *endDeviceRegistry) Count(
+	ctx context.Context, req *ttnpb.CountEndDevicesRequest,
+) (*ttnpb.CountEndDevicesResponse, error) {
+	return dr.countEndDevices(ctx, req)
 }
 
 func (reg *endDeviceBatchRegistry) Delete(

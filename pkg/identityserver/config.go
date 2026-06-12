@@ -91,6 +91,9 @@ type Config struct {
 		Enabled  bool          `name:"enabled" description:"enable users requesting login tokens"`
 		TokenTTL time.Duration `name:"token-ttl" description:"TTL of login tokens"`
 	} `name:"login-tokens"`
+	UserLogin struct {
+		SessionTTL time.Duration `name:"session-ttl" description:"TTL of user login sessions; zero means sessions never expire"` // nolint:lll
+	} `name:"user-login"`
 	Email struct {
 		email.Config `name:",squash"`
 		Provider     string               `name:"provider" description:"Email provider to use"`

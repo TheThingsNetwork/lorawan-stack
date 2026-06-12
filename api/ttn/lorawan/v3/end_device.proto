@@ -1346,6 +1346,15 @@ message ListEndDevicesRequest {
   repeated Filter filters = 6;
 }
 
+message CountEndDevicesRequest {
+  ApplicationIdentifiers application_ids = 1 [(validate.rules).message.required = true];
+  repeated ListEndDevicesRequest.Filter filters = 2;
+}
+
+message CountEndDevicesResponse {
+  uint64 count = 1;
+}
+
 message SetEndDeviceRequest {
   EndDevice end_device = 1 [(validate.rules).message.required = true];
   // The names of the end device fields that should be updated.

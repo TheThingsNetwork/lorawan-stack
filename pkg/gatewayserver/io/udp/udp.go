@@ -450,6 +450,8 @@ var (
 )
 
 func (s *srv) handleDown(ctx context.Context, st *state) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 	defer func() {
 		st.lastDownlinkPath.Store(nil)
 		st.startHandleDownMu.Lock()
@@ -530,7 +532,16 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 			st.clockMu.RUnlock()
 			d := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
 			logger.WithField("duration", d).Debug("Wait to schedule downlink message late")
-			time.AfterFunc(d, write)
+			go func() {
+				t := time.NewTimer(d)
+				defer t.Stop()
+				select {
+				case <-t.C:
+					write()
+				case <-ctx.Done():
+				case <-st.io.Context().Done():
+				}
+			}()
 		case <-healthCheck.C:
 			if st.isPullPathActive(s.config.DownlinkPathExpires) {
 				break

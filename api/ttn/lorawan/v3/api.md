@@ -249,6 +249,8 @@
   - [Message `BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest.EndDeviceLastSeenUpdate)
   - [Message `BoolValue`](#ttn.lorawan.v3.BoolValue)
   - [Message `ConvertEndDeviceTemplateRequest`](#ttn.lorawan.v3.ConvertEndDeviceTemplateRequest)
+  - [Message `CountEndDevicesRequest`](#ttn.lorawan.v3.CountEndDevicesRequest)
+  - [Message `CountEndDevicesResponse`](#ttn.lorawan.v3.CountEndDevicesResponse)
   - [Message `CreateEndDeviceRequest`](#ttn.lorawan.v3.CreateEndDeviceRequest)
   - [Message `DevAddrPrefix`](#ttn.lorawan.v3.DevAddrPrefix)
   - [Message `EndDevice`](#ttn.lorawan.v3.EndDevice)
@@ -3984,6 +3986,25 @@ Configuration options for static ADR.
 | ----- | ----------- |
 | `format_id` | <p>`string.max_len`: `36`</p><p>`string.pattern`: `^[a-z0-9](?:[-]?[a-z0-9]){2,}$`</p> |
 
+### <a name="ttn.lorawan.v3.CountEndDevicesRequest">Message `CountEndDevicesRequest`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `application_ids` | [`ApplicationIdentifiers`](#ttn.lorawan.v3.ApplicationIdentifiers) |  |  |
+| `filters` | [`ListEndDevicesRequest.Filter`](#ttn.lorawan.v3.ListEndDevicesRequest.Filter) | repeated |  |
+
+#### Field Rules
+
+| Field | Validations |
+| ----- | ----------- |
+| `application_ids` | <p>`message.required`: `true`</p> |
+
+### <a name="ttn.lorawan.v3.CountEndDevicesResponse">Message `CountEndDevicesResponse`</a>
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `count` | [`uint64`](#uint64) |  |  |
+
 ### <a name="ttn.lorawan.v3.CreateEndDeviceRequest">Message `CreateEndDeviceRequest`</a>
 
 | Field | Type | Label | Description |
@@ -4854,6 +4875,7 @@ NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 | `Get` | [`GetEndDeviceRequest`](#ttn.lorawan.v3.GetEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Get the end device with the given identifiers, selecting the fields specified in the field mask. More or less fields may be returned, depending on the rights of the caller. |
 | `GetIdentifiersForEUIs` | [`GetEndDeviceIdentifiersForEUIsRequest`](#ttn.lorawan.v3.GetEndDeviceIdentifiersForEUIsRequest) | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | Get the identifiers of the end device that has the given EUIs registered. |
 | `List` | [`ListEndDevicesRequest`](#ttn.lorawan.v3.ListEndDevicesRequest) | [`EndDevices`](#ttn.lorawan.v3.EndDevices) | List end devices in the given application. Similar to Get, this selects the fields given by the field mask. More or less fields may be returned, depending on the rights of the caller. |
+| `Count` | [`CountEndDevicesRequest`](#ttn.lorawan.v3.CountEndDevicesRequest) | [`CountEndDevicesResponse`](#ttn.lorawan.v3.CountEndDevicesResponse) | Count end devices in the given application. |
 | `Update` | [`UpdateEndDeviceRequest`](#ttn.lorawan.v3.UpdateEndDeviceRequest) | [`EndDevice`](#ttn.lorawan.v3.EndDevice) | Update the end device, changing the fields specified by the field mask to the provided values. |
 | `BatchUpdateLastSeen` | [`BatchUpdateEndDeviceLastSeenRequest`](#ttn.lorawan.v3.BatchUpdateEndDeviceLastSeenRequest) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Update the last seen timestamp for a batch of end devices. |
 | `Delete` | [`EndDeviceIdentifiers`](#ttn.lorawan.v3.EndDeviceIdentifiers) | [`.google.protobuf.Empty`](#google.protobuf.Empty) | Delete the end device with the given IDs. Before deleting an end device it first needs to be deleted from the NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry. In addition, if the device claimed on a Join Server, it also needs to be unclaimed via the DeviceClaimingServer so it can be claimed in the future. This is NOT done automatically. |
@@ -4866,6 +4888,7 @@ NsEndDeviceRegistry, the AsEndDeviceRegistry and the JsEndDeviceRegistry.
 | `Get` | `GET` | `/api/v3/applications/{end_device_ids.application_ids.application_id}/devices/{end_device_ids.device_id}` |  |
 | `List` | `GET` | `/api/v3/applications/{application_ids.application_id}/devices` |  |
 | `List` | `POST` | `/api/v3/applications/{application_ids.application_id}/devices/filter` | `*` |
+| `Count` | `GET` | `/api/v3/applications/{application_ids.application_id}/devices/count` |  |
 | `Update` | `PUT` | `/api/v3/applications/{end_device.ids.application_ids.application_id}/devices/{end_device.ids.device_id}` | `*` |
 | `Delete` | `DELETE` | `/api/v3/applications/{application_ids.application_id}/devices/{device_id}` |  |
 

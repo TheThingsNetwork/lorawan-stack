@@ -268,6 +268,113 @@ func TestEndDevicesPagination(t *testing.T) {
 	}, withPrivateTestDatabase(p))
 }
 
+func TestEndDevicesCount(t *testing.T) {
+	p := &storetest.Population{}
+
+	usr1 := p.NewUser()
+	app1 := p.NewApplication(usr1.GetOrganizationOrUserIdentifiers())
+	for range 5 {
+		p.NewEndDevice(app1.GetIds())
+	}
+
+	key, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_ALL)
+	creds := rpcCreds(key)
+
+	readKey, _ := p.NewAPIKey(usr1.GetEntityIdentifiers(), ttnpb.Right_RIGHT_APPLICATION_DEVICES_READ)
+	readCreds := rpcCreds(readKey)
+
+	t.Parallel()
+	a, ctx := test.New(t)
+
+	testWithIdentityServer(t, func(_ *IdentityServer, cc *grpc.ClientConn) {
+		reg := ttnpb.NewEndDeviceRegistryClient(cc)
+
+		t.Run("Permission denied without credentials", func(_ *testing.T) { // nolint:paralleltest
+			_, err := reg.Count(ctx, &ttnpb.CountEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+			})
+			if a.So(err, should.NotBeNil) {
+				a.So(errors.IsPermissionDenied(err), should.BeTrue)
+			}
+		})
+
+		t.Run("Count with read credentials", func(_ *testing.T) { // nolint:paralleltest
+			resp, err := reg.Count(ctx, &ttnpb.CountEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+			}, readCreds)
+			if a.So(err, should.BeNil) && a.So(resp, should.NotBeNil) {
+				a.So(resp.Count, should.Equal, uint64(5))
+			}
+		})
+
+		t.Run("Count after adding a device", func(_ *testing.T) { // nolint:paralleltest
+			_, err := reg.Create(ctx, &ttnpb.CreateEndDeviceRequest{
+				EndDevice: &ttnpb.EndDevice{
+					Ids: &ttnpb.EndDeviceIdentifiers{
+						ApplicationIds: app1.GetIds(),
+						DeviceId:       "count-test-dev",
+					},
+				},
+			}, creds)
+			a.So(err, should.BeNil)
+
+			resp, err := reg.Count(ctx, &ttnpb.CountEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+			}, readCreds)
+			if a.So(err, should.BeNil) && a.So(resp, should.NotBeNil) {
+				a.So(resp.Count, should.Equal, uint64(6))
+			}
+		})
+
+		t.Run("Count after deleting a device", func(_ *testing.T) { // nolint:paralleltest
+			_, err := reg.Delete(ctx, &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: app1.GetIds(),
+				DeviceId:       "count-test-dev",
+			}, creds)
+			a.So(err, should.BeNil)
+
+			resp, err := reg.Count(ctx, &ttnpb.CountEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+			}, readCreds)
+			if a.So(err, should.BeNil) && a.So(resp, should.NotBeNil) {
+				a.So(resp.Count, should.Equal, uint64(5))
+			}
+		})
+
+		t.Run("Count with updated_since filter", func(_ *testing.T) { // nolint:paralleltest
+			// Filter by 1 hour ago - all devices should match.
+			resp, err := reg.Count(ctx, &ttnpb.CountEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+				Filters: []*ttnpb.ListEndDevicesRequest_Filter{
+					{
+						Field: &ttnpb.ListEndDevicesRequest_Filter_UpdatedSince{
+							UpdatedSince: timestamppb.New(time.Now().Add(-time.Hour)),
+						},
+					},
+				},
+			}, readCreds)
+			if a.So(err, should.BeNil) && a.So(resp, should.NotBeNil) {
+				a.So(resp.Count, should.Equal, uint64(5))
+			}
+
+			// Filter by now - no devices should match.
+			resp, err = reg.Count(ctx, &ttnpb.CountEndDevicesRequest{
+				ApplicationIds: app1.GetIds(),
+				Filters: []*ttnpb.ListEndDevicesRequest_Filter{
+					{
+						Field: &ttnpb.ListEndDevicesRequest_Filter_UpdatedSince{
+							UpdatedSince: timestamppb.New(time.Now()),
+						},
+					},
+				},
+			}, readCreds)
+			if a.So(err, should.BeNil) && a.So(resp, should.NotBeNil) {
+				a.So(resp.Count, should.Equal, uint64(0))
+			}
+		})
+	}, withPrivateTestDatabase(p))
+}
+
 func TestEndDevicesBatchOperationsPermissions(t *testing.T) {
 	t.Parallel()
 	a, ctx := test.New(t)
