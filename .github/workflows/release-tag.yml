@@ -120,7 +120,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v7
         with:
           version: "~> v2"
-          args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m
+          args: release --config .goreleaser.release.yml --release-notes /tmp/release-notes.md --timeout 120m --parallelism 2
         env:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
