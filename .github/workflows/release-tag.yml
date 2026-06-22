@@ -52,7 +52,7 @@ jobs:
           export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
           echo "result=$VERSION" >> $GITHUB_OUTPUT
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: true
