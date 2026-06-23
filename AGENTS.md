@@ -30,6 +30,7 @@ node_modules/.bin/cypress run --config-file config/cypress.config.js --spec <spe
 
 # Lint and format
 golangci-lint run ./pkg/...        # Go lint (config in .golangci.yml)
+golangci-lint run --new-from-rev=HEAD~1 ./<pkg_path>/... --fix # lint and fix only what has changed since the last commit
 tools/bin/mage js:lint             # JS lint (eslint, config in config/eslintrc.yaml)
 tools/bin/mage js:fmt              # JS format (prettier)
 
