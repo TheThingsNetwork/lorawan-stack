@@ -6,6 +6,23 @@ env:
   NODE_ENV: production
 
 jobs:
+  summary:
+    name: Workflow summary
+    runs-on: ubuntu-latest
+    steps:
+      - name: Workflow summary
+        run: |
+          export TAG=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
+          cat << EOF >> $GITHUB_STEP_SUMMARY
+          ## Tag Release
+
+          | Property | Value |
+          | --- | --- |
+          | **Branch** | \`${{ github.ref_name }}\` |
+          | **Tag** | \`v${TAG}\` |
+          | **Commit** | \`${{ github.sha }}\` |
+          | **Triggered by** | [${{ github.actor }}](https://github.com/${{ github.actor }}) |
+          EOF
   release:
     name: Tag release
     runs-on: ubuntu-24.04
