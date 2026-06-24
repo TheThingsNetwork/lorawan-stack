@@ -34,11 +34,10 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Maximize build space
-        uses: justinthelaw/maximize-github-runner-space@v0.8.0
+        uses: justinthelaw/maximize-github-runner-space@v0.10.0
         with:
-          cleanup-profile: max
-          skip-components: docker-engine,gh-cli
-          swapfile-size: 4096MiB
+          skip-components: docker-engine,cached-go,cached-node,aws-cli,gh-cli
+          swapfile-size: 2G
       - name: Check branch
         run: echo "${{ github.ref_name }}" | grep -Pq '^release/v3\.\d+\.\d+$'
       - name: Get version
