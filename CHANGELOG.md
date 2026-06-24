@@ -21,7 +21,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.36.1] - unreleased
+## [3.36.1] - 2026-06-24
 
 ### Added
 
