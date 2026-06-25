@@ -1533,6 +1533,7 @@ func (ns *NetworkServer) ResetFactoryDefaults(ctx context.Context, req *ttnpb.Re
 		"lorawan_phy_version",
 		"lorawan_version",
 		"mac_settings",
+		"mac_settings_profile_ids",
 		"multicast",
 		"session.dev_addr",
 		"session.keys",
