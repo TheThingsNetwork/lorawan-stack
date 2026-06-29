@@ -9172,10 +9172,17 @@ js-yaml@^3.13.1:
     argparse "^1.0.7"
     esprima "^4.0.0"
 
-js-yaml@^4.1.0, js-yaml@^4.2.0:
+js-yaml@^4.1.0:
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-4.2.0.tgz#2bd9e85682dd91bd469afb809d816043b3d49524"
   integrity sha512-ePWsvanv0DWuDRsW8dnt+R4jQ31SCRCQ7hhNcPXZPsoBZiemuZNYGf7adZdqX2D86j6rvKp3RpCxVTSb8WQlOw==
+  dependencies:
+    argparse "^2.0.1"
+
+js-yaml@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/js-yaml/-/js-yaml-5.2.0.tgz#b559a892cae3e32fc5afecc9f18e1672378ddb68"
+  integrity sha512-YeLUMlvR4Ou1B119LIaM0r65JvbOBooJDc9yEu0dClb/uSC5P4FrLU8OCCz/HXWvtPoIrR0dRzABTjo1sTN9Bw==
   dependencies:
     argparse "^2.0.1"
 
@@ -13598,7 +13605,7 @@ tsyringe@^4.10.0:
     tslib "^1.9.3"
 
 "ttn-lw@file:sdk/js":
-  version "3.35.2"
+  version "3.36.1"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     auto-bind "^5.0.1"
