@@ -157,6 +157,8 @@ type OTAAFlowTestConfig struct {
 	CreateDevice *ttnpb.SetEndDeviceRequest
 	Func         func(context.Context, TestEnvironment, *ttnpb.EndDevice)
 
+	Profile *ttnpb.MACSettingsProfile
+
 	UplinkMACCommanders       []MACCommander
 	UplinkEventBuilders       []events.Builder
 	DownlinkHeadMACCommanders []MACCommander
@@ -170,6 +172,18 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 		t, a := test.MustNewTFromContext(ctx)
 
 		start := time.Now()
+
+		if conf.Profile != nil {
+			profilePaths := []string{"ids", "mac_settings"} // nolint: goconst
+			_, err := env.MACSettingsProfileRegistry.Set(ctx, conf.Profile.Ids, profilePaths,
+				func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
+					return conf.Profile, profilePaths, nil
+				})
+			if !a.So(err, should.BeNil) {
+				t.Error("Failed to register MAC settings profile")
+				return
+			}
+		}
 
 		dev, err, ok := env.AssertSetDevice(ctx, true, conf.CreateDevice,
 			ttnpb.Right_RIGHT_APPLICATION_DEVICES_WRITE,
@@ -201,6 +215,8 @@ func makeOTAAFlowTest(conf OTAAFlowTestConfig) func(context.Context, TestEnviron
 				"GsNs-join-1",
 				"GsNs-join-2",
 			},
+
+			Profile: conf.Profile,
 
 			ClusterResponse: &NsJsHandleJoinResponse{
 				Response: &ttnpb.JoinResponse{
@@ -432,11 +448,51 @@ func makeClassCOTAAFlowTest(macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVer
 	})
 }
 
+func makeOTAAFlowTestWithMACSettingsProfile( // nolint: lll
+	macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion, fpID string,
+) func(context.Context, TestEnvironment) {
+	const testProfileID = "test-mac-settings-profile-id"
+	profileID := &ttnpb.MACSettingsProfileIdentifiers{
+		ApplicationIds: test.DefaultApplicationIdentifiers,
+		ProfileId:      testProfileID,
+	}
+	profile := &ttnpb.MACSettingsProfile{
+		Ids: profileID,
+		MacSettings: &ttnpb.MACSettings{
+			Rx1Delay: &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2},
+		},
+	}
+	return makeOTAAFlowTest(OTAAFlowTestConfig{
+		Profile: profile,
+		CreateDevice: &ttnpb.SetEndDeviceRequest{
+			EndDevice: MakeOTAAEndDevice(
+				EndDeviceOptions.WithFrequencyPlanId(fpID),
+				EndDeviceOptions.WithLorawanVersion(macVersion),
+				EndDeviceOptions.WithLorawanPhyVersion(phyVersion),
+				EndDeviceOptions.WithMacSettingsProfileIds(profileID),
+			),
+			FieldMask: ttnpb.FieldMask(
+				"frequency_plan_id",
+				"lorawan_phy_version",
+				"lorawan_version",
+				"mac_settings_profile_ids",
+				"supports_join",
+			),
+		},
+		DownlinkTailMACCommanders: []MACCommander{ttnpb.MACCommandIdentifier_CID_DEV_STATUS},
+		DownlinkTailEventBuilders: []events.Builder{mac.EvtEnqueueDevStatusRequest},
+		Func:                      func(context.Context, TestEnvironment, *ttnpb.EndDevice) {},
+	})
+}
+
 func TestFlow(t *testing.T) {
 	ForEachFrequencyPlanLoRaWANVersionPair(t, func(makeName func(...string) string, fpID string, _ *frequencyplans.FrequencyPlan, phy *band.Band, macVersion ttnpb.MACVersion, phyVersion ttnpb.PHYVersion) {
 		for flowName, handleFlowTest := range map[string]func(context.Context, TestEnvironment){
 			MakeTestCaseName("Class A", "OTAA"): makeClassAOTAAFlowTest(macVersion, phyVersion, fpID),
 			MakeTestCaseName("Class C", "OTAA"): makeClassCOTAAFlowTest(macVersion, phyVersion, fpID),
+			MakeTestCaseName("Class A", "OTAA", "with profile"): makeOTAAFlowTestWithMACSettingsProfile( // nolint: lll
+				macVersion, phyVersion, fpID,
+			),
 		} {
 			test.RunSubtest(t, test.SubtestConfig{
 				Name:     makeName(flowName),
