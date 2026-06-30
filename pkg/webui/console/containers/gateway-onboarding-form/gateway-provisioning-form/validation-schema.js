@@ -19,7 +19,6 @@ import registerValidationSchema from './gateway-registration-form-section/valida
 
 export const validationSchema = Yup.object({
   _owner_id: Yup.string(),
-  _isFleet: Yup.boolean(),
 }).when('._inputMethod', {
   is: 'register',
   then: schema => schema.concat(registerValidationSchema),

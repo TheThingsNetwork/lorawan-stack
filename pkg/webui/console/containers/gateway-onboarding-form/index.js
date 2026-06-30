@@ -150,12 +150,13 @@ const GatewayOnboardingForm = props => {
             ...message,
             values: {
               link: content => (
-                <Link.DocLink
+                <Link.Anchor
                   secondary
-                  path="/hardware/gateways/models/thethingsindoorgatewaypro/#subscription"
+                  external
+                  href="https://accounts.thethingsindustries.com/gateway-status"
                 >
                   {content}
-                </Link.DocLink>
+                </Link.Anchor>
               ),
             },
           }
