@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Applying the MAC settings profile values to the device's MAC state during the join procedure (OTAA) or factory reset (ABP).
+
 ### Security
 
 ## [3.36.1] - 2026-06-24

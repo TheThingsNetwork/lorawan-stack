@@ -840,11 +840,13 @@ func appendRecentUplink(
 }
 
 var handleDataUplinkGetPaths = [...]string{
+	"battery_percentage",
 	"frequency_plan_id",
 	"last_dev_status_received_at",
 	"lorawan_phy_version",
 	"lorawan_version",
 	"mac_settings",
+	"mac_settings_profile_ids",
 	"mac_state",
 	"multicast",
 	"pending_mac_state",
@@ -853,7 +855,6 @@ var handleDataUplinkGetPaths = [...]string{
 	"supports_class_b",
 	"supports_class_c",
 	"supports_join",
-	"battery_percentage",
 }
 
 // mergeMetadata merges the metadata collected for up.
@@ -1264,6 +1265,7 @@ func (ns *NetworkServer) handleJoinRequest(ctx context.Context, up *ttnpb.Uplink
 			"lorawan_phy_version",
 			"lorawan_version",
 			"mac_settings",
+			"mac_settings_profile_ids",
 			"session.dev_addr",
 			"supports_class_b",
 			"supports_class_c",

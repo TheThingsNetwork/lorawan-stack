@@ -1019,9 +1019,23 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 	macSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
 	activateOpt := EndDeviceOptions.Activate(macSettings, true, activeSessionOpts)
 
+	macSettingsProfileID := &ttnpb.MACSettingsProfileIdentifiers{
+		ApplicationIds: &ttnpb.ApplicationIdentifiers{
+			ApplicationId: "test-app-id",
+		},
+		ProfileId: "test-mac-settings-profile-id",
+	}
+	macSettingsProfile := &ttnpb.MACSettingsProfile{
+		Ids: macSettingsProfileID,
+		MacSettings: &ttnpb.MACSettings{
+			Rx1Delay: &ttnpb.RxDelayValue{Value: ttnpb.RxDelay_RX_DELAY_2},
+		},
+	}
+
 	// TODO: Refactor into same structure as Set
 	for _, tc := range []struct {
 		CreateDevice *SetDeviceRequest
+		Profile      *ttnpb.MACSettingsProfile
 	}{
 		{},
 
@@ -1058,6 +1072,12 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 				EndDeviceOptions.WithLorawanVersion(ttnpb.MACVersion_MAC_V1_0_3),
 				EndDeviceOptions.WithLorawanPhyVersion(ttnpb.PHYVersion_RP001_V1_0_3_REV_A),
 			}),
+		},
+		{
+			CreateDevice: MakeABPSetDeviceRequest(macSettings, activeSessionOpts, nil, []test.EndDeviceOption{
+				EndDeviceOptions.WithMacSettingsProfileIds(macSettingsProfileID),
+			}),
+			Profile: macSettingsProfile,
 		},
 	} {
 		for _, conf := range []struct {
@@ -1134,22 +1154,24 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 					if tc.CreateDevice == nil {
 						return "no device"
 					}
-					return MakeTestCaseName(
-						fmt.Sprintf("paths:[%s]", strings.Join(conf.Paths, ",")),
-						func() string {
-							if tc.CreateDevice.EndDevice.SupportsJoin {
-								return "OTAA"
-							}
-							if tc.CreateDevice.EndDevice.Session == nil {
-								return MakeTestCaseName("ABP", "no session")
-							}
-							return fmt.Sprintf(MakeTestCaseName("ABP", "dev_addr:%s", "queue_len:%d", "session_keys:%v"),
-								types.MustDevAddr(tc.CreateDevice.Session.DevAddr).OrZero(),
-								len(tc.CreateDevice.EndDevice.Session.QueuedApplicationDownlinks),
-								tc.CreateDevice.Session.Keys,
-							)
-						}(),
-					)
+					nameParts := []string{fmt.Sprintf("paths:[%s]", strings.Join(conf.Paths, ","))}
+					switch {
+					case tc.CreateDevice.SupportsJoin:
+						nameParts = append(nameParts, "OTAA")
+					case tc.CreateDevice.Session == nil:
+						nameParts = append(nameParts, MakeTestCaseName("ABP", "no session"))
+					default:
+						nameParts = append(nameParts, fmt.Sprintf(
+							MakeTestCaseName("ABP", "dev_addr:%s", "queue_len:%d", "session_keys:%v"),
+							types.MustDevAddr(tc.CreateDevice.Session.DevAddr).OrZero(),
+							len(tc.CreateDevice.Session.QueuedApplicationDownlinks),
+							tc.CreateDevice.Session.Keys,
+						))
+						if tc.Profile != nil {
+							nameParts = append(nameParts, "with_profile")
+						}
+					}
+					return MakeTestCaseName(nameParts...)
 				}(),
 				Parallel: true,
 				Func: func(ctx context.Context, t *testing.T, a *assertions.Assertion) {
@@ -1182,6 +1204,16 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 
 					clock := test.NewMockClock(time.Now().UTC())
 					defer SetMockClock(clock)()
+
+					if tc.Profile != nil {
+						_, err := env.MACSettingsProfileRegistry.Set(ctx, tc.Profile.Ids, []string{"ids", "mac_settings"},
+							func(context.Context, *ttnpb.MACSettingsProfile) (*ttnpb.MACSettingsProfile, []string, error) {
+								return tc.Profile, []string{"ids", "mac_settings"}, nil
+							})
+						if !a.So(err, should.BeNil) {
+							return
+						}
+					}
 
 					req := &ttnpb.ResetAndGetEndDeviceRequest{
 						EndDeviceIds: test.MakeEndDeviceIdentifiers(),
@@ -1244,7 +1276,7 @@ func TestDeviceRegistryResetFactoryDefaults(t *testing.T) {
 						}
 						var newErr error
 						defaultMACSettings := test.Must(DefaultConfig.DefaultMACSettings.Parse())
-						macState, newErr = mac.NewState(created, fps, defaultMACSettings, nil)
+						macState, newErr = mac.NewState(created, fps, defaultMACSettings, tc.Profile.GetMacSettings())
 						if newErr != nil {
 							a.So(err, should.NotBeNil)
 							a.So(err, should.HaveSameErrorDefinitionAs, newErr)

@@ -1560,6 +1560,8 @@ type JoinAssertionConfig struct {
 	RxMetadatas    [][]*ttnpb.RxMetadata
 	CorrelationIDs []string
 
+	Profile *ttnpb.MACSettingsProfile
+
 	ClusterResponse *NsJsHandleJoinResponse
 	InteropResponse *InteropClientHandleJoinRequestResponse
 }
@@ -1600,7 +1602,7 @@ func (env TestEnvironment) AssertJoin(ctx context.Context, conf JoinAssertionCon
 			t, a := test.MustNewTFromContext(ctx)
 			t.Helper()
 
-			var profileMACSettings *ttnpb.MACSettings
+			profileMACSettings := conf.Profile.GetMacSettings()
 			defaultMACSettings := test.Must(env.Config.DefaultMACSettings.Parse())
 
 			defaultLoRaWANVersion := mac.DeviceDefaultLoRaWANVersion(conf.Device)
