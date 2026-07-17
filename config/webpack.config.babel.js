@@ -227,6 +227,7 @@ export default {
     publicPath: ASSETS_ROOT,
   },
   optimization: {
+    avoidEntryIife: false,
     splitChunks: {
       cacheGroups: {
         styles: {
