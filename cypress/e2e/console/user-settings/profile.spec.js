@@ -21,12 +21,12 @@ const user = {
 }
 
 describe('User settings / profile', () => {
-  before(() => {
+  beforeEach(() => {
     cy.dropAndSeedDatabase()
+    cy.createUser(user)
   })
 
   it('displays UI elements in place', () => {
-    cy.createUser(user)
     cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
     cy.visit(`${Cypress.config('consoleRootPath')}/user-settings/profile`)
 
