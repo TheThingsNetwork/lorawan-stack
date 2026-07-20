@@ -36,7 +36,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: false
@@ -45,7 +45,7 @@ jobs:
         run: echo "hash=${{ hashFiles('.github/workflows/console-e2e.yml', '*.go', 'go.mod', 'go.sum', 'pkg/**', 'tools/**', 'config/**', 'package.json', 'pkg/webui/**', 'sdk/js/**', 'yarn.lock', 'cypress/**', 'docker-compose.yml') }}" >> $GITHUB_OUTPUT
       - name: Get the cached result
         id: run-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .cache/passed
           key: run-cache-${{ steps.get-hash.outputs.hash }}-${{ github.run_id }}
@@ -63,7 +63,7 @@ jobs:
     timeout-minutes: 30
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: true
@@ -75,7 +75,7 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Initialize SQL dump cache
         id: db-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: |
             .env/cache/database.pgdump
@@ -83,7 +83,7 @@ jobs:
           key: db-cache-${{ hashFiles('pkg/identityserver/**/*.go', 'pkg/identityserver/**/*.sql', 'cmd/ttn-lw-stack/commands/is_db.go', '.github/workflows/console-e2e.yml', 'docker-compose.yml') }}
       - name: Initialize device repository index cache
         id: dr-index-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: data/lorawan-devices-index
           key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
@@ -97,7 +97,7 @@ jobs:
         uses: ./.github/actions/build-frontend
       - name: Initialize build cache
         id: build-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ttn-lw-stack
           key: build-cache-${{ hashFiles('go.mod', 'go.sum', 'pkg/**',  'config/**', 'cmd/**') }}
@@ -125,7 +125,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: true
@@ -145,7 +145,7 @@ jobs:
         with:
           name: "build-files"
       - name: Download last failed spec
-        uses: dawidd6/action-download-artifact@v20
+        uses: dawidd6/action-download-artifact@v21
         continue-on-error: true
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -222,7 +222,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: true
@@ -280,7 +280,7 @@ jobs:
     steps:
       - name: Setup result cache to skip redundant runs
         id: run-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: .cache/passed
           key: run-cache-${{ needs.determine-if-required.outputs.hash }}
