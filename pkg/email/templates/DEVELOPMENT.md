@@ -16,6 +16,8 @@ Each of these email templates gets rendered together with the base template that
 
 We use [MJML](https://mjml.io/) to generate the HTML base template `base.html.tmpl` from `base.mjml`. Do not edit `base.html.tmpl` directly. If you want to edit the HTML base template, edit the `.mjml` files and run `go generate ./pkg/email/templates` to update `base.html.tmpl`.
 
+`base.mjml` composes the repo-local partials `_attributes.mjml`, `_header.mjml` and `_footer.mjml` via `mj-include`. MJML v5+ disables `mj-include` by default, so `generate.sh` passes `--config.allowIncludes true`. This is safe here because the included files are trusted and committed to this repository.
+
 The HTML base template contains three blocks: **title**, **preview** and **body**. The **title** is typically not visible in emails, but would be visible if we start supporting "view this email online" functionality. The **preview** is a short text that many email clients render in the list view, next to the subject.
 
 ## Testing
