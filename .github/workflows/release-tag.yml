@@ -46,7 +46,7 @@ jobs:
           export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
           echo "result=$VERSION" >> $GITHUB_OUTPUT
       - name: Check out code
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           fetch-depth: 0
           submodules: true
@@ -104,7 +104,7 @@ jobs:
         uses: ./.github/actions/install-node-and-deps
       - name: Initialize device repository index cache
         id: dr-index-cache
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: data/lorawan-devices-index
           key: dr-index-cache-${{ hashFiles('data/lorawan-devices') }}
