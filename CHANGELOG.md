@@ -19,9 +19,13 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Applying the MAC settings profile values to the device's MAC state during the join procedure (OTAA) or factory reset (ABP).
-
 ### Security
+
+## [3.36.2] - unreleased
+
+### Fixed
+
+- Applying the MAC settings profile values to the device's MAC state during the join procedure (OTAA) or factory reset (ABP).
 
 ## [3.36.1] - 2026-06-24
 
@@ -3081,7 +3085,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.1...v3.36
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.2...v3.36
+[3.36.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.1...v3.36.2
 [3.36.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.0...v3.36.1
 [3.36.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.2...v3.36.0
 [3.35.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.1...v3.35.2
