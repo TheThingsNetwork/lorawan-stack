@@ -6,7 +6,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/labeler@v6
+      - uses: actions/labeler@v7
         if: ${{ github.event.pull_request.head.repo.full_name == github.repository && !startsWith(github.actor, 'dependabot') }}
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
