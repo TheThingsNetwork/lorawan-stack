@@ -13,6 +13,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Changed
 
+- In the Semtech UDP Packet Forwarder protocol, `PUSH_ACK` and `PULL_ACK` are only sent after the gateway has connected to the Gateway Server and the gateway's `PUSH_DATA` or `PULL_DATA` respectively has been accepted.
+
 ### Deprecated
 
 ### Removed
