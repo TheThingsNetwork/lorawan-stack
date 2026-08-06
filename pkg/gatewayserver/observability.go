@@ -136,6 +136,14 @@ var gsMetrics = &messageMetrics{
 		},
 		[]string{protocol},
 	),
+	gatewaysDisconnected: metrics.NewContextualCounterVec(
+		prometheus.CounterOpts{
+			Subsystem: subsystem,
+			Name:      "gateways_disconnected_total",
+			Help:      "Total number of gateway disconnections",
+		},
+		[]string{protocol, "error"},
+	),
 	statusReceived: metrics.NewContextualCounterVec(
 		prometheus.CounterOpts{
 			Subsystem: subsystem,
@@ -256,6 +264,7 @@ func init() {
 
 type messageMetrics struct {
 	gatewaysConnected         *metrics.ContextualGaugeVec
+	gatewaysDisconnected      *metrics.ContextualCounterVec
 	statusReceived            *metrics.ContextualCounterVec
 	statusForwarded           *metrics.ContextualCounterVec
 	statusDropped             *metrics.ContextualCounterVec
@@ -274,6 +283,7 @@ type messageMetrics struct {
 
 func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 	m.gatewaysConnected.Describe(ch)
+	m.gatewaysDisconnected.Describe(ch)
 	m.statusReceived.Describe(ch)
 	m.statusForwarded.Describe(ch)
 	m.statusDropped.Describe(ch)
@@ -292,6 +302,7 @@ func (m messageMetrics) Describe(ch chan<- *prometheus.Desc) {
 
 func (m messageMetrics) Collect(ch chan<- prometheus.Metric) {
 	m.gatewaysConnected.Collect(ch)
+	m.gatewaysDisconnected.Collect(ch)
 	m.statusReceived.Collect(ch)
 	m.statusForwarded.Collect(ch)
 	m.statusDropped.Collect(ch)
@@ -320,6 +331,11 @@ func registerGatewayConnect(
 func registerGatewayDisconnect(ctx context.Context, ids *ttnpb.GatewayIdentifiers, protocol string, err error) {
 	events.Publish(evtGatewayDisconnect.NewWithIdentifiersAndData(ctx, ids, err))
 	gsMetrics.gatewaysConnected.WithLabelValues(ctx, protocol).Dec()
+	errorLabel := unknown
+	if ttnErr, ok := errors.From(err); ok {
+		errorLabel = ttnErr.FullName()
+	}
+	gsMetrics.gatewaysDisconnected.WithLabelValues(ctx, protocol, errorLabel).Inc()
 }
 
 func registerGatewayConnectionStats(ctx context.Context, ids *ttnpb.GatewayIdentifiers, stats *ttnpb.GatewayConnectionStats) {

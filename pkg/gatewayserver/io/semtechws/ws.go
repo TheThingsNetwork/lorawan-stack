@@ -58,7 +58,17 @@ var (
 	errGatewayID          = errors.DefineInvalidArgument("invalid_gateway_id", "invalid gateway ID `{id}`")
 	errNoAuthProvided     = errors.DefineUnauthenticated("no_auth_provided", "no auth provided `{uid}`")
 	errMissedTooManyPongs = errors.Define("missed_too_many_pongs", "gateway missed too many pongs")
+	errWebsocketClosed    = errors.DefineAborted("websocket_closed", "websocket closed with code `{code}`")
 )
+
+// disconnectError converts err into the error that the connection is disconnected with.
+func disconnectError(err error) error {
+	var closeErr *websocket.CloseError
+	if errors.As(err, &closeErr) {
+		return errWebsocketClosed.WithCause(err).WithAttributes("code", closeErr.Code)
+	}
+	return err
+}
 
 type srv struct {
 	ctx       context.Context
@@ -288,7 +298,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 			span.RecordError(err)
 			span.SetStatus(codes.Error, "handle traffic failed")
 		}
-		conn.Disconnect(err)
+		conn.Disconnect(disconnectError(err))
 		err = nil // Errors are sent over the websocket connection that is established by this point.
 	}()
 
@@ -346,7 +356,7 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		defer ws.Close()
 		defer func() {
 			if err != nil {
-				conn.Disconnect(err)
+				conn.Disconnect(disconnectError(err))
 			}
 		}()
 		for {

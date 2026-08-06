@@ -11,9 +11,13 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- `gs_gateways_disconnected_total` metric, counting gateway disconnections by protocol and by the error the connection was disconnected with. This makes disconnection reasons (such as gateways disappearing without a close handshake, or missing too many pongs) observable as a rate, instead of only through logs.
+
 ### Changed
 
 - In the Semtech UDP Packet Forwarder protocol, `PUSH_ACK` and `PULL_ACK` are only sent after the gateway has connected to the Gateway Server and the gateway's `PUSH_DATA` or `PULL_DATA` respectively has been accepted.
+- Don't log a `Task failed` warning in GS for every task attached to a gateway connection when that connection is closed. The tasks that run for the lifetime of a gateway connection now stop without an error when the connection is closed, and the disconnection is logged once, as `Disconnected`, including the reason. This removes several duplicate warnings per gateway disconnection, which were particularly noisy for gateways on unreliable backhaul.
+- Websocket close errors on the LoRa Basics Station frontend (such as `websocket: close 1006 (abnormal closure): unexpected EOF`, which is what a gateway disappearing without a close handshake looks like) are now reported as the defined error `pkg/gatewayserver/io/semtechws:websocket_closed`, with the close code as an attribute and the original error as the cause. As a result, the `gs.gateway.disconnect` event for these disconnections now carries structured error details instead of a plain string; consumers that parse the event data should expect the `ErrorDetails` format.
 
 ### Deprecated
 

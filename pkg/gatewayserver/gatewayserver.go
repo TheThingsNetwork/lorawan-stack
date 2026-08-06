@@ -694,12 +694,19 @@ func (gs *GatewayServer) Connect(
 
 	for name, handler := range gs.upstreamHandlers {
 		connCtx := log.NewContextWithField(conn.Context(), "upstream_handler", name)
-		handler := handler
 		gs.StartTask(&task.Config{
 			Context: connCtx,
 			ID:      fmt.Sprintf("%s_connect_gateway_%s", name, ids.GatewayId),
 			Func: func(ctx context.Context) error {
-				return handler.ConnectGateway(ctx, ids, conn)
+				err := handler.ConnectGateway(ctx, ids, conn)
+				if err != nil && errors.Is(err, ctx.Err()) {
+					// Expected stop — the handler returned the error that the context was
+					// canceled with, so the gateway is disconnected. The reason is reported
+					// when the connection is torn down, not in this task. Any other error is
+					// a genuine failure and is reported, even when the context is done.
+					return nil
+				}
+				return err
 			},
 			Done:    wg.Done,
 			Restart: task.RestartOnFailure,
@@ -764,7 +771,9 @@ func (gs *GatewayServer) startDisconnectOnChangeTask(conn connectionEntry) {
 				d := random.Jitter(gs.config.FetchGatewayInterval, gs.config.FetchGatewayJitter)
 				select {
 				case <-ctx.Done():
-					return ctx.Err()
+					// Expected stop — the context is done, gateway is disconnected. The reason
+					// is reported when the connection is torn down, not in this task.
+					return nil
 				case <-time.After(d):
 				}
 
@@ -991,7 +1000,7 @@ func (gs *GatewayServer) handleUpstream(ctx context.Context, conn connectionEntr
 	defer func() {
 		gs.connections.Delete(unique.ID(ctx, gtw.GetIds()))
 		registerGatewayDisconnect(ctx, gtw.GetIds(), protocol, ctx.Err())
-		logger.Info("Disconnected")
+		logger.WithError(ctx.Err()).Info("Disconnected")
 	}()
 
 	hosts := make([]*upstreamHost, 0, len(gs.upstreamHandlers))
