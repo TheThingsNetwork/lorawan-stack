@@ -4318,10 +4318,10 @@ anymatch@^3.1.3, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
-apexcharts@^5.16.0:
-  version "5.16.0"
-  resolved "https://registry.yarnpkg.com/apexcharts/-/apexcharts-5.16.0.tgz#f54348162bec24ab8acfb0744a38c2dd0c784502"
-  integrity sha512-ULO3Gqrm0/26uwBcYz49u181uIp8Fy6BQQgg9QUDajs+JAs/EbXxiAmdc6BLy1JY29/JXroM7P0j0t2JPDApdg==
+apexcharts@^6.8.0:
+  version "6.8.0"
+  resolved "https://registry.yarnpkg.com/apexcharts/-/apexcharts-6.8.0.tgz#1e92c45cb76768ea666f95f358db1455e71e2226"
+  integrity sha512-ifEl3w/NAMsKQ60JNDD8nRCGdnGeuuKNvUzZTQpPr/3JNewoZv98H42VpXFB96sHle/8GDsHn/NQp785xsNh4A==
 
 arch@^3.0.0:
   version "3.0.0"
