@@ -263,13 +263,6 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 	ctx = log.NewContextWithField(ctx, "gateway_eui", eui)
 	logger := log.FromContext(ctx)
 
-	switch packet.PacketType {
-	case encoding.PullData, encoding.PushData:
-		if err := s.writeAckFor(packet); err != nil {
-			logger.WithError(err).Warn("Failed to write acknowledgment")
-		}
-	}
-
 	cs, err := s.connect(ctx, eui, packet.GatewayAddr)
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
@@ -278,6 +271,13 @@ func (s *srv) handlePacket(ctx context.Context, packet encoding.Packet) {
 
 	if err := s.handleUp(cs.io.Context(), cs, packet); err != nil {
 		logger.WithError(err).Warn("Failed to handle upstream packet")
+	}
+
+	switch packet.PacketType {
+	case encoding.PullData, encoding.PushData:
+		if err := s.writeAckFor(packet); err != nil {
+			logger.WithError(err).Warn("Failed to write acknowledgment")
+		}
 	}
 }
 

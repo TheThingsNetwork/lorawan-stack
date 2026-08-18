@@ -34,7 +34,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/iotest"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
-	. "go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/udp"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -47,7 +46,7 @@ import (
 func TestConnection(t *testing.T) {
 	var (
 		timeout    = (1 << 4) * test.Delay
-		testConfig = Config{
+		testConfig = udp.Config{
 			PacketHandlers:      2,
 			PacketBuffer:        10,
 			DownlinkPathExpires: 8 * timeout,
@@ -81,7 +80,7 @@ func TestConnection(t *testing.T) {
 		t.FailNow()
 	}
 
-	go Serve(ctx, gs, lis, testConfig)
+	go udp.Serve(ctx, gs, lis, testConfig)
 
 	connections := &sync.Map{}
 	eui := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
@@ -212,7 +211,7 @@ func TestScheduleLateCancel(t *testing.T) {
 	var (
 		registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 		timeout             = (1 << 4) * test.Delay
-		testConfig          = Config{
+		testConfig          = udp.Config{
 			PacketHandlers:      2,
 			PacketBuffer:        10,
 			DownlinkPathExpires: 8 * timeout,
@@ -246,7 +245,7 @@ func TestScheduleLateCancel(t *testing.T) {
 		t.FailNow()
 	}
 
-	go Serve(ctx, gs, lis, testConfig) // nolint:errcheck
+	go udp.Serve(ctx, gs, lis, testConfig) // nolint:errcheck
 
 	connections := &sync.Map{}
 	eui := types.EUI64{0x05, 0x05, 0x05, 0x05, 0x05, 0x05, 0x05, 0x05}
@@ -368,7 +367,7 @@ func TestScheduleLateDownlinkPathExpired(t *testing.T) {
 	var (
 		registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 		timeout             = (1 << 4) * test.Delay
-		testConfig          = Config{
+		testConfig          = udp.Config{
 			PacketHandlers:      2,
 			PacketBuffer:        10,
 			DownlinkPathExpires: 8 * timeout,
@@ -402,7 +401,7 @@ func TestScheduleLateDownlinkPathExpired(t *testing.T) {
 		t.FailNow()
 	}
 
-	go Serve(ctx, gs, lis, testConfig) // nolint:errcheck
+	go udp.Serve(ctx, gs, lis, testConfig) // nolint:errcheck
 
 	connections := &sync.Map{}
 	eui := types.EUI64{0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06, 0x06}
@@ -690,7 +689,7 @@ func TestRawData(t *testing.T) {
 	var (
 		registeredGatewayID = ttnpb.GatewayIdentifiers{GatewayId: "test-gateway"}
 		timeout             = (1 << 4) * test.Delay
-		testConfig          = Config{
+		testConfig          = udp.Config{
 			PacketHandlers: 2,
 			PacketBuffer:   10,
 			// DownlinkPathExpires must exceed the ~300*test.Delay late-schedule timer
@@ -726,7 +725,7 @@ func TestRawData(t *testing.T) {
 		t.FailNow()
 	}
 
-	go Serve(ctx, gs, lis, testConfig)
+	go udp.Serve(ctx, gs, lis, testConfig)
 
 	connections := &sync.Map{}
 	eui1 := types.EUI64{0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01, 0x01}
