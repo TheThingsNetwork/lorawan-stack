@@ -659,7 +659,7 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
 
   const handleEdit = useCallback(
     async (_, { setSubmitting }, cleanedValues) => {
-      const profileDiff = diff(macSettingsProfile, cleanedValues)
+      const profileDiff = diff(parsedInitialValues, cleanedValues)
       try {
         if (!isEmpty(profileDiff)) {
           profileDiff.ids = {
@@ -686,7 +686,7 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
         setError(error)
       }
     },
-    [appId, dispatch, macSettingsProfile, macSettingsProfileId],
+    [appId, dispatch, parsedInitialValues, macSettingsProfileId],
   )
 
   return (
