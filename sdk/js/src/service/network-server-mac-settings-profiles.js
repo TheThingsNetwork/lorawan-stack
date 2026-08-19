@@ -57,6 +57,13 @@ class NsMACSettingsProfiles {
   }
 
   async update(applicationId, macSettingsProfileId, patch) {
+    const fieldMaskPaths = Marshaler.fieldMaskFromPatch(
+      patch,
+      this._api.UpdateAllowedFieldMaskPaths,
+    )
+    const fieldMaskPathsWithoutAncestors = fieldMaskPaths.filter(
+      path => !fieldMaskPaths.some(other => other !== path && other.startsWith(`${path}.`)),
+    )
     const result = await this._api.Update(
       {
         routeParams: {
@@ -65,11 +72,8 @@ class NsMACSettingsProfiles {
         },
       },
       {
-        mac_settings_profile_ids: {
-          application_ids: { application_id: applicationId },
-          profile_id: macSettingsProfileId,
-        },
         mac_settings_profile: patch,
+        field_mask: { paths: fieldMaskPathsWithoutAncestors },
       },
     )
     return Marshaler.payloadSingleResponse(result)
