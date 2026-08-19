@@ -622,8 +622,10 @@ const MACSettingsProfileForm = ({ edit, macSettingsProfile, macSettingsProfileId
             }
           : Boolean(macSettingsProfile?.mac_settings?.adr?.static)
             ? {
-                ...initialValues.mac_settings.adr,
-                ...macSettingsProfile.mac_settings.adr,
+                static: {
+                  ...initialValues.mac_settings.adr.static,
+                  ...macSettingsProfile.mac_settings.adr.static,
+                },
               }
             : {
                 disabled: {},
