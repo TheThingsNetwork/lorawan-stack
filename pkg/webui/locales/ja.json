@@ -2471,6 +2471,7 @@
   "error:pkg/gatewayserver/io/semtechws:invalid_gateway_id": "無効なゲートウェイID `{id}`",
   "error:pkg/gatewayserver/io/semtechws:missed_too_many_pongs": "ゲートウェイが多くのポングを見逃しました",
   "error:pkg/gatewayserver/io/semtechws:no_auth_provided": "認証されていな `{uid}`",
+  "error:pkg/gatewayserver/io/semtechws:websocket_closed": "",
   "error:pkg/gatewayserver/io/ttigw:downlink_channel_mixed_bandwidths": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_board": "",
   "error:pkg/gatewayserver/io/ttigw:invalid_gateway_eui": "",
