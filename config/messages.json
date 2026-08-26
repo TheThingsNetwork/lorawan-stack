@@ -5273,6 +5273,15 @@
       "file": "ws.go"
     }
   },
+  "error:pkg/gatewayserver/io/semtechws:websocket_closed": {
+    "translations": {
+      "en": "websocket closed with code `{code}`"
+    },
+    "description": {
+      "package": "pkg/gatewayserver/io/semtechws",
+      "file": "ws.go"
+    }
+  },
   "error:pkg/gatewayserver/io/ttigw:downlink_channel_mixed_bandwidths": {
     "translations": {
       "en": "downlink channel `{channel}` has mixed bandwidths `{bandwidth_low}` and `{bandwidth_high}` Hz"
