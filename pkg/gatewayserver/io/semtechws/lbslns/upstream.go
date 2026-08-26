@@ -44,7 +44,7 @@ var (
 // UpInfo provides additional metadata on each upstream message.
 type UpInfo struct {
 	RxTime  float64 `json:"rxtime"`
-	RCtx    int64   `json:"rtcx"`
+	RCtx    int64   `json:"rctx"`
 	XTime   int64   `json:"xtime"`
 	GPSTime int64   `json:"gpstime"`
 	RSSI    float32 `json:"rssi"`
