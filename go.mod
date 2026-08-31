@@ -25,7 +25,7 @@ replace (
 )
 
 require (
-	github.com/KimMachineGun/automemlimit v0.7.5
+	github.com/KimMachineGun/automemlimit v1.0.0
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/TheThingsIndustries/mystique v0.0.0-20221125120501-80ab21781b6d
 	github.com/TheThingsIndustries/protoc-gen-go-flags v1.2.0
