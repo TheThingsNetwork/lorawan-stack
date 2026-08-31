@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 90
     steps:
       - name: Maximize build space
-        uses: justinthelaw/maximize-github-runner-space@v0.10.0
+        uses: justinthelaw/maximize-github-runner-space@v0.12.2
         with:
           skip-components: docker-engine,cached-go,cached-node,aws-cli,gh-cli
           swapfile-size: 2G
