@@ -41,6 +41,8 @@ tools/bin/mage js:translations     # after adding/changing frontend react-intl m
 tools/bin/mage go:eventData        # after adding/changing events
 ```
 
+Changing backend error definitions (`errors.Define*`) requires running **both** `tools/bin/mage go:messages` and `tools/bin/mage js:translations`: the locale files in `pkg/webui/locales/*.json` embed the backend error keys from `config/messages.json`, so CI fails if only the first is regenerated.
+
 Go tests that need Redis **skip themselves silently** unless `TEST_REDIS=1` is set and the databases are running (`dev:dbStart`) — passing output may mean skipped, not tested. `REDIS_ADDRESS`/`REDIS_DB` override the target instance; `TEST_SLOWDOWN` scales test timeouts on slow machines.
 
 Add `-v` to mage for verbose output when a target fails silently. If a build is in a broken state, rebuild the frontend from scratch: `tools/bin/mage jsSDK:cleanDeps jsSDK:clean js:cleanDeps js:clean js:build`.
