@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - `gs_gateways_disconnected_total` metric, counting gateway disconnections by protocol and by the error the connection was disconnected with. This makes disconnection reasons (such as gateways disappearing without a close handshake, or missing too many pongs) observable as a rate, instead of only through logs.
+- Downlink scheduling on all antennas of a gateway. Previously, only the first antenna could be used as a downlink path, and uplinks received on any other antenna had their downlink path disabled. See [issue #48](https://github.com/TheThingsNetwork/lorawan-stack/issues/48) for more context.
 
 ### Changed
 
