@@ -64,7 +64,7 @@ func (*lbsLNS) GetRouterConfig(
 	msg []byte,
 	bandID string,
 	fps []*frequencyplans.FrequencyPlan,
-	antennaGain int,
+	antennaGains []float32,
 	receivedAt time.Time,
 ) (context.Context, []byte, *ttnpb.GatewayStatus, error) {
 	var version Version
@@ -76,7 +76,7 @@ func (*lbsLNS) GetRouterConfig(
 	// to gateways that signal the presence of a PPS.
 	// References https://github.com/lorabasics/basicstation/issues/135.
 	semtechws.UpdateSessionTimeSync(ctx, true)
-	cfg, err := pfconfig.GetRouterConfig(ctx, bandID, fps, version, time.Now(), antennaGain)
+	cfg, err := pfconfig.GetRouterConfig(ctx, bandID, fps, version, time.Now(), antennaGains)
 	if err != nil {
 		return ctx, nil, nil, err
 	}
