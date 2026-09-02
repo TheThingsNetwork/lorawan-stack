@@ -19,11 +19,19 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
 )
 
+// LBSCUPSConfig is the configuration for LoRa Basics Station gateways that connect
+// to The Things Gateway Controller via CUPS.
+type LBSCUPSConfig struct {
+	LNSPort uint16 `name:"lns-port" description:"LoRa Basics Station LNS port of the Gateway Server"`
+}
+
 // Config is the configuration for The Things Gateway Controller.
 type Config struct {
-	Enabled     bool                 `name:"enabled" description:"Enable The Things Gateway Controller"`
-	GatewayEUIs []types.EUI64Prefix  `name:"gateway-euis" description:"Gateway EUI prefixes that are managed by The Things Gateway Controller"` //nolint:lll
-	Address     string               `name:"address" description:"The address of The Things Gateway Controller"`
-	Domain      string               `name:"domain" description:"The domain of this cluster"`
-	TLS         tlsconfig.ClientAuth `name:"tls" description:"TLS configuration"`
+	Enabled            bool                 `name:"enabled" description:"Enable The Things Gateway Controller"`
+	GatewayEUIs        []types.EUI64Range   `name:"gateway-euis" description:"Gateway EUI prefixes or ranges of gateways that connect to The Things Gateway Controller"` //nolint:lll
+	ManagedGatewayEUIs []types.EUI64Range   `name:"managed-gateway-euis" description:"Gateway EUI prefixes or ranges of managed gateways"`                               //nolint:lll
+	Address            string               `name:"address" description:"The address of The Things Gateway Controller"`
+	Domain             string               `name:"domain" description:"The domain of this cluster"`
+	TLS                tlsconfig.ClientAuth `name:"tls" description:"TLS configuration"`
+	LBSCUPS            LBSCUPSConfig        `name:"lbscups" description:"Configuration for LoRa Basics Station gateways connecting via CUPS"` //nolint:lll
 }

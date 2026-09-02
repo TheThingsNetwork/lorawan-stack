@@ -19,6 +19,7 @@ import (
 	"context"
 	"crypto/tls"
 	"slices"
+	"strconv"
 
 	northboundv1 "go.thethings.industries/pkg/api/gen/tti/gateway/controller/northbound/v1"
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
@@ -37,7 +38,12 @@ var errNoSupportedClaimOption = errors.DefineFailedPrecondition(
 	"no supported claim option (protocol + auth method) found for gateway",
 )
 
-const profileGroup = "tts"
+const (
+	profileGroup = "tts"
+
+	// Default LoRa Basics Station LNS port of the Gateway Server.
+	defaultLNSPort uint16 = 8887
+)
 
 type component interface {
 	GetTLSConfig(context.Context) tlsconfig.Config
@@ -49,9 +55,9 @@ type component interface {
 // Upstream is the client for The Things Gateway Controller.
 type Upstream struct {
 	component
-	client *ttgc.Client
-
-	gatewayAccess ttnpb.GatewayAccessClient
+	client        *ttgc.Client
+	lnsPort       string
+	managedRanges []types.EUI64Range
 }
 
 // New returns a new upstream client for The Things Gateway Controller.
@@ -60,9 +66,15 @@ func New(ctx context.Context, c component, config ttgc.Config) (*Upstream, error
 	if err != nil {
 		return nil, err
 	}
+	lnsPort := config.LBSCUPS.LNSPort
+	if lnsPort == 0 {
+		lnsPort = defaultLNSPort
+	}
 	return &Upstream{
-		component: c,
-		client:    client,
+		component:     c,
+		client:        client,
+		lnsPort:       strconv.Itoa(int(lnsPort)),
+		managedRanges: config.ManagedGatewayEUIs,
 	}, nil
 }
 
@@ -132,12 +144,6 @@ func (*Upstream) supportsOption(
 func (u *Upstream) Unclaim(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
 	eui := types.MustEUI64(ids.Eui).OrZero()
 
-	// Delete the CUPS and LNS API keys for the gateway.
-	if err := u.deleteAPIKeys(ctx, ids); err != nil {
-		// Don't fail unclaiming if deleting the API keys fails.
-		log.FromContext(ctx).WithError(err).Warn("Failed to delete API keys for gateway")
-	}
-
 	gtwClient := northboundv1.NewGatewayServiceClient(u.client)
 	_, err := gtwClient.Unclaim(ctx, &northboundv1.GatewayServiceUnclaimRequest{
 		GatewayId: eui.MarshalNumber(),
@@ -149,11 +155,23 @@ func (u *Upstream) Unclaim(ctx context.Context, ids *ttnpb.GatewayIdentifiers) e
 		}
 		return err
 	}
+
+	// Delete the CUPS and LNS API keys for the gateway.
+	if err := u.deleteAPIKeys(ctx, ids); err != nil {
+		// Don't fail unclaiming if deleting the API keys fails.
+		log.FromContext(ctx).WithError(err).Warn("Failed to delete API keys for gateway")
+	}
+
 	return nil
 }
 
 // IsManagedGateway implements gateways.GatewayClaimer.
-// This method always returns true.
-func (*Upstream) IsManagedGateway(context.Context, types.EUI64) (bool, error) {
-	return true, nil
+// This method returns true for gateways in the configured managed Gateway EUI ranges and false otherwise.
+func (u *Upstream) IsManagedGateway(_ context.Context, eui types.EUI64) (bool, error) {
+	for _, r := range u.managedRanges {
+		if r.Contains(eui) {
+			return true, nil
+		}
+	}
+	return false, nil
 }

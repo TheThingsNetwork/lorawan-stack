@@ -273,6 +273,9 @@ func (prefix *EUI64Prefix) UnmarshalJSON(data []byte) error {
 	if err != nil {
 		return err
 	}
+	if length < 0 || length > 64 {
+		return errInvalidEUIPrefix.New()
+	}
 	prefix.Length = uint8(length)
 	return nil
 }
@@ -324,11 +327,17 @@ func (prefix *EUI64Prefix) UnmarshalText(data []byte) error {
 		return err
 	}
 	// transform length from number character range
-	if len(data) == 18 {
-		prefix.Length = data[17] - '0'
-	} else {
-		prefix.Length = (data[17]-'0')*10 + (data[18] - '0')
+	var length uint8
+	for _, c := range data[17:] {
+		if c < '0' || c > '9' {
+			return errInvalidEUIPrefix.New()
+		}
+		length = length*10 + (c - '0')
 	}
+	if length > 64 {
+		return errInvalidEUIPrefix.New()
+	}
+	prefix.Length = length
 	return nil
 }
 
@@ -367,6 +376,127 @@ func (eui EUI64) HasPrefix(prefix EUI64Prefix) bool { return prefix.Matches(eui)
 // Matches returns true iff the EUI64 matches the prefix.
 func (prefix EUI64Prefix) Matches(eui EUI64) bool {
 	return eui.Mask(prefix.Length) == prefix.EUI64.Mask(prefix.Length)
+}
+
+// EUI64Range returns the range that contains all EUI64s with the prefix.
+func (prefix EUI64Prefix) EUI64Range() EUI64Range {
+	start := prefix.EUI64.Mask(prefix.Length).MarshalNumber()
+	return EUI64Range{
+		start:        start,
+		end:          start | (^uint64(0) >> prefix.Length),
+		prefixLength: prefix.Length,
+		isPrefix:     true,
+	}
+}
+
+// EUI64Range is an inclusive range of EUI64s.
+type EUI64Range struct {
+	start, end uint64
+	// prefixLength is set if the range represents an EUI64 prefix.
+	prefixLength uint8
+	isPrefix     bool
+}
+
+// EUI64RangeFromInterval returns the range that contains all EUI64s between start and end, inclusive.
+func EUI64RangeFromInterval(start, end EUI64) EUI64Range {
+	return EUI64Range{
+		start: start.MarshalNumber(),
+		end:   end.MarshalNumber(),
+	}
+}
+
+// Contains returns true if the EUI64 is in the range.
+func (r EUI64Range) Contains(eui EUI64) bool {
+	n := eui.MarshalNumber()
+	return n >= r.start && n <= r.end
+}
+
+func (r EUI64Range) String() string {
+	var start EUI64
+	start.UnmarshalNumber(r.start)
+	if r.isPrefix {
+		return EUI64Prefix{EUI64: start, Length: r.prefixLength}.String()
+	}
+	var end EUI64
+	end.UnmarshalNumber(r.end)
+	return start.String() + "-" + end.String()
+}
+
+// ConfigString implements the config.Stringer interface.
+func (r EUI64Range) ConfigString() string {
+	return r.String()
+}
+
+// UnmarshalConfigString implements the config.Configurable interface.
+func (r *EUI64Range) UnmarshalConfigString(s string) error {
+	parsed, err := ParseEUI64Range(s)
+	if err != nil {
+		return err
+	}
+	*r = parsed
+	return nil
+}
+
+var errInvalidEUI64Range = errors.DefineInvalidArgument("invalid_eui64_range", "invalid EUI64 range `{value}`")
+
+// ParseEUI64Range parses an EUI64 range from a string. Supported formats are a prefix
+// (e.g. "58A0CBFFFE800000/48") and an inclusive range (e.g. "001616FFFE300500-001616FFFE30FFFF").
+func ParseEUI64Range(val string) (EUI64Range, error) {
+	switch {
+	case strings.Contains(val, "/"):
+		var prefix EUI64Prefix
+		if err := prefix.UnmarshalText([]byte(val)); err != nil {
+			return EUI64Range{}, errInvalidEUI64Range.WithAttributes("value", val).WithCause(err)
+		}
+		return prefix.EUI64Range(), nil
+	case strings.Contains(val, "-"):
+		parts := strings.Split(val, "-")
+		if len(parts) != 2 || parts[0] == "" || parts[1] == "" {
+			return EUI64Range{}, errInvalidEUI64Range.WithAttributes("value", val)
+		}
+		var start, end EUI64
+		if err := start.UnmarshalText([]byte(parts[0])); err != nil {
+			return EUI64Range{}, errInvalidEUI64Range.WithAttributes("value", val).WithCause(err)
+		}
+		if err := end.UnmarshalText([]byte(parts[1])); err != nil {
+			return EUI64Range{}, errInvalidEUI64Range.WithAttributes("value", val).WithCause(err)
+		}
+		if start.MarshalNumber() > end.MarshalNumber() {
+			return EUI64Range{}, errInvalidEUI64Range.WithAttributes("value", val)
+		}
+		return EUI64RangeFromInterval(start, end), nil
+	default:
+		return EUI64Range{}, errInvalidEUI64Range.WithAttributes("value", val)
+	}
+}
+
+// ParseEUI64Ranges parses EUI64 ranges from strings. See ParseEUI64Range for the supported formats.
+func ParseEUI64Ranges(vals []string) ([]EUI64Range, error) {
+	ranges := make([]EUI64Range, len(vals))
+	for i, val := range vals {
+		r, err := ParseEUI64Range(val)
+		if err != nil {
+			return nil, err
+		}
+		ranges[i] = r
+	}
+	return ranges, nil
+}
+
+var errInvalidEUI64Ranges = errors.DefineInvalidArgument("invalid_eui64_ranges", "invalid EUI64 ranges of `{name}`")
+
+// ParseEUI64RangesMap parses named lists of EUI64 ranges from strings.
+// See ParseEUI64Range for the supported formats.
+func ParseEUI64RangesMap(conf map[string][]string) (map[string][]EUI64Range, error) {
+	res := make(map[string][]EUI64Range, len(conf))
+	for name, vals := range conf {
+		ranges, err := ParseEUI64Ranges(vals)
+		if err != nil {
+			return nil, errInvalidEUI64Ranges.WithAttributes("name", name).WithCause(err)
+		}
+		res[name] = ranges
+	}
+	return res, nil
 }
 
 // Copy stores a copy of eui in x and returns it.

@@ -18,10 +18,12 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/observability"
 	gtwregistry "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/registry/gateways"
+	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/retry"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/rpcmetadata"
@@ -66,11 +68,35 @@ var (
 		"create_gateway",
 		"create gateway",
 	)
+	errUpdateGateway = errors.DefineAborted(
+		"update_gateway",
+		"update gateway",
+	)
 	errNoEUI = errors.DefineInvalidArgument(
 		"no_eui",
 		"no EUI found for gateway",
 	)
+	errFetchCreatedGateway = errors.DefineDeadlineExceeded(
+		"fetch_created_gateway",
+		"fetch gateway after creation",
+	)
 )
+
+// claimCleanupTimeout bounds the compensating operations that revert a partially claimed gateway.
+const claimCleanupTimeout = 10 * time.Second
+
+// parseClaimRequest extracts the EUI and the owner token (claim authentication code) from the request.
+func parseClaimRequest(req *ttnpb.ClaimGatewayRequest) (types.EUI64, []byte, error) {
+	switch claim := req.SourceGateway.(type) {
+	case *ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_:
+		authIDs := claim.AuthenticatedIdentifiers
+		return types.MustEUI64(authIDs.GatewayEui).OrZero(), authIDs.AuthenticationCode, nil
+	case *ttnpb.ClaimGatewayRequest_QrCode:
+		return types.EUI64{}, nil, errGatewayClaimingWithQRCode.New()
+	default:
+		panic(fmt.Sprintf("proto: unexpected type %T", claim))
+	}
+}
 
 // Claim implements GatewayClaimingServer.
 func (gcls *gatewayClaimingServer) Claim(
@@ -79,19 +105,9 @@ func (gcls *gatewayClaimingServer) Claim(
 ) (ids *ttnpb.GatewayIdentifiers, retErr error) {
 	logger := log.FromContext(ctx)
 
-	// Extract the EUI and the owner token (claim authentication code) from the request.
-	var (
-		authCode   []byte
-		gatewayEUI types.EUI64
-	)
-	switch claim := req.SourceGateway.(type) {
-	case *ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_:
-		authIDs := claim.AuthenticatedIdentifiers
-		gatewayEUI, authCode = types.MustEUI64(authIDs.GatewayEui).OrZero(), authIDs.AuthenticationCode
-	case *ttnpb.ClaimGatewayRequest_QrCode:
-		return nil, errGatewayClaimingWithQRCode.New()
-	default:
-		panic(fmt.Sprintf("proto: unexpected type %T", claim))
+	gatewayEUI, authCode, err := parseClaimRequest(req)
+	if err != nil {
+		return nil, err
 	}
 	logger = logger.WithFields(log.Fields(
 		"gateway_eui", gatewayEUI,
@@ -106,14 +122,15 @@ func (gcls *gatewayClaimingServer) Claim(
 	}
 
 	// Check if the gateway already exists.
-	_, err := gcls.registry.GetIdentifiersForEUI(ctx, gatewayEUI)
+	_, err = gcls.registry.GetIdentifiersForEUI(ctx, gatewayEUI)
 	if err == nil {
 		return nil, errGatewayAlreadyExists.WithAttributes("eui", gatewayEUI)
 	} else if !errors.IsNotFound(err) {
 		return nil, err
 	}
 
-	// Create the gateway in the IS.
+	// Create the gateway in the IS. The gateway is created before claiming on the upstream because the upstream
+	// needs the gateway to exist in order to create API keys for it.
 	gateway := &ttnpb.Gateway{
 		Ids: ids,
 	}
@@ -128,14 +145,22 @@ func (gcls *gatewayClaimingServer) Claim(
 	if createdIDs := created.GetIds(); createdIDs != nil {
 		ids = createdIDs
 	}
+
 	defer func(ids *ttnpb.GatewayIdentifiers) {
+		cleanupCtx, cancelCleanup := context.WithTimeout(context.WithoutCancel(ctx), claimCleanupTimeout)
+		defer cancelCleanup()
+
 		if retErr != nil {
 			logger.Warn("Failed to claim gateway, deleting created gateway")
-			if _, delErr := gcls.registry.Delete(ctx, ids); delErr != nil {
+			if _, delErr := gcls.registry.Purge(cleanupCtx, ids); delErr != nil {
 				logger.WithError(delErr).Warn("Failed to delete created gateway after failed claim")
 			}
 		}
 	}(ids)
+
+	if err := gcls.waitForCreatedGateway(ctx, ids); err != nil {
+		return nil, err
+	}
 
 	// Support clients that only set a single frequency plan.
 	if len(req.TargetFrequencyPlanIds) == 0 && req.TargetFrequencyPlanId != "" { // nolint:staticcheck
@@ -157,9 +182,12 @@ func (gcls *gatewayClaimingServer) Claim(
 
 	// Unclaim if update fails.
 	defer func(ids *ttnpb.GatewayIdentifiers) {
+		cleanupCtx, cancelCleanup := context.WithTimeout(context.WithoutCancel(ctx), claimCleanupTimeout)
+		defer cancelCleanup()
+
 		if retErr != nil {
 			observability.RegisterAbortClaim(ctx, ids.GetEntityIdentifiers(), retErr)
-			if err := claimer.Unclaim(ctx, ids); err != nil {
+			if err := claimer.Unclaim(cleanupCtx, ids); err != nil {
 				logger.WithError(err).Warn("Failed to unclaim gateway")
 			}
 			return
@@ -198,10 +226,40 @@ func (gcls *gatewayClaimingServer) Claim(
 		FieldMask: fieldMask,
 	})
 	if err != nil {
-		return nil, errCreateGateway.WithCause(err)
+		return nil, errUpdateGateway.WithCause(err)
 	}
 
 	return ids, nil
+}
+
+// waitForCreatedGateway waits until the created gateway is visible to the caller's credentials. Rights on the new
+// gateway are computed against a possibly lagging IS read replica; a missing gateway surfaces as a not-found error
+// for admin callers and is masked as a permission-denied error otherwise.
+func (gcls *gatewayClaimingServer) waitForCreatedGateway(ctx context.Context, ids *ttnpb.GatewayIdentifiers) error {
+	getCreatedGatewayTask := retry.Task{
+		Name: "get created gateway",
+		F: func() (bool, error) {
+			_, err := gcls.registry.Get(ctx, &ttnpb.GetGatewayRequest{
+				GatewayIds: ids,
+				FieldMask:  ttnpb.FieldMask("ids"),
+			})
+			switch {
+			case err == nil:
+				return false, nil
+			case errors.IsNotFound(err), errors.IsPermissionDenied(err):
+				return true, err
+			default:
+				return false, err
+			}
+		},
+		WaitTime:    500 * time.Millisecond,
+		Jitter:      0.2,
+		MaxAttempts: 5,
+	}
+	if err := getCreatedGatewayTask.Do(ctx); err != nil {
+		return errFetchCreatedGateway.WithCause(err)
+	}
+	return nil
 }
 
 // GetInfoByGatewayEUI implements GatewayClaimingServer.

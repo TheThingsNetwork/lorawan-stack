@@ -64,9 +64,9 @@ func New(ctx context.Context, c Component, conf ttgc.Config) (*Server, error) {
 			return nil, err
 		}
 		srv.grpc.server = &managedGCSServer{
-			Component:   c,
-			client:      client,
-			gatewayEUIs: conf.GatewayEUIs,
+			Component:          c,
+			client:             client,
+			managedGatewayEUIs: conf.ManagedGatewayEUIs,
 		}
 		srv.grpc.wifiProfiles = &managedGatewayWiFiProfileServer{
 			client: client,

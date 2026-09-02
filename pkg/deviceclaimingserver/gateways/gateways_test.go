@@ -22,7 +22,6 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
 	"go.thethings.network/lorawan-stack/v3/pkg/config/tlsconfig"
 	"go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/gateways"
-	dcstypes "go.thethings.network/lorawan-stack/v3/pkg/deviceclaimingserver/types"
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttgc"
 	"go.thethings.network/lorawan-stack/v3/pkg/types"
@@ -39,11 +38,11 @@ func TestUpstream(t *testing.T) {
 		ServiceBase: config.ServiceBase{
 			TTGC: ttgc.Config{
 				Enabled: true,
-				GatewayEUIs: []types.EUI64Prefix{
-					{
+				GatewayEUIs: []types.EUI64Range{
+					types.EUI64Prefix{
 						EUI64:  types.EUI64{0x58, 0xa0, 0xcb, 0xff, 0xfe, 0x80, 0x00, 0x00},
 						Length: 48,
-					},
+					}.EUI64Range(),
 				},
 				TLS: tlsconfig.ClientAuth{
 					Source:      "file",
@@ -56,32 +55,32 @@ func TestUpstream(t *testing.T) {
 
 	// Invalid ranges.
 	ranges := map[string][]string{"ttgc": {"&S(FU*)"}}
-	euiPrefixes, err := gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err := types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.NotBeNil)
 	a.So(euiPrefixes, should.BeEmpty)
 
 	ranges = map[string][]string{"ttgc": {"58A0CBFFFE800000"}}
-	euiPrefixes, err = gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err = types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.NotBeNil)
 	a.So(euiPrefixes, should.BeEmpty)
 
 	ranges = map[string][]string{"ttgc": {"58A0CBFFFE800000/123456"}}
-	euiPrefixes, err = gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err = types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.NotBeNil)
 	a.So(euiPrefixes, should.BeEmpty)
 
 	ranges = map[string][]string{"ttgc": {"58A0CBFFFE800000-58A0CBFFFE800000-58A0CBFFFE800000"}}
-	euiPrefixes, err = gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err = types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.NotBeNil)
 	a.So(euiPrefixes, should.BeEmpty)
 
 	ranges = map[string][]string{"ttgc": {"001616FFFEWXUSD-001616FFFETGENDE"}}
-	euiPrefixes, err = gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err = types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.NotBeNil)
 	a.So(euiPrefixes, should.BeEmpty)
 
 	ranges = map[string][]string{"ttgc": {"001616FFFE42DFAD-001616FFFETGENDE"}}
-	euiPrefixes, err = gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err = types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.NotBeNil)
 	a.So(euiPrefixes, should.BeEmpty)
 
@@ -92,15 +91,15 @@ func TestUpstream(t *testing.T) {
 			"001616FFFE42DFAD-001616FFFE42E395",
 		},
 	}
-	euiPrefixes, err = gateways.ParseGatewayEUIRanges(ranges)
+	euiPrefixes, err = types.ParseEUI64RangesMap(ranges)
 	a.So(err, should.BeNil)
-	a.So(euiPrefixes, should.Resemble, map[string][]dcstypes.EUI64Range{
+	a.So(euiPrefixes, should.Resemble, map[string][]types.EUI64Range{
 		"ttgc": {
-			dcstypes.RangeFromEUI64Prefix(types.EUI64Prefix{
+			types.EUI64Prefix{
 				EUI64:  types.EUI64{0x58, 0xa0, 0xcb, 0xff, 0xfe, 0x80, 0x00, 0x00},
 				Length: 48,
-			}),
-			dcstypes.RangeFromEUI64Range(
+			}.EUI64Range(),
+			types.EUI64RangeFromInterval(
 				types.EUI64{0x00, 0x16, 0x16, 0xff, 0xfe, 0x42, 0xdf, 0xad},
 				types.EUI64{0x00, 0x16, 0x16, 0xff, 0xfe, 0x42, 0xe3, 0x95},
 			),

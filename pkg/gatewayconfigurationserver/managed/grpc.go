@@ -31,8 +31,8 @@ type managedGCSServer struct {
 	Component
 	ttnpb.UnsafeManagedGatewayConfigurationServiceServer
 
-	gatewayEUIs []types.EUI64Prefix
-	client      *ttgc.Client
+	managedGatewayEUIs []types.EUI64Range
+	client             *ttgc.Client
 }
 
 var (
@@ -45,7 +45,8 @@ var (
 
 // managedGatewayID looks up the gateway EUI for the given gateway identifiers and returns a copy of the gateway
 // identifiers with the EUI filled.
-// If the EUI does not match the prefix configured for The Things Gateway Controller, this method returns NotFound.
+// If the EUI is not in the managed gateway EUI ranges configured for The Things Gateway Controller,
+// this method returns NotFound.
 func (s *managedGCSServer) managedGatewayID(
 	ctx context.Context, ids *ttnpb.GatewayIdentifiers,
 ) (*ttnpb.GatewayIdentifiers, error) {
@@ -68,16 +69,16 @@ func (s *managedGCSServer) managedGatewayID(
 		return nil, errGatewayNotManaged.WithAttributes("gateway_id", ids.GatewayId)
 	}
 	var (
-		matchesPrefix bool
-		eui           = types.MustEUI64(gtw.Ids.Eui).OrZero()
+		matchesRange bool
+		eui          = types.MustEUI64(gtw.Ids.Eui).OrZero()
 	)
-	for _, prefix := range s.gatewayEUIs {
-		if prefix.Matches(eui) {
-			matchesPrefix = true
+	for _, r := range s.managedGatewayEUIs {
+		if r.Contains(eui) {
+			matchesRange = true
 			break
 		}
 	}
-	if !matchesPrefix {
+	if !matchesRange {
 		return nil, errGatewayNotManaged.WithAttributes("gateway_id", ids.GatewayId)
 	}
 	return &ttnpb.GatewayIdentifiers{

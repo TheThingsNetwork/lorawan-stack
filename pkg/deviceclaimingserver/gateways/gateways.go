@@ -18,7 +18,6 @@ package gateways
 import (
 	"context"
 	"crypto/tls"
-	"strings"
 
 	"go.thethings.network/lorawan-stack/v3/pkg/cluster"
 	"go.thethings.network/lorawan-stack/v3/pkg/config"
@@ -52,42 +51,6 @@ var (
 	errTTGCNotEnabled  = errors.DefineFailedPrecondition("ttgc_not_enabled", "TTGC is not enabled")
 )
 
-// ParseGatewayEUIRanges parses the configured upstream map and returns map of ranges.
-func ParseGatewayEUIRanges(conf map[string][]string) (map[string][]dcstypes.EUI64Range, error) {
-	res := make(map[string][]dcstypes.EUI64Range, len(conf))
-	for host, ranges := range conf {
-		res[host] = make([]dcstypes.EUI64Range, 0, len(ranges))
-		for _, val := range ranges {
-			var r dcstypes.EUI64Range
-			switch {
-			case strings.Contains(val, "/"):
-				var prefix types.EUI64Prefix
-				if err := prefix.UnmarshalText([]byte(val)); err != nil {
-					return nil, errInvalidUpstream.WithAttributes("name", host).WithCause(err)
-				}
-				r = dcstypes.RangeFromEUI64Prefix(prefix)
-			case strings.Contains(val, "-"):
-				parts := strings.Split(val, "-")
-				if len(parts) != 2 {
-					return nil, errInvalidUpstream.WithAttributes("name", host)
-				}
-				var start, end types.EUI64
-				if err := start.UnmarshalText([]byte(parts[0])); err != nil {
-					return nil, errInvalidUpstream.WithAttributes("name", host).WithCause(err)
-				}
-				if err := end.UnmarshalText([]byte(parts[1])); err != nil {
-					return nil, errInvalidUpstream.WithAttributes("name", host).WithCause(err)
-				}
-				r = dcstypes.RangeFromEUI64Range(start, end)
-			default:
-				return nil, errInvalidUpstream.WithAttributes("name", host)
-			}
-			res[host] = append(res[host], r)
-		}
-	}
-	return res, nil
-}
-
 // Claimer provides methods for claiming Gateways.
 type Claimer interface {
 	// Claim claims a gateway.
@@ -102,7 +65,7 @@ type Claimer interface {
 
 // rangeClaimer supports claiming a range of EUIs.
 type rangeClaimer struct {
-	ranges []dcstypes.EUI64Range
+	ranges []types.EUI64Range
 	Claimer
 }
 
@@ -125,7 +88,7 @@ func NewUpstream(
 		opt(upstream)
 	}
 
-	hosts, err := ParseGatewayEUIRanges(conf.Upstreams)
+	hosts, err := types.ParseEUI64RangesMap(conf.Upstreams)
 	if err != nil {
 		return nil, err
 	}
@@ -133,11 +96,7 @@ func NewUpstream(
 	// Implicitly add TTGC if it is enabled and not already configured.
 	ttgcConf := c.GetBaseConfig(ctx).TTGC
 	if _, ttgcAdded := hosts["ttgc"]; ttgcConf.Enabled && !ttgcAdded {
-		ttgcRanges := make([]dcstypes.EUI64Range, len(ttgcConf.GatewayEUIs))
-		for i, prefix := range ttgcConf.GatewayEUIs {
-			ttgcRanges[i] = dcstypes.RangeFromEUI64Prefix(prefix)
-		}
-		hosts["ttgc"] = ttgcRanges
+		hosts["ttgc"] = ttgcConf.GatewayEUIs
 	}
 
 	// Setup upstream table.
@@ -170,7 +129,7 @@ func NewUpstream(
 type Option func(*Upstream)
 
 // WithClaimer adds a claimer to Upstream.
-func WithClaimer(name string, ranges []dcstypes.EUI64Range, claimer Claimer) Option {
+func WithClaimer(name string, ranges []types.EUI64Range, claimer Claimer) Option {
 	return func(upstream *Upstream) {
 		upstream.claimers[name] = rangeClaimer{
 			Claimer: claimer,
