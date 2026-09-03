@@ -110,7 +110,7 @@ var (
 			if _, err := maxprocs.Set(); err != nil {
 				logger.WithError(err).Info("Failed to set GOMAXPROCS")
 			}
-			if _, err := memlimit.SetGoMemLimit(0.9); err != nil {
+			if _, err := memlimit.Set(memlimit.WithRatio(0.9)); err != nil {
 				logger.WithError(err).Info("Failed to set GOMEMLIMIT")
 			}
 
