@@ -12,6 +12,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - `gs_gateways_disconnected_total` metric, counting gateway disconnections by protocol and by the error the connection was disconnected with. This makes disconnection reasons (such as gateways disappearing without a close handshake, or missing too many pongs) observable as a rate, instead of only through logs.
+- Downlink scheduling on all antennas of a gateway. Previously, only the first antenna could be used as a downlink path, and uplinks received on any other antenna had their downlink path disabled. See [issue #48](https://github.com/TheThingsNetwork/lorawan-stack/issues/48) for more context.
 
 ### Changed
 
@@ -26,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Parsing of the `rctx` field in the `upinfo` object of upstream messages received via the LoRa Basics Station LNS protocol. The field name was misspelled as `rtcx`, so the radio context reported by gateways was ignored. The antenna index in the uplink metadata now reflects the reported radio context and is echoed back in class A downlinks, instead of always being 0.
+- The antenna gain sent to LoRa Basics Station gateways in the router configuration. Each board's radio configuration now uses the gain of its own antenna instead of applying the first antenna's gain to all boards, and fractional gains are no longer truncated.
 
 ### Security
 
