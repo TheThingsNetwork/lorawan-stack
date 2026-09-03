@@ -548,6 +548,8 @@ func TestFlow(t *testing.T) {
 }
 
 func TestNewConnectionAntennaGains(t *testing.T) {
+	t.Parallel()
+
 	ctx := test.Context()
 	frontend := &mock.Frontend{}
 	addr := &ttnpb.GatewayRemoteAddress{Ip: "127.0.0.1"}
@@ -587,6 +589,8 @@ func TestNewConnectionAntennaGains(t *testing.T) {
 		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
 			a := assertions.New(t)
 			gtw := &ttnpb.Gateway{
 				Ids:              &ttnpb.GatewayIdentifiers{GatewayId: "antenna-gain-test"},
