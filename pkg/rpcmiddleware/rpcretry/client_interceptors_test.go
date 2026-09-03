@@ -17,6 +17,7 @@ package rpcretry_test
 import (
 	"context"
 	"net"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -40,13 +41,13 @@ type unaryService struct {
 	rpctest.FooBarServer
 	md metadata.MD
 
-	counter uint
+	counter atomic.Int64
 	err     error
 	sleep   time.Duration
 }
 
 func (fs *unaryService) Unary(ctx context.Context, foo *rpctest.Foo) (*rpctest.Bar, error) {
-	fs.counter++
+	fs.counter.Add(1)
 	time.Sleep(fs.sleep)
 
 	if err := grpc.SendHeader(ctx, fs.md); err != nil {
@@ -74,7 +75,7 @@ func Test_UnaryClientInterceptor(t *testing.T) {
 		service           Service
 		client            Client
 		errAssertion      func(error) bool
-		expectedReqAmount int
+		expectedReqAmount int64
 	}{
 		{
 			name:              "no error",
@@ -106,7 +107,7 @@ func Test_UnaryClientInterceptor(t *testing.T) {
 					return ctx
 				},
 			},
-			service:           Service{sleep: 5 * test.Delay},
+			service:           Service{sleep: 8 * test.Delay},
 			errAssertion:      errors.IsDeadlineExceeded,
 			expectedReqAmount: 1,
 		},
@@ -168,7 +169,7 @@ func Test_UnaryClientInterceptor(t *testing.T) {
 				a.So(err, should.BeNil)
 				a.So(resp.Message, should.Equal, "bar")
 			}
-			a.So(testService.counter, should.Equal, tt.expectedReqAmount)
+			a.So(testService.counter.Load(), should.Equal, tt.expectedReqAmount)
 		})
 	}
 }
