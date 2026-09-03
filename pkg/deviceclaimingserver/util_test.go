@@ -114,6 +114,7 @@ type mockGatewayRegistry struct {
 
 	createFunc func(ctx context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
 	deleteFunc func(ctx context.Context, in *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
+	purgeFunc  func(ctx context.Context, in *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
 	getFunc    func(ctx context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
 	updateFunc func(ctx context.Context, req *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error)
 }
@@ -121,6 +122,7 @@ type mockGatewayRegistry struct {
 var (
 	errInvalidCredentials = errors.DefineUnauthenticated("invalid_credentials", "invalid credentials")
 	errGatewayNotFound    = errors.DefineNotFound("gateway_not_found", "gateway not found")
+	errNoRights           = errors.DefinePermissionDenied("no_rights", "no rights")
 	errClaim              = errors.DefineAborted("claim", "claim")
 	errCreate             = errors.DefineAborted("create_gateway", "create gateway")
 	errUpdate             = errors.DefineAborted("update_gateway", "update gateway")
@@ -161,6 +163,11 @@ func (mock mockGatewayRegistry) Create(ctx context.Context, in *ttnpb.CreateGate
 // Delete implements GatewayRegistry.
 func (mock mockGatewayRegistry) Delete(ctx context.Context, in *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 	return mock.deleteFunc(ctx, in)
+}
+
+// Purge implements GatewayRegistry.
+func (mock mockGatewayRegistry) Purge(ctx context.Context, in *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+	return mock.purgeFunc(ctx, in)
 }
 
 // Get implements GatewayRegistry.

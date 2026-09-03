@@ -12,6 +12,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Added
 
 - `gs_gateways_disconnected_total` metric, counting gateway disconnections by protocol and by the error the connection was disconnected with. This makes disconnection reasons (such as gateways disappearing without a close handshake, or missing too many pongs) observable as a rate, instead of only through logs.
+- `ttgc.managed-gateway-euis` configuration option: Gateway EUI prefixes of managed gateways, defaulting to the EUI prefix of The Things Industries managed gateways. Gateways outside these prefixes are reported as not managed in the claiming info.
+- `ttgc.lbscups.lns-port` configuration option: the LoRa Basics Station LNS port of the Gateway Server, defaulting to `8887`.
 
 ### Changed
 

@@ -178,18 +178,28 @@ var DefaultTelemetryConfig = telemetry.Config{
 
 // DefaultTTGCConfig is the default config for The Things Gateway Controller.
 var DefaultTTGCConfig = ttgc.Config{
-	GatewayEUIs: []types.EUI64Prefix{
-		// The Things Industries gateways
-		{
+	GatewayEUIs: []types.EUI64Range{
+		// TTIGPro gateways.
+		types.EUI64Prefix{
 			EUI64:  types.EUI64{0xEC, 0x65, 0x6E, 0xFF, 0xFE, 0x00, 0x00, 0x00},
 			Length: 40,
-		},
+		}.EUI64Range(),
+	},
+	ManagedGatewayEUIs: []types.EUI64Range{
+		// TTIGPro gateways.
+		types.EUI64Prefix{
+			EUI64:  types.EUI64{0xEC, 0x65, 0x6E, 0xFF, 0xFE, 0x00, 0x00, 0x00},
+			Length: 40,
+		}.EUI64Range(),
 	},
 	Address: "gc.thethings.industries:443",
 	TLS: tlsconfig.ClientAuth{
 		Source:      "file",
 		Certificate: "cert.pem",
 		Key:         "key.pem",
+	},
+	LBSCUPS: ttgc.LBSCUPSConfig{
+		LNSPort: 8887,
 	},
 }
 

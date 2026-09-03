@@ -49,7 +49,7 @@ var (
 	authorizedCallOpt = grpc.PerRPCCredentials(authorizedMD)
 )
 
-func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
+func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest,gocyclo
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))
 	ctx, cancelCtx := context.WithCancel(ctx)
@@ -83,11 +83,11 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 		gateways.Config{},
 		gateways.WithClaimer(
 			"mock",
-			[]dcstypes.EUI64Range{
-				dcstypes.RangeFromEUI64Prefix(types.EUI64Prefix{
+			[]types.EUI64Range{
+				types.EUI64Prefix{
 					EUI64:  types.EUI64{0x58, 0xa0, 0xcb, 0xff, 0xfe, 0x80, 0x00, 0x00},
 					Length: 48,
-				}),
+				}.EUI64Range(),
 			},
 			mockGatewayClaimer,
 		),
@@ -97,6 +97,10 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 	}
 
 	existingEUI := types.EUI64{0x58, 0xa0, 0xcb, 0xff, 0xfe, 0x80, 0x00, 0xFF}
+	// Default Get behavior: the created gateway is immediately visible.
+	getCreatedGatewayFunc := func(_ context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+		return &ttnpb.Gateway{Ids: req.GatewayIds}, nil
+	}
 	mockGatewayRegistry := &mockGatewayRegistry{
 		authorizedMD: authorizedMD,
 		gateways: []*ttnpb.Gateway{
@@ -177,15 +181,17 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 	a.So(resp.IsManaged, should.BeTrue)
 
 	// Test claiming
+	getGatewayCalls := 0
 	for _, tc := range []struct {
 		Name           string
 		Req            *ttnpb.ClaimGatewayRequest
 		CallOpt        grpc.CallOption
 		ClaimFunc      func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error)
 		CreateFunc     func(context.Context, *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error)
+		GetFunc        func(context.Context, *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error)
 		UpdateFunc     func(context.Context, *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error)
 		UnclaimFunc    func(context.Context, *ttnpb.GatewayIdentifiers) error
-		DeleteFunc     func(context.Context, *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
+		PurgeFunc      func(context.Context, *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error)
 		ErrorAssertion func(error) bool
 	}{
 		{
@@ -280,7 +286,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
 				return in.Gateway, nil
 			},
-			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+			PurgeFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				return &emptypb.Empty{}, nil
 			},
 			ErrorAssertion: errors.IsAborted,
@@ -308,7 +314,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 				return in.Gateway, nil
 			},
-			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+			PurgeFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				return &emptypb.Empty{}, nil
 			},
 			ErrorAssertion: errors.IsAborted,
@@ -336,7 +342,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			UpdateFunc: func(_ context.Context, _ *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errUpdate.New()
 			},
-			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+			PurgeFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				return &emptypb.Empty{}, nil
 			},
 			UnclaimFunc: func(_ context.Context, ids *ttnpb.GatewayIdentifiers) error {
@@ -370,7 +376,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			UpdateFunc: func(_ context.Context, _ *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
 				return nil, errUpdate.New()
 			},
-			DeleteFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+			PurgeFunc: func(_ context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				return &emptypb.Empty{}, nil
 			},
 			UnclaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers) error {
@@ -403,6 +409,38 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			CallOpt: authorizedCallOpt,
 		},
 		{
+			Name: "Claim/CreatedGatewayVisibleAfterReplicationLag",
+			Req: &ttnpb.ClaimGatewayRequest{
+				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
+				SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
+					AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
+						GatewayEui:         supportedEUI.Bytes(),
+						AuthenticationCode: claimAuthCode,
+					},
+				},
+				TargetGatewayId:            "test-gateway",
+				TargetGatewayServerAddress: "things.example.com",
+			},
+			CallOpt: authorizedCallOpt,
+			CreateFunc: func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+				getGatewayCalls = 0
+				return in.Gateway, nil
+			},
+			GetFunc: func(_ context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+				// The created gateway becomes visible on the third attempt.
+				if getGatewayCalls++; getGatewayCalls < 3 {
+					return nil, errGatewayNotFound.New()
+				}
+				return &ttnpb.Gateway{Ids: req.GatewayIds}, nil
+			},
+			ClaimFunc: func(context.Context, *ttnpb.GatewayIdentifiers, string, string) (*dcstypes.GatewayMetadata, error) {
+				return &dcstypes.GatewayMetadata{}, nil
+			},
+			UpdateFunc: func(_ context.Context, in *ttnpb.UpdateGatewayRequest) (*ttnpb.Gateway, error) {
+				return in.Gateway, nil
+			},
+		},
+		{
 			Name: "Claim/EmptyTargetGatewayIDDefaultsToEUIAndDeletesOnFailedClaim",
 			Req: &ttnpb.ClaimGatewayRequest{
 				Collaborator: userID.GetOrganizationOrUserIdentifiers(),
@@ -426,7 +464,7 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				a.So(in.Gateway.GetIds().GetGatewayId(), should.Equal, "58a0cbfffe800001")
 				return in.Gateway, nil
 			},
-			DeleteFunc: func(_ context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+			PurgeFunc: func(_ context.Context, ids *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
 				a.So(ids.GatewayId, should.Equal, "58a0cbfffe800001")
 				a.So(ids.Eui, should.Resemble, supportedEUI.Bytes())
 				return &emptypb.Empty{}, nil
@@ -472,11 +510,16 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			if tc.CreateFunc != nil {
 				mockGatewayRegistry.createFunc = tc.CreateFunc
 			}
+			if tc.GetFunc != nil {
+				mockGatewayRegistry.getFunc = tc.GetFunc
+			} else {
+				mockGatewayRegistry.getFunc = getCreatedGatewayFunc
+			}
 			if tc.UpdateFunc != nil {
 				mockGatewayRegistry.updateFunc = tc.UpdateFunc
 			}
-			if tc.DeleteFunc != nil {
-				mockGatewayRegistry.deleteFunc = tc.DeleteFunc
+			if tc.PurgeFunc != nil {
+				mockGatewayRegistry.purgeFunc = tc.PurgeFunc
 			}
 
 			_, err := gclsClient.Claim(ctx, tc.Req, tc.CallOpt)
@@ -489,6 +532,41 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 			}
 		})
 	}
+
+	t.Run("Claim/CreatedGatewayNotVisible", func(t *testing.T) { //nolint:paralleltest
+		a := assertions.New(t)
+		var deleted bool
+		mockGatewayRegistry.createFunc = func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+			return in.Gateway, nil
+		}
+		// Rights on a not yet replicated gateway are masked as a permission-denied error for non-admin callers.
+		mockGatewayRegistry.getFunc = func(context.Context, *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+			return nil, errNoRights.New()
+		}
+		mockGatewayRegistry.purgeFunc = func(context.Context, *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+			deleted = true
+			return &emptypb.Empty{}, nil
+		}
+		_, err := gclsClient.Claim(ctx, &ttnpb.ClaimGatewayRequest{
+			Collaborator: userID.GetOrganizationOrUserIdentifiers(),
+			SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
+				AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
+					GatewayEui:         supportedEUI.Bytes(),
+					AuthenticationCode: claimAuthCode,
+				},
+			},
+			TargetGatewayId:            "test-gateway",
+			TargetGatewayServerAddress: "things.example.com",
+		}, authorizedCallOpt)
+		a.So(errors.IsDeadlineExceeded(err), should.BeTrue)
+		a.So(deleted, should.BeTrue)
+	})
+
+	t.Run("Claim/CleanupAfterCanceledRequest", func(t *testing.T) { //nolint:paralleltest
+		assertClaimCleanupNotBoundToRequest(
+			ctx, t, gclsClient, mockGatewayRegistry, mockGatewayClaimer, supportedEUI,
+		)
+	})
 
 	// Test unclaiming.
 	for _, tc := range []struct { //nolint:paralleltest
@@ -630,5 +708,68 @@ func TestGatewayClaimingServer(t *testing.T) { //nolint:paralleltest
 				t.Fatalf("Expected error")
 			}
 		})
+	}
+}
+
+// assertClaimCleanupNotBoundToRequest asserts that the cleanup of a partially claimed gateway is not bound to the
+// request context, since cancellation of the request is itself one of the failures that the cleanup reverts.
+func assertClaimCleanupNotBoundToRequest(
+	ctx context.Context,
+	t *testing.T,
+	gclsClient ttnpb.GatewayClaimingServerClient,
+	registry *mockGatewayRegistry,
+	claimer *MockGatewayClaimer,
+	eui types.EUI64,
+) {
+	t.Helper()
+	a := assertions.New(t)
+
+	callCtx, cancelCall := context.WithCancel(ctx)
+	t.Cleanup(cancelCall)
+
+	// Records the error of the context that the delete is called with, at the time of the call.
+	deleteCtxErrCh := make(chan error, 1)
+	registry.createFunc = func(_ context.Context, in *ttnpb.CreateGatewayRequest) (*ttnpb.Gateway, error) {
+		return in.Gateway, nil
+	}
+	registry.getFunc = func(_ context.Context, req *ttnpb.GetGatewayRequest) (*ttnpb.Gateway, error) {
+		return &ttnpb.Gateway{Ids: req.GatewayIds}, nil
+	}
+	registry.purgeFunc = func(ctx context.Context, _ *ttnpb.GatewayIdentifiers) (*emptypb.Empty, error) {
+		deleteCtxErrCh <- ctx.Err()
+		return &emptypb.Empty{}, nil
+	}
+	claimer.ClaimFunc = func(
+		reqCtx context.Context, _ *ttnpb.GatewayIdentifiers, _, _ string,
+	) (*dcstypes.GatewayMetadata, error) {
+		// Cancel the request and wait until the cancellation reaches the handler, so that the deferred cleanup runs
+		// with an already canceled request context.
+		cancelCall()
+		select {
+		case <-reqCtx.Done():
+		case <-time.After(timeout):
+			t.Error("Request context was not canceled")
+		}
+		return nil, reqCtx.Err()
+	}
+
+	_, err := gclsClient.Claim(callCtx, &ttnpb.ClaimGatewayRequest{
+		Collaborator: userID.GetOrganizationOrUserIdentifiers(),
+		SourceGateway: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers_{
+			AuthenticatedIdentifiers: &ttnpb.ClaimGatewayRequest_AuthenticatedIdentifiers{
+				GatewayEui:         eui.Bytes(),
+				AuthenticationCode: claimAuthCode,
+			},
+		},
+		TargetGatewayId:            "test-gateway",
+		TargetGatewayServerAddress: "things.example.com",
+	}, authorizedCallOpt)
+	a.So(err, should.NotBeNil)
+
+	select {
+	case deleteCtxErr := <-deleteCtxErrCh:
+		a.So(deleteCtxErr, should.BeNil)
+	case <-time.After(timeout):
+		t.Fatal("Created gateway was not deleted after the request was canceled")
 	}
 }

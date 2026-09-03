@@ -4076,6 +4076,15 @@
       "file": "gateways.go"
     }
   },
+  "error:pkg/deviceclaimingserver/retry:operation_unsuccessful": {
+    "translations": {
+      "en": "operation `{name}` unsuccessful after `{number}` attempts"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver/retry",
+      "file": "task.go"
+    }
+  },
   "error:pkg/deviceclaimingserver:claim gateway": {
     "translations": {
       "en": "claim gateway"
@@ -4110,6 +4119,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver",
       "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:fetch_created_gateway": {
+    "translations": {
+      "en": "fetch gateway after creation"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/deviceclaimingserver:gateway_already_exists": {
@@ -4191,6 +4209,15 @@
     "description": {
       "package": "pkg/deviceclaimingserver",
       "file": "grpc_end_devices.go"
+    }
+  },
+  "error:pkg/deviceclaimingserver:update_gateway": {
+    "translations": {
+      "en": "update gateway"
+    },
+    "description": {
+      "package": "pkg/deviceclaimingserver",
+      "file": "grpc_gateways.go"
     }
   },
   "error:pkg/devicerepository/store/bleve:cannot_open_index": {
@@ -9794,6 +9821,24 @@
   "error:pkg/types:invalid_eui": {
     "translations": {
       "en": "invalid EUI"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "eui.go"
+    }
+  },
+  "error:pkg/types:invalid_eui64_range": {
+    "translations": {
+      "en": "invalid EUI64 range `{value}`"
+    },
+    "description": {
+      "package": "pkg/types",
+      "file": "eui.go"
+    }
+  },
+  "error:pkg/types:invalid_eui64_ranges": {
+    "translations": {
+      "en": "invalid EUI64 ranges of `{name}`"
     },
     "description": {
       "package": "pkg/types",
