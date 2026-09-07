@@ -116,6 +116,7 @@ type Connection struct {
 	gateway          *ttnpb.Gateway
 	gatewayPrimaryFP *frequencyplans.FrequencyPlan
 	gatewayFPs       []*frequencyplans.FrequencyPlan
+	antennaGains     []float32
 	band             *band.Band
 	fps              *frequencyplans.Store
 	scheduler        *scheduling.Scheduler
@@ -216,6 +217,25 @@ func NewConnection(
 		}
 	}
 
+	var fallbackAntennaGain float32
+	if len(gateway.Antennas) > 0 && gateway.Antennas[0] != nil {
+		fallbackAntennaGain = gateway.Antennas[0].Gain
+	}
+
+	// antennaGains is aligned index-for-index with gatewayFPs: antennaGains[i] is the gain for the
+	// board configured by gatewayFPs[i]. Physically each board carries exactly one antenna, but the
+	// registry does not enforce that the antennas and frequency plans of a gateway are registered
+	// consistently, so a gateway may have fewer antennas registered than frequency plans. In that
+	// case the gain of the first antenna is used as a fallback.
+	antennaGains := make([]float32, len(gatewayFPs))
+	for i := range gatewayFPs {
+		if i < len(gateway.Antennas) && gateway.Antennas[i] != nil {
+			antennaGains[i] = gateway.Antennas[i].Gain
+			continue
+		}
+		antennaGains[i] = fallbackAntennaGain
+	}
+
 	ctx, cancelCtx := errorcontext.New(ctx)
 	scheduler, err := scheduling.NewScheduler(
 		ctx, gatewayFPs, enforceDutyCycle, frontend.DutyCycleStyle(), scheduleAnytimeDelay, nil,
@@ -232,6 +252,7 @@ func NewConnection(
 		gateway:          gateway,
 		gatewayPrimaryFP: fp0,
 		gatewayFPs:       gatewayFPs,
+		antennaGains:     antennaGains,
 		band:             &phy,
 		fps:              fps,
 		scheduler:        scheduler,
@@ -342,11 +363,6 @@ func (c *Connection) HandleUp(up *ttnpb.UplinkMessage, frontendSync *FrontendClo
 	for _, md := range up.RxMetadata {
 		md.ReceivedAt = timestamppb.New(receivedAtGateway)
 
-		if md.AntennaIndex != 0 {
-			// TODO: Support downlink path to multiple antennas (https://github.com/TheThingsNetwork/lorawan-stack/issues/48)
-			md.DownlinkPathConstraint = ttnpb.DownlinkPathConstraint_DOWNLINK_PATH_CONSTRAINT_NEVER
-			continue
-		}
 		buf, err := UplinkToken(
 			&ttnpb.GatewayAntennaIdentifiers{
 				GatewayIds:   c.gateway.GetIds(),
@@ -876,6 +892,12 @@ func (c *Connection) PrimaryFrequencyPlan() *frequencyplans.FrequencyPlan { retu
 // BandID returns the common band ID for the frequency plans in this connection.
 // TODO: Handle mixed bands (https://github.com/TheThingsNetwork/lorawan-stack/issues/1394)
 func (c *Connection) BandID() string { return c.band.ID }
+
+// AntennaGains returns the antenna gains of the gateway, aligned index-for-index with the
+// frequency plans returned by FrequencyPlans(). When the gateway has fewer registered antennas
+// than frequency plans, the first antenna's gain (or 0 when there are no antennas) is used for
+// the remaining entries.
+func (c *Connection) AntennaGains() []float32 { return c.antennaGains }
 
 // SyncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
 // relative gateway time that corresponds to the given timestamp.

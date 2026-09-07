@@ -547,6 +547,66 @@ func TestFlow(t *testing.T) {
 	}
 }
 
+func TestNewConnectionAntennaGains(t *testing.T) {
+	t.Parallel()
+
+	ctx := test.Context()
+	frontend := &mock.Frontend{}
+	addr := &ttnpb.GatewayRemoteAddress{Ip: "127.0.0.1"}
+
+	for _, tc := range []struct {
+		Name          string
+		Antennas      []*ttnpb.GatewayAntenna
+		ExpectedGains []float32
+	}{
+		{
+			Name: "MatchesFrequencyPlans",
+			Antennas: []*ttnpb.GatewayAntenna{
+				{Gain: 3},
+				{Gain: 5},
+			},
+			ExpectedGains: []float32{3, 5},
+		},
+		{
+			Name: "FewerAntennasThanFrequencyPlans",
+			Antennas: []*ttnpb.GatewayAntenna{
+				{Gain: 3},
+			},
+			ExpectedGains: []float32{3, 3},
+		},
+		{
+			Name: "NilAntennaFallsBackToFirst",
+			Antennas: []*ttnpb.GatewayAntenna{
+				{Gain: 3},
+				nil,
+			},
+			ExpectedGains: []float32{3, 3},
+		},
+		{
+			Name:          "NoAntennas",
+			Antennas:      nil,
+			ExpectedGains: []float32{0, 0},
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			gtw := &ttnpb.Gateway{
+				Ids:              &ttnpb.GatewayIdentifiers{GatewayId: "antenna-gain-test"},
+				FrequencyPlanId:  "EU_863_870",
+				FrequencyPlanIds: []string{"EU_863_870", "EU_863_870"},
+				Antennas:         tc.Antennas,
+			}
+			conn, err := io.NewConnection(ctx, frontend, gtw, test.FrequencyPlanStore, true, nil, addr)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			a.So(conn.AntennaGains(), should.Resemble, tc.ExpectedGains)
+		})
+	}
+}
+
 func TestSubBandEIRPOverride(t *testing.T) {
 	a := assertions.New(t)
 	ctx := log.NewContext(test.Context(), test.GetLogger(t))

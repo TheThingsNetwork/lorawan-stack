@@ -141,7 +141,7 @@ func (c LBSSX1301Config) MarshalJSON() ([]byte, error) {
 }
 
 // fromSX1301Conf updates fields from shared.SX1301Config.
-func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antennaGain int) {
+func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antennaGain float32) {
 	c.LoRaStandardChannel = sx1301Conf.LoRaStandardChannel
 	c.FSKChannel = sx1301Conf.FSKChannel
 	c.LBTConfig = sx1301Conf.LBTConfig
@@ -150,7 +150,7 @@ func (c *LBSSX1301Config) fromSX1301Conf(sx1301Conf shared.SX1301Config, antenna
 		c.Radios = append(c.Radios, LBSRFConfig{
 			Enable:      radio.Enable,
 			Frequency:   radio.Frequency,
-			AntennaGain: antennaGain,
+			AntennaGain: int(antennaGain),
 		})
 	}
 
@@ -271,13 +271,14 @@ type RouterFeatures interface {
 // GetRouterConfig returns the routerconfig message to be sent to the gateway.
 // Currently as per the LBS docs, all frequency plans have to be from the same region (band).
 // https://doc.sm.tc/station/tcproto.html#router-config-message.
+// antennaGains is aligned index-for-index with fps, and missing entries default to 0.
 func GetRouterConfig(
 	ctx context.Context,
 	bandID string,
 	fps []*frequencyplans.FrequencyPlan,
 	features RouterFeatures,
 	dlTime time.Time,
-	antennaGain int,
+	antennaGains []float32,
 ) (RouterConfig, error) {
 	for _, fp := range fps {
 		if err := fp.Validate(); err != nil {
@@ -324,13 +325,17 @@ func GetRouterConfig(
 	conf.NoDutyCycle = !production
 	conf.NoDwellTime = !production
 
-	for _, fp := range fps {
+	for i, fp := range fps {
 		if len(fp.Radios) == 0 {
 			continue
 		}
 		sx1301Conf, err := shared.BuildSX1301Config(fp)
 		if err != nil {
 			return RouterConfig{}, err
+		}
+		var antennaGain float32
+		if i < len(antennaGains) {
+			antennaGain = antennaGains[i]
 		}
 		var lbsSX1301Config LBSSX1301Config
 		lbsSX1301Config.fromSX1301Conf(*sx1301Conf, antennaGain)
