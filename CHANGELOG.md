@@ -15,12 +15,14 @@ For details about compatibility between different releases, see the **Commitment
 - `ttgc.managed-gateway-euis` configuration option: Gateway EUI prefixes of managed gateways, defaulting to the EUI prefix of The Things Industries managed gateways. Gateways outside these prefixes are reported as not managed in the claiming info.
 - `ttgc.lbscups.lns-port` configuration option: the LoRa Basics Station LNS port of the Gateway Server, defaulting to `8887`.
 - Downlink scheduling on all antennas of a gateway. Previously, only the first antenna could be used as a downlink path, and uplinks received on any other antenna had their downlink path disabled.
+- `events.redis.store.expire-limiter-size` configuration option: how many entity event streams the `PEXPIRE` rate limiter tracks, at 8 bytes each, defaulting to `4194304` (32 MiB). A negative value refreshes the TTL on every event.
 
 ### Changed
 
 - In the Semtech UDP Packet Forwarder protocol, `PUSH_ACK` and `PULL_ACK` are only sent after the gateway has connected to the Gateway Server and the gateway's `PUSH_DATA` or `PULL_DATA` respectively has been accepted.
 - Don't log a `Task failed` warning in GS for every task attached to a gateway connection when that connection is closed. The tasks that run for the lifetime of a gateway connection now stop without an error when the connection is closed, and the disconnection is logged once, as `Disconnected`, including the reason. This removes several duplicate warnings per gateway disconnection, which were particularly noisy for gateways on unreliable backhaul.
 - Websocket close errors on the LoRa Basics Station frontend (such as `websocket: close 1006 (abnormal closure): unexpected EOF`, which is what a gateway disappearing without a close handshake looks like) are now reported as the defined error `pkg/gatewayserver/io/semtechws:websocket_closed`, with the close code as an attribute and the original error as the cause. As a result, the `gs.gateway.disconnect` event for these disconnections now carries structured error details instead of a plain string; consumers that parse the event data should expect the `ErrorDetails` format.
+- The events Redis store now refreshes each per-entity event stream's TTL at most once per half of the configured `events.redis.store.entity-ttl`, instead of on every published event, to reduce `PEXPIRE` command load (and therefore CPU) on the events Redis. The refresh is rate limited with a fixed-size table allocated at startup, so memory does not grow with the number of entities. Event history retention is unchanged.
 
 ### Deprecated
 
