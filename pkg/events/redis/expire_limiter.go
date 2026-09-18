@@ -22,8 +22,8 @@ import (
 )
 
 const (
-	// Slots the limiter tracks: 8 bytes each, so a flat 32 MiB, holding the ideal
-	// PEXPIRE rate to about a million streams.
+	// Slots when events.redis.store.expire-limiter-size is unset: 8 bytes each, so
+	// a flat 32 MiB, holding the ideal PEXPIRE rate to about a million streams.
 	defaultExpireLimiterSlots = 1 << 22
 	// Slots a key may occupy. Eight of 8 bytes are one cache line, so scanning a
 	// whole set is a single fetch.

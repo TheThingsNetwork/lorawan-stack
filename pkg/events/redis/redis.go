@@ -111,7 +111,11 @@ func NewPubSub(
 		pss.streamPartitionSize = 64
 	}
 
-	pss.expireLimiter = newExpireLimiter(defaultExpireLimiterSlots, pss.entityHistoryTTL/2, time.Now())
+	expireLimiterSize := conf.Store.ExpireLimiterSize
+	if expireLimiterSize == 0 {
+		expireLimiterSize = defaultExpireLimiterSlots
+	}
+	pss.expireLimiter = newExpireLimiter(expireLimiterSize, pss.entityHistoryTTL/2, time.Now())
 
 	pss.publisher = events.PublishFunc(pss.publish)
 	if batchConf.Enable {

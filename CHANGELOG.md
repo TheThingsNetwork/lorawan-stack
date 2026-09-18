@@ -15,6 +15,7 @@ For details about compatibility between different releases, see the **Commitment
 - `ttgc.managed-gateway-euis` configuration option: Gateway EUI prefixes of managed gateways, defaulting to the EUI prefix of The Things Industries managed gateways. Gateways outside these prefixes are reported as not managed in the claiming info.
 - `ttgc.lbscups.lns-port` configuration option: the LoRa Basics Station LNS port of the Gateway Server, defaulting to `8887`.
 - Downlink scheduling on all antennas of a gateway. Previously, only the first antenna could be used as a downlink path, and uplinks received on any other antenna had their downlink path disabled.
+- `events.redis.store.expire-limiter-size` configuration option: how many entity event streams the `PEXPIRE` rate limiter tracks, at 8 bytes each, defaulting to `4194304` (32 MiB). A negative value refreshes the TTL on every event.
 
 ### Changed
 

@@ -138,8 +138,9 @@ type RedisEvents struct {
 		TTL                 time.Duration `name:"ttl" description:"How long event payloads are retained"`
 		EntityCount         int           `name:"entity-count" description:"How many events are indexed for a entity ID"`
 		EntityTTL           time.Duration `name:"entity-ttl" description:"How long events are indexed for a entity ID"`
-		CorrelationIDCount  int           `name:"correlation-id-count" description:"How many events are indexed for a correlation ID"`     //nolint:lll
-		StreamPartitionSize int           `name:"stream-partition-size" description:"How many streams to listen to in a single partition"` //nolint:lll
+		CorrelationIDCount  int           `name:"correlation-id-count" description:"How many events are indexed for a correlation ID"`                                                                                 //nolint:lll
+		StreamPartitionSize int           `name:"stream-partition-size" description:"How many streams to listen to in a single partition"`                                                                             //nolint:lll
+		ExpireLimiterSize   int           `name:"expire-limiter-size" description:"How many entity event streams the PEXPIRE rate limiter tracks, at 8 bytes each; a negative value refreshes the TTL on every event"` //nolint:lll
 	} `name:"store"`
 	Workers int `name:"workers"`
 	Publish struct {
