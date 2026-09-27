@@ -51,6 +51,10 @@ type PubSubStore struct {
 	entityHistoryTTL          time.Duration
 	correlationIDHistoryCount int
 	streamPartitionSize       int
+
+	// expireLimiter keeps PEXPIRE on entity event streams down to one command per
+	// stream per entityHistoryTTL/2.
+	expireLimiter *expireLimiter
 }
 
 func (ps *PubSubStore) eventDataKey(_ context.Context, uid string) string {
@@ -532,7 +536,11 @@ func (ps *PubSubStore) publish(evs ...events.Event) {
 	}
 
 	entityHistoryTTL := random.Jitter(ps.entityHistoryTTL, ttlJitter)
+	now := time.Now()
 	for eventStream := range eventStreams {
+		if !ps.expireLimiter.allow(eventStream, now) {
+			continue
+		}
 		tx.PExpire(ps.ctx, eventStream, entityHistoryTTL)
 	}
 
