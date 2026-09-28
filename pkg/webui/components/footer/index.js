@@ -153,10 +153,7 @@ const Footer = ({
         <div>
           © {year}{' '}
           <span className={style.copyrightLinks}>
-            <a
-              className={style.link}
-              href="https://www.thethingsindustries.com"
->
+            <a className={style.link} href="https://www.thethingsindustries.com">
               The Things Industries
             </a>
           </span>
