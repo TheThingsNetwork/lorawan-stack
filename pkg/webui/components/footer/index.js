@@ -49,11 +49,16 @@ const FooterSection = ({ className, action, link, children, primary, safe }) => 
   let content
   if (Boolean(link)) {
     content = safe ? (
-      <a className={style.footerSectionButton} href={link} target="_blank">
+      <a
+        className={style.footerSectionButton}
+        href={link}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
         {children}
       </a>
     ) : (
-      <Button.AnchorLink className={style.footerSectionButton} href={link} unstyled target="blank">
+      <Button.AnchorLink className={style.footerSectionButton} href={link} unstyled target="_blank">
         {children}
       </Button.AnchorLink>
     )
@@ -148,7 +153,11 @@ const Footer = ({
         <div>
           © {year}{' '}
           <span className={style.copyrightLinks}>
-            <a className={style.link} href="https://www.thethingsindustries.com">
+            <a
+              className={style.link}
+              href="https://www.thethingsindustries.com"
+              rel="noopener noreferrer"
+            >
               The Things Industries
             </a>
           </span>
