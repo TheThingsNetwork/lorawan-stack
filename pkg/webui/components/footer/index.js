@@ -156,8 +156,7 @@ const Footer = ({
             <a
               className={style.link}
               href="https://www.thethingsindustries.com"
-              rel="noopener noreferrer"
-            >
+>
               The Things Industries
             </a>
           </span>
