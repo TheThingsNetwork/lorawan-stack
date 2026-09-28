@@ -11,6 +11,20 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [3.37.0] - unreleased
+
+### Added
+
 - `gs_gateways_disconnected_total` metric, counting gateway disconnections by protocol and by the error the connection was disconnected with. This makes disconnection reasons (such as gateways disappearing without a close handshake, or missing too many pongs) observable as a rate, instead of only through logs.
 - `ttgc.managed-gateway-euis` configuration option: Gateway EUI prefixes of managed gateways, defaulting to the EUI prefix of The Things Industries managed gateways. Gateways outside these prefixes are reported as not managed in the claiming info.
 - `ttgc.lbscups.lns-port` configuration option: the LoRa Basics Station LNS port of the Gateway Server, defaulting to `8887`.
@@ -24,16 +38,10 @@ For details about compatibility between different releases, see the **Commitment
 - Websocket close errors on the LoRa Basics Station frontend (such as `websocket: close 1006 (abnormal closure): unexpected EOF`, which is what a gateway disappearing without a close handshake looks like) are now reported as the defined error `pkg/gatewayserver/io/semtechws:websocket_closed`, with the close code as an attribute and the original error as the cause. As a result, the `gs.gateway.disconnect` event for these disconnections now carries structured error details instead of a plain string; consumers that parse the event data should expect the `ErrorDetails` format.
 - The events Redis store now refreshes each per-entity event stream's TTL at most once per half of the configured `events.redis.store.entity-ttl`, instead of on every published event, to reduce `PEXPIRE` command load (and therefore CPU) on the events Redis. The refresh is rate limited with a fixed-size table allocated at startup, so memory does not grow with the number of entities. Event history retention is unchanged.
 
-### Deprecated
-
-### Removed
-
 ### Fixed
 
 - Parsing of the `rctx` field in the `upinfo` object of upstream messages received via the LoRa Basics Station LNS protocol. The field name was misspelled as `rtcx`, so the radio context reported by gateways was ignored. The antenna index in the uplink metadata now reflects the reported radio context and is echoed back in class A downlinks, instead of always being 0.
 - The antenna gain sent to LoRa Basics Station gateways in the router configuration. Each board's radio configuration now uses the gain of its own antenna instead of applying the first antenna's gain to all boards, and fractional gains are no longer truncated.
-
-### Security
 
 ## [3.36.2] - 2026-08-17
 
@@ -3099,7 +3107,8 @@ For details about compatibility between different releases, see the **Commitment
 NOTE: These links should respect backports. See https://github.com/TheThingsNetwork/lorawan-stack/pull/1444/files#r333379706.
 -->
 
-[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.2...v3.36
+[unreleased]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.37.0...v3.37
+[3.37.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.2...v3.37.0
 [3.36.2]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.1...v3.36.2
 [3.36.1]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.36.0...v3.36.1
 [3.36.0]: https://github.com/TheThingsNetwork/lorawan-stack/compare/v3.35.2...v3.36.0
