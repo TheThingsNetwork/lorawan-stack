@@ -25,7 +25,7 @@ import Checkbox from '@ttn-lw/components/checkbox'
 import UnitInput from '@ttn-lw/components/unit-input'
 import Select from '@ttn-lw/components/select'
 import KeyValueMap from '@ttn-lw/components/key-value-map'
-import Icon, { IconPlus, IconTrash } from '@ttn-lw/components/icon'
+import Icon, { IconInfoCircle, IconPlus, IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 import SubmitBar from '@ttn-lw/components/submit-bar'
 import SubmitButton from '@ttn-lw/components/submit-button'
@@ -469,7 +469,7 @@ const MACSettingsProfileInnerForm = ({ edit }) => {
               </Form.FieldContainer>
               {!defaultNbTransDisabled && (
                 <div>
-                  <Icon icon="info" nudgeUp className="mr-cs-xxs" />
+                  <Icon icon={IconInfoCircle} nudgeUp className="mr-cs-xxs" />
                   <Message content={sharedMessages.defaultNbTransMessage} />
                 </div>
               )}
