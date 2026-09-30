@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Allow selecting the same frequency plan multiple times for a gateway in the Console.
+
 ### Security
 
 ## [3.37.0] - unreleased

@@ -94,21 +94,25 @@ const Entry = ({
   )
 
   const handleOptionComposition = useCallback(() => {
-    let newOptions
-    if (currentValue) {
-      newOptions = options.filter(v => !fieldValue.includes(v.value) || v.value === currentValue)
-    } else {
-      newOptions = options.filter(v => !fieldValue.includes(v.value))
+    let newOptions = options
+    if (distinctOptions) {
+      if (currentValue) {
+        newOptions = options.filter(v => !fieldValue.includes(v.value) || v.value === currentValue)
+      } else {
+        newOptions = options.filter(v => !fieldValue.includes(v.value))
+      }
     }
 
     let taggedOptions = newOptions
     if (fieldValue.length >= 2 && filterByTag) {
       const selectedOption = options.find(v => v.value === fieldValue[0])
-      taggedOptions = newOptions.filter(v => selectedOption.tag === v.tag)
+      if (selectedOption) {
+        taggedOptions = newOptions.filter(v => selectedOption.tag === v.tag)
+      }
     }
 
     setNewOptions(taggedOptions)
-  }, [currentValue, options, fieldValue, filterByTag])
+  }, [currentValue, options, fieldValue, filterByTag, distinctOptions])
 
   const showRemoveButton = atLeastOneEntry ? index !== 0 : true
 
@@ -137,7 +141,7 @@ const Entry = ({
         type="text"
         onChange={handleValueChanged}
         onBlur={handleBlur}
-        onFocus={distinctOptions && options ? handleOptionComposition : undefined}
+        onFocus={(distinctOptions || filterByTag) && options ? handleOptionComposition : undefined}
         value={indexAsKey ? value : value.value}
         readOnly={readOnly}
         code
