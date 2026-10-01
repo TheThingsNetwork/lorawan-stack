@@ -19,8 +19,6 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Allow selecting the same frequency plan multiple times for a gateway in the Console.
-
 ### Security
 
 ## [3.37.0] - unreleased
@@ -50,6 +48,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Applying the MAC settings profile values to the device's MAC state during the join procedure (OTAA) or factory reset (ABP).
+- Allow selecting the same frequency plan multiple times for a gateway in the Console.
 
 ## [3.36.1] - 2026-06-24
 
