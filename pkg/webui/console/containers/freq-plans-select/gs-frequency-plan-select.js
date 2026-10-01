@@ -67,7 +67,6 @@ const GatewayFrequencyPlansSelect = () => {
       addMessage={m.addFrequencyPlan}
       onChange={onFrequencyPlanChange}
       additionalInputProps={{ options: freqPlanOptions }}
-      distinctOptions
       atLeastOneEntry
       filterByTag
       required
