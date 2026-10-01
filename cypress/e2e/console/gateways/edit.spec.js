@@ -18,6 +18,7 @@ describe('Gateway general settings', () => {
   let user
   let gateway
   let gateway2
+  let gateway3
   const collabUserId = 'test-collab-user'
   const collabUser = {
     ids: { user_id: collabUserId },
@@ -59,8 +60,18 @@ describe('Gateway general settings', () => {
       },
       frequency_plan_ids: ['EU_863_870', 'US_902_928_FSB_1'],
     }
+    gateway3 = {
+      ids: { gateway_id: 'test-gateway-duplicate-plans', eui: '0000000000000002' },
+      name: 'Test Gateway Duplicate Frequency Plans',
+      description: 'Gateway for testing the same frequency plan multiple times',
+      schedule_anytime_delay: '523ms',
+      enforce_duty_cycle: true,
+      gateway_server_address: 'localhost',
+      frequency_plan_ids: ['EU_863_870'],
+    }
     cy.createGateway(gateway, user.ids.user_id)
     cy.createGateway(gateway2, user.ids.user_id)
+    cy.createGateway(gateway3, user.ids.user_id)
   })
 
   it('displays newly created gateway values', () => {
@@ -316,6 +327,38 @@ describe('Gateway general settings', () => {
         cy.findByRole('button', { name: 'Expand' }).click()
         cy.findByText('Frequency plan')
         cy.findByText(newFrequencyPlan)
+      })
+  })
+
+  it('succeeds adding the same frequency plan multiple times', () => {
+    const frequencyPlan = 'Europe 863-870 MHz (SF12 for RX2)'
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway3.ids.gateway_id}/general-settings`,
+    )
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByRole('button', { name: 'Add frequency plan' }).click()
+        cy.findByText('Frequency plan')
+          .parents('div[data-test-id="form-field"]')
+          .find('input:not([type="hidden"])')
+          .eq(1)
+          .selectOption(frequencyPlan)
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification-success').findByText('Gateway updated').should('be.visible')
+    cy.reload()
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findAllByText(frequencyPlan).should('have.length', 2)
       })
   })
 
