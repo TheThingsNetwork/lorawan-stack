@@ -18,7 +18,7 @@ import '@testing-library/cypress/add-commands'
 import { configure } from '@testing-library/cypress'
 import './commands'
 
-const failedSpecsFilename = `./.cache/.failed-specs-${Cypress.env('MACHINE_NUMBER') || '0'}.txt`
+const failedSpecsFilename = `./.cache/.failed-specs-${Cypress.expose('MACHINE_NUMBER') || '0'}.txt`
 
 configure({ testIdAttribute: 'data-test-id' })
 Cypress.ElementSelector.defaults({
@@ -27,7 +27,7 @@ Cypress.ElementSelector.defaults({
 
 afterEach(function () {
   // Enable fail-early, if set.:
-  if (this.currentTest.state === 'failed' && Cypress.env('FAIL_FAST')) {
+  if (this.currentTest.state === 'failed' && Cypress.expose('FAIL_FAST')) {
     cy.log('Skipping rest of run due to test failure (fail fast)')
     const file = this.currentTest?.invocationDetails?.relativeFile
     // Sometimes `invocationDetails` is not set, see:
@@ -54,7 +54,7 @@ afterEach(function () {
 // Skip remaining runs if fail early is set.
 const skipIfNecessary = function () {
   cy.task('fileExists', failedSpecsFilename).then(content => {
-    if (content !== '' && content !== false && Cypress.env('FAIL_FAST')) {
+    if (content !== '' && content !== false && Cypress.expose('FAIL_FAST')) {
       this.currentTest.pending = true
       Cypress.runner.stop()
     }
