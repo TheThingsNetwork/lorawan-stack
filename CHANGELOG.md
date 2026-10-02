@@ -19,6 +19,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
+- Fix storybook errors.
+
 ### Security
 
 ## [3.37.0] - unreleased
