@@ -36,6 +36,10 @@ module.exports = defineConfig({
       camera: 'allow',
     },
   },
+  expose: {
+    FAIL_FAST: process.env.CYPRESS_FAIL_FAST === 'true',
+    MACHINE_NUMBER: process.env.CYPRESS_MACHINE_NUMBER || '0',
+  },
   e2e: {
     setupNodeEvents: (on, config) => {
       const configWithPermissions = cypressBrowserPermissionsPlugin(on, config)
