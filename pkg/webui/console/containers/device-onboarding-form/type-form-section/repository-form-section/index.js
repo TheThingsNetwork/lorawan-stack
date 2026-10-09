@@ -33,7 +33,10 @@ import { hasSelectedDeviceRepositoryOther } from '@console/lib/device-utils'
 
 import { getTemplate } from '@console/store/actions/device-repository'
 
-import { selectDeviceTemplate } from '@console/store/selectors/device-repository'
+import {
+  selectDeviceModelById,
+  selectDeviceTemplate,
+} from '@console/store/selectors/device-repository'
 import { selectSelectedApplicationId } from '@console/store/selectors/applications'
 
 import { initialValues as provisioningInitialValues } from '../../provisioning-form-section'
@@ -57,13 +60,14 @@ const DeviceTypeRepositoryFormSection = () => {
   const firmwareVersion = version_ids?.firmware_version
   const band = version_ids?.band_id
   const template = useSelector(selectDeviceTemplate)
+  const hasModel = useSelector(state => Boolean(selectDeviceModelById(state, brand, model)))
   const supportLink = useSelector(selectSupportLinkConfig)
 
   const hasSelectedOther = hasSelectedDeviceRepositoryOther(version)
   const hasCompleted = hasCompletedDeviceRepositorySelection(version)
   const hasValidType = hasValidDeviceRepositoryType(version, template)
   const showProgressHint = !hasSelectedOther && !hasCompleted
-  const showDeviceCard = hasValidType
+  const showDeviceCard = hasValidType && hasModel
   const showFrequencyPlanSelector = hasValidType
   const showOtherHint = hasSelectedOther
 

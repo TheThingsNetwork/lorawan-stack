@@ -100,6 +100,17 @@ class DeviceRepository {
     return Marshaler.payloadSingleResponse(result)
   }
 
+  async getTemplateByProfileIds(vendorId, vendorProfileId) {
+    const result = await this._api.GetTemplate({
+      routeParams: {
+        'end_device_profile_ids.vendor_id': vendorId,
+        'end_device_profile_ids.vendor_profile_id': vendorProfileId,
+      },
+    })
+
+    return Marshaler.payloadSingleResponse(result)
+  }
+
   // Formatters retrieval.
 
   async getUplinkDecoder(appId, version) {
