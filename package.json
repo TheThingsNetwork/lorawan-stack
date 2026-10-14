@@ -138,7 +138,7 @@
     "reselect": "^5.3.0",
     "scroll-into-view-if-needed": "^3.1.0",
     "ttn-lw": "file:sdk/js",
-    "unicode-properties": "^1.4.1",
+    "unicode-properties": "^2.0.1",
     "url-template": "^3.1.1",
     "yup": "^1.7.1"
   },
