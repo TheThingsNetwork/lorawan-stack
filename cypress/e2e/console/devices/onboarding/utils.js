@@ -44,7 +44,13 @@ export const interceptDeviceRepo = appId => {
   })
 }
 
-export const composeQRGeneratorParseResponse = ({ joinEui, devEui, cac, vendorId }) => ({
+export const composeQRGeneratorParseResponse = ({
+  joinEui,
+  devEui,
+  cac,
+  vendorId,
+  vendorProfileId,
+}) => ({
   format_id: 'tr005',
   end_device_template: {
     end_device: {
@@ -52,6 +58,7 @@ export const composeQRGeneratorParseResponse = ({ joinEui, devEui, cac, vendorId
       claim_authentication_code: { value: cac },
       lora_alliance_profile_ids: {
         vendor_id: vendorId,
+        ...(vendorProfileId ? { vendor_profile_id: vendorProfileId } : {}),
       },
     },
     field_mask: { paths: ['ids', 'claim_authentication_code'] },

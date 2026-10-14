@@ -97,6 +97,17 @@ const getTemplateLogic = createRequestLogic({
   },
 })
 
+const getTemplateByProfileIdsLogic = createRequestLogic({
+  type: repository.GET_TEMPLATE_BY_PROFILE_IDS,
+  process: ({ action }) => {
+    const {
+      payload: { vendorId, vendorProfileId },
+    } = action
+
+    return tts.Applications.Devices.Repository.getTemplateByProfileIds(vendorId, vendorProfileId)
+  },
+})
+
 const getRepositoryPayloadFormattersLogic = createRequestLogic({
   type: repository.GET_REPO_PF,
   process: async ({ action }) => {
@@ -130,5 +141,6 @@ export default [
   listDeviceModelsLogic,
   getDeviceModelLogic,
   getTemplateLogic,
+  getTemplateByProfileIdsLogic,
   getRepositoryPayloadFormattersLogic,
 ]
