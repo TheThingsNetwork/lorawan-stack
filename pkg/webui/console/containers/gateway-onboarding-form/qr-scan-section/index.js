@@ -132,7 +132,7 @@ const GatewayQRScanSection = () => {
         {qrData.approved ? (
           <ModalButton
             type="button"
-            icon="close"
+            icon={IconX}
             onApprove={handleReset}
             message={sharedMessages.qrCodeDataReset}
             modalData={{
