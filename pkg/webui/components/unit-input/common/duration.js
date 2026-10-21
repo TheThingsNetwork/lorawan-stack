@@ -39,7 +39,7 @@ const decoder = (rawValue = '') => {
     return { value: '', unit: null }
   }
   const value = rawValue.split(unitRegexp)[0]
-  const unit = rawValue.split(value)[1] || null
+  const unit = rawValue.slice(value.length) || null
   return {
     value: value ? Number(value) : undefined,
     unit,
