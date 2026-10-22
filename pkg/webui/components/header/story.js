@@ -19,7 +19,7 @@ import TtsLogo from '@assets/static/tts-logo.svg'
 import {
   IconUser,
   IconLogout,
-  IconAdminShield,
+  IconAdminPanel,
   IconCreditCard,
   IconChartBar,
   IconBook,
@@ -31,7 +31,6 @@ import {
 } from '@ttn-lw/components/icon'
 import Dropdown from '@ttn-lw/components/dropdown'
 import ExampleLogo from '@ttn-lw/components/logo/story-logo-new.svg'
-import Breadcrumb from '@ttn-lw/components/breadcrumbs/breadcrumb'
 
 import Header from '.'
 
@@ -59,7 +58,7 @@ const plusDropdownItems = (
   </>
 )
 
-const starDropdownItems = (
+const bookmarkDropdownItems = (
   <>
     <Dropdown.Item title="Parking Lot Occupancy" icon={IconApplication} path="/parking1" />
     <Dropdown.Item title="Parking Lot Occupancy" icon={IconApplication} path="/parking2" />
@@ -79,7 +78,7 @@ const profileDropdownItems = (
       path="/manage-cloud-subs"
     />
     <Dropdown.Item title="Network Operations Center" icon={IconChartBar} path="/network_ops" />
-    <Dropdown.Item title="Admin panel" icon={IconAdminShield} path="/admin-panel" />
+    <Dropdown.Item title="Admin panel" icon={IconAdminPanel} path="/admin-panel" />
     <hr />
     <Dropdown.Item title="Upgrade" icon={IconRocket} path="/upgrade" />
     <Dropdown.Item title="Get support" icon={IconSupport} path="/support" />
@@ -89,24 +88,21 @@ const profileDropdownItems = (
   </>
 )
 
-export const Default = () => {
-  const breadcrumbs = [
-    <Breadcrumb key="1" path="/applications" content="Applications" />,
-    <Breadcrumb key="2" path="/applications/test-app" content="test-app" />,
-    <Breadcrumb key="3" path="/applications/test-app/devices" content="Devices" />,
-  ]
+// eslint-disable-next-line react/prop-types
+const Logo = ({ className }) => <img src={TtsLogo} alt="Logo" className={className} />
 
-  return (
-    <div style={{ height: '25rem' }}>
-      <Header
-        user={user}
-        breadcrumbs={breadcrumbs}
-        profileDropdownItems={profileDropdownItems}
-        addDropdownItems={plusDropdownItems}
-        starDropdownItems={starDropdownItems}
-        brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
-        logo={{ src: TtsLogo, alt: 'Logo' }}
-      />
-    </div>
-  )
-}
+export const Default = () => (
+  <div style={{ height: '25rem' }}>
+    <Header
+      user={user}
+      profileDropdownItems={profileDropdownItems}
+      addDropdownItems={plusDropdownItems}
+      bookmarkDropdownItems={bookmarkDropdownItems}
+      brandLogo={{ src: ExampleLogo, alt: 'Secondary Logo' }}
+      Logo={Logo}
+      isSidebarMinimized={false}
+      toggleSidebarMinimized={() => null}
+      expandSidebar={() => null}
+    />
+  </div>
+)
