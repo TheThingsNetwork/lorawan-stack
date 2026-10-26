@@ -96,6 +96,13 @@ func (ems Emissions) Insert(em Emission) Emissions {
 	return append(ems, em)
 }
 
+// Shift moves all emissions by the given delta. The order of the emissions is preserved.
+func (ems Emissions) Shift(delta ConcentratorTime) {
+	for i := range ems {
+		ems[i].t += delta
+	}
+}
+
 // GreaterThan returns a new list of emissions that have not ended relative to the provided time.
 func (ems Emissions) GreaterThan(to ConcentratorTime) Emissions {
 	expired := 0

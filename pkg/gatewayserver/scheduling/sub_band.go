@@ -103,6 +103,13 @@ func (sb *SubBand) gc(to ConcentratorTime) {
 	sb.emissions = sb.emissions.GreaterThan(to)
 }
 
+// shift moves the emissions by the given delta.
+func (sb *SubBand) shift(delta ConcentratorTime) {
+	sb.mu.Lock()
+	defer sb.mu.Unlock()
+	sb.emissions.Shift(delta)
+}
+
 // Comprises returns whether the given frequency falls in the sub-band.
 func (sb SubBandParameters) Comprises(frequency uint64) bool {
 	return frequency >= sb.MinFrequency && frequency <= sb.MaxFrequency

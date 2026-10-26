@@ -52,6 +52,10 @@ var (
 	// ScheduleLateRTTPercentile is the percentile of round-trip times that is considered for determining whether
 	// scheduling is too late.
 	scheduleLateRTTPercentile = 90
+
+	// ClockJumpTolerance is the duration by which a synchronized concentrator time may lag behind the concentrator
+	// time expected from the server time, before the concentrator time is considered to have jumped backwards.
+	clockJumpTolerance = time.Minute
 )
 
 // TimeSource is a source for getting a current time.
@@ -126,6 +130,7 @@ func NewScheduler(
 		fps:                  fps,
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
+		logger:               logger,
 	}
 	if enforceDutyCycle {
 		for _, fp := range fps {
@@ -201,6 +206,7 @@ type Scheduler struct {
 	mu                   sync.RWMutex
 	emissions            Emissions
 	scheduleAnytimeDelay time.Duration
+	logger               log.Interface
 }
 
 var errSubBandNotFound = errors.DefineFailedPrecondition(
@@ -274,7 +280,7 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool { //nolin
 	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*ttnpb.StdTime(token.ServerTime)) {
 		return false
 	}
-	s.clock.SyncWithGatewayConcentrator(
+	s.syncWithGatewayConcentrator(
 		token.Timestamp,
 		*ttnpb.StdTime(token.ServerTime),
 		ttnpb.StdTime(token.GatewayTime),
@@ -492,6 +498,32 @@ func (s *Scheduler) SyncWithGatewayConcentrator(
 ) ConcentratorTime {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.syncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
+}
+
+// syncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
+// relative gateway time that corresponds to the given timestamp.
+// If the concentrator time jumped backwards, for example because the gateway does not account for concentrator
+// timestamp roll over or because the concentrator time base changed, the emissions are shifted to the new time base.
+// This keeps the emissions at their position relative to the server time, so that they do not appear to be in the
+// future, while they keep counting towards the duty-cycle.
+// This method assumes that the mutex is held.
+func (s *Scheduler) syncWithGatewayConcentrator(
+	timestamp uint32, server time.Time, gateway *time.Time, concentrator ConcentratorTime,
+) ConcentratorTime {
+	if expected, ok := s.clock.FromServerTime(server); ok {
+		if delta := concentrator - expected; delta < -ConcentratorTime(clockJumpTolerance) {
+			s.logger.WithFields(log.Fields(
+				"expected_concentrator_time", expected,
+				"concentrator_time", concentrator,
+				"delta", time.Duration(delta),
+			)).Warn("Concentrator time jumped backwards, shift emissions to new time base")
+			s.emissions.Shift(delta)
+			for _, sb := range s.subBands {
+				sb.shift(delta)
+			}
+		}
+	}
 	return s.clock.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 
