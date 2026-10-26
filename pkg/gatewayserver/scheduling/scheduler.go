@@ -96,6 +96,7 @@ func NewScheduler(
 	dutyCycleStyle DutyCycleStyle,
 	scheduleAnytimeDelay *time.Duration,
 	timeSource TimeSource,
+	opts ...Option,
 ) (*Scheduler, error) {
 	logger := log.FromContext(ctx)
 	if timeSource == nil {
@@ -131,6 +132,9 @@ func NewScheduler(
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
 		logger:               logger,
+	}
+	for _, opt := range opts {
+		opt(s)
 	}
 	if enforceDutyCycle {
 		for _, fp := range fps {
@@ -207,6 +211,20 @@ type Scheduler struct {
 	emissions            Emissions
 	scheduleAnytimeDelay time.Duration
 	logger               log.Interface
+
+	ignoreUplinkTokensBefore time.Time
+}
+
+// Option is a Scheduler option.
+type Option func(*Scheduler)
+
+// WithIgnorePriorUplinkTokens configures the Scheduler to ignore uplink tokens of uplink messages that were received
+// before the Scheduler was created. Such uplink tokens originate from a previous gateway connection.
+// This option should be used for gateways of which the concentrator time base may change between connections.
+func WithIgnorePriorUplinkTokens() Option {
+	return func(s *Scheduler) {
+		s.ignoreUplinkTokensBefore = s.timeSource.Now()
+	}
 }
 
 var errSubBandNotFound = errors.DefineFailedPrecondition(
@@ -277,12 +295,16 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool { //nolin
 	if token.GetServerTime() == nil || token.GetConcentratorTime() == 0 {
 		return false
 	}
-	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*ttnpb.StdTime(token.ServerTime)) {
+	serverTime := *ttnpb.StdTime(token.ServerTime)
+	if serverTime.Before(s.ignoreUplinkTokensBefore) {
+		return false
+	}
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(serverTime) {
 		return false
 	}
 	s.syncWithGatewayConcentrator(
 		token.Timestamp,
-		*ttnpb.StdTime(token.ServerTime),
+		serverTime,
 		ttnpb.StdTime(token.GatewayTime),
 		ConcentratorTime(token.ConcentratorTime),
 	)

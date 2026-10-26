@@ -153,7 +153,8 @@ var (
 )
 
 type connectionOptions struct {
-	streamActive func(MessageStream) bool
+	streamActive     func(MessageStream) bool
+	schedulerOptions []scheduling.Option
 }
 
 // ConnectionOption is a Connection option.
@@ -164,6 +165,15 @@ type ConnectionOption func(*connectionOptions)
 func WithStreamActive(f func(MessageStream) bool) ConnectionOption {
 	return ConnectionOption(func(opts *connectionOptions) {
 		opts.streamActive = f
+	})
+}
+
+// WithIgnorePriorUplinkTokens configures the connection to ignore uplink tokens of uplink messages that were received
+// before the connection was established, when synchronizing the gateway clock.
+// This option should be used by frontends of which the concentrator time base may change between connections.
+func WithIgnorePriorUplinkTokens() ConnectionOption {
+	return ConnectionOption(func(opts *connectionOptions) {
+		opts.schedulerOptions = append(opts.schedulerOptions, scheduling.WithIgnorePriorUplinkTokens())
 	})
 }
 
@@ -239,6 +249,7 @@ func NewConnection(
 	ctx, cancelCtx := errorcontext.New(ctx)
 	scheduler, err := scheduling.NewScheduler(
 		ctx, gatewayFPs, enforceDutyCycle, frontend.DutyCycleStyle(), scheduleAnytimeDelay, nil,
+		connectionOptions.schedulerOptions...,
 	)
 	if err != nil {
 		return nil, err

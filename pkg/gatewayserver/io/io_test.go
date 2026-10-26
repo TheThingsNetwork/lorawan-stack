@@ -28,6 +28,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/errors"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/mock"
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	mockis "go.thethings.network/lorawan-stack/v3/pkg/identityserver/mock"
 	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
@@ -603,6 +604,83 @@ func TestNewConnectionAntennaGains(t *testing.T) {
 				t.FailNow()
 			}
 			a.So(conn.AntennaGains(), should.Resemble, tc.ExpectedGains)
+		})
+	}
+}
+
+func TestIgnorePriorUplinkTokens(t *testing.T) {
+	t.Parallel()
+
+	frontend := &mock.Frontend{}
+	addr := &ttnpb.GatewayRemoteAddress{Ip: "127.0.0.1"}
+	ids := &ttnpb.GatewayIdentifiers{GatewayId: "prior-uplink-token-test"}
+
+	for _, tc := range []struct {
+		Name      string
+		Options   []io.ConnectionOption
+		ExpectErr bool
+	}{
+		{
+			Name: "Default",
+		},
+		{
+			Name:      "IgnorePriorUplinkTokens",
+			Options:   []io.ConnectionOption{io.WithIgnorePriorUplinkTokens()},
+			ExpectErr: true,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a := assertions.New(t)
+			ctx := t.Context()
+			// The uplink message was received before the connection was established.
+			receivedAt := time.Now().Add(-time.Second)
+			conn, err := io.NewConnection(ctx, frontend, &ttnpb.Gateway{
+				Ids:             ids,
+				FrequencyPlanId: "EU_863_870",
+			}, test.FrequencyPlanStore, true, nil, addr, tc.Options...)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			// The connection has no clock synchronization other than the uplink token.
+			_, _, _, err = conn.ScheduleDown(&ttnpb.DownlinkPath{
+				Path: &ttnpb.DownlinkPath_UplinkToken{
+					UplinkToken: io.MustUplinkToken(
+						&ttnpb.GatewayAntennaIdentifiers{GatewayIds: ids},
+						1000000,
+						scheduling.ConcentratorTime(time.Second),
+						receivedAt,
+						nil,
+					),
+				},
+			}, &ttnpb.DownlinkMessage{
+				RawPayload: []byte{0x01},
+				Settings: &ttnpb.DownlinkMessage_Request{
+					Request: &ttnpb.TxRequest{
+						Class:    ttnpb.Class_CLASS_A,
+						Priority: ttnpb.TxSchedulePriority_HIGHEST,
+						Rx1Delay: ttnpb.RxDelay_RX_DELAY_5,
+						Rx1DataRate: &ttnpb.DataRate{
+							Modulation: &ttnpb.DataRate_Lora{
+								Lora: &ttnpb.LoRaDataRate{
+									SpreadingFactor: 7,
+									Bandwidth:       125000,
+									CodingRate:      band.Cr4_5,
+								},
+							},
+						},
+						Rx1Frequency:    868100000,
+						FrequencyPlanId: "EU_863_870",
+					},
+				},
+			})
+			if tc.ExpectErr {
+				a.So(err, should.NotBeNil)
+			} else {
+				a.So(err, should.BeNil)
+			}
 		})
 	}
 }

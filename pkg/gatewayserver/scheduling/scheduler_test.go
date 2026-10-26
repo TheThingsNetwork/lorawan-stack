@@ -1491,6 +1491,42 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		})
 		a.So(err, should.BeNil)
 	}
+
+	// No clock sync, uplink token from before the scheduler was created is ignored.
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Unix(11, 0),
+		}
+		scheduler, err := scheduling.NewScheduler(
+			ctx, fps, true, scheduling.DefaultDutyCycleStyle, nil, timeSource,
+			scheduling.WithIgnorePriorUplinkTokens(),
+		)
+		a.So(err, should.BeNil)
+		t := time.Unix(10, 0)
+		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+			PayloadSize: 10,
+			TxSettings: &ttnpb.TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+				Frequency: 869525000,
+				Timestamp: 7000000,
+			},
+			UplinkToken: &ttnpb.UplinkToken{
+				ServerTime:       timestamppb.New(t),
+				Timestamp:        5000000,
+				ConcentratorTime: 5000000000,
+			},
+			Priority: ttnpb.TxSchedulePriority_NORMAL,
+		})
+		a.So(errors.IsUnavailable(err), should.BeTrue)
+	}
 }
 
 func TestScheduleConcentratorTimeJump(t *testing.T) {
