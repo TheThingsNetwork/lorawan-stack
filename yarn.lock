@@ -919,10 +919,10 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
 
-"@babel/plugin-transform-spread@^7.29.7", "@babel/plugin-transform-spread@^7.29.8":
-  version "7.29.8"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-spread/-/plugin-transform-spread-7.29.8.tgz#c894cff38556a5dafeb412e13fc012b6df4b95a2"
-  integrity sha512-4S9ksMGVWUshvgK0mKfvZky7leuG5/uoFVwMpAomJ8bMoDJiNHRVmc1EglwW/CmGVSqqWpEbXm9FmbRit22qoA==
+"@babel/plugin-transform-spread@^7.29.11", "@babel/plugin-transform-spread@^7.29.7":
+  version "7.29.11"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-spread/-/plugin-transform-spread-7.29.11.tgz#72b8330d0382dee9d367cc54b10be531e7f0dff9"
+  integrity sha512-5xWGhfuMgbOfIjsk/I2c4uMnoqRwQdKYi4QjvybQrcEVE0G9/p3qmIkp2Sxe8YF8DGNNVs5whfwNqIM5684XoQ==
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
     "@babel/helper-skip-transparent-expression-wrappers" "^7.29.7"
