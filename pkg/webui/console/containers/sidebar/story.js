@@ -18,7 +18,7 @@ import classnames from 'classnames'
 import TtsLogo from '@assets/static/tts-logo.svg'
 
 import {
-  IconData,
+  IconLiveData,
   IconApiKeys,
   IconGeneralSettings,
   IconMap,
@@ -34,6 +34,9 @@ import SideFooter from '@ttn-lw/components/sidebar/side-footer'
 import SidebarContext from '@console/containers/sidebar/context'
 
 import style from './sidebar.styl'
+
+// eslint-disable-next-line react/prop-types
+const Logo = ({ className }) => <img src={TtsLogo} alt="logo" className={className} />
 
 export default {
   title: 'Sidebar/Sidebar',
@@ -67,12 +70,12 @@ export const Default = () => (
     )}
     style={{ width: '17rem', height: '96vh' }}
   >
-    <SideHeader logo={{ src: TtsLogo, alt: 'logo' }} />
+    <SideHeader Logo={Logo} />
     <Switcher />
     <SearchButton />
     <SideNavigation className="mt-cs-xs">
       <SideNavigation.Item title="Overview" path="" icon={IconOverview} exact />
-      <SideNavigation.Item title="Live data" path="data" icon={IconData} />
+      <SideNavigation.Item title="Live data" path="data" icon={IconLiveData} />
       <SideNavigation.Item title="Location" path="location" icon={IconMap} />
       <SideNavigation.Item title="Collaborators" path="collaborators" icon={IconOrganization} />
       <SideNavigation.Item title="API keys" path="api-keys" icon={IconApiKeys} />
