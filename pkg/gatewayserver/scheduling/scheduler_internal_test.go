@@ -21,3 +21,6 @@ var (
 	ErrDutyCycle           = errDutyCycle
 	ErrScheduleTooFarAhead = errScheduleTooFarAhead
 )
+
+// GC removes the emissions that ended more than the duty-cycle window ago.
+func (s *Scheduler) GC() { s.gcOnce() }

@@ -248,21 +248,26 @@ func (s *Scheduler) gc(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			s.mu.RLock()
-			serverTime, ok := s.clock.FromServerTime(s.timeSource.Now())
-			s.mu.RUnlock()
-			if !ok {
-				continue
-			}
-			to := serverTime - ConcentratorTime(DutyCycleWindow)
-			for _, subBand := range s.subBands {
-				subBand.gc(to)
-			}
-			s.mu.Lock()
-			s.emissions = s.emissions.GreaterThan(to)
-			s.mu.Unlock()
+			s.gcOnce()
 		}
 	}
+}
+
+// gcOnce removes the emissions that ended more than the duty-cycle window ago.
+// The mutex is held while determining the cutoff time and removing the emissions, so that the emissions cannot be
+// shifted to a new time base in between.
+func (s *Scheduler) gcOnce() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	serverTime, ok := s.clock.FromServerTime(s.timeSource.Now())
+	if !ok {
+		return
+	}
+	to := serverTime - ConcentratorTime(DutyCycleWindow)
+	for _, subBand := range s.subBands {
+		subBand.gc(to)
+	}
+	s.emissions = s.emissions.GreaterThan(to)
 }
 
 var errDwellTime = errors.DefineFailedPrecondition("dwell_time", "packet exceeds dwell time restriction")

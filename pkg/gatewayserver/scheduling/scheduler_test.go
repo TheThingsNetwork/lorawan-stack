@@ -1620,6 +1620,10 @@ func TestScheduleConcentratorTimeJump(t *testing.T) {
 			}
 			scheduler.SyncWithGatewayConcentrator(timestampOf(after), serverTime, nil, after)
 
+			// Garbage collection after the jump uses the new time base, so it keeps the emission that is still within
+			// the duty-cycle window.
+			scheduler.GC()
+
 			// Without shift, the emission remains at its position in the new time base.
 			blockedUntil := em.Starts() + scheduling.ConcentratorTime(blockedFor)
 			if tc.ExpectShift {
