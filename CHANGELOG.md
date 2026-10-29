@@ -22,6 +22,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Goroutine and memory leak in the Gateway Server when downlink messages were scheduled too far in the future. Downlinks scheduled at an absolute time or timestamp, and class C downlinks without absolute time under sustained load, could be accepted far beyond the maximum schedule-ahead time, which kept a goroutine alive per downlink on Semtech UDP Packet Forwarder gateways until the gateway disconnected. Such downlinks are now rejected.
+- Downlink scheduling failing with `sub band is blocked` for up to hours on LoRa Basics Station gateways whose concentrator time jumps backwards, such as gateways that do not extend the concentrator time beyond 32 bits and gateways that change their concentrator time base on reconnect. The Gateway Server now moves the recorded transmissions to the new time base, so that they keep counting towards the duty-cycle without blocking the sub-band.
+- Uplink tokens of uplink messages received before a LoRa Basics Station gateway connected are no longer used to synchronize the gateway clock, as their concentrator time may refer to a different time base.
 
 ### Security
 

@@ -1491,4 +1491,160 @@ func TestScheduleSyncViaUplinkToken(t *testing.T) {
 		})
 		a.So(err, should.BeNil)
 	}
+
+	// No clock sync, uplink token from before the scheduler was created is ignored.
+	{
+		timeSource := &mockTimeSource{
+			Time: time.Unix(11, 0),
+		}
+		scheduler, err := scheduling.NewScheduler(
+			ctx, fps, true, scheduling.DefaultDutyCycleStyle, nil, timeSource,
+			scheduling.WithIgnorePriorUplinkTokens(),
+		)
+		a.So(err, should.BeNil)
+		t := time.Unix(10, 0)
+		_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+			PayloadSize: 10,
+			TxSettings: &ttnpb.TxSettings{
+				DataRate: &ttnpb.DataRate{
+					Modulation: &ttnpb.DataRate_Lora{
+						Lora: &ttnpb.LoRaDataRate{
+							Bandwidth:       125000,
+							SpreadingFactor: 7,
+							CodingRate:      band.Cr4_5,
+						},
+					},
+				},
+				Frequency: 869525000,
+				Timestamp: 7000000,
+			},
+			UplinkToken: &ttnpb.UplinkToken{
+				ServerTime:       timestamppb.New(t),
+				Timestamp:        5000000,
+				ConcentratorTime: 5000000000,
+			},
+			Priority: ttnpb.TxSchedulePriority_NORMAL,
+		})
+		a.So(errors.IsUnavailable(err), should.BeTrue)
+	}
+}
+
+func TestScheduleConcentratorTimeJump(t *testing.T) {
+	t.Parallel()
+	fps := []*frequencyplans.FrequencyPlan{{
+		BandID: band.EU_863_870,
+		TimeOffAir: frequencyplans.TimeOffAir{
+			Duration: time.Second,
+		},
+	}}
+	settings := func(timestamp uint32) *ttnpb.TxSettings {
+		return &ttnpb.TxSettings{
+			DataRate: &ttnpb.DataRate{
+				Modulation: &ttnpb.DataRate_Lora{
+					Lora: &ttnpb.LoRaDataRate{
+						Bandwidth:       125000,
+						SpreadingFactor: 7,
+						CodingRate:      band.Cr4_5,
+					},
+				},
+			},
+			Frequency: 868100000,
+			Timestamp: timestamp,
+		}
+	}
+	timestampOf := func(ct scheduling.ConcentratorTime) uint32 {
+		return uint32(time.Duration(ct) / time.Microsecond) //nolint:gosec
+	}
+
+	for _, tc := range []struct {
+		Name string
+		// Before is the concentrator time of the first synchronization.
+		Before scheduling.ConcentratorTime
+		// Jitter is the duration by which the concentrator time lags behind the expected concentrator time
+		// on the second synchronization. It is only used when Reset is false.
+		Jitter time.Duration
+		// Reset indicates whether the concentrator time restarts from zero on the second synchronization.
+		Reset bool
+		// ExpectShift indicates whether the emissions are expected to be shifted to the new time base.
+		ExpectShift bool
+	}{
+		{
+			Name:        "RollOverNotAccountedFor",
+			Before:      scheduling.ConcentratorTime(time.Duration(math.MaxUint32)*time.Microsecond - 2*time.Second),
+			Reset:       true,
+			ExpectShift: true,
+		},
+		{
+			Name:        "TimeBaseReset",
+			Before:      scheduling.ConcentratorTime(94 * time.Hour),
+			Reset:       true,
+			ExpectShift: true,
+		},
+		{
+			Name:   "Jitter",
+			Before: scheduling.ConcentratorTime(time.Hour),
+			Jitter: 100 * time.Millisecond,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+			a := assertions.New(t)
+			ctx := t.Context()
+			serverTime := time.Unix(1000, 0)
+			timeSource := &mockTimeSource{Time: serverTime}
+			scheduler, err := scheduling.NewScheduler(
+				ctx, fps, true, scheduling.DutyCycleStyleBlockingWindow, nil, timeSource,
+			)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+
+			scheduler.SyncWithGatewayConcentrator(timestampOf(tc.Before), serverTime, nil, tc.Before)
+			em, _, err := scheduler.ScheduleAt(ctx, scheduling.Options{
+				PayloadSize: 10,
+				TxSettings:  settings(timestampOf(tc.Before + scheduling.ConcentratorTime(time.Second))),
+				Priority:    ttnpb.TxSchedulePriority_HIGHEST,
+			})
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			// The sub-band of 868.1 MHz has a duty-cycle of 1%.
+			blockedFor := em.Duration() * 100
+
+			serverTime = serverTime.Add(3 * time.Second)
+			timeSource.Time = serverTime
+			expected := tc.Before + scheduling.ConcentratorTime(3*time.Second)
+			after := expected - scheduling.ConcentratorTime(tc.Jitter)
+			if tc.Reset {
+				after = scheduling.ConcentratorTime(time.Second)
+			}
+			scheduler.SyncWithGatewayConcentrator(timestampOf(after), serverTime, nil, after)
+
+			// Garbage collection after the jump uses the new time base, so it keeps the emission that is still within
+			// the duty-cycle window.
+			scheduler.GC()
+
+			// Without shift, the emission remains at its position in the new time base.
+			blockedUntil := em.Starts() + scheduling.ConcentratorTime(blockedFor)
+			if tc.ExpectShift {
+				blockedUntil += after - expected
+			}
+
+			// The emission still counts towards the duty-cycle in the new time base.
+			_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+				PayloadSize: 10,
+				TxSettings:  settings(timestampOf(blockedUntil - scheduling.ConcentratorTime(50*time.Millisecond))),
+				Priority:    ttnpb.TxSchedulePriority_HIGHEST,
+			})
+			a.So(errors.IsResourceExhausted(err), should.BeTrue)
+
+			// The sub-band is available after the emission is no longer blocking it.
+			_, _, err = scheduler.ScheduleAt(ctx, scheduling.Options{
+				PayloadSize: 10,
+				TxSettings:  settings(timestampOf(blockedUntil + scheduling.ConcentratorTime(50*time.Millisecond))),
+				Priority:    ttnpb.TxSchedulePriority_HIGHEST,
+			})
+			a.So(err, should.BeNil)
+		})
+	}
 }

@@ -52,6 +52,10 @@ var (
 	// ScheduleLateRTTPercentile is the percentile of round-trip times that is considered for determining whether
 	// scheduling is too late.
 	scheduleLateRTTPercentile = 90
+
+	// ClockJumpTolerance is the duration by which a synchronized concentrator time may lag behind the concentrator
+	// time expected from the server time, before the concentrator time is considered to have jumped backwards.
+	clockJumpTolerance = time.Minute
 )
 
 // TimeSource is a source for getting a current time.
@@ -92,6 +96,7 @@ func NewScheduler(
 	dutyCycleStyle DutyCycleStyle,
 	scheduleAnytimeDelay *time.Duration,
 	timeSource TimeSource,
+	opts ...Option,
 ) (*Scheduler, error) {
 	logger := log.FromContext(ctx)
 	if timeSource == nil {
@@ -126,6 +131,10 @@ func NewScheduler(
 		fps:                  fps,
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
+		logger:               logger,
+	}
+	for _, opt := range opts {
+		opt(s)
 	}
 	if enforceDutyCycle {
 		for _, fp := range fps {
@@ -201,6 +210,21 @@ type Scheduler struct {
 	mu                   sync.RWMutex
 	emissions            Emissions
 	scheduleAnytimeDelay time.Duration
+	logger               log.Interface
+
+	ignoreUplinkTokensBefore time.Time
+}
+
+// Option is a Scheduler option.
+type Option func(*Scheduler)
+
+// WithIgnorePriorUplinkTokens configures the Scheduler to ignore uplink tokens of uplink messages that were received
+// before the Scheduler was created. Such uplink tokens originate from a previous gateway connection.
+// This option should be used for gateways of which the concentrator time base may change between connections.
+func WithIgnorePriorUplinkTokens() Option {
+	return func(s *Scheduler) {
+		s.ignoreUplinkTokensBefore = s.timeSource.Now()
+	}
 }
 
 var errSubBandNotFound = errors.DefineFailedPrecondition(
@@ -224,21 +248,26 @@ func (s *Scheduler) gc(ctx context.Context) error {
 		case <-ctx.Done():
 			return ctx.Err()
 		case <-ticker.C:
-			s.mu.RLock()
-			serverTime, ok := s.clock.FromServerTime(s.timeSource.Now())
-			s.mu.RUnlock()
-			if !ok {
-				continue
-			}
-			to := serverTime - ConcentratorTime(DutyCycleWindow)
-			for _, subBand := range s.subBands {
-				subBand.gc(to)
-			}
-			s.mu.Lock()
-			s.emissions = s.emissions.GreaterThan(to)
-			s.mu.Unlock()
+			s.gcOnce()
 		}
 	}
+}
+
+// gcOnce removes the emissions that ended more than the duty-cycle window ago.
+// The mutex is held while determining the cutoff time and removing the emissions, so that the emissions cannot be
+// shifted to a new time base in between.
+func (s *Scheduler) gcOnce() {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	serverTime, ok := s.clock.FromServerTime(s.timeSource.Now())
+	if !ok {
+		return
+	}
+	to := serverTime - ConcentratorTime(DutyCycleWindow)
+	for _, subBand := range s.subBands {
+		subBand.gc(to)
+	}
+	s.emissions = s.emissions.GreaterThan(to)
 }
 
 var errDwellTime = errors.DefineFailedPrecondition("dwell_time", "packet exceeds dwell time restriction")
@@ -271,12 +300,16 @@ func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool { //nolin
 	if token.GetServerTime() == nil || token.GetConcentratorTime() == 0 {
 		return false
 	}
-	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*ttnpb.StdTime(token.ServerTime)) {
+	serverTime := *ttnpb.StdTime(token.ServerTime)
+	if serverTime.Before(s.ignoreUplinkTokensBefore) {
 		return false
 	}
-	s.clock.SyncWithGatewayConcentrator(
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(serverTime) {
+		return false
+	}
+	s.syncWithGatewayConcentrator(
 		token.Timestamp,
-		*ttnpb.StdTime(token.ServerTime),
+		serverTime,
 		ttnpb.StdTime(token.GatewayTime),
 		ConcentratorTime(token.ConcentratorTime),
 	)
@@ -492,6 +525,32 @@ func (s *Scheduler) SyncWithGatewayConcentrator(
 ) ConcentratorTime {
 	s.mu.Lock()
 	defer s.mu.Unlock()
+	return s.syncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
+}
+
+// syncWithGatewayConcentrator synchronizes the clock with the given concentrator timestamp, the server time and the
+// relative gateway time that corresponds to the given timestamp.
+// If the concentrator time jumped backwards, for example because the gateway does not account for concentrator
+// timestamp roll over or because the concentrator time base changed, the emissions are shifted to the new time base.
+// This keeps the emissions at their position relative to the server time, so that they do not appear to be in the
+// future, while they keep counting towards the duty-cycle.
+// This method assumes that the mutex is held.
+func (s *Scheduler) syncWithGatewayConcentrator(
+	timestamp uint32, server time.Time, gateway *time.Time, concentrator ConcentratorTime,
+) ConcentratorTime {
+	if expected, ok := s.clock.FromServerTime(server); ok {
+		if delta := concentrator - expected; delta < -ConcentratorTime(clockJumpTolerance) {
+			s.logger.WithFields(log.Fields(
+				"expected_concentrator_time", expected,
+				"concentrator_time", concentrator,
+				"delta", time.Duration(delta),
+			)).Warn("Concentrator time jumped backwards, shift emissions to new time base")
+			s.emissions.Shift(delta)
+			for _, sb := range s.subBands {
+				sb.shift(delta)
+			}
+		}
+	}
 	return s.clock.SyncWithGatewayConcentrator(timestamp, server, gateway, concentrator)
 }
 

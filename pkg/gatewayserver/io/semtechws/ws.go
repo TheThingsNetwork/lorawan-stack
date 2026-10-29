@@ -285,9 +285,11 @@ func (s *srv) handleTraffic(w http.ResponseWriter, r *http.Request) (err error) 
 		addr = xRealIP[0]
 	}
 
+	// LoRa Basics Station may start a new concentrator time session when it reconnects. Uplink tokens of uplink
+	// messages received on a previous connection may therefore refer to a different time base.
 	conn, err := s.server.Connect(ctx, s, ids, &ttnpb.GatewayRemoteAddress{
 		Ip: addr,
-	})
+	}, io.WithIgnorePriorUplinkTokens())
 	if err != nil {
 		logger.WithError(err).Warn("Failed to connect")
 		return err
