@@ -515,12 +515,14 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 					// TODO: Report to Network Server: https://github.com/TheThingsNetwork/lorawan-stack/issues/76
 				}
 			}
+
 			canImmediate := atomic.LoadUint32(&st.receivedTxAck) == 1
 			forceLate := st.io.Gateway().ScheduleDownlinkLate
 			if canImmediate && !forceLate {
 				write()
 				break
 			}
+
 			st.clockMu.RLock()
 			if !st.clock.IsSynced() {
 				st.clockMu.RUnlock()
@@ -530,16 +532,29 @@ func (s *srv) handleDown(ctx context.Context, st *state) error {
 			}
 			serverTime := st.clock.ToServerTime(scheduling.ConcentratorTime(concentratorTime))
 			st.clockMu.RUnlock()
-			d := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
-			logger.WithField("duration", d).Debug("Wait to schedule downlink message late")
+			writeDelay := time.Until(serverTime.Add(-s.config.ScheduleLateTime))
+			registerSchedulingDelay(ctx, writeDelay)
+
+			// A write scheduled beyond MaxScheduleAhead will never be accepted, so discard it.
+			if writeDelay > scheduling.MaxScheduleAhead {
+				logger.WithField("duration", writeDelay).Info("Scheduling delay exceeds maximum; dropping downlink")
+				registerScheduleDelayDropped(ctx)
+				break
+			}
+
+			logger.WithField("duration", writeDelay).Debug("Wait to schedule downlink message late")
+			registerPendingDownlinkAdded(ctx)
 			go func() {
-				t := time.NewTimer(d)
-				defer t.Stop()
+				defer registerPendingDownlinkRemoved(ctx)
+				timer := time.NewTimer(writeDelay)
+				defer timer.Stop()
 				select {
-				case <-t.C:
-					write()
 				case <-ctx.Done():
+					return
 				case <-st.io.Context().Done():
+					return
+				case <-timer.C:
+					write()
 				}
 			}()
 		case <-healthCheck.C:

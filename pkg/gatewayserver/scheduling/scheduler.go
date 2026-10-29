@@ -356,6 +356,9 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (res Emission,
 			"min", minScheduleTime,
 		)
 	}
+	if delay > MaxScheduleAhead {
+		return Emission{}, 0, errScheduleTooFarAhead.New()
+	}
 	log.FromContext(ctx).WithFields(log.Fields(
 		"now", now,
 		"starts", starts,

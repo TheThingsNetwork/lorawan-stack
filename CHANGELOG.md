@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- `ttn_lw_gs_io_udp_scheduling_delay_seconds` histogram, `ttn_lw_gs_io_udp_pending_downlinks` gauge and `ttn_lw_gs_io_udp_schedule_delay_dropped_total` counter metrics, to observe downlink messages that are scheduled late on Semtech UDP Packet Forwarder gateways.
+
 ### Changed
 
 ### Deprecated
@@ -18,6 +20,8 @@ For details about compatibility between different releases, see the **Commitment
 ### Removed
 
 ### Fixed
+
+- Goroutine and memory leak in the Gateway Server when downlink messages were scheduled too far in the future. Downlinks scheduled at an absolute time or timestamp, and class C downlinks without absolute time under sustained load, could be accepted far beyond the maximum schedule-ahead time, which kept a goroutine alive per downlink on Semtech UDP Packet Forwarder gateways until the gateway disconnected. Such downlinks are now rejected.
 
 ### Security
 
