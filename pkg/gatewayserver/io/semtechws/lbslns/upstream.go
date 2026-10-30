@@ -541,6 +541,13 @@ func (f *lbsLNS) HandleUp( // nolint:gocyclo
 		}
 	}
 	syncClock := func(xTime int64, gpsTime int64, onlyWithGPS bool) *io.FrontendClockSynchronization {
+		logger.WithFields(log.Fields(
+			"xtime", xTime,
+			"session_id", semtechws.SessionIDFromXTime(xTime),
+			"concentrator_time", semtechws.ConcentratorTimeFromXTime(xTime),
+			"gps_time", gpsTime,
+			"server_time", receivedAt,
+		)).Debug("Received xtime")
 		if onlyWithGPS && gpsTime == 0 {
 			return nil
 		}

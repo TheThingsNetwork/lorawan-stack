@@ -24,6 +24,7 @@ import (
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/io/semtechws"
 	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
+	"go.thethings.network/lorawan-stack/v3/pkg/log"
 	"go.thethings.network/lorawan-stack/v3/pkg/ttnpb"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
@@ -121,6 +122,11 @@ func (f *lbsLNS) FromDownlink(
 
 		xTime := semtechws.ConcentratorTimeToXTime(sessionID, scheduling.ConcentratorTime(settings.ConcentratorTimestamp))
 		xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
+		log.FromContext(ctx).WithFields(log.Fields(
+			"xtime", xTime,
+			"session_id", sessionID,
+			"concentrator_time", scheduling.ConcentratorTime(settings.ConcentratorTimestamp),
+		)).Debug("Computed downlink xtime")
 
 		// Timestamp based downlinks are scheduled as class A downlinks.
 		dnmsg.DeviceClass = uint(ttnpb.Class_CLASS_A)
