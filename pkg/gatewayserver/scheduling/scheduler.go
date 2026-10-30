@@ -126,6 +126,7 @@ func NewScheduler(
 		fps:                  fps,
 		timeSource:           timeSource,
 		scheduleAnytimeDelay: *scheduleAnytimeDelay,
+		createdAt:            timeSource.Now(),
 	}
 	if enforceDutyCycle {
 		for _, fp := range fps {
@@ -201,6 +202,7 @@ type Scheduler struct {
 	mu                   sync.RWMutex
 	emissions            Emissions
 	scheduleAnytimeDelay time.Duration
+	createdAt            time.Time
 }
 
 var errSubBandNotFound = errors.DefineFailedPrecondition(
@@ -264,22 +266,38 @@ func (s *Scheduler) SubBandCount() int {
 }
 
 // SyncWithUplinkToken synchronizes the clock using the given token.
-// If the given token does not provide enough information or if the latest clock sync is more recent,
-// this method returns false.
+// If the given token does not provide enough information, if the token originates from an uplink message that was
+// received before the Scheduler was created or if the latest clock sync is more recent, this method returns false.
+// Uplink messages received before the Scheduler was created belong to a previous gateway connection, and the
+// concentrator time base of the gateway may have changed since then, for example because the gateway restarted.
 // This method assumes that the mutex is held.
-func (s *Scheduler) syncWithUplinkToken(token *ttnpb.UplinkToken) bool { //nolint:unparam
+func (s *Scheduler) syncWithUplinkToken(ctx context.Context, token *ttnpb.UplinkToken) bool { //nolint:unparam
 	if token.GetServerTime() == nil || token.GetConcentratorTime() == 0 {
 		return false
 	}
-	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(*ttnpb.StdTime(token.ServerTime)) {
+	serverTime := *ttnpb.StdTime(token.ServerTime)
+	logger := log.FromContext(ctx).WithFields(log.Fields(
+		"timestamp", token.Timestamp,
+		"concentrator_time", ConcentratorTime(token.ConcentratorTime),
+		"server_time", serverTime,
+		"gateway_time", ttnpb.StdTime(token.GatewayTime),
+	))
+	if serverTime.Before(s.createdAt) {
+		logger.WithField("scheduler_created_at", s.createdAt).Debug(
+			"Ignore uplink token of uplink message received before gateway connection",
+		)
+		return false
+	}
+	if lastSync, ok := s.clock.SyncTime(); ok && lastSync.After(serverTime) {
 		return false
 	}
 	s.clock.SyncWithGatewayConcentrator(
 		token.Timestamp,
-		*ttnpb.StdTime(token.ServerTime),
+		serverTime,
 		ttnpb.StdTime(token.GatewayTime),
 		ConcentratorTime(token.ConcentratorTime),
 	)
+	logger.Debug("Synchronized gateway clock with uplink token")
 	return true
 }
 
@@ -311,7 +329,7 @@ func (s *Scheduler) ScheduleAt(ctx context.Context, opts Options) (res Emission,
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if opts.UplinkToken != nil {
-		s.syncWithUplinkToken(opts.UplinkToken)
+		s.syncWithUplinkToken(ctx, opts.UplinkToken)
 	}
 	if !s.clock.IsSynced() {
 		return Emission{}, 0, errNoClockSync.New()
@@ -398,7 +416,7 @@ func (s *Scheduler) ScheduleAnytime(ctx context.Context, opts Options) (res Emis
 	s.mu.Lock()
 	defer s.mu.Unlock()
 	if opts.UplinkToken != nil {
-		s.syncWithUplinkToken(opts.UplinkToken)
+		s.syncWithUplinkToken(ctx, opts.UplinkToken)
 	}
 	if !s.clock.IsSynced() {
 		return Emission{}, 0, errNoClockSync.New()

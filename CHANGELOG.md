@@ -22,6 +22,7 @@ For details about compatibility between different releases, see the **Commitment
 ### Fixed
 
 - Goroutine and memory leak in the Gateway Server when downlink messages were scheduled too far in the future. Downlinks scheduled at an absolute time or timestamp, and class C downlinks without absolute time under sustained load, could be accepted far beyond the maximum schedule-ahead time, which kept a goroutine alive per downlink on Semtech UDP Packet Forwarder gateways until the gateway disconnected. Such downlinks are now rejected.
+- Downlink scheduling failing with `sub band is blocked` for up to days after a gateway reconnected. A downlink scheduled right after the reconnect with the uplink token of an uplink message received on the previous connection synchronized the gateway clock to the previous concentrator time base, which may have changed in between, for example because the gateway restarted. The Gateway Server no longer uses uplink tokens of uplink messages received before the gateway connected to synchronize the gateway clock.
 
 ### Security
 
