@@ -38,6 +38,7 @@ const UnitInput = props => {
     inputWidth,
     onInputChange,
     onUnitChange,
+    placeholder,
   } = props
   const maskedUnits = unitSelector ? units.filter(u => unitSelector.includes(u.value)) : units
   return (
@@ -57,6 +58,7 @@ const UnitInput = props => {
           disabled={disabled}
           error={error}
           inputWidth={inputWidth}
+          placeholder={placeholder}
         />
         <Select
           className={style.select}
@@ -83,6 +85,7 @@ UnitInput.propTypes = {
   onBlur: PropTypes.func.isRequired,
   onInputChange: PropTypes.func.isRequired,
   onUnitChange: PropTypes.func.isRequired,
+  placeholder: PropTypes.message,
   required: PropTypes.bool,
   selectWidth: PropTypes.inputWidth,
   unitSelector: PropTypes.arrayOf(PropTypes.string),
@@ -103,6 +106,7 @@ UnitInput.defaultProps = {
   defaultUnit: undefined,
   inputWidth: 'm',
   disabled: false,
+  placeholder: undefined,
   required: false,
   value: undefined,
   error: false,

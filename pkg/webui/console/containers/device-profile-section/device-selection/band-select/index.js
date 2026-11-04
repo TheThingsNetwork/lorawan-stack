@@ -43,11 +43,11 @@ const BandSelect = props => {
   const { name, onChange, brandId, modelId, fwVersion, ...rest } = props
   const { setFieldValue } = useFormContext()
   const versions = useSelector(state => selectDeviceModelFirmwareVersions(state, brandId, modelId))
-  const version = versions.find(v => v.version === fwVersion) || { profiles: [] }
-  const profiles = Object.keys(version.profiles)
+  const version = versions.find(v => v.version === fwVersion)
+  const profiles = Object.keys(version?.profiles || {})
 
   const options = React.useMemo(() => formatOptions(profiles), [profiles])
-  const onlyOption = options.length > 0 && options.length <= 2 ? options[0].value : undefined
+  const onlyOption = version && options.length <= 2 ? options[0].value : undefined
 
   React.useEffect(() => {
     if (onlyOption) {

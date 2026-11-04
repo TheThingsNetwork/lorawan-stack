@@ -18,6 +18,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"testing"
 	"time"
 
@@ -38,6 +39,12 @@ import (
 func TestFrontend(t *testing.T) {
 	t.Parallel()
 	wsPingInterval := (1 << 3) * test.Delay
+	lis, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatalf("Failed to find free port: %v", err)
+	}
+	listenAddr := lis.Addr().String()
+	lis.Close() //nolint:gosec
 	iotest.Frontend(t, iotest.FrontendConfig{
 		SupportsStatus:                 false,
 		DropsCRCFailure:                true,
@@ -58,7 +65,7 @@ func TestFrontend(t *testing.T) {
 		},
 		CustomGatewayServerConfig: func(config *gatewayserver.Config) {
 			config.BasicStation = gatewayserver.BasicStationConfig{
-				Listen: ":1887",
+				Listen: listenAddr,
 				Config: semtechws.Config{
 					WSPingInterval:       wsPingInterval,
 					MissedPongThreshold:  2,
@@ -78,7 +85,7 @@ func TestFrontend(t *testing.T) {
 			if ids.Eui == nil {
 				t.SkipNow()
 			}
-			wsConn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("ws://0.0.0.0:1887/traffic/eui-%08x", ids.Eui), nil)
+			wsConn, _, err := websocket.DefaultDialer.Dial(fmt.Sprintf("ws://%s/traffic/eui-%08x", listenAddr, ids.Eui), nil)
 			if err != nil {
 				return err
 			}

@@ -20,10 +20,10 @@ import { delay as delayRegexp } from '@console/lib/regexp'
 const validationSchema = Yup.object().shape({
   frequency_plan_ids: Yup.array(),
   schedule_downlink_late: Yup.boolean().default(false),
-  schedule_anytime_delay: Yup.string().matches(
-    delayRegexp,
-    Yup.passValues(sharedMessages.validateDelayFormat),
-  ),
+  schedule_anytime_delay: Yup.string()
+    // An empty delay lets the Gateway Server use the default delay.
+    .transform(value => (parseFloat(value) ? value : '0s'))
+    .matches(delayRegexp, Yup.passValues(sharedMessages.validateDelayFormat)),
 })
 
 export default validationSchema

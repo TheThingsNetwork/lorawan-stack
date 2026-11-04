@@ -173,8 +173,6 @@ export default defineMessages({
   data: 'Data',
   dataSheet: 'Data sheet',
   defineRights: 'Define rights',
-  delayWarning:
-    'Delay too short. The lower bound ({minimumValue}ms) will be used by the Gateway Server.',
   deleteGateway: 'Delete gateway',
   unclaimAndDeleteDevice: 'Unclaim and delete end device',
   unclaimAndDeleteGateway: 'Unclaim and delete gateway',
@@ -553,7 +551,7 @@ export default defineMessages({
   scanEndDevice: 'Scan end device QR code',
   scheduleAnyTimeDelay: 'Schedule any time delay',
   scheduleAnyTimeDescription:
-    'Configure gateway delay (minimum: {minimumValue}ms, default: {defaultValue}ms)',
+    'Configure gateway delay. If the delay is too short, the minimum of {minimumValue}ms will be used.',
   scheduleDownlink: 'Schedule downlink',
   scheduleDownlinkLateDescription: 'Enable server-side buffer of downlink messages',
   searchApplications: 'Search applications',

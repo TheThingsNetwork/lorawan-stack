@@ -19,6 +19,8 @@ describe('Gateway general settings', () => {
   let gateway
   let gateway2
   let gateway3
+  let gateway4
+  let gateway5
   const collabUserId = 'test-collab-user'
   const collabUser = {
     ids: { user_id: collabUserId },
@@ -69,9 +71,26 @@ describe('Gateway general settings', () => {
       gateway_server_address: 'localhost',
       frequency_plan_ids: ['EU_863_870'],
     }
+    gateway4 = {
+      ids: { gateway_id: 'test-gateway-default-delay', eui: '0000000000000003' },
+      name: 'Test Gateway Default Delay',
+      description: 'Gateway for testing the default schedule any time delay',
+      gateway_server_address: 'localhost',
+      frequency_plan_ids: ['EU_863_870'],
+    }
+    gateway5 = {
+      ids: { gateway_id: 'test-gateway-reset-delay', eui: '0000000000000004' },
+      name: 'Test Gateway Reset Delay',
+      description: 'Gateway for testing resetting the schedule any time delay',
+      schedule_anytime_delay: '523ms',
+      gateway_server_address: 'localhost',
+      frequency_plan_ids: ['EU_863_870'],
+    }
     cy.createGateway(gateway, user.ids.user_id)
     cy.createGateway(gateway2, user.ids.user_id)
     cy.createGateway(gateway3, user.ids.user_id)
+    cy.createGateway(gateway4, user.ids.user_id)
+    cy.createGateway(gateway5, user.ids.user_id)
   })
 
   it('displays newly created gateway values', () => {
@@ -150,6 +169,65 @@ describe('Gateway general settings', () => {
     cy.findByTestId('schedule_anytime_delay')
       .should('be.visible')
       .and('have.attr', 'value', '0.523')
+  })
+
+  it('displays the default schedule any time delay when no delay is set', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway4.ids.gateway_id}/general-settings`,
+    )
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Schedule any time delay')
+          .should('have.value', '')
+          .and('have.attr', 'placeholder', '532.5ms')
+        cy.findByText(
+          'Configure gateway delay. If the delay is too short, the minimum of 132.5ms will be used.',
+        ).should('be.visible')
+      })
+  })
+
+  it('succeeds resetting the schedule any time delay to the default', () => {
+    cy.loginConsole({ user_id: user.ids.user_id, password: user.password })
+    cy.visit(
+      `${Cypress.config('consoleRootPath')}/gateways/${gateway5.ids.gateway_id}/general-settings`,
+    )
+    cy.intercept('PUT', `/api/v3/gateways/${gateway5.ids.gateway_id}`).as('update-gateway')
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Schedule any time delay').should('have.value', '0.523')
+        cy.findByLabelText('Schedule any time delay').clear()
+        cy.findByRole('button', { name: 'Save changes' }).click()
+      })
+
+    cy.wait('@update-gateway')
+      .its('request.body')
+      .should(body => {
+        expect(body.gateway.schedule_anytime_delay).to.equal('0s')
+        expect(body.field_mask.paths).to.include('schedule_anytime_delay')
+      })
+    cy.findByTestId('error-notification').should('not.exist')
+    cy.findByTestId('toast-notification-success').findByText('Gateway updated').should('be.visible')
+    cy.findByLabelText('Schedule any time delay')
+      .should('have.value', '')
+      .and('have.attr', 'placeholder', '532.5ms')
+
+    cy.reload()
+
+    cy.findByText('LoRaWAN options', { selector: 'h3' })
+      .closest('[data-test-id="collapsible-section"]')
+      .within(() => {
+        cy.findByRole('button', { name: 'Expand' }).click()
+        cy.findByLabelText('Schedule any time delay')
+          .should('have.value', '')
+          .and('have.attr', 'placeholder', '532.5ms')
+      })
   })
 
   it('succeeds changing gateway information', () => {
