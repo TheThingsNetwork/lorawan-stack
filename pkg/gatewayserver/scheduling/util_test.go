@@ -80,5 +80,7 @@ func float32Ptr(v float32) *float32              { return &v }
 
 func init() {
 	scheduling.DutyCycleWindow = 10 * time.Second
-	scheduling.MaxScheduleAhead = 2 * scheduling.DutyCycleWindow
+	// Use a large bound by default so existing tests exercising far-future timestamps keep passing.
+	// Tests that need to assert the bound itself override it locally.
+	scheduling.MaxScheduleAhead = 100 * scheduling.DutyCycleWindow
 }
