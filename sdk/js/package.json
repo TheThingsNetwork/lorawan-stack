@@ -54,7 +54,7 @@
       "^.+\\.js$": "babel-jest"
     },
     "transformIgnorePatterns": [
-      "node_modules/(?!(auto-bind|query-string|decode-uri-component))/"
+      "node_modules/(?!(auto-bind|query-string))/"
     ]
   },
   "prettier": "../../config/.prettierrc.js",

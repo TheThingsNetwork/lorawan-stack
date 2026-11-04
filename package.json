@@ -110,7 +110,7 @@
     "lodash": "^4.18.1",
     "md5": "^2.3.0",
     "prop-types": "^15.8.1",
-    "query-string": "^9.5.1",
+    "query-string": "^10.0.0",
     "react": "^17.0.1",
     "react-ace": "^6.6.0",
     "react-apexcharts": "^2.2.0",
@@ -144,6 +144,7 @@
   },
   "resolutions": {
     "cli-truncate": "2.1.0",
+    "regjsparser": "^0.14.1",
     "string-width": "4.2.2",
     "strip-ansi": "6.0.0"
   },
