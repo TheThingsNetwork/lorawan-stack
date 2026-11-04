@@ -28,7 +28,7 @@ import ShellPlugin from 'webpack-shell-plugin'
 import CopyWebpackPlugin from 'copy-webpack-plugin'
 import ReactRefreshWebpackPlugin from '@pmmmwh/react-refresh-webpack-plugin'
 
-import pjson from '../package.json'
+import pjson from '../package.json' with { type: 'json' }
 
 const { version } = pjson
 const revision =
@@ -194,14 +194,16 @@ export default {
         secure: false,
         ws: true,
         selfHandleResponse: true,
-        onProxyRes: responseInterceptor(async responseBuffer => {
-          // Replace occurrences of the proxyhost with localhost:8080.
-          // Otherwise, many entities will appear as "Other cluster".
-          const response = responseBuffer
-            .toString('utf8')
-            .replace(new RegExp(proxyHost, 'g'), 'localhost')
-          return response
-        }),
+        on: {
+          proxyRes: responseInterceptor(async responseBuffer => {
+            // Replace occurrences of the proxyhost with localhost:8080.
+            // Otherwise, many entities will appear as "Other cluster".
+            const response = responseBuffer
+              .toString('utf8')
+              .replace(new RegExp(proxyHost, 'g'), 'localhost')
+            return response
+          }),
+        },
       },
     ],
     historyApiFallback: true,
