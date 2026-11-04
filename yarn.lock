@@ -4025,6 +4025,13 @@
   resolved "https://registry.yarnpkg.com/@types/stack-utils/-/stack-utils-2.0.3.tgz#6209321eb2c1712a7e7466422b8cb1fc0d9dd5d8"
   integrity sha512-9aEbYZ3TbYMznPdcdr3SmIrLXwC/AKZXQeCf9Pgao5CKb8CyHuEX5jzWPTkvregvhRJHcpRO6BFoGW9ycaOkYw==
 
+"@types/stylus@^0.48.43":
+  version "0.48.43"
+  resolved "https://registry.yarnpkg.com/@types/stylus/-/stylus-0.48.43.tgz#182c09bdf210b70837270f87480f7f8f23581eef"
+  integrity sha512-72dv/zdhuyXWVHUXG2VTPEQdOG+oen95/DNFx2aMFFaY6LoITI6PwEqf5x31JF49kp2w9hvUzkNfTGBIeg61LQ==
+  dependencies:
+    "@types/node" "*"
+
 "@types/tmp@^0.2.3":
   version "0.2.6"
   resolved "https://registry.yarnpkg.com/@types/tmp/-/tmp-0.2.6.tgz#d785ee90c52d7cc020e249c948c36f7b32d1e217"
@@ -7595,7 +7602,7 @@ fast-diff@^1.1.2, fast-diff@^1.2.0:
   resolved "https://registry.yarnpkg.com/fast-diff/-/fast-diff-1.3.0.tgz#ece407fa550a64d638536cd727e129c61616e0f0"
   integrity sha512-VxPP4NqbUjj6MaAOafWeUn2cXWLcCtljklUtZf0Ind4XQ+QPtmA0b18zZy0jIQx+ExRVCR/ZQpBmik5lXshNsw==
 
-fast-glob@^3.2.9, fast-glob@^3.3.2, fast-glob@^3.3.3:
+fast-glob@^3.2.9, fast-glob@^3.3.3:
   version "3.3.3"
   resolved "https://registry.yarnpkg.com/fast-glob/-/fast-glob-3.3.3.tgz#d06d585ce8dba90a16b0505c543c3ccfb3aeb818"
   integrity sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==
@@ -13991,13 +13998,14 @@ stylis@4.2.0:
   resolved "https://registry.yarnpkg.com/stylis/-/stylis-4.2.0.tgz#79daee0208964c8fe695a42fcffcac633a211a51"
   integrity sha512-Orov6g6BB1sDfYgzWfTHDOxamtX1bE/zo104Dh9e6fqJ3PooipYyfJ0pUmrZO2wAvO8YbEyeFrkV91XTsGMSrw==
 
-stylus-loader@^8.1.3:
-  version "8.1.3"
-  resolved "https://registry.yarnpkg.com/stylus-loader/-/stylus-loader-8.1.3.tgz#3aac853aa842b984bb72881066731aab69169faf"
-  integrity sha512-Rxf+ybxW+wH9/fY2Qlaae/u/PrAck3I3LKXXZQq5XaxVGp1nNm/Z76vHSdhjXltyLETs+42lpQcA4SBY2DWswg==
+stylus-loader@^9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/stylus-loader/-/stylus-loader-9.1.0.tgz#7db08d46470e20b1949a8915a3e1ec9b266dd8a0"
+  integrity sha512-++TkHIlmKicwAVwJNU60l0H/MomtfGr0249JO2Y/ikjc3RIycpFtOfBQ+fgaxl2dh6aHwslg5G/vlIVXGMThSg==
   dependencies:
-    fast-glob "^3.3.2"
+    "@types/stylus" "^0.48.43"
     normalize-path "^3.0.0"
+    tinyglobby "^0.2.12"
 
 stylus@^0.57.0:
   version "0.57.0"
