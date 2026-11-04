@@ -188,7 +188,7 @@ ace.define(
   color: var(--c-text-info-bold);
 }
 .ace-ttn-dark .ace_comment {
-  color: var(--c-text-neutral-extralight);
+  color: var(--c-text-neutral-semilight);
 }
 .ace-ttn-dark .ace_heading,
 .ace-ttn-dark .ace_markup.ace_heading,
@@ -197,7 +197,7 @@ ace.define(
   color: #00d2ff;
 }
 .ace-ttn-dark .ace_paren {
-  color: var(--c-text-neutral-max);
+  color: var(--c-text-neutral-heavy);
 }
 .ace-ttn-dark .ace_string.ace_regexp {
   color: var(--c-text-warning-bold);
@@ -213,7 +213,7 @@ ace.define(
   color: var(--c-text-neutral-min);
 }
 .ace-ttn-dark .ace_marker-layer .ace_active-line {
-  background: var(--c-bg-neutral-extalight);
+  background: var(--c-bg-neutral-extralight);
 }
 .ace-ttn-dark .ace_marker-layer .ace_selection {
   background: var(--c-bg-info-normal);
@@ -238,7 +238,7 @@ ace.define(
   background-color: var(--c-bg-neutral-normal);
 }
 .ace-ttn-dark .ace_marker-layer .ace_selected-word {
-  border: 1px solid var(--c-border-brand-norma);
+  border: 1px solid var(--c-border-brand-normal);
 }
 .ace-ttn-dark .ace_invisible {
   color: var(--c-text-neutral-light);
