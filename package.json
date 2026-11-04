@@ -144,6 +144,7 @@
   },
   "resolutions": {
     "cli-truncate": "2.1.0",
+    "regjsparser": "^0.14.1",
     "string-width": "4.2.2",
     "strip-ansi": "6.0.0"
   },
