@@ -60,6 +60,23 @@ export const [
   { request: getTemplate, success: getTemplateSuccess, failure: getTemplateFailure },
 ] = createRequestActions(GET_TEMPLATE_BASE, (appId, version) => ({ appId, version }))
 
+export const GET_TEMPLATE_BY_PROFILE_IDS_BASE = 'GET_DEVICE_TEMPLATE_BY_PROFILE_IDS'
+export const [
+  {
+    request: GET_TEMPLATE_BY_PROFILE_IDS,
+    success: GET_TEMPLATE_BY_PROFILE_IDS_SUCCESS,
+    failure: GET_TEMPLATE_BY_PROFILE_IDS_FAILURE,
+  },
+  {
+    request: getTemplateByProfileIds,
+    success: getTemplateByProfileIdsSuccess,
+    failure: getTemplateByProfileIdsFailure,
+  },
+] = createRequestActions(GET_TEMPLATE_BY_PROFILE_IDS_BASE, (vendorId, vendorProfileId) => ({
+  vendorId,
+  vendorProfileId,
+}))
+
 export const GET_REPO_PF_BASE = 'GET_REPOSITORY_PAYLOAD_FORMATTERS'
 export const [
   { request: GET_REPO_PF, success: GET_REPO_PF_SUCCESS, failure: GET_REPO_PF_FAILURE },

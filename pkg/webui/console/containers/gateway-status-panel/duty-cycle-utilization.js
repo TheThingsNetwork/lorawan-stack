@@ -65,6 +65,9 @@ const options = {
         show: true,
         margin: 0.9,
       },
+      hollow: {
+        margin: 0,
+      },
       dataLabels: {
         show: false,
       },
@@ -93,7 +96,7 @@ const DutyCycleUtilization = ({ band }) => {
         <div className="sm-md:d-none">
           <ReactApexChart
             options={options}
-            series={[utilization.toFixed(2)]}
+            series={[utilization]}
             type="radialBar"
             height={20}
             width={20}

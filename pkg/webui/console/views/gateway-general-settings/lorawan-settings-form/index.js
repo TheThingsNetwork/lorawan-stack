@@ -29,59 +29,24 @@ import tooltipIds from '@ttn-lw/lib/constants/tooltip-ids'
 import PropTypes from '@ttn-lw/lib/prop-types'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
-import { unit as unitRegexp, emptyDuration as emptyDurationRegexp } from '@console/lib/regexp'
-
 import validationSchema from './validation-schema'
-
-const decodeDelayValue = value => {
-  if (emptyDurationRegexp.test(value)) {
-    return {
-      duration: undefined,
-      unit: value,
-    }
-  }
-  const duration = value.split(unitRegexp)[0]
-  const unit = value.split(duration)[1]
-  return {
-    duration: duration ? Number(duration) : undefined,
-    unit,
-  }
-}
 
 const isEmptyFrequencyPlan = value => value?.includes(frequencyPlans.EMPTY_FREQ_PLAN)
 
-const isNotValidDuration = value => {
-  const { duration, unit } = decodeDelayValue(value)
-
-  switch (unit) {
-    case 'ms':
-      return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY
-    case 's':
-      return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY / 1000
-    case 'm':
-      return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY / 60000
-    case 'h':
-      return duration < delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY / 3600000
-  }
-}
+// A zero delay lets the Gateway Server use the default delay, so the field is left empty
+// to show the default delay as placeholder instead.
+const decodeDelay = value => (parseFloat(value) ? value : '')
 
 const LorawanSettingsForm = React.memo(props => {
   const { gateway, onSubmit } = props
 
   const [error, setError] = React.useState(undefined)
 
-  const [shouldDisplayWarning, setShouldDisplayWarning] = React.useState(
-    isNotValidDuration(gateway.schedule_anytime_delay),
-  )
-
-  const onScheduleAnytimeDelayChange = React.useCallback(value => {
-    setShouldDisplayWarning(isNotValidDuration(value))
-  }, [])
-
   const initialValues = React.useMemo(
     () => ({
       ...validationSchema.cast(gateway),
       frequency_plan_ids: gateway.frequency_plan_ids || [frequencyPlans.EMPTY_FREQ_PLAN],
+      schedule_anytime_delay: decodeDelay(gateway.schedule_anytime_delay),
     }),
     [gateway],
   )
@@ -97,7 +62,12 @@ const LorawanSettingsForm = React.memo(props => {
       setError(undefined)
       try {
         await onSubmit(castedValues)
-        resetForm({ values: castedValues })
+        resetForm({
+          values: {
+            ...castedValues,
+            schedule_anytime_delay: decodeDelay(castedValues.schedule_anytime_delay),
+          },
+        })
       } catch (err) {
         setSubmitting(false)
         setError(err)
@@ -136,27 +106,15 @@ const LorawanSettingsForm = React.memo(props => {
         unitSelector={['ms', 's']}
         description={{
           ...sharedMessages.scheduleAnyTimeDescription,
-          values: {
-            minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY,
-            defaultValue: delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY,
-          },
+          values: { minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY },
         }}
+        placeholder={`${delay.DEFAULT_GATEWAY_SCHEDULE_ANYTIME_DELAY}ms`}
         units={[
           { label: sharedMessages.milliseconds, value: 'ms' },
           { label: sharedMessages.seconds, value: 's' },
           { label: sharedMessages.minutes, value: 'm' },
           { label: sharedMessages.hours, value: 'h' },
         ]}
-        onChange={onScheduleAnytimeDelayChange}
-        warning={
-          shouldDisplayWarning
-            ? {
-                ...sharedMessages.delayWarning,
-                values: { minimumValue: delay.MINIMUM_GATEWAY_SCHEDULE_ANYTIME_DELAY },
-              }
-            : undefined
-        }
-        required
         tooltipId={tooltipIds.SCHEDULE_ANYTIME_DELAY}
       />
       <SubmitBar>

@@ -111,6 +111,68 @@ describe('Device onboarding with QR scan', () => {
       )
   })
 
+  it('succeeds prefilling the end device type from the vendor profile ID', () => {
+    const vendorProfileId = 2
+    cy.intercept(
+      'POST',
+      '/api/v3/qr-codes/end-devices/parse',
+      composeQRGeneratorParseResponse({ ...device, vendorId: 428, vendorProfileId }),
+    ).as('qr-code-parse-request')
+    cy.intercept('GET', `/api/v3/dr/vendors/428/profiles/${vendorProfileId}/template`, {
+      body: {
+        end_device: {
+          version_ids: {
+            brand_id: 'test-brand-otaa',
+            model_id: 'test-model3',
+            hardware_version: '2.0',
+            firmware_version: '1.0.1',
+            band_id: 'EU_863_870',
+          },
+        },
+        field_mask: { paths: ['version_ids'] },
+      },
+    }).as('profile-template-request')
+    cy.intercept('GET', `/api/v3/dr/applications/${appId}/brands/test-brand-otaa/models*`, {
+      fixture: 'console/devices/repository/test-brand-otaa.models.json',
+      delay: 2000,
+    })
+
+    cy.findByTestId('full-error-view').should('not.exist')
+    cy.findByTestId('error-notification').should('not.exist')
+
+    // Open qr modal and scan.
+    cy.findByRole('button', { name: /Scan end device QR code/g }).click()
+    cy.findByText('Found QR code data').should('be.visible')
+    cy.wait('@qr-code-parse-request')
+    cy.wait('@profile-template-request')
+    cy.findByText('test-model3').should('be.visible')
+    cy.findByText('Apply').should('not.be.disabled').click()
+
+    // Display scanned data in form, including the full end device type.
+    cy.findByText('QR code scanned successfully').should('be.visible')
+    cy.findByLabelText('End device brand')
+      .parents('.select__control')
+      .next('input')
+      .should('have.value', 'test-brand-otaa')
+    cy.findByLabelText('Model')
+      .parents('.select__control')
+      .next('input')
+      .should('have.value', 'test-model3')
+    cy.findByLabelText('Hardware Ver.')
+      .parents('.select__control')
+      .next('input')
+      .should('have.value', '2.0')
+    cy.findByLabelText('Firmware Ver.')
+      .parents('.select__control')
+      .next('input')
+      .should('have.value', '1.0.1')
+    cy.findByLabelText('Profile (Region)')
+      .parents('.select__control')
+      .next('input')
+      .should('have.value', 'EU_863_870')
+    cy.findByLabelText('Frequency plan').should('be.visible')
+  })
+
   it('succeeds scanning again', () => {
     cy.findByTestId('full-error-view').should('not.exist')
     cy.findByTestId('error-notification').should('not.exist')

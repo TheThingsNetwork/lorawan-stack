@@ -28,6 +28,7 @@ import attachPromise from '@ttn-lw/lib/store/actions/attach-promise'
 import sharedMessages from '@ttn-lw/lib/shared-messages'
 
 import { parseEndDeviceQRCode } from '@console/store/actions/qr-code-generator'
+import { getTemplateByProfileIds } from '@console/store/actions/device-repository'
 
 import { selectDeviceBrands } from '@console/store/selectors/device-repository'
 
@@ -38,6 +39,7 @@ const qrDataInitialState = {
   approved: false,
   data: undefined,
   device: undefined,
+  versionIds: undefined,
 }
 
 const DeviceQRScanFormSection = () => {
@@ -52,20 +54,39 @@ const DeviceQRScanFormSection = () => {
   }, [resetForm])
 
   const getBrand = useCallback(
-    vendorId => {
-      const brand = brands.find(brand => brand?.lora_alliance_vendor_id === vendorId)
-
-      return brand
-    },
+    (vendorId, brandId) =>
+      brands.find(brand =>
+        brandId ? brand?.brand_id === brandId : brand?.lora_alliance_vendor_id === vendorId,
+      ),
     [brands],
   )
 
-  const handleQRCodeApprove = useCallback(() => {
-    const { device } = qrData
-    const { end_device } = device.end_device_template
-    const { lora_alliance_profile_ids } = end_device
+  // Resolve the full end device version identifiers (brand, model, hardware and firmware version
+  // and band) from the LoRa Alliance vendor ID and vendor profile ID, if present in the QR code.
+  // Not all vendors map vendor profile IDs to models, so failing to resolve is not an error.
+  const getVersionIds = useCallback(
+    async ({ vendor_id, vendor_profile_id } = {}) => {
+      if (!vendor_id || !vendor_profile_id) {
+        return undefined
+      }
+      try {
+        const template = await dispatch(
+          attachPromise(getTemplateByProfileIds(vendor_id, vendor_profile_id)),
+        )
+        return template?.end_device?.version_ids
+      } catch {
+        return undefined
+      }
+    },
+    [dispatch],
+  )
 
-    const brand = getBrand(lora_alliance_profile_ids.vendor_id)
+  const handleQRCodeApprove = useCallback(() => {
+    const { device, versionIds } = qrData
+    const { end_device } = device.end_device_template
+    const { lora_alliance_profile_ids = {} } = end_device
+
+    const brand = getBrand(lora_alliance_profile_ids.vendor_id, versionIds?.brand_id)
 
     setValues(values => ({
       ...values,
@@ -84,10 +105,19 @@ const DeviceQRScanFormSection = () => {
           : '',
         join_eui: end_device.ids.join_eui,
       },
-      version_ids: {
-        ...values.version_ids,
-        brand_id: brand ? brand.brand_id : values.version_ids.brand_id,
-      },
+      version_ids:
+        brand && versionIds?.model_id
+          ? {
+              brand_id: brand.brand_id,
+              model_id: versionIds.model_id,
+              hardware_version: versionIds.hardware_version || '',
+              firmware_version: versionIds.firmware_version || '',
+              band_id: versionIds.band_id || '',
+            }
+          : {
+              ...values.version_ids,
+              brand_id: brand ? brand.brand_id : values.version_ids.brand_id,
+            },
     }))
 
     setQrData({ ...qrData, approved: true })
@@ -104,9 +134,10 @@ const DeviceQRScanFormSection = () => {
         const device = await dispatch(attachPromise(parseEndDeviceQRCode(qrCode)))
 
         const { end_device } = device.end_device_template
-        const { lora_alliance_profile_ids } = end_device
+        const { lora_alliance_profile_ids = {} } = end_device
 
-        const brand = getBrand(lora_alliance_profile_ids.vendor_id)
+        const versionIds = await getVersionIds(lora_alliance_profile_ids)
+        const brand = getBrand(lora_alliance_profile_ids.vendor_id, versionIds?.brand_id)
         const sheetData = [
           {
             header: sharedMessages.qrCodeData,
@@ -130,6 +161,13 @@ const DeviceQRScanFormSection = () => {
                 sensitive: false,
               },
               { key: sharedMessages.brand, value: brand?.name },
+              ...(brand && versionIds?.model_id
+                ? [
+                    { key: sharedMessages.model, value: versionIds.model_id },
+                    { key: sharedMessages.hardwareVersion, value: versionIds.hardware_version },
+                    { key: sharedMessages.firmwareVersion, value: versionIds.firmware_version },
+                  ].filter(({ value }) => Boolean(value))
+                : []),
             ],
           },
         ]
@@ -138,12 +176,13 @@ const DeviceQRScanFormSection = () => {
           valid: true,
           data: sheetData,
           device,
+          versionIds,
         })
       } catch (error) {
         setQrData({ ...qrData, data: [], valid: false })
       }
     },
-    [dispatch, getBrand, qrData],
+    [dispatch, getBrand, getVersionIds, qrData],
   )
 
   return (
