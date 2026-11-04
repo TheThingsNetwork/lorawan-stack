@@ -14,32 +14,46 @@
 
 import React from 'react'
 
-import Icon, { IconDevice } from '@ttn-lw/components/icon'
+import Icon, {
+  IconApplication,
+  IconLiveData,
+  IconDevice,
+  IconGateway,
+  IconGeneralSettings,
+  IconIntegration,
+  IconLock,
+  IconLockOpen,
+  IconMenu2,
+  IconOrganization,
+  IconOverview,
+  IconSort,
+  IconTransform,
+  IconX,
+} from '@ttn-lw/components/icon'
 
 import style from './story.styl'
 
-const icons = [
-  'device',
-  'integration',
-  'settings',
-  'lock',
-  'lock_open',
-  'close',
-  'menu',
-  'dashboard',
-  'transform',
-  'data',
-  'sort',
-  'overview',
-  'application',
-  'gateway',
-  'organization',
-]
+const icons = {
+  IconDevice,
+  IconIntegration,
+  IconGeneralSettings,
+  IconLock,
+  IconLockOpen,
+  IconX,
+  IconMenu2,
+  IconTransform,
+  IconLiveData,
+  IconSort,
+  IconOverview,
+  IconApplication,
+  IconGateway,
+  IconOrganization,
+}
 
-const iconElement = icons.map(icon => (
-  <div className={style.wrapper} key={icon}>
+const iconElement = Object.entries(icons).map(([name, icon]) => (
+  <div className={style.wrapper} key={name}>
     <Icon icon={icon} />
-    {icon}
+    {name}
   </div>
 ))
 

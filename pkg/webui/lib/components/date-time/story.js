@@ -16,7 +16,7 @@
 
 import React from 'react'
 
-import RelativeDateTime from './relative'
+import DateTime from '.'
 
 const Example = ({ title, unit, ago }) => {
   const date = new Date()
@@ -35,7 +35,7 @@ const Example = ({ title, unit, ago }) => {
   return (
     <div>
       <h3>{title}:</h3>
-      <RelativeDateTime value={date} />
+      <DateTime.Relative value={date} />
       <hr />
     </div>
   )

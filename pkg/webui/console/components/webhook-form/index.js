@@ -18,7 +18,13 @@ import { uniq } from 'lodash'
 
 import tts from '@console/api/tts'
 
-import { IconTrash, IconRefresh, IconPlayerPlay, IconPlayerPause } from '@ttn-lw/components/icon'
+import {
+  IconTrash,
+  IconRefresh,
+  IconPlayerPlay,
+  IconPlayerPause,
+  IconX,
+} from '@ttn-lw/components/icon'
 import Form from '@ttn-lw/components/form'
 import Input from '@ttn-lw/components/input'
 import SubmitBar from '@ttn-lw/components/submit-bar'
@@ -671,7 +677,7 @@ const WebhookForm = props => {
                     buttonMessage: m.pauseWebhook,
                     children: <Message content={m.pauseWebhookDescription} component="span" />,
                     approveButtonProps: {
-                      icon: 'close',
+                      icon: IconX,
                       danger: false,
                     },
                   }}

@@ -17,7 +17,7 @@ import React from 'react'
 import {
   IconUser,
   IconLogout,
-  IconAdminShield,
+  IconAdminPanel,
   IconCreditCard,
   IconChartBar,
   IconBook,
@@ -49,7 +49,7 @@ export const Default = () => (
         path="/manage-cloud-subs"
       />
       <Dropdown.Item title="Network Operations Center" icon={IconChartBar} path="/network_ops" />
-      <Dropdown.Item title="Admin panel" icon={IconAdminShield} path="/admin-panel" />
+      <Dropdown.Item title="Admin panel" icon={IconAdminPanel} path="/admin-panel" />
       <hr />
       <Dropdown.Item title="Upgrade" icon={IconRocket} path="/upgrade" />
       <Dropdown.Item title="Get support" icon={IconSupport} path="/support" />
