@@ -193,12 +193,13 @@ jobs:
       - name: Tag latest
         if: steps.latest-version.outputs.latest == '1'
         # The images are copied within the registry, as this job does not have the images built by GoReleaser.
+        # --prefer-index=false copies the manifests as is, instead of wrapping single images in a new image index.
         run: |
           export VERSION=$(echo ${{ steps.version.outputs.result }} | grep -Po '3\.\d+')
           for ARCH in amd64 arm64 armv7; do
-            docker buildx imagetools create --tag ${DOCKER_PREFIX}/lorawan-stack:latest-${ARCH} ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-${ARCH}
+            docker buildx imagetools create --prefer-index=false --tag ${DOCKER_PREFIX}/lorawan-stack:latest-${ARCH} ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-${ARCH}
           done
-          docker buildx imagetools create --tag ${DOCKER_PREFIX}/lorawan-stack:latest ${DOCKER_PREFIX}/lorawan-stack:${VERSION}
+          docker buildx imagetools create --prefer-index=false --tag ${DOCKER_PREFIX}/lorawan-stack:latest ${DOCKER_PREFIX}/lorawan-stack:${VERSION}
         env:
           DOCKER_PREFIX: thethingsnetwork
       - uses: bufbuild/buf-action@v1
