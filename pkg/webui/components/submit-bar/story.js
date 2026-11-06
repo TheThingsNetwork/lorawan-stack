@@ -14,7 +14,7 @@
 
 import React from 'react'
 
-import { IconCicleCheck, IconTrash } from '@ttn-lw/components/icon'
+import { IconCircleCheck, IconTrash } from '@ttn-lw/components/icon'
 import Button from '@ttn-lw/components/button'
 
 import SubmitBar from '.'
@@ -25,13 +25,13 @@ export default {
 
 export const OnlySubmit = () => (
   <SubmitBar>
-    <Button message="Save Changes" icon={IconCicleCheck} primary />
+    <Button message="Save Changes" icon={IconCircleCheck} primary />
   </SubmitBar>
 )
 
 export const SubmitAndReset = () => (
   <SubmitBar>
-    <Button message="Save Changes" icon={IconCicleCheck} primary />
+    <Button message="Save Changes" icon={IconCircleCheck} primary />
     <Button message="Delete" icon={IconTrash} naked danger />
   </SubmitBar>
 )
@@ -42,7 +42,7 @@ SubmitAndReset.story = {
 
 export const SubmitAndText = () => (
   <SubmitBar align="start">
-    <Button message="Save Changes" icon={IconCicleCheck} primary />
+    <Button message="Save Changes" icon={IconCircleCheck} primary />
     <SubmitBar.Message content="Note: End device level message payload formats take precedence over application level message payload formats" />
   </SubmitBar>
 )

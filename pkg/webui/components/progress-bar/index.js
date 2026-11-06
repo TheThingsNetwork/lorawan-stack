@@ -17,7 +17,7 @@ import classnames from 'classnames'
 import { defineMessages } from 'react-intl'
 
 import Message from '@ttn-lw/lib/components/message'
-import RelativeDateTime from '@ttn-lw/lib/components/date-time/relative'
+import DateTime from '@ttn-lw/lib/components/date-time'
 
 import PropTypes from '@ttn-lw/lib/prop-types'
 
@@ -67,11 +67,11 @@ const ProgressBar = props => {
     displayEstimation =
       !showEstimation ||
       estimations < 3 || // Avoid inaccurate early estimations.
-      estimatedDuration === Infinity ||
+      !Number.isFinite(estimatedDuration) ||
       !startTime ? null : (
         <div>
           <span>
-            Estimated completion <RelativeDateTime value={eta} />
+            Estimated completion <DateTime.Relative value={eta} />
           </span>
         </div>
       )
@@ -107,11 +107,7 @@ const ProgressBar = props => {
           )}
           {children}
           {props.percentage !== undefined && (
-            <Message
-              component="div"
-              content={m.percentage}
-              values={{ percentage: displayPercentage }}
-            />
+            <Message component="div" content={m.percentage} values={{ percentage: fraction }} />
           )}
           {displayEstimation}
         </div>

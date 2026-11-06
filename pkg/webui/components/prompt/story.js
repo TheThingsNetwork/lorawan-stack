@@ -13,6 +13,7 @@
 // limitations under the License.
 
 import React from 'react'
+import { createMemoryRouter, RouterProvider } from 'react-router-dom'
 import { action } from '@storybook/addon-actions'
 
 import Link from '@ttn-lw/components/link'
@@ -28,9 +29,11 @@ const linkContainerStyle = {
 export default {
   title: 'Prompt',
   component: Prompt,
+  // The `Prompt` component requires a data router.
+  parameters: { dataRouter: true },
 }
 
-export const Default = () => (
+const Content = () => (
   <div>
     Navigate using the links below to trigger the `Prompt` component to appear.
     <div style={linkContainerStyle}>
@@ -64,3 +67,7 @@ export const Default = () => (
     </Prompt>
   </div>
 )
+
+const router = createMemoryRouter([{ path: '*', element: <Content /> }])
+
+export const Default = () => <RouterProvider router={router} />

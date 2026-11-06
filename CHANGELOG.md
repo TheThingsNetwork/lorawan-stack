@@ -11,6 +11,8 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Added
 
+- `ttn_lw_gs_io_udp_scheduling_delay_seconds` histogram, `ttn_lw_gs_io_udp_pending_downlinks` gauge and `ttn_lw_gs_io_udp_schedule_delay_dropped_total` counter metrics, to observe downlink messages that are scheduled late on Semtech UDP Packet Forwarder gateways.
+
 ### Changed
 
 ### Deprecated
@@ -19,7 +21,10 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Fixed
 
-- Allow selecting the same frequency plan multiple times for a gateway in the Console.
+- Goroutine and memory leak in the Gateway Server when downlink messages were scheduled too far in the future. Downlinks scheduled at an absolute time or timestamp, and class C downlinks without absolute time under sustained load, could be accepted far beyond the maximum schedule-ahead time, which kept a goroutine alive per downlink on Semtech UDP Packet Forwarder gateways until the gateway disconnected. Such downlinks are now rejected.
+- Downlink scheduling failing with `sub band is blocked` for up to days after a gateway reconnected. A downlink scheduled right after the reconnect with the uplink token of an uplink message received on the previous connection synchronized the gateway clock to the previous concentrator time base, which may have changed in between, for example because the gateway restarted. The Gateway Server no longer uses uplink tokens of uplink messages received before the gateway connected to synchronize the gateway clock.
+- Fix JavaScript comment readability in dark mode in the code editor.
+- Fix storybook errors.
 
 ### Security
 
@@ -44,12 +49,16 @@ For details about compatibility between different releases, see the **Commitment
 
 - Parsing of the `rctx` field in the `upinfo` object of upstream messages received via the LoRa Basics Station LNS protocol. The field name was misspelled as `rtcx`, so the radio context reported by gateways was ignored. The antenna index in the uplink metadata now reflects the reported radio context and is echoed back in class A downlinks, instead of always being 0.
 - The antenna gain sent to LoRa Basics Station gateways in the router configuration. Each board's radio configuration now uses the gain of its own antenna instead of applying the first antenna's gain to all boards, and fractional gains are no longer truncated.
+- Prefilling the end device model, hardware version, firmware version and band in the Console when scanning an end device QR code that contains a LoRa Alliance vendor ID and vendor profile ID that are known in the Device Repository. Previously, only the brand was prefilled.
+- Misleading schedule any time delay hints in the gateway LoRaWAN settings in the Console. The Console showed a "delay too short" warning for gateways without a delay, even though the Gateway Server then uses the default delay. The Console now shows the minimum (132.5ms) in a single description and shows the default delay (532.5ms) as placeholder when no delay is set.
+- Allow selecting the same frequency plan multiple times for a gateway in the Console.
 
 ## [3.36.2] - 2026-08-17
 
 ### Fixed
 
 - Applying the MAC settings profile values to the device's MAC state during the join procedure (OTAA) or factory reset (ABP).
+- Allow selecting the same frequency plan multiple times for a gateway in the Console.
 
 ## [3.36.1] - 2026-06-24
 

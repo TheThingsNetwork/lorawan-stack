@@ -94,6 +94,7 @@ const Link = React.forwardRef((props, ref) => {
       replace={replace}
       to={to}
       target={target}
+      rel={target === '_blank' ? 'noopener noreferrer' : undefined}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       tabIndex={tabIndex}
@@ -195,6 +196,7 @@ const DocLink = props => {
       id={id}
       href={link}
       target="_blank"
+      rel="noopener noreferrer"
       name={name}
       onClick={onClick}
       tabIndex={tabIndex}
@@ -323,6 +325,7 @@ const AnchorLink = props => {
       target={external ? '_blank' : target}
       name={name}
       tabIndex={tabIndex}
+      rel={external ? 'noopener noreferrer' : undefined}
       {...dataProps}
     >
       {children}
