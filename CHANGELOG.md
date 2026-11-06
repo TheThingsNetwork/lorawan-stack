@@ -28,7 +28,7 @@ For details about compatibility between different releases, see the **Commitment
 
 ### Security
 
-## [3.37.0] - unreleased
+## [3.37.0] - 2026-11-04
 
 ### Added
 
@@ -51,6 +51,7 @@ For details about compatibility between different releases, see the **Commitment
 - The antenna gain sent to LoRa Basics Station gateways in the router configuration. Each board's radio configuration now uses the gain of its own antenna instead of applying the first antenna's gain to all boards, and fractional gains are no longer truncated.
 - Prefilling the end device model, hardware version, firmware version and band in the Console when scanning an end device QR code that contains a LoRa Alliance vendor ID and vendor profile ID that are known in the Device Repository. Previously, only the brand was prefilled.
 - Misleading schedule any time delay hints in the gateway LoRaWAN settings in the Console. The Console showed a "delay too short" warning for gateways without a delay, even though the Gateway Server then uses the default delay. The Console now shows the minimum (132.5ms) in a single description and shows the default delay (532.5ms) as placeholder when no delay is set.
+- Allow selecting the same frequency plan multiple times for a gateway in the Console.
 
 ## [3.36.2] - 2026-08-17
 

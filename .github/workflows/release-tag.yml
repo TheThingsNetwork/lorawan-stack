@@ -1,6 +1,14 @@
 name: Tag release
 
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      skip_goreleaser:
+        description: >-
+          Skip building and publishing artifacts. Only use this when GoReleaser already published the release and the
+          post release steps (latest tag, buf push, merge PR) need to run again.
+        type: boolean
+        default: false
 
 env:
   NODE_ENV: production
@@ -22,9 +30,11 @@ jobs:
           | **Tag** | \`v${TAG}\` |
           | **Commit** | \`${{ github.sha }}\` |
           | **Triggered by** | [${{ github.actor }}](https://github.com/${{ github.actor }}) |
+          | **Skip GoReleaser** | \`${{ inputs.skip_goreleaser }}\` |
           EOF
   release:
     name: Tag release
+    if: ${{ !inputs.skip_goreleaser }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -136,6 +146,43 @@ jobs:
           SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_LOGIN }}
           GITHUB_TOKEN: ${{ secrets.RELEASE_TOKEN }}
           SIGN_KEY_NAME: ${{ secrets.SIGN_KEY_NAME }}
+  post-release:
+    name: Post release
+    needs: [release]
+    # Run when the release job succeeded or was skipped with skip_goreleaser.
+    if: ${{ !failure() && !cancelled() }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check branch
+        run: echo "${{ github.ref_name }}" | grep -Pq '^release/v3\.\d+\.\d+$'
+      - name: Get version
+        id: version
+        run: |
+          export VERSION=$(echo ${{ github.ref_name }} | grep -Po '3\.\d+.\d+')
+          echo "result=$VERSION" >> $GITHUB_OUTPUT
+      - name: Check that the release is published
+        run: gh release view "v${{ steps.version.outputs.result }}" --repo "${{ github.repository }}" --json tagName
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Check out code
+        uses: actions/checkout@v7
+        with:
+          # Check out the branch tip instead of the triggering commit, so that the changelog commit and the release tag
+          # pushed by the release job are included.
+          ref: ${{ github.ref_name }}
+          fetch-depth: 0
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Login to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          username: "${{ secrets.DOCKERHUB_USERNAME }}"
+          password: "${{ secrets.DOCKERHUB_PASSWORD }}"
+      - name: Install Buf
+        uses: bufbuild/buf-setup-action@v1
       - name: Determine if released version is latest
         id: latest-version
         run: |
@@ -145,18 +192,15 @@ jobs:
           echo "latest=$?" >> $GITHUB_OUTPUT
       - name: Tag latest
         if: steps.latest-version.outputs.latest == '1'
+        # The images are copied within the registry, as this job does not have the images built by GoReleaser.
+        # --prefer-index=false copies the manifests as is, instead of wrapping single images in a new image index.
         run: |
           export VERSION=$(echo ${{ steps.version.outputs.result }} | grep -Po '3\.\d+')
-          docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-amd64 ${DOCKER_PREFIX}/lorawan-stack:latest-amd64
-          docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-arm64 ${DOCKER_PREFIX}/lorawan-stack:latest-arm64
-          docker tag ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-armv7 ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
-          docker push ${DOCKER_PREFIX}/lorawan-stack:latest-amd64
-          docker push ${DOCKER_PREFIX}/lorawan-stack:latest-arm64
-          docker push ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
-          docker manifest create ${DOCKER_PREFIX}/lorawan-stack:latest ${DOCKER_PREFIX}/lorawan-stack:latest-amd64 ${DOCKER_PREFIX}/lorawan-stack:latest-arm64 ${DOCKER_PREFIX}/lorawan-stack:latest-armv7
-          docker manifest push ${DOCKER_PREFIX}/lorawan-stack:latest
+          for ARCH in amd64 arm64 armv7; do
+            docker buildx imagetools create --prefer-index=false --tag ${DOCKER_PREFIX}/lorawan-stack:latest-${ARCH} ${DOCKER_PREFIX}/lorawan-stack:${VERSION}-${ARCH}
+          done
+          docker buildx imagetools create --prefer-index=false --tag ${DOCKER_PREFIX}/lorawan-stack:latest ${DOCKER_PREFIX}/lorawan-stack:${VERSION}
         env:
-          DOCKER_CLI_EXPERIMENTAL: enabled
           DOCKER_PREFIX: thethingsnetwork
       - uses: bufbuild/buf-action@v1
         with:
@@ -165,6 +209,11 @@ jobs:
           token: ${{ secrets.BUF_TOKEN }}
       - name: Prepare merge PR
         run: |
+          if [ -n "$(gh pr list --head '${{ github.ref_name }}' --state all --json number --jq '.[].number')" ]; then
+            echo "Merge PR for ${{ github.ref_name }} already exists"
+            exit 0
+          fi
+
           export PR_URL=$(mktemp)
 
           gh pr create \
