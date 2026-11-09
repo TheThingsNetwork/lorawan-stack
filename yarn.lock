@@ -79,10 +79,10 @@
     json5 "^2.2.3"
     semver "^6.3.1"
 
-"@babel/eslint-parser@^7.29.9":
-  version "7.29.9"
-  resolved "https://registry.yarnpkg.com/@babel/eslint-parser/-/eslint-parser-7.29.9.tgz#48005ed01026fd31875257d504d7186ccb591484"
-  integrity sha512-GmrJTAtiRbNip+eKFqeuSvoHMJhKlH36j8U0yE3Gqn45B+SIO7NvsEiHtsmzkBqV1hLSMqYr41dI1aZLTkJ37g==
+"@babel/eslint-parser@^7.29.13":
+  version "7.29.13"
+  resolved "https://registry.yarnpkg.com/@babel/eslint-parser/-/eslint-parser-7.29.13.tgz#8be8917c0d313eba6ca280331b0a69c4f246ea15"
+  integrity sha512-MURiSTWPmb5VXh3DQYXSgaZSO6+/Cx9ump7lIiVS7iawLGKhsFQScjDuUvVNA4QuPudQeF453Coxrb67wJboSQ==
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals" "5.1.1-v1"
     eslint-visitor-keys "^2.1.0"
@@ -14347,7 +14347,7 @@ tsyringe@^4.10.0:
     tslib "^1.9.3"
 
 "ttn-lw@file:sdk/js":
-  version "3.36.2"
+  version "3.37.0"
   dependencies:
     arraybuffer-to-string "^1.0.2"
     auto-bind "^5.0.1"
