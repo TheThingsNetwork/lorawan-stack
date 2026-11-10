@@ -1404,9 +1404,9 @@ unbox-primitive@^1.1.0:
     which-boxed-primitive "^1.1.1"
 
 web-streams-polyfill@^4.0.0:
-  version "4.3.0"
-  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-4.3.0.tgz#2f5fe004e2c53f09f7e03aef25b892953cab99a6"
-  integrity sha512-/Gnggvj9oSrEvJbDyyPtAnxBt5fGQM2iWOKQNu7ie1OxDgK40iZpyV3TKaRiEzVj1oA1UxKnEy9XPXh6PW3eVw==
+  version "4.5.1"
+  resolved "https://registry.yarnpkg.com/web-streams-polyfill/-/web-streams-polyfill-4.5.1.tgz#30db3e05432082c26427af6697c9545a841ca75f"
+  integrity sha512-pFmV/G8K9uKW3I3xx3vqpKYLBer7K1wZej5uU66zhtjzG1bfE6e+OHNxhmGb9UsXe+geX4/lndxJDgs7wbYO9g==
 
 which-boxed-primitive@^1.0.2:
   version "1.0.2"
