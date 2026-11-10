@@ -1896,6 +1896,13 @@
   dependencies:
     "@formatjs/fast-memoize" "3.1.7"
 
+"@formatjs/intl-localematcher@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.10.1.tgz#bf0cc98f9138e129132d79d53cef16f0fb060225"
+  integrity sha512-gBqglQK9rXuHsLmM8wzTMBy4Xo4d0jamirIVKuEL8F1rwbskWdpMA1kZarSkny+uvr5q/K6GSzE0Rcq1wZLl3g==
+  dependencies:
+    "@formatjs/fast-memoize" "3.1.7"
+
 "@formatjs/intl-localematcher@0.6.2":
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.6.2.tgz#e9ebe0b4082d7d48e5b2d753579fb7ece4eaefea"
@@ -1919,12 +1926,12 @@
     "@formatjs/bigdecimal" "0.2.7"
     "@formatjs/intl-localematcher" "0.10.0"
 
-"@formatjs/intl-relativetimeformat@^12.4.0":
-  version "12.4.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-12.4.0.tgz#97d4f8ad075faf3aadfb3d94d598ccae6fed632a"
-  integrity sha512-sXYW00Zh2rodj2HguxY/IoXSsrru3YAIbvH+JeXPvpQs5ukS2eWwv3zvcPTWZyFzqSiwFiKAuPtdr/6kQn3u6g==
+"@formatjs/intl-relativetimeformat@^13.0.1":
+  version "13.0.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-13.0.1.tgz#65238f6e9aefe02f3d4213aa435b75a787535d9b"
+  integrity sha512-Gl5dCHb7elEC19tTzxIyllWLHaHnN+HpQYEaA9xxAt9rKgRLwC3vGty1w8bVGG7p2YcGSPIg5c4qn4KdkGcTqg==
   dependencies:
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-supportedvaluesof@3.0.0":
   version "3.0.0"
