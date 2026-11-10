@@ -83,7 +83,7 @@
   },
   "dependencies": {
     "@formatjs/intl-datetimeformat": "^7.9.0",
-    "@formatjs/intl-displaynames": "^7.4.0",
+    "@formatjs/intl-displaynames": "^8.0.1",
     "@formatjs/intl-listformat": "^8.4.0",
     "@formatjs/intl-locale": "^5.4.2",
     "@formatjs/intl-numberformat": "^9.5.0",

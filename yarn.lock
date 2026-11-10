@@ -1862,12 +1862,12 @@
     "@formatjs/bigdecimal" "0.2.7"
     "@formatjs/intl-localematcher" "0.10.0"
 
-"@formatjs/intl-displaynames@^7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-7.4.0.tgz#9acf3c33b4860beb13607b0633ea18e95f3864db"
-  integrity sha512-D2SZXvkeMadjGeg1vlqcqtNg0hJIKxUL5HiFkSdCt8pmKH5sNMP0DKND+X1cfuOV0EMyKIp04WYRSIHFFVYAfA==
+"@formatjs/intl-displaynames@^8.0.1":
+  version "8.0.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-8.0.1.tgz#54992e5c1acacf4b20a3198a749eff50b308dc99"
+  integrity sha512-8RTQvKIGx+SAqI+bvVrrupwzeEZGGzdzJwVbZaK9U5VKuVo34LOFOkn7GX9KfwHuVIKxM7pKv8yYTs6UIkeyTA==
   dependencies:
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-getcanonicallocales@3.3.0":
   version "3.3.0"
@@ -1893,6 +1893,13 @@
   version "0.10.0"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.10.0.tgz#988e22e1dc0c961e20aeb5496c28043cf2fc08e0"
   integrity sha512-OvfBelurObm02D1+4BsuHSt3Xkn49RZPo7uJXt/1Z0dNET3EN39kY1rKMV3kG0tn0p4gyGWrcFx9HyeF07cq5g==
+  dependencies:
+    "@formatjs/fast-memoize" "3.1.7"
+
+"@formatjs/intl-localematcher@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.10.1.tgz#bf0cc98f9138e129132d79d53cef16f0fb060225"
+  integrity sha512-gBqglQK9rXuHsLmM8wzTMBy4Xo4d0jamirIVKuEL8F1rwbskWdpMA1kZarSkny+uvr5q/K6GSzE0Rcq1wZLl3g==
   dependencies:
     "@formatjs/fast-memoize" "3.1.7"
 
