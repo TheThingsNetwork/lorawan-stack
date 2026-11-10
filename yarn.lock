@@ -1810,6 +1810,11 @@
   resolved "https://registry.yarnpkg.com/@floating-ui/utils/-/utils-0.2.1.tgz#16308cea045f0fc777b6ff20a9f25474dd8293d2"
   integrity sha512-9TANp6GPoMtYzQdt54kfAyMmz1+osLlXdg2ENroU7zzrtflTLrrC/lgrIfaSe+Wu0b89GKccT7vxXA0MoAIO+Q==
 
+"@formatjs/bigdecimal@0.2.10":
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/@formatjs/bigdecimal/-/bigdecimal-0.2.10.tgz#8a68c4401dd36017714f00394e326c81f0cde6a8"
+  integrity sha512-npIs6UARNOg5amJY5UOVsd6HUQQfzYjet0sa0SWIqzsnVhxLSpaIx2DjoIVrr/vqmjURjvroeW6dItjfy3Uf8A==
+
 "@formatjs/bigdecimal@0.2.7":
   version "0.2.7"
   resolved "https://registry.yarnpkg.com/@formatjs/bigdecimal/-/bigdecimal-0.2.7.tgz#164256d9bd93766b792fc9c0b803cbae4fc37261"
@@ -1896,6 +1901,13 @@
   dependencies:
     "@formatjs/fast-memoize" "3.1.7"
 
+"@formatjs/intl-localematcher@0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.10.1.tgz#bf0cc98f9138e129132d79d53cef16f0fb060225"
+  integrity sha512-gBqglQK9rXuHsLmM8wzTMBy4Xo4d0jamirIVKuEL8F1rwbskWdpMA1kZarSkny+uvr5q/K6GSzE0Rcq1wZLl3g==
+  dependencies:
+    "@formatjs/fast-memoize" "3.1.7"
+
 "@formatjs/intl-localematcher@0.6.2":
   version "0.6.2"
   resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.6.2.tgz#e9ebe0b4082d7d48e5b2d753579fb7ece4eaefea"
@@ -1903,13 +1915,13 @@
   dependencies:
     tslib "^2.8.0"
 
-"@formatjs/intl-numberformat@^9.5.0":
-  version "9.5.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-9.5.0.tgz#fecf9d6938e8d3bee9d730a3a7024eb69cf04feb"
-  integrity sha512-l2kTmIyUEw/peqc01A1Fz3WxJHsb9ntAUIgAe0016svJJa6TBxriGARfTzOOI5WvsDO1dWXHHQ7gkOv4gtHm2w==
+"@formatjs/intl-numberformat@^10.0.2":
+  version "10.0.2"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-numberformat/-/intl-numberformat-10.0.2.tgz#ebc790c6ec78e544fad68a656c8897576f83bab3"
+  integrity sha512-iLS3ly1lGZ/a/IVpcSUgC37RjQUZ2wN6zR9+Zbr2uXsxATfMLD+fBqggiXuFudLmZXpbPueCs4Mz3vDsaOVE9A==
   dependencies:
-    "@formatjs/bigdecimal" "0.2.7"
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/bigdecimal" "0.2.10"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-pluralrules@^6.4.0":
   version "6.4.0"
