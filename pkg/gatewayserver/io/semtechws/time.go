@@ -25,6 +25,12 @@ import (
 const (
 	// XTime48BitLSBMask is the mask used to extract the lower 48 bits of the XTime.
 	XTime48BitLSBMask = 0xFFFFFFFFFFFF
+	// XTime32BitLSBMask is the mask used to extract the lower 32 bits of the XTime.
+	XTime32BitLSBMask = 0xFFFFFFFF
+
+	// The session ID consists of the radio unit (bits 8-14) and the session (bits 0-7).
+	// The xTimeSessionMask is the mask used to extract the session from the session ID.
+	xTimeSessionMask = 0xFF
 )
 
 // TimeFromUnixSeconds constructs a time.Time from the provided UNIX fractional timestamp.
@@ -99,6 +105,15 @@ func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
 	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & XTime48BitLSBMask)
 }
 
+// ConcentratorTimeToTimestampXTime constructs the XTime associated with the provided
+// session ID and concentrator time for sessions that do not extend the concentrator timestamp.
+// Only the lower 32 bits of the concentrator time (in microseconds) are used, which wrap around
+// on rollover in the same way as the concentrator timestamp of the gateway.
+// See IsExtendedXTimeSession.
+func ConcentratorTimeToTimestampXTime(id int32, t scheduling.ConcentratorTime) int64 {
+	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & XTime32BitLSBMask)
+}
+
 // ConcentratorTimeFromXTime constructs the scheduling.ConcentratorTime associated
 // with the provided XTime.
 func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
@@ -110,10 +125,19 @@ func ConcentratorTimeFromXTime(xTime int64) scheduling.ConcentratorTime {
 // provided XTime.
 func TimestampFromXTime(xTime int64) uint32 {
 	// The concentrator timestamp is the 32 LSB.
-	return uint32(xTime & 0xFFFFFFFF)
+	return uint32(xTime & XTime32BitLSBMask)
 }
 
 // SessionIDFromXTime constructs the session ID associated with the provided XTime.
 func SessionIDFromXTime(xTime int64) int32 {
 	return int32(xTime >> 48)
+}
+
+// IsExtendedXTimeSession returns whether the provided session ID belongs to a gateway
+// that extends the 32-bit concentrator timestamp to 48 bits in the XTime.
+// LoRa Basics Station never uses session 0 and accounts for rollovers in the lower 48 bits.
+// Some implementations report the raw 32-bit concentrator timestamp as
+// XTime, without a session and without accounting for rollovers.
+func IsExtendedXTimeSession(id int32) bool {
+	return id&xTimeSessionMask != 0
 }

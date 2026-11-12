@@ -551,6 +551,12 @@ func (f *lbsLNS) HandleUp( // nolint:gocyclo
 		if onlyWithGPS && gpsTime == 0 {
 			return nil
 		}
+		if !semtechws.IsExtendedXTimeSession(semtechws.SessionIDFromXTime(xTime)) {
+			// The gateway reports only the 32-bit concentrator timestamp, which rolls over approximately
+			// every 72 minutes. Let the scheduler synchronize using the concentrator timestamp, as it
+			// accounts for rollovers.
+			return nil
+		}
 		return &io.FrontendClockSynchronization{
 			Timestamp:  semtechws.TimestampFromXTime(xTime),
 			ServerTime: receivedAt,

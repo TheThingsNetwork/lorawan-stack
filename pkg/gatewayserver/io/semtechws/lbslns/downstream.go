@@ -120,12 +120,22 @@ func (f *lbsLNS) FromDownlink(
 			return nil, errSessionStateNotFound.New()
 		}
 
-		xTime := semtechws.ConcentratorTimeToXTime(sessionID, scheduling.ConcentratorTime(settings.ConcentratorTimestamp))
-		xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
+		concentratorTime := scheduling.ConcentratorTime(settings.ConcentratorTimestamp)
+		var xTime int64
+		if semtechws.IsExtendedXTimeSession(sessionID) {
+			xTime = semtechws.ConcentratorTimeToXTime(sessionID, concentratorTime)
+			xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
+		} else {
+			// The gateway does not extend the 32-bit concentrator timestamp, so the XTime must wrap
+			// around in the same way. Subtract a second before truncating, since the RX delay is 1.
+			xTime = semtechws.ConcentratorTimeToTimestampXTime(
+				sessionID, concentratorTime-scheduling.ConcentratorTime(time.Second),
+			)
+		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"xtime", xTime,
 			"session_id", sessionID,
-			"concentrator_time", scheduling.ConcentratorTime(settings.ConcentratorTimestamp),
+			"concentrator_time", concentratorTime,
 		)).Debug("Computed downlink xtime")
 
 		// Timestamp based downlinks are scheduled as class A downlinks.
@@ -193,6 +203,10 @@ func (*lbsLNS) TransferTime(
 	}
 
 	sessionID, found := semtechws.GetSessionID(ctx)
+	if found && !semtechws.IsExtendedXTimeSession(sessionID) {
+		// Gateways that do not extend the concentrator timestamp do not implement time transfers.
+		return nil, nil
+	}
 	if !found || gpsTime == nil || concentratorTime == nil {
 		// Update only the MuxTime.
 		// https://github.com/lorabasics/basicstation/blob/bd17e53ab1137de6abb5ae48d6f3d52f6c268299/src/s2e.c#L1616-L1619
