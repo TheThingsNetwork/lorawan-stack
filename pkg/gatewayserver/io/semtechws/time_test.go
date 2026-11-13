@@ -116,7 +116,6 @@ func TestConcentratorTimeToTimestampXTime(t *testing.T) {
 
 	for _, tc := range []struct {
 		Name             string
-		SessionID        int32
 		ConcentratorTime scheduling.ConcentratorTime
 		Expected         int64
 	}{
@@ -140,18 +139,12 @@ func TestConcentratorTimeToTimestampXTime(t *testing.T) {
 			ConcentratorTime: scheduling.ConcentratorTime(-500 * time.Millisecond),
 			Expected:         1<<32 - 500000,
 		},
-		{
-			Name:             "WithRadioUnit",
-			SessionID:        0x0100,
-			ConcentratorTime: scheduling.ConcentratorTime((1<<32 + 780557) * time.Microsecond),
-			Expected:         0x0100<<48 | 780557,
-		},
 	} {
 		t.Run(tc.Name, func(t *testing.T) {
 			t.Parallel()
 
 			a, _ := test.New(t)
-			a.So(ConcentratorTimeToTimestampXTime(tc.SessionID, tc.ConcentratorTime), should.Equal, tc.Expected)
+			a.So(ConcentratorTimeToTimestampXTime(tc.ConcentratorTime), should.Equal, tc.Expected)
 		})
 	}
 }

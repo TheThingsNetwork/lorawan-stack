@@ -374,11 +374,20 @@ func TestTransferTime(t *testing.T) {
 		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
 	}
 
-	// Gateways that do not extend the concentrator timestamp do not support time transfers.
+	// Gateways that do not extend the concentrator timestamp receive the 32-bit concentrator timestamp.
 	semtechws.UpdateSessionID(ctx, 0)
+	concentratorTime = scheduling.ConcentratorTime((1<<32 + 780557) * time.Microsecond)
 	b, err = f.TransferTime(ctx, now, &gpsTime, &concentratorTime)
 	if !a.So(err, should.BeNil) {
 		t.FailNow()
 	}
-	a.So(b, should.BeNil)
+	if a.So(b, should.NotBeNil) {
+		var res TimeSyncResponse
+		if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(res.XTime, should.Equal, 780557)
+		a.So(res.GPSTime, should.Equal, semtechws.TimeToGPSTime(gpsTime))
+		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
+	}
 }

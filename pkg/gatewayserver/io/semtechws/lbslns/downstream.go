@@ -126,10 +126,10 @@ func (f *lbsLNS) FromDownlink(
 			xTime = semtechws.ConcentratorTimeToXTime(sessionID, concentratorTime)
 			xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
 		} else {
-			// The gateway does not extend the 32-bit concentrator timestamp, so the XTime must wrap
-			// around in the same way. Subtract a second before truncating, since the RX delay is 1.
+			// The gateway uses the 32-bit concentrator timestamp as XTime, so the XTime must roll over
+			// in the same way. Subtract a second before truncating, since the RX delay is 1.
 			xTime = semtechws.ConcentratorTimeToTimestampXTime(
-				sessionID, concentratorTime-scheduling.ConcentratorTime(time.Second),
+				concentratorTime - scheduling.ConcentratorTime(time.Second),
 			)
 		}
 		log.FromContext(ctx).WithFields(log.Fields(
@@ -203,17 +203,17 @@ func (*lbsLNS) TransferTime(
 	}
 
 	sessionID, found := semtechws.GetSessionID(ctx)
-	if found && !semtechws.IsExtendedXTimeSession(sessionID) {
-		// Gateways that do not extend the concentrator timestamp do not implement time transfers.
-		return nil, nil
-	}
 	if !found || gpsTime == nil || concentratorTime == nil {
 		// Update only the MuxTime.
 		// https://github.com/lorabasics/basicstation/blob/bd17e53ab1137de6abb5ae48d6f3d52f6c268299/src/s2e.c#L1616-L1619
 		return response.MarshalJSON()
 	}
 
-	response.XTime = semtechws.ConcentratorTimeToXTime(sessionID, *concentratorTime)
+	if semtechws.IsExtendedXTimeSession(sessionID) {
+		response.XTime = semtechws.ConcentratorTimeToXTime(sessionID, *concentratorTime)
+	} else {
+		response.XTime = semtechws.ConcentratorTimeToTimestampXTime(*concentratorTime)
+	}
 	response.GPSTime = semtechws.TimeToGPSTime(*gpsTime)
 
 	return response.MarshalJSON()

@@ -106,12 +106,12 @@ func ConcentratorTimeToXTime(id int32, t scheduling.ConcentratorTime) int64 {
 }
 
 // ConcentratorTimeToTimestampXTime constructs the XTime associated with the provided
-// session ID and concentrator time for sessions that do not extend the concentrator timestamp.
-// Only the lower 32 bits of the concentrator time (in microseconds) are used, which wrap around
-// on rollover in the same way as the concentrator timestamp of the gateway.
+// concentrator time for gateways that do not extend the concentrator timestamp.
+// The XTime is the 32-bit unsigned concentrator timestamp, which rolls over in the same way
+// as the concentrator timestamp of the gateway.
 // See IsExtendedXTimeSession.
-func ConcentratorTimeToTimestampXTime(id int32, t scheduling.ConcentratorTime) int64 {
-	return int64(id)<<48 | (int64(t) / int64(time.Microsecond) & XTime32BitLSBMask)
+func ConcentratorTimeToTimestampXTime(t scheduling.ConcentratorTime) int64 {
+	return int64(t) / int64(time.Microsecond) & XTime32BitLSBMask
 }
 
 // ConcentratorTimeFromXTime constructs the scheduling.ConcentratorTime associated
