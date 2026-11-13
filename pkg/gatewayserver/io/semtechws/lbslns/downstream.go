@@ -120,12 +120,22 @@ func (f *lbsLNS) FromDownlink(
 			return nil, errSessionStateNotFound.New()
 		}
 
-		xTime := semtechws.ConcentratorTimeToXTime(sessionID, scheduling.ConcentratorTime(settings.ConcentratorTimestamp))
-		xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
+		concentratorTime := scheduling.ConcentratorTime(settings.ConcentratorTimestamp)
+		var xTime int64
+		if semtechws.IsExtendedXTimeSession(sessionID) {
+			xTime = semtechws.ConcentratorTimeToXTime(sessionID, concentratorTime)
+			xTime = xTime - int64(time.Second/time.Microsecond) // Subtract a second, since the RX delay is 1.
+		} else {
+			// The gateway uses the 32-bit concentrator timestamp as XTime, so the XTime must roll over
+			// in the same way. Subtract a second before truncating, since the RX delay is 1.
+			xTime = semtechws.ConcentratorTimeToTimestampXTime(
+				concentratorTime - scheduling.ConcentratorTime(time.Second),
+			)
+		}
 		log.FromContext(ctx).WithFields(log.Fields(
 			"xtime", xTime,
 			"session_id", sessionID,
-			"concentrator_time", scheduling.ConcentratorTime(settings.ConcentratorTimestamp),
+			"concentrator_time", concentratorTime,
 		)).Debug("Computed downlink xtime")
 
 		// Timestamp based downlinks are scheduled as class A downlinks.
@@ -199,7 +209,11 @@ func (*lbsLNS) TransferTime(
 		return response.MarshalJSON()
 	}
 
-	response.XTime = semtechws.ConcentratorTimeToXTime(sessionID, *concentratorTime)
+	if semtechws.IsExtendedXTimeSession(sessionID) {
+		response.XTime = semtechws.ConcentratorTimeToXTime(sessionID, *concentratorTime)
+	} else {
+		response.XTime = semtechws.ConcentratorTimeToTimestampXTime(*concentratorTime)
+	}
 	response.GPSTime = semtechws.TimeToGPSTime(*gpsTime)
 
 	return response.MarshalJSON()

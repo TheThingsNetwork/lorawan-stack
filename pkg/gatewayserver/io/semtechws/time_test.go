@@ -18,6 +18,7 @@ import (
 	"testing"
 	"time"
 
+	"go.thethings.network/lorawan-stack/v3/pkg/gatewayserver/scheduling"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test"
 	"go.thethings.network/lorawan-stack/v3/pkg/util/test/assertions/should"
 )
@@ -63,6 +64,87 @@ func TestTimePtrFromUpInfo(t *testing.T) {
 
 			a, _ := test.New(t)
 			a.So(TimePtrFromUpInfo(tc.GPSTime, tc.RxTime), should.Resemble, tc.ExpectedTime)
+		})
+	}
+}
+
+func TestIsExtendedXTimeSession(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name     string
+		XTime    int64
+		Expected bool
+	}{
+		{
+			Name:     "NonExtendedTimestamp",
+			XTime:    4290303429,
+			Expected: false,
+		},
+		{
+			Name:     "NonExtendedTimestampAfterRollover",
+			XTime:    780557,
+			Expected: false,
+		},
+		{
+			Name:     "Session",
+			XTime:    0x42<<48 | 0x1FFFFFFFF,
+			Expected: true,
+		},
+		{
+			Name:     "SessionWithRadioUnit",
+			XTime:    0x0142<<48 | 0x1FFFFFFFF,
+			Expected: true,
+		},
+		{
+			Name:     "RadioUnitWithoutSession",
+			XTime:    0x0100<<48 | 0xFFFFFFFF,
+			Expected: false,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, _ := test.New(t)
+			a.So(IsExtendedXTimeSession(SessionIDFromXTime(tc.XTime)), should.Equal, tc.Expected)
+		})
+	}
+}
+
+func TestConcentratorTimeToTimestampXTime(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name             string
+		ConcentratorTime scheduling.ConcentratorTime
+		Expected         int64
+	}{
+		{
+			Name:             "BeforeRollover",
+			ConcentratorTime: scheduling.ConcentratorTime(4290303429 * time.Microsecond),
+			Expected:         4290303429,
+		},
+		{
+			Name:             "AfterRollover",
+			ConcentratorTime: scheduling.ConcentratorTime((1<<32 + 780557) * time.Microsecond),
+			Expected:         780557,
+		},
+		{
+			Name:             "AfterMultipleRollovers",
+			ConcentratorTime: scheduling.ConcentratorTime((3<<32 + 780557) * time.Microsecond),
+			Expected:         780557,
+		},
+		{
+			Name:             "Negative",
+			ConcentratorTime: scheduling.ConcentratorTime(-500 * time.Millisecond),
+			Expected:         1<<32 - 500000,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, _ := test.New(t)
+			a.So(ConcentratorTimeToTimestampXTime(tc.ConcentratorTime), should.Equal, tc.Expected)
 		})
 	}
 }

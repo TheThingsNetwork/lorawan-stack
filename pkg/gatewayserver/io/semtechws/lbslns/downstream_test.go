@@ -154,6 +154,75 @@ func TestFromDownlinkMessage(t *testing.T) {
 	}
 }
 
+func TestFromDownlinkMessageNonExtendedXTime(t *testing.T) {
+	t.Parallel()
+
+	for _, tc := range []struct {
+		Name             string
+		ConcentratorTime scheduling.ConcentratorTime
+		ExpectedXTime    int64
+	}{
+		{
+			Name:             "BeforeRollover",
+			ConcentratorTime: scheduling.ConcentratorTime((4277615293 + 1000000) * time.Microsecond),
+			ExpectedXTime:    4277615293,
+		},
+		{
+			Name:             "AfterRollover",
+			ConcentratorTime: scheduling.ConcentratorTime((1<<32 + 780557 + 1000000) * time.Microsecond),
+			ExpectedXTime:    780557,
+		},
+		{
+			Name:             "RxDelayAcrossRollover",
+			ConcentratorTime: scheduling.ConcentratorTime((1<<32 + 500000) * time.Microsecond),
+			ExpectedXTime:    1<<32 - 500000,
+		},
+	} {
+		t.Run(tc.Name, func(t *testing.T) {
+			t.Parallel()
+
+			a, ctx := test.New(t)
+			ctx = semtechws.NewContextWithSession(ctx, &semtechws.Session{})
+			semtechws.UpdateSessionID(ctx, 0)
+
+			raw, err := (&lbsLNS{}).FromDownlink(
+				ctx,
+				&ttnpb.DownlinkMessage{
+					RawPayload: []byte{0x60},
+					Settings: &ttnpb.DownlinkMessage_Scheduled{
+						Scheduled: &ttnpb.TxSettings{
+							DataRate: &ttnpb.DataRate{
+								Modulation: &ttnpb.DataRate_Lora{
+									Lora: &ttnpb.LoRaDataRate{
+										SpreadingFactor: 12,
+										Bandwidth:       125000,
+										CodingRate:      band.Cr4_5,
+									},
+								},
+							},
+							Frequency:             868300000,
+							Downlink:              &ttnpb.TxSettings_Downlink{},
+							ConcentratorTimestamp: int64(tc.ConcentratorTime),
+						},
+					},
+				},
+				band.EU_863_870,
+				time.Unix(1794217854, 0),
+				&io.DownlinkTokens{},
+			)
+			if !a.So(err, should.BeNil) {
+				t.FailNow()
+			}
+			var dnmsg DownlinkMessage
+			if !a.So(dnmsg.unmarshalJSON(raw), should.BeNil) || !a.So(dnmsg.TimestampDownlinkMessage, should.NotBeNil) {
+				t.FailNow()
+			}
+			a.So(dnmsg.RxDelay, should.Equal, 1)
+			a.So(dnmsg.XTime, should.Equal, tc.ExpectedXTime)
+		})
+	}
+}
+
 func TestToDownlinkMessage(t *testing.T) {
 	for _, tc := range []struct {
 		BandID,
@@ -301,6 +370,23 @@ func TestTransferTime(t *testing.T) {
 		a.So(res.TxTime, should.Equal, 0.0)
 		a.So(semtechws.SessionIDFromXTime(res.XTime), should.Equal, 0x42)
 		a.So(semtechws.ConcentratorTimeFromXTime(res.XTime), should.Equal, 890*time.Microsecond)
+		a.So(res.GPSTime, should.Equal, semtechws.TimeToGPSTime(gpsTime))
+		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
+	}
+
+	// Gateways that do not extend the concentrator timestamp receive the 32-bit concentrator timestamp.
+	semtechws.UpdateSessionID(ctx, 0)
+	concentratorTime = scheduling.ConcentratorTime((1<<32 + 780557) * time.Microsecond)
+	b, err = f.TransferTime(ctx, now, &gpsTime, &concentratorTime)
+	if !a.So(err, should.BeNil) {
+		t.FailNow()
+	}
+	if a.So(b, should.NotBeNil) {
+		var res TimeSyncResponse
+		if err := json.Unmarshal(b, &res); !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		a.So(res.XTime, should.Equal, 780557)
 		a.So(res.GPSTime, should.Equal, semtechws.TimeToGPSTime(gpsTime))
 		a.So(res.MuxTime, should.Equal, semtechws.TimeToUnixSeconds(now))
 	}

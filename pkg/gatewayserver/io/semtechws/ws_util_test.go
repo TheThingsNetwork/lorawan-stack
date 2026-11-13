@@ -52,6 +52,10 @@ func (c *mockClock) Start(ctx context.Context, now time.Time) {
 	// Set the clock to a random value on every start.
 	c.startTimeStamp = rand.Uint32()
 	c.sessionID = uint16(rand.Uint32())
+	if c.sessionID&0xFF == 0 {
+		// LoRa Basics Station never uses session 0.
+		c.sessionID |= 0x01
+	}
 	c.startTime = now
 }
 
