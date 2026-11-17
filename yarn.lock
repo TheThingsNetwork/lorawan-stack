@@ -1926,12 +1926,12 @@
     "@formatjs/bigdecimal" "0.2.7"
     "@formatjs/intl-localematcher" "0.10.0"
 
-"@formatjs/intl-relativetimeformat@^12.4.0":
-  version "12.4.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-12.4.0.tgz#97d4f8ad075faf3aadfb3d94d598ccae6fed632a"
-  integrity sha512-sXYW00Zh2rodj2HguxY/IoXSsrru3YAIbvH+JeXPvpQs5ukS2eWwv3zvcPTWZyFzqSiwFiKAuPtdr/6kQn3u6g==
+"@formatjs/intl-relativetimeformat@^13.0.3":
+  version "13.0.3"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-relativetimeformat/-/intl-relativetimeformat-13.0.3.tgz#d0693c673995f0729d9608948ae0b323bf11973e"
+  integrity sha512-5nyIp4F/59A5hcfU6lZphSslpildVSirqudWfygBENGdGSHmggZVjhoad458XWEgtUd6d0JoiwsiUBFLfbqJ9Q==
   dependencies:
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-supportedvaluesof@3.0.1":
   version "3.0.1"
