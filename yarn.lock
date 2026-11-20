@@ -1923,13 +1923,13 @@
     "@formatjs/bigdecimal" "0.2.10"
     "@formatjs/intl-localematcher" "0.10.1"
 
-"@formatjs/intl-pluralrules@^6.4.0":
-  version "6.4.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-pluralrules/-/intl-pluralrules-6.4.0.tgz#d96d2c0105ac3501294cfc8c19d26fa238a349ab"
-  integrity sha512-dPsgM2WeLIRPzH8wqv9mnq2sdnAeyz7n7gqv/JSK6jFVvJEEZIyZX0XalFZsuuNQ8U2CQQ5RxCy0h9U/nirJIQ==
+"@formatjs/intl-pluralrules@^7.0.4":
+  version "7.0.4"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-pluralrules/-/intl-pluralrules-7.0.4.tgz#cf6d55b99738a30edf5edc96d3daafcf42eb167e"
+  integrity sha512-EeQ8YUs1QOpYLUiNHkHfR1rsOMtQUBQXEQwR9WmJRWfzvVXeYZ7vBeMARtlb2KuHUgdmfXjoin5oNn68hjyrEQ==
   dependencies:
-    "@formatjs/bigdecimal" "0.2.7"
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/bigdecimal" "0.2.10"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-relativetimeformat@^13.0.3":
   version "13.0.3"

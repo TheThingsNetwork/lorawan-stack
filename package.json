@@ -87,7 +87,7 @@
     "@formatjs/intl-listformat": "^9.0.3",
     "@formatjs/intl-locale": "^5.4.3",
     "@formatjs/intl-numberformat": "^10.0.4",
-    "@formatjs/intl-pluralrules": "^6.4.0",
+    "@formatjs/intl-pluralrules": "^7.0.4",
     "@formatjs/intl-relativetimeformat": "^13.0.3",
     "@reduxjs/toolkit": "^2.14.0",
     "@sentry/integrations": "^7.114.0",
