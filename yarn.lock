@@ -1867,12 +1867,12 @@
     "@formatjs/bigdecimal" "0.2.7"
     "@formatjs/intl-localematcher" "0.10.0"
 
-"@formatjs/intl-displaynames@^7.4.0":
-  version "7.4.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-7.4.0.tgz#9acf3c33b4860beb13607b0633ea18e95f3864db"
-  integrity sha512-D2SZXvkeMadjGeg1vlqcqtNg0hJIKxUL5HiFkSdCt8pmKH5sNMP0DKND+X1cfuOV0EMyKIp04WYRSIHFFVYAfA==
+"@formatjs/intl-displaynames@^8.0.3":
+  version "8.0.3"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-displaynames/-/intl-displaynames-8.0.3.tgz#ed2075b515466761960cddad59fb0916e781c5fa"
+  integrity sha512-UhKG1OwrbQzZNKIcmZu+/JR5SOxE25RWmUzxaNfQ04AJ4OwxNkTvAbVX0ojnkm0i8Qs4E8ElIoBdA6F8XTkJXw==
   dependencies:
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-getcanonicallocales@3.3.1":
   version "3.3.1"
