@@ -237,13 +237,13 @@
     "@babel/helper-optimise-call-expression" "^7.29.7"
     "@babel/traverse" "^7.29.7"
 
-"@babel/helper-skip-transparent-expression-wrappers@^7.29.7":
-  version "7.29.7"
-  resolved "https://registry.yarnpkg.com/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.29.7.tgz#50c95c7e4c4f54936cfa0116428edc559862d551"
-  integrity sha512-brcMGQaVzIeUb+6/bs1Av0f8YuNNjKY2JyvfRCsFuFsdKccEQ5Ges2y74D74NZ1Rz8lKJ9ksJkfqwQFJ/iNEyQ==
+"@babel/helper-skip-transparent-expression-wrappers@^7.29.13", "@babel/helper-skip-transparent-expression-wrappers@^7.29.7":
+  version "7.29.13"
+  resolved "https://registry.yarnpkg.com/@babel/helper-skip-transparent-expression-wrappers/-/helper-skip-transparent-expression-wrappers-7.29.13.tgz#7e65e12c6d82f5a38a489428e6b0d4c509faa49f"
+  integrity sha512-Abm4rKIH0tmCayJLwcoeOkdzpYUphTbO52fHhyEBHn7S0R+ni4epNLI/8nq1L0DN2Bl0u5qmgWm2Og/z4fBb+Q==
   dependencies:
-    "@babel/traverse" "^7.29.7"
-    "@babel/types" "^7.29.7"
+    "@babel/traverse" "^7.29.13"
+    "@babel/types" "^7.29.11"
 
 "@babel/helper-string-parser@^7.29.11":
   version "7.29.13"
@@ -919,13 +919,13 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
 
-"@babel/plugin-transform-spread@^7.29.11", "@babel/plugin-transform-spread@^7.29.7":
-  version "7.29.11"
-  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-spread/-/plugin-transform-spread-7.29.11.tgz#72b8330d0382dee9d367cc54b10be531e7f0dff9"
-  integrity sha512-5xWGhfuMgbOfIjsk/I2c4uMnoqRwQdKYi4QjvybQrcEVE0G9/p3qmIkp2Sxe8YF8DGNNVs5whfwNqIM5684XoQ==
+"@babel/plugin-transform-spread@^7.29.15", "@babel/plugin-transform-spread@^7.29.7":
+  version "7.29.15"
+  resolved "https://registry.yarnpkg.com/@babel/plugin-transform-spread/-/plugin-transform-spread-7.29.15.tgz#6eb7017b2ce029cc78f671a752957c5557edc897"
+  integrity sha512-pRjXL7b9aBlzKQ7BAgzd4fald8z6tPCrpFun1lhndMYk8k2+5ccRDVlFDfgsnVK5lpP89yydrCdMqxB5sMNicg==
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
-    "@babel/helper-skip-transparent-expression-wrappers" "^7.29.7"
+    "@babel/helper-skip-transparent-expression-wrappers" "^7.29.13"
 
 "@babel/plugin-transform-sticky-regex@^7.29.7":
   version "7.29.7"
