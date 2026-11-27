@@ -197,6 +197,44 @@ func (st *StoreTest) TestEndDeviceStoreCRUD(t *T) {
 		}
 	})
 
+	t.Run("GetEndDevice_ByIDsIgnoresEUIs", func(t *T) {
+		a, ctx := test.New(t)
+		// When the primary identifiers are set, the EUIs do not restrict the lookup.
+		got, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: application.GetIds(),
+			DeviceId:       "foo",
+			DevEui:         types.EUI64{8, 7, 6, 5, 4, 3, 2, 1}.Bytes(),
+			JoinEui:        types.EUI64{}.Bytes(),
+		}, endDeviceMask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, created)
+		}
+	})
+
+	t.Run("GetEndDevice_WithoutStoredEUIs", func(t *T) {
+		a, ctx := test.New(t)
+		withoutEUIs, err := s.CreateEndDevice(ctx, &ttnpb.EndDevice{
+			Ids: &ttnpb.EndDeviceIdentifiers{
+				ApplicationIds: application.GetIds(),
+				DeviceId:       "without-euis",
+			},
+		})
+		if !a.So(err, should.BeNil) {
+			t.FailNow()
+		}
+		got, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
+			ApplicationIds: application.GetIds(),
+			DeviceId:       "without-euis",
+			DevEui:         types.EUI64{1, 1, 1, 1, 1, 1, 1, 1}.Bytes(),
+			JoinEui:        types.EUI64{}.Bytes(),
+		}, endDeviceMask)
+		if a.So(err, should.BeNil) && a.So(got, should.NotBeNil) {
+			a.So(got, should.Resemble, withoutEUIs)
+		}
+		err = s.DeleteEndDevice(ctx, withoutEUIs.GetIds())
+		a.So(err, should.BeNil)
+	})
+
 	t.Run("GetEndDevice_Other", func(t *T) {
 		a, ctx := test.New(t)
 		_, err := s.GetEndDevice(ctx, &ttnpb.EndDeviceIdentifiers{
