@@ -89,8 +89,13 @@ const DeviceInfoPanel = ({ events }) => {
 
   const dispatch = useDispatch()
   const handleGetBrand = useCallback(async () => {
-    const brand = await dispatch(attachPromise(getBrand(appId, version_ids.brand_id, ['name'])))
-    setBrandName(brand?.name)
+    try {
+      const brand = await dispatch(attachPromise(getBrand(appId, version_ids.brand_id, ['name'])))
+      setBrandName(brand?.name)
+    } catch {
+      // The brand may not be part of the Device Repository.
+      setBrandName('')
+    }
   }, [appId, version_ids.brand_id, dispatch])
 
   useEffect(() => {

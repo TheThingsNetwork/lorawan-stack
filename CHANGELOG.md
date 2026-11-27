@@ -27,6 +27,7 @@ For details about compatibility between different releases, see the **Commitment
 - Downlink scheduling failing with `sub band is blocked` for up to 72 minutes on LoRa Basics Station gateways that report the 32-bit concentrator timestamp as `xtime` without a session. When the concentrator timestamp rolled over, the gateway clock went back in time. The Gateway Server now accounts for rollovers of the concentrator timestamp for these gateways, and sends `xtime` values to them as 32-bit concentrator timestamps.
 - Fix JavaScript comment readability in dark mode in the code editor.
 - Fix storybook errors.
+- Flaky Console end-to-end tests.
 
 ### Security
 

@@ -50,6 +50,7 @@ const NotificationList = ({
   listRef,
   updatePendingNotificationIds,
   unreadNotificationsCount,
+  unreadNotificationsCountLoading,
 }) => {
   const { category } = useParams()
   const isArchive = category === 'archived'
@@ -125,7 +126,7 @@ const NotificationList = ({
             icon={IconEye}
             onClick={handleMarkAllAsSeen}
             message={m.markAllAsRead}
-            disabled={!unreadNotificationsCount}
+            disabled={!unreadNotificationsCount || unreadNotificationsCountLoading}
           />
         )}
       </div>
@@ -170,11 +171,13 @@ NotificationList.propTypes = {
   }),
   totalCount: PropTypes.number.isRequired,
   unreadNotificationsCount: PropTypes.number.isRequired,
+  unreadNotificationsCountLoading: PropTypes.bool,
   updatePendingNotificationIds: PropTypes.arrayOf(PropTypes.string).isRequired,
 }
 
 NotificationList.defaultProps = {
   selectedNotification: undefined,
+  unreadNotificationsCountLoading: false,
 }
 
 export default NotificationList

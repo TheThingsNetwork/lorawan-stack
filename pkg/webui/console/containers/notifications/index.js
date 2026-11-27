@@ -288,6 +288,7 @@ const Notifications = React.memo(() => {
           selectedNotification={selectedNotification}
           updatePendingNotificationIds={updatePendingNotificationIds}
           unreadNotificationsCount={unreadNotificationsCount}
+          unreadNotificationsCountLoading={unseenNotificationsLoading}
           listRef={listRef}
         />
         <div className="d-flex j-center">

@@ -63,6 +63,26 @@ describe('Notifications', () => {
     cy.findByTestId('total-unseen-notifications').should('not.exist')
   })
 
+  it('succeeds marking all notifications as read once the unread count is loaded', () => {
+    cy.intercept(
+      { method: 'GET', pathname: '/api/v3/users/admin/notifications', query: { limit: '1' } },
+      req => {
+        req.on('response', res => {
+          res.setDelay(3000)
+        })
+      },
+    )
+    cy.visit(`${Cypress.config('consoleRootPath')}/notifications`)
+
+    cy.findByTestId('total-unseen-notifications').should('be.visible')
+    cy.findByRole('button', { name: /Mark all as read/ }).should('be.disabled')
+    cy.findByRole('button', { name: /Mark all as read/ }).click()
+    cy.findByTestId('total-unseen-notifications').should('not.exist')
+    cy.reload()
+    cy.findAllByTestId('notification-list-item').should('have.length', 2)
+    cy.findByTestId('total-unseen-notifications').should('not.exist')
+  })
+
   it('succeeds archiving and unarchiving a notification', () => {
     cy.findByText(/Collaborator of application added or updated/).click()
     cy.findByRole('button', { name: /Archive/ }).click()
