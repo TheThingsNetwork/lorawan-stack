@@ -536,11 +536,16 @@ func (s *endDeviceStore) GetEndDevice(
 			by = append(by, s.selectWithID(ctx, id.GetApplicationIds().GetApplicationId()))
 		}
 	}
-	if euiString := eui64ToString(types.MustEUI64(id.GetDevEui())); euiString != nil {
-		by = append(by, s.selectWithDevEUI(ctx, *euiString))
-	}
-	if euiString := eui64ToString(types.MustEUI64(id.GetJoinEui())); euiString != nil {
-		by = append(by, s.selectWithJoinEUI(ctx, *euiString))
+	// The EUIs are lookup keys only when the primary identifiers do not identify a single
+	// end device. End devices may be registered without EUIs, so filtering on EUIs provided
+	// in addition to the primary identifiers would not find such end devices.
+	if id.GetApplicationIds().GetApplicationId() == "" || id.GetDeviceId() == "" {
+		if euiString := eui64ToString(types.MustEUI64(id.GetDevEui())); euiString != nil {
+			by = append(by, s.selectWithDevEUI(ctx, *euiString))
+		}
+		if euiString := eui64ToString(types.MustEUI64(id.GetJoinEui())); euiString != nil {
+			by = append(by, s.selectWithJoinEUI(ctx, *euiString))
+		}
 	}
 
 	model, err := s.getEndDeviceModelBy(ctx, combineApply(by...), fieldMask)
