@@ -1815,11 +1815,6 @@
   resolved "https://registry.yarnpkg.com/@formatjs/bigdecimal/-/bigdecimal-0.2.10.tgz#8a68c4401dd36017714f00394e326c81f0cde6a8"
   integrity sha512-npIs6UARNOg5amJY5UOVsd6HUQQfzYjet0sa0SWIqzsnVhxLSpaIx2DjoIVrr/vqmjURjvroeW6dItjfy3Uf8A==
 
-"@formatjs/bigdecimal@0.2.7":
-  version "0.2.7"
-  resolved "https://registry.yarnpkg.com/@formatjs/bigdecimal/-/bigdecimal-0.2.7.tgz#164256d9bd93766b792fc9c0b803cbae4fc37261"
-  integrity sha512-B4+XY/e4u5v261r3a37Kq2ax91gPZSKGyVpx8X5dygAggLlUz+6MeBpmAhaBFGB8WQ4JB1qD+QtKHk9aJkEb9Q==
-
 "@formatjs/ecma402-abstract@2.3.6":
   version "2.3.6"
   resolved "https://registry.yarnpkg.com/@formatjs/ecma402-abstract/-/ecma402-abstract-2.3.6.tgz#d6ca9d3579054fe1e1a0a0b5e872e0d64922e4e1"
@@ -1859,13 +1854,13 @@
     "@formatjs/ecma402-abstract" "2.3.6"
     tslib "^2.8.0"
 
-"@formatjs/intl-datetimeformat@^7.9.0":
-  version "7.9.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-7.9.0.tgz#abf9109b9b9cc680e1c33d4a713f304f101111c9"
-  integrity sha512-C17ilxM6zJO1wAYDwoW4E0Oy8K6krEC7MjcZAArW/wEthBb3Lab0LBTh0G7liLOGEj74iCTWm2TYHtLv+SbtYg==
+"@formatjs/intl-datetimeformat@^8.2.0":
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/@formatjs/intl-datetimeformat/-/intl-datetimeformat-8.2.0.tgz#878830b4d1869eb1c64078f7b4a5cf3bb4890193"
+  integrity sha512-lwxgpDDm3AG2JKAgN1sj6bOZdM1fVDE1xIyGYqmTxlloI4NuT2ccWMx8FKQGARvUCwKG+5MUtwt+e4VVj4P03Q==
   dependencies:
-    "@formatjs/bigdecimal" "0.2.7"
-    "@formatjs/intl-localematcher" "0.10.0"
+    "@formatjs/bigdecimal" "0.2.10"
+    "@formatjs/intl-localematcher" "0.10.1"
 
 "@formatjs/intl-displaynames@^8.0.3":
   version "8.0.3"
@@ -1893,13 +1888,6 @@
   dependencies:
     "@formatjs/intl-getcanonicallocales" "3.4.0"
     "@formatjs/intl-supportedvaluesof" "3.1.0"
-
-"@formatjs/intl-localematcher@0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@formatjs/intl-localematcher/-/intl-localematcher-0.10.0.tgz#988e22e1dc0c961e20aeb5496c28043cf2fc08e0"
-  integrity sha512-OvfBelurObm02D1+4BsuHSt3Xkn49RZPo7uJXt/1Z0dNET3EN39kY1rKMV3kG0tn0p4gyGWrcFx9HyeF07cq5g==
-  dependencies:
-    "@formatjs/fast-memoize" "3.1.7"
 
 "@formatjs/intl-localematcher@0.10.1":
   version "0.10.1"
