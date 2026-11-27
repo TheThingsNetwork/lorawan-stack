@@ -964,7 +964,7 @@
   dependencies:
     "@babel/helper-plugin-utils" "^7.29.7"
 
-"@babel/plugin-transform-spread@^7.29.11", "@babel/plugin-transform-spread@^7.29.15", "@babel/plugin-transform-spread@^7.29.7":
+"@babel/plugin-transform-spread@^7.29.11", "@babel/plugin-transform-spread@^7.29.15":
   version "7.29.15"
   resolved "https://registry.yarnpkg.com/@babel/plugin-transform-spread/-/plugin-transform-spread-7.29.15.tgz#6eb7017b2ce029cc78f671a752957c5557edc897"
   integrity sha512-pRjXL7b9aBlzKQ7BAgzd4fald8z6tPCrpFun1lhndMYk8k2+5ccRDVlFDfgsnVK5lpP89yydrCdMqxB5sMNicg==
