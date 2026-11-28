@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-import unicode from 'unicode-properties'
+import { isAlphabetic, isDigit, isUpperCase } from 'unicode-properties'
 
 /**
  * Checks if `password` has enough special characters.
@@ -25,7 +25,7 @@ export const hasSpecial = (password = '', specialCount = 0) => {
   let foundSpecial = 0
   for (let i = 0; i < password.length && foundSpecial < specialCount; i++) {
     const codePoint = password.codePointAt(i)
-    if (!unicode.isAlphabetic(codePoint) && !unicode.isDigit(codePoint)) {
+    if (!isAlphabetic(codePoint) && !isDigit(codePoint)) {
       foundSpecial++
     }
   }
@@ -43,7 +43,7 @@ export const hasSpecial = (password = '', specialCount = 0) => {
 export const hasUpper = (password = '', upperCount = 0) => {
   let foundUppercase = 0
   for (let i = 0; i < password.length && foundUppercase < upperCount; i++) {
-    if (unicode.isUpperCase(password.codePointAt(i))) {
+    if (isUpperCase(password.codePointAt(i))) {
       foundUppercase++
     }
   }
@@ -61,7 +61,7 @@ export const hasUpper = (password = '', upperCount = 0) => {
 export const hasDigit = (password = '', digitCount = 0) => {
   let foundDigits = 0
   for (let i = 0; i < password.length && foundDigits < digitCount; i++) {
-    if (unicode.isDigit(password.charCodeAt(i))) {
+    if (isDigit(password.charCodeAt(i))) {
       foundDigits++
     }
   }

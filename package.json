@@ -138,7 +138,7 @@
     "reselect": "^5.3.0",
     "scroll-into-view-if-needed": "^3.2.1",
     "ttn-lw": "file:sdk/js",
-    "unicode-properties": "^1.4.1",
+    "unicode-properties": "^2.0.2",
     "url-template": "^3.1.1",
     "yup": "^1.7.1"
   },
@@ -159,6 +159,21 @@
       "<rootDir>/pkg/**/*_test.js"
     ],
     "transform": {
+      "/node_modules/(unicode-properties|unicode-trie)/.+\\.js$": [
+        "babel-jest",
+        {
+          "presets": [
+            [
+              "@babel/preset-env",
+              {
+                "targets": {
+                  "node": "current"
+                }
+              }
+            ]
+          ]
+        }
+      ],
       "^.+\\.js$": "babel-jest",
       "\\.(css|styl|less|sass)$": "<rootDir>/config/jest/styles.transform.js",
       "\\.(jpg|jpeg|svg|png|woff|woff2|ttf|eot|gif|webp)$": "<rootDir>/config/jest/files.transform.js"
@@ -170,6 +185,9 @@
       "^\\@account(.*)": "<rootDir>/pkg/webui/account$1",
       "^\\@assets(.*)": "<rootDir>/pkg/webui/assets$1"
     },
+    "transformIgnorePatterns": [
+      "/node_modules/(?!(unicode-properties|unicode-trie)/)"
+    ],
     "testEnvironment": "jest-environment-jsdom"
   },
   "eslintConfig": {
