@@ -201,7 +201,7 @@ const UsersTable = () => {
           width: 15,
           render: date => <DateTime.Relative value={date} />,
         },
-        ...state,
+        state,
         {
           name: 'actions',
           displayName: sharedMessages.actions,

@@ -128,8 +128,10 @@ describe('End device repository claiming', () => {
     cy.get('#sidebar').within(() => {
       cy.findByRole('link', { name: /End devices/ }).click()
     })
-    cy.findByText(device1.id).should('be.visible')
-    cy.findByText(device2.id).should('be.visible')
+    cy.findByRole('rowgroup').within(() => {
+      cy.findByText(device1.id).should('be.visible')
+      cy.findByText(device2.id).should('be.visible')
+    })
   })
 
   it('succeeds claiming a multiple devices using manual type specification', () => {
@@ -251,8 +253,10 @@ describe('End device repository claiming', () => {
     cy.get('#sidebar').within(() => {
       cy.findByRole('link', { name: /End devices/ }).click()
     })
-    cy.findByText(device1.id).should('be.visible')
-    cy.findByText(device2.id).should('be.visible')
-    cy.findByText(device3.id).should('be.visible')
+    cy.findByRole('rowgroup').within(() => {
+      cy.findByText(device1.id).should('be.visible')
+      cy.findByText(device2.id).should('be.visible')
+      cy.findByText(device3.id).should('be.visible')
+    })
   })
 })
